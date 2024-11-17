@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password/Code Toggle Button</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f4f8;
+            margin: 0;
+
+        }
+        .toggle-container {
+            position: relative;
+            width: 400px;
+            height: 60px;
+            background-color: grey;
+            border-radius: 35px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .toggle-container input[type="radio"] {
+            display: none;
+        }
+        .toggle-button {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            line-height: 60px; /* Center text vertically */
+            color: white;
+            opacity: 0.25;
+            transition: width 0.5s ease-in-out, opacity 0.3s ease-in-out;
+            z-index: 1;
+            font-size: 16px;
+            cursor: pointer; /* Change cursor to pointer */
+            font-family: 'Mulish',sans-serif;
+        }
+
+        .toggle-button.password {
+            left: 0;
+            width: 75%; /* Initial width */
+            text-align: center;
+        }
+        .toggle-button.code {
+            right: 0;
+            width: 25%; /* Initial width */
+            text-align: center;
+        }
+        .toggle-container .slider {
+            position: absolute;
+            background-color: green;
+            border-radius: 50px;
+            width: 75%;
+            height: 100%;
+            transition: all 0.5s ease-in-out;
+            z-index: 0;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2),
+                        inset 0 -2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        #password:checked ~ .slider {
+            left: 0;
+        }
+        #code:checked ~ .slider {
+            left: 25%;
+        }
+        #password:checked ~ .toggle-button.password {
+            opacity: 1;
+            width: 75%; /* Reduced width when selected */
+        }
+        #password:checked ~ .toggle-button.code {
+            opacity: 0.25;
+            width: 25%; /* Expanded width when the other option is selected */
+        }
+        #code:checked ~ .toggle-button.code {
+            opacity: 1;
+            width: 75%; /* Reduced width when selected */
+        }
+        #code:checked ~ .toggle-button.password {
+            opacity: 0.25;
+            width: 25%; /* Expanded width when the other option is selected */
+        }
+
+        /* New Button Styles */
+        .login-button-75, .code-button-75 {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 16px;
+            line-height: 50px;
+            text-align: center;
+            background-color: green;
+            box-shadow: 0 5px 6px rgba(0, 0, 0, 0.4), inset 0 -2px 1px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.5s ease-in-out;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .login-button-75 {
+            width: 75%;
+            left: 0;
+            font-size:18px;
+        }
+
+        .login-button-75:hover {
+        border: 5px #14ff00 outset;
+        line-height: 50px;
+        }
+        .code-button-75 {
+            width: 75%;
+            right: 0;
+            opacity: 0;
+            font-size:18px;
+        }
+        .hidden {
+            display: none;
+        }
+
+
+    </style>
+</head>
+<body>
+<h1>Hello</h1>
+    <div class="toggle-container">
+        <input type="radio" id="password" name="toggle" checked>
+        <input type="radio" id="code" name="toggle">
+        <div class="toggle-button password">🔑 Pass</div>
+        <div class="toggle-button code">🕵️‍♂️ Code</div>
+        <div class="slider"></div>
+        <input type="submit" id="submit-password-button" value="Login with Password" class="login-button-75">
+        <input type="submit" id="send-code-button" value="Send Login Code" class="code-button-75 hidden">
+    </div>
+
+    <script>
+    // Add event listeners to all elements with the class 'toggle-button'
+
+    document.querySelectorAll('.toggle-button').forEach(button => {
+        button.addEventListener('click', () => {
+            // Check which button was clicked and update the corresponding radio button
+            if (button.classList.contains('password')) {
+                document.getElementById('password').checked = true; // Set the 'password' radio button as checked
+            } else {
+                document.getElementById('code').checked = true; // Set the 'code' radio button as checked
+            }
+            // Update button visibility based on the selected radio button
+            updateButtonVisibility();
+        });
+    });
+
+   // Function to update the visibility of the submit buttons
+    function updateButtonVisibility() {
+        // Get references to the submit buttons
+        const submitButton = document.getElementById('submit-password-button');
+        const codeButton = document.getElementById('send-code-button');
+
+        // Check if the 'password' radio button is selected
+        if (document.getElementById('password').checked) {
+           codeButton.classList.add('hidden');
+           codeButton.style.opacity = '0';
+           setTimeout(() => {
+             submitButton.classList.remove('hidden');
+             submitButton.style.opacity = '1';
+                        }, 1000); // 1 second delay
+
+
+        } else {
+
+                   submitButton.style.opacity = '0';
+            submitButton.classList.add('hidden');
+
+        setTimeout(() => {
+
+            codeButton.classList.remove('hidden');
+            codeButton.style.opacity = '1';
+                                    }, 1000); // 1 second delay
+
+        }
+    }
+
+    // Initial setup of button visibility based on the default radio button state
+    updateButtonVisibility();
+</script>
+
+
+</body>
+</html>
