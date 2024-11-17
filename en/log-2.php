@@ -1,5 +1,4 @@
 <?php
-
 ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
@@ -35,59 +34,52 @@ if ($is_logged_in) {
     $thumbnail_file_sizes = [];
 
     if (isset($_GET['id'])) {
-    $ecobrick_unique_id = (int)$_GET['id'];
+        $ecobrick_unique_id = (int)$_GET['id'];
 
-    // Log the ecobrick_unique_id to ensure it's retrieved correctly
-    error_log("Ecobrick ID retrieved: " . $ecobrick_unique_id);
+        // Log the ecobrick_unique_id to ensure it's retrieved correctly
+        error_log("Ecobrick ID retrieved: " . $ecobrick_unique_id);
 
-    // Check if the ecobrick has already been processed
-    $status_check_stmt = $gobrik_conn->prepare("SELECT status FROM tb_ecobricks WHERE ecobrick_unique_id = ?");
-    if ($status_check_stmt) {
-        $status_check_stmt->bind_param("i", $ecobrick_unique_id);
-        $status_check_stmt->execute();
-        $status_check_stmt->bind_result($status);
-        $status_check_stmt->fetch();
-        $status_check_stmt->close();
+        // Check if the ecobrick has already been processed
+        $status_check_stmt = $gobrik_conn->prepare("SELECT status FROM tb_ecobricks WHERE ecobrick_unique_id = ?");
+        if ($status_check_stmt) {
+            $status_check_stmt->bind_param("i", $ecobrick_unique_id);
+            $status_check_stmt->execute();
+            $status_check_stmt->bind_result($status);
+            $status_check_stmt->fetch();
+            $status_check_stmt->close();
 
-//         // Log the status for debugging
-//         if (isset($status)) {
-//             error_log("Ecobrick status retrieved: " . $status);
-//         } else {
-//             error_log("No status found for ecobrick_unique_id: " . $ecobrick_unique_id);
-//         }
-
-        // If status is 'authenticated', show an alert and redirect
-        if ($status === "authenticated") {
-            echo "<script>
-                alert('This ecobrick has been authenticated and cannot be edited.  Please log another.');
-                window.location.href = 'log.php'; // Redirect to the logging page or any other appropriate page
-            </script>";
-            exit();
-        }
-    } else {
-        error_log("Error preparing status check statement: " . $gobrik_conn->error);
-    }
-
-    // Fetch the ecobrick details from the database if it has not been processed
-    if ($stmt = $gobrik_conn->prepare("SELECT universal_volume_ml, serial_no, density, weight_g FROM tb_ecobricks WHERE ecobrick_unique_id = ?")) {
-        $stmt->bind_param("i", $ecobrick_unique_id);
-        $stmt->execute();
-        $stmt->bind_result($universal_volume_ml, $serial_no, $density, $weight_g);
-        $stmt->fetch();
-
-        // Log the serial number to the error log
-        if (isset($serial_no)) {
-            error_log("Ecobrick Serial Number retrieved: " . $serial_no);
+            // If status is 'authenticated', show an alert and redirect
+            if ($status === "authenticated") {
+                if (ob_get_level() > 0) ob_end_clean();
+                echo "<script>
+                    alert('This ecobrick has been authenticated and cannot be edited.  Please log another.');
+                    window.location.href = 'log.php'; // Redirect to the logging page or any other appropriate page
+                </script>";
+                exit();
+            }
         } else {
-            error_log("Failed to retrieve ecobrick details for ecobrick_unique_id: " . $ecobrick_unique_id);
+            error_log("Error preparing status check statement: " . $gobrik_conn->error);
         }
 
-        $stmt->close();
-    } else {
-        error_log("Error preparing ecobrick details statement: " . $gobrik_conn->error);
-    }
-}
+        // Fetch the ecobrick details from the database if it has not been processed
+        if ($stmt = $gobrik_conn->prepare("SELECT universal_volume_ml, serial_no, density, weight_g FROM tb_ecobricks WHERE ecobrick_unique_id = ?")) {
+            $stmt->bind_param("i", $ecobrick_unique_id);
+            $stmt->execute();
+            $stmt->bind_result($universal_volume_ml, $serial_no, $density, $weight_g);
+            $stmt->fetch();
 
+            // Log the serial number to the error log
+            if (isset($serial_no)) {
+                error_log("Ecobrick Serial Number retrieved: " . $serial_no);
+            } else {
+                error_log("Failed to retrieve ecobrick details for ecobrick_unique_id: " . $ecobrick_unique_id);
+            }
+
+            $stmt->close();
+        } else {
+            error_log("Error preparing ecobrick details statement: " . $gobrik_conn->error);
+        }
+    }
 
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ecobrick_unique_id'])) {
         $ecobrick_unique_id = (int)$_POST['ecobrick_unique_id'];
@@ -95,12 +87,11 @@ if ($is_logged_in) {
         include '../scripts/photo-functions.php';
 
         $upload_dirs = [
-    "basic" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic/',
-    "basic-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic-thumb/',
-    "selfie" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie/',
-    "selfie-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie-thumb/'
-];
-
+            "basic" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic/',
+            "basic-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic-thumb/',
+            "selfie" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie/',
+            "selfie-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie-thumb/'
+        ];
 
         $db_fields = [];
         $db_values = [];
@@ -137,13 +128,11 @@ if ($is_logged_in) {
         }
 
         if (!empty($db_fields) && empty($error_message)) {
-            // Add 'status' to the fields being updated
             $fields_for_update = implode(", ", array_map(function($field) { return "{$field} = ?"; }, $db_fields));
             $fields_for_update .= ", status = ?";
             array_push($db_values, "step 2 complete");
             $db_types .= "s";
 
-            // Prepare and execute the update statement
             $update_sql = "UPDATE tb_ecobricks SET {$fields_for_update} WHERE ecobrick_unique_id = ?";
             $db_values[] = $ecobrick_unique_id;
             $db_types .= "i";
@@ -157,33 +146,29 @@ if ($is_logged_in) {
         }
 
         if (!empty($error_message)) {
-    if (ob_get_level() > 0) {
-        ob_end_clean(); // Clean output buffer before headers
+            if (ob_get_level() > 0) ob_end_clean();
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => "An error has occurred: " . $error_message . " END"]);
+            exit;
+        } else {
+            if (ob_get_level() > 0) ob_end_clean();
+            $response = [
+                'ecobrick_unique_id' => $ecobrick_unique_id,
+                'full_urls' => $full_urls,
+                'thumbnail_paths' => $thumbnail_paths,
+                'main_file_sizes' => $main_file_sizes,
+                'thumbnail_file_sizes' => $thumbnail_file_sizes
+            ];
+            header('Content-Type: application/json');
+            echo json_encode($response);
+            exit;
+        }
     }
-    http_response_code(400);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => "An error has occurred: " . $error_message . " END"]);
-    exit;
-} else {
-    if (ob_get_level() > 0) {
-        ob_end_clean(); // Clean output buffer before headers
-    }
-    $response = [
-        'ecobrick_unique_id' => $ecobrick_unique_id,
-        'full_urls' => $full_urls,
-        'thumbnail_paths' => $thumbnail_paths,
-        'main_file_sizes' => $main_file_sizes,
-        'thumbnail_file_sizes' => $thumbnail_file_sizes
-    ];
-    header('Content-Type: application/json');
-    echo json_encode($response);
-    exit;
-}
-
 
     echo "<script>var density = $density, volume = '$universal_volume_ml', weight = '$weight_g';</script>";
 } else {
-    // Redirect to login page with the redirect parameter if the user is not logged in
+    if (ob_get_level() > 0) ob_end_clean();
     header('Location: login.php?redirect=' . urlencode($page));
     exit();
 }
@@ -194,6 +179,7 @@ echo '<!DOCTYPE html>
 <meta charset="UTF-8">
 ';
 ?>
+
 
 <?php require_once ("../includes/log-2-inc.php");?>
 
