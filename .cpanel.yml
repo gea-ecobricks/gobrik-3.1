@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=${DEPLOYPATH:-$PWD}
+    - /bin/cp -R $DEPLOYPATH/en/* $DEPLOYPATH/fr/
+    - /bin/cp -R $DEPLOYPATH/en/* $DEPLOYPATH/es/
+    - /bin/cp -R $DEPLOYPATH/en/* $DEPLOYPATH/id/
