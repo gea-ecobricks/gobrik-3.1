@@ -1,4 +1,6 @@
 <?php
+
+ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
 // Set up page variables
@@ -155,25 +157,29 @@ if ($is_logged_in) {
         }
 
         if (!empty($error_message)) {
-            ob_end_clean(); // Clean the output buffer before sending headers
-            http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => "An error has occurred: " . $error_message . " END"]);
-            exit;
-        } else {
-            ob_end_clean(); // Clean the output buffer before sending headers
-            $response = [
-                'ecobrick_unique_id' => $ecobrick_unique_id,
-                'full_urls' => $full_urls,
-                'thumbnail_paths' => $thumbnail_paths,
-                'main_file_sizes' => $main_file_sizes,
-                'thumbnail_file_sizes' => $thumbnail_file_sizes
-            ];
-            header('Content-Type: application/json');
-            echo json_encode($response);
-            exit;
-        }
+    if (ob_get_level() > 0) {
+        ob_end_clean(); // Clean output buffer before headers
     }
+    http_response_code(400);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => "An error has occurred: " . $error_message . " END"]);
+    exit;
+} else {
+    if (ob_get_level() > 0) {
+        ob_end_clean(); // Clean output buffer before headers
+    }
+    $response = [
+        'ecobrick_unique_id' => $ecobrick_unique_id,
+        'full_urls' => $full_urls,
+        'thumbnail_paths' => $thumbnail_paths,
+        'main_file_sizes' => $main_file_sizes,
+        'thumbnail_file_sizes' => $thumbnail_file_sizes
+    ];
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
+}
+
 
     echo "<script>var density = $density, volume = '$universal_volume_ml', weight = '$weight_g';</script>";
 } else {
