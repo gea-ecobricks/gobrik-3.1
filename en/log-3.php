@@ -7,29 +7,8 @@ $version = '0.446';
 $page = 'log-3';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// Initialize user variables
-$first_name = '';
-$buwana_id = '';
-$country_icon = '';
-$watershed_id = '';
-$watershed_name = '';
-$is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
+startSecureSession(); // Start a secure session with regeneration to prevent session fixation
 
-
-// Check if the request method is POST and the action is skip (AJAX request handling)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'skip' && isset($_POST['ecobrick_unique_id'])) {
-    header('Content-Type: application/json'); // Set response headers for JSON response
-
-    $ecobrick_unique_id = (int)$_POST['ecobrick_unique_id'];
-
-    // Update the status of the ecobrick to 'Awaiting validation'
-    if (setEcobrickStatus('Awaiting validation', $ecobrick_unique_id)) {
-        echo json_encode(['success' => true, 'message' => 'Status updated to Awaiting validation.']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to update status.']);
-    }
-    exit(); // Exit to prevent the rest of the script from running
-}
 
 // Check if user is logged in and session active
 if ($is_logged_in) {
@@ -96,9 +75,27 @@ if ($is_logged_in) {
     }
 } else {
     // Redirect to login page with the redirect parameter set to the current page
-    header('Location: login.php?redirect=' . urlencode($page));
+    header('Location: login.php?redirect=log.php');
     exit();
 }
+
+
+// Check if the request method is POST and the action is skip (AJAX request handling)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'skip' && isset($_POST['ecobrick_unique_id'])) {
+    header('Content-Type: application/json'); // Set response headers for JSON response
+
+    $ecobrick_unique_id = (int)$_POST['ecobrick_unique_id'];
+
+    // Update the status of the ecobrick to 'Awaiting validation'
+    if (setEcobrickStatus('Awaiting validation', $ecobrick_unique_id)) {
+        echo json_encode(['success' => true, 'message' => 'Status updated to Awaiting validation.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to update status.']);
+    }
+    exit(); // Exit to prevent the rest of the script from running
+}
+
+
 
 echo '<!DOCTYPE html>
 <html lang="' . $lang . '">
