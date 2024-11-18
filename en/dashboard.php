@@ -69,11 +69,13 @@ $location_parts = explode(',', $location_full_txt);
 $location_parts = array_map('trim', $location_parts); // Trim whitespace from each part
 $location_last = $location_parts[count($location_parts) - 1] ?? '';
 $location_third_last = $location_parts[count($location_parts) - 3] ?? '';
-$locationFullTxt = $location_third_last . ', ' . $location_last;
+$locationFullTxt = 'nothing';
 
     // Close the database connections
     $buwana_conn->close();
     $gobrik_conn->close();
+
+
 } else {
     // Redirect to login page with the redirect parameter set to the current page
     echo '<script>
