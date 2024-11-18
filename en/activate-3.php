@@ -228,21 +228,22 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     </div>
 
-    <!-- COMMUNITY FIELD -->
-    <div class="form-item" id="community-section" style="display: none; margin-top:20px;">
-        <label for="community_name" data-lang-id="012-community-name">Select and confirm your GoBrik community:</label><br>
-        <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
-               placeholder="Type your community" style="width: 100%; padding: 10px;"
-               value="<?php echo htmlspecialchars($pre_community); ?>">
-        <datalist id="community_list">
-            <?php foreach ($communities as $community) : ?>
-                <option value="<?php echo htmlspecialchars($community); ?>" <?php echo ($community === $pre_community) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($community); ?>
-                </option>
-            <?php endforeach; ?>
-        </datalist>
-        <p class="form-caption" data-lang-id="012-community-caption">Start typing to see and select a community.  Only GoBrik 2.0 currently available.  Soon you'll be able to add a new community!</p>
-    </div>
+   <!-- COMMUNITY FIELD -->
+<div class="form-item" id="community-section" style="display: none; margin-top:20px;">
+    <label for="community_name" data-lang-id="012-community-name">Select and confirm your GoBrik community:</label><br>
+    <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
+           placeholder="Type your community" style="width: 100%; padding: 10px;"
+           value="<?php echo htmlspecialchars($pre_community ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <datalist id="community_list">
+        <?php foreach ($communities as $community) : ?>
+            <option value="<?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>" <?php echo (isset($pre_community) && $community === $pre_community) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+        <?php endforeach; ?>
+    </datalist>
+    <p class="form-caption" data-lang-id="012-community-caption">Start typing to see and select a community. Only GoBrik 2.0 currently available. Soon you'll be able to add a new community!</p>
+</div>
+
 
     <!-- SUBMIT SECTION -->
     <div id="submit-section" style="text-align: center; margin-top: 25px; display: none;" data-lang-id="016-next-button">
