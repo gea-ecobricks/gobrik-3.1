@@ -3,17 +3,18 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
-$version = '0.447';
+$version = '0.448';
 $page = 'log-3';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-startSecureSession(); // Start a secure session with regeneration to prevent session fixation
+// Start the secure session
+startSecureSession();
 
 // Define $is_logged_in based on session state
 $is_logged_in = isLoggedIn();
 
 // Ensure the user is logged in
-if (!isset($is_logged_in) || !$is_logged_in) {
+if (!$is_logged_in) {
     header('Location: login.php?redirect=log.php');
     exit();
 }
