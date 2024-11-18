@@ -300,7 +300,7 @@ echo '
 
 		';
 		}
-		$conn->close();
+		$gobrik_conn->close();
 
 		?>
 
