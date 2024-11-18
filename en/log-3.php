@@ -1,23 +1,17 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
+// Ensure the user is logged in (handled by $is_logged_in from helper)
+if (!$is_logged_in) {
+    header('Location: login.php?redirect=log.php');
+    exit();
+}
+
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
 $version = '0.448';
 $page = 'log-3';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
-
-// Start the secure session
-startSecureSession();
-
-// Define $is_logged_in based on session state
-$is_logged_in = isLoggedIn();
-
-// Ensure the user is logged in
-if (!$is_logged_in) {
-    header('Location: login.php?redirect=log.php');
-    exit();
-}
 
 // Include database connections
 require_once '../gobrikconn_env.php';
@@ -26,11 +20,20 @@ require_once '../buwanaconn_env.php';
  // Fetch the user's location data
     $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
 
+    // Fetch the user's location data
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
     $gea_status = getGEA_status($buwana_id);
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $ecobrick_unique_id = '';
+    $first_name = getFirstName($buwana_conn, $buwana_id);
+
+    $error_message = '';
+    $full_urls = [];
+    $thumbnail_paths = [];
+    $main_file_sizes = [];
+    $thumbnail_file_sizes = [];
 
 // Validate ecobrick ID
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
