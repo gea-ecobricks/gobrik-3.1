@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Encodes data to a URL-safe Base64 format.
  * 
@@ -10,20 +9,11 @@ function base64UrlEncode($data) {
     return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
 }
 
-
-// // Base64Url Encode function (defined outside for global use)
-// function base64UrlEncode($data) {
-//     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-// }
-
 /**
  * Creates a JWT token for Ghost Admin API authentication.
- * 
  * @return string JWT token.
  * @throws Exception if the API key is not found or invalid.
  */
-
-
 
 function createGhostJWT() {
     // Retrieve the API key from the environment variable

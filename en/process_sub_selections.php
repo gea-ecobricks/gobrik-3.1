@@ -1,8 +1,6 @@
 <?php
+ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 require_once("../buwanaconn_env.php");
 require_once("../gobrikconn_env.php");
@@ -92,5 +90,5 @@ if ($buwana_id) {
 // Redirect the user to the login page with the required parameters after processing
 header('Location: login.php?status=firsttime&id=' . urlencode($buwana_id));
 exit();
-
+ob_end_flush(); // Flush the buffer and send output
 ?>
