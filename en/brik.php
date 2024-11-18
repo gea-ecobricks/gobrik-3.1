@@ -256,7 +256,57 @@ $gobrik_conn->close();
 				</div>
 			</div>
 			' ;
-			?>
+				}
+
+
+} else {
+
+
+
+echo '
+<div class="splash-content-block">
+		<div class="splash-box">
+			<div class="splash-heading">';
+
+			echo 'Sorry! :-(</div>
+			<div class="splash-sub" data-lang-id="151x">No results for ecobrick '. $serialNo .' in the Brikchain.  Most likely this is because the Brikchain data is still in migration.</div>
+		</div>
+		<div class="splash-image"><img src="../webp/empty-ecobrick-450px.webp?v2" style="width: 80%; margin-top:20px;" alt="empty ecobrick"></div>
+	</div>
+	<div id="splash-bar"></div>
+
+	<a name="top"></a>
+
+	<div id="main-content">
+		<div class="row">
+			<div class="main">
+				<br><br>
+
+
+
+			<div class="ecobrick-data">
+			<p data-lang-id="152x">🚧 The data for ecobrick '. $serialNo .' has not yet been migrated to the blockchain.  This could be because of transfer delay.  Normally publishing occurs within 30 seconds of authentication.  If more than 24hrs has passed, an error has occurred or this ecobrick was not authenticated.
+				</p></div><br><br><br><br>
+
+				<div class="page-paragraph">
+				<p><h3 data-lang-id="154">The Brikchain</h3></p>
+
+				<p data-lang-id="155">When an ecobrick is authenticated, it is published to the brikcoin manual blockchain and coins are issued according to its ecological value.  This is what we call the Brikchain.  On the Brikchain, you can find authenticated ecobricks, blocks and transactions that underpin the Brickoin complimentary currency.</p>
+
+			<p data-lang-id="156">As a non-capital, manual process, Brikcoins favors anyone anywhere willing to work with their hands to make a meaningful ecological contribution.</p>
+				<br>
+				<p><a class="action-btn-blue" href="brikchain.php" data-lang-id="157">🔎 Browse the Brikchain</a></p>
+				<p style="font-size: 0.85em; margin-top:20px;" data-lang-id="158">The live chain of transactions and ecobricks.</a></p>
+				</div>
+			</div>
+
+			<div class="side">
+
+		';
+		}
+		$conn->close();
+
+		?>
 
 			<!--
 
