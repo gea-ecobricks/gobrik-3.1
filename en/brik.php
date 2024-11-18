@@ -205,6 +205,50 @@ $gobrik_conn->close();
 
 
 
+<div id="data-chunk">
+				<div class="ecobrick-data">
+					<p style="margin-left: -32px;font-weight: bold;" data-lang-id="125"> +++ Raw Brikchain Data Record</p><br>
+					<p>--------------------</p>
+					<p data-lang-id="126">BEGIN BRIK RECORD ></p>';
+
+			echo ' <p><b data-lang-id="127">Logged:</b> ' . $array["date_logged_ts"] .'</p>' ;
+			echo ' <p><b data-lang-id="128">Volume:</b> <var>'. $array["volume_ml"] .' &#8202;ml</var></p>' ;
+			echo ' <p><b data-lang-id="129">Weight:</b> <var>' . $array["weight_g"] .'&#8202;g</var></p>' ;
+			echo ' <p><b data-lang-id="130">Density:</b> <var>' . $array["density"] .'&#8202;g/ml</var></p>' ;
+			echo ' <p><b data-lang-id="131">CO2e:</b><var>' . $array["CO2_kg"] .' &#8202;kg</var></p>' ;
+			echo ' <p><b data-lang-id="132">Brikcoin value:</b> <var>' . $array["ecobrick_dec_brk_val"] .'&#8202;ß</var></p>' ;
+
+			echo ' <p><b data-lang-id="133">Maker:</b> <var><i>' . $array["owner"] .'</i></var> </p>' ;
+			echo ' <p><b data-lang-id="134">Sequestration:</b> <var>' . $array["sequestration_type"].'</var></p>' ;
+			echo ' <p><b data-lang-id="135">Brand:</b> <var>' . $array["brand_name"] .'</var></p>' ;
+			echo ' <p><b data-lang-id="136">Bottom colour:</b> ' . $array["bottom_colour"] .'</p>' ;
+
+			echo ' <p><b data-lang-id="137">Plastic source:</b>' . $array["plastic_from"] .'</p>' ;
+
+			echo ' <p><b data-lang-id="138">Community:</b> <var>' . $array["community_name"] .'</var></p>' ;
+			echo ' <p><b data-lang-id="139">City:</b> <var>' . $array["location_city"] .'</var></p>' ;
+			echo ' <p><b data-lang-id="140">Region:</b> <var>' . $array["location_region"] .'</var></p>' ;
+			echo ' <p><b data-lang-id="141">Country:</b> ' . $array["location_country"] .'</p>' ;
+			echo ' <p><b data-lang-id="142">Full location:</b> <var>' . $array["location_full"] .'</var></p>' ;
+
+
+			echo ' <p><b data-lang-id="143">Validation:</b> ' . $array["last_validation_ts"] .'</var></p>' ;
+			echo ' <p><b data-lang-id="144">Validator 1:</b> <var>' . $array["validator_1"] .'</var> </p>' ;
+			echo ' <p><b data-lang-id="145">Validator 2:</b> <var>' . $array["validator_2"] .'</var> </p>' ;
+			echo ' <p><b data-lang-id="146">Validator 3:</b> <var>' . $array["validator_3"] .'</var> </p>' ;
+			echo ' <p><b data-lang-id="147">Validation score avg.:</b> <var>' . $array["validation_score_avg"] .'</var></p>' ;
+        echo ' <p><b data-lang-id="147b">Catalyst:</b> <var>' . $array["catalyst"] .'</var></p>' ;
+
+			echo ' <p><b data-lang-id="148">Validation score final:</b> <var>' . $array["final_validation_score"] .'</var></p>' ;
+			echo ' <p><b data-lang-id="149">Authenticated weight:</b> <var> ' . $array["weight_authenticated_kg"] .'&#8202;kg</p>
+			<p data-lang-id="150"> ||| END RECORD.</p>
+				</div>
+			</div>
+			' ;
+
+			<!--
+
+
             <table id="singleEcobrickTable" class="display">
                 <thead>
                     <tr>
@@ -240,7 +284,7 @@ $gobrik_conn->close();
                 </tbody>
             </table>
 
-
+-->
 
 
 
