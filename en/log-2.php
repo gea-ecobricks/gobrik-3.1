@@ -1,21 +1,13 @@
 <?php
+ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
-// Ensure the user is logged in (handled by $is_logged_in from helper)
-if (!$is_logged_in) {
-    header('Location: login.php?redirect=log.php');
-    exit();
-}
-
 // Set up page variables
-$lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
-$version = '0.448';
-$page = 'log-3';
+$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
+$version = '0.582';
+$page = 'log-2';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// Include database connections
-require_once '../gobrikconn_env.php';
-require_once '../buwanaconn_env.php';
 
 // PART 2: Check if user is logged in and session active
 if ($is_logged_in) {
@@ -94,11 +86,11 @@ if ($is_logged_in) {
         include '../scripts/photo-functions.php';
 
         $upload_dirs = [
-    "basic" => '../briks/2024/basic/',
-    "basic-thumb" => '../briks/2024/basic-thumb/',
-    "selfie" => '../briks/2024/selfie/',
-    "selfie-thumb" => '../briks/2024/selfie-thumb/'
-];
+            "basic" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic/',
+            "basic-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic-thumb/',
+            "selfie" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie/',
+            "selfie-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie-thumb/'
+        ];
 
         $db_fields = [];
         $db_values = [];
