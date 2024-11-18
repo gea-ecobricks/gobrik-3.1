@@ -23,11 +23,12 @@ if (!$is_logged_in) {
 require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
 
-// Retrieve user details
-$buwana_id = $_SESSION['buwana_id'] ?? '';
-$country_icon = getUserContinent($buwana_conn, $buwana_id);
-$watershed_name = getWatershedName($buwana_conn, $buwana_id, $lang);
-$first_name = getUserFirstName($buwana_conn, $buwana_id);
+ // Fetch the user's location data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 
 // Validate ecobrick ID
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
