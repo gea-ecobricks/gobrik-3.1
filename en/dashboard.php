@@ -60,11 +60,16 @@ if ($is_logged_in) {
     $net_density = $total_volume_ml > 0 ? ($total_weight_kg * 1000) / $total_volume_ml : 0; // Convert weight back to grams for density calculation
 
     // Process locationFullTxt by extracting the last and third-last elements
-    $location_parts = explode(',', $location_full_txt);
-    $location_parts = array_map('trim', $location_parts); // Trim whitespace from each part
-    $location_last = $location_parts[count($location_parts) - 1] ?? '';
-    $location_third_last = $location_parts[count($location_parts) - 3] ?? '';
-    $locationFullTxt = $location_third_last . ', ' . $location_last;
+    // Ensure $location_full_txt is a string
+$location_full_txt = $location_full_txt ?? ''; // Default to an empty string if null
+
+// Process locationFullTxt by extracting the last and third-last elements
+$location_parts = explode(',', $location_full_txt);
+$location_parts = array_map('trim', $location_parts); // Trim whitespace from each part
+$location_last = $location_parts[count($location_parts) - 1] ?? '';
+$location_third_last = $location_parts[count($location_parts) - 3] ?? '';
+$locationFullTxt = $location_third_last . ', ' . $location_last;
+
 
     // Close the database connections
     $buwana_conn->close();
@@ -388,11 +393,11 @@ function mainGreeting() {
 // Secondary greeting function to provide additional dynamic content
 function secondaryGreeting() {
     // Retrieve the language setting from the server-side PHP variable
-    const lang = '<?php echo htmlspecialchars($lang); ?>';
-    const ecobricksMade = <?php echo (int) $ecobricks_made; ?>;
-    const locationFullTxt = '<?php echo htmlspecialchars($user_location_full); ?>';
-    const totalWeight = '<?php echo number_format($total_weight_kg, 1); ?>';
-    const netDensity = '<?php echo number_format($net_density, 2); ?>';
+    const lang = '<?php echo htmlspecialchars($lang ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+    const ecobricksMade = <?php echo (int)($ecobricks_made ?? 0); ?>;
+    const locationFullTxt = '<?php echo htmlspecialchars($user_location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>';
+    const totalWeight = '<?php echo number_format($total_weight_kg ?? 0, 1); ?>';
+    const netDensity = '<?php echo number_format($net_density ?? 0, 2); ?>';
 
     // Determine the appropriate language object based on the current language setting
     let translations;
