@@ -2,107 +2,111 @@
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
 // Set up page variables
-$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.446';
+$lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
+$version = '0.447';
 $page = 'log-3';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 startSecureSession(); // Start a secure session with regeneration to prevent session fixation
 
+// Define $is_logged_in based on session state
+$is_logged_in = isLoggedIn();
 
-// Check if user is logged in and session active
-if ($is_logged_in) {
-    $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
-
-    // Include database connection
-    require_once '../gobrikconn_env.php';
-    require_once '../buwanaconn_env.php';
-
-    // Fetch the user's continent icon
-    $country_icon = getUserContinent($buwana_conn, $buwana_id);
-    $watershed_name = getWatershedName($buwana_conn, $buwana_id, $lang); // Corrected to include the $lang parameter
-
-    // Fetch the user's first name from the database
-    $first_name = getUserFirstName($buwana_conn, $buwana_id);
-
-    if (isset($_GET['id'])) {
-        $ecobrick_unique_id = (int)$_GET['id'];
-
-        // Check if the ecobrick has already been processed
-        $status_check_stmt = $gobrik_conn->prepare("SELECT status FROM tb_ecobricks WHERE ecobrick_unique_id = ?");
-        $status_check_stmt->bind_param("i", $ecobrick_unique_id);
-        $status_check_stmt->execute();
-        $status_check_stmt->bind_result($status);
-        $status_check_stmt->fetch();
-        $status_check_stmt->close();
-
-        // If status is 'Awaiting validation', show an alert and redirect to the dashboard
-        if ($status === "Awaiting validation") {
-            echo "<script>
-                alert('Oops! It looks like this ecobrick has already had its serial generated and logged. Please log another ecobrick or manage it on your dashboard.');
-                window.location.href = 'dashboard.php'; // Redirect to the dashboard
-            </script>";
-            exit();
-        }
-
-
-        // Fetch the ecobrick details from the database
-        $sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url
-                FROM tb_ecobricks
-                WHERE ecobrick_unique_id = ?";
-        $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("i", $ecobrick_unique_id);
-        $stmt->execute();
-        $stmt->store_result(); // Store result to check number of rows
-
-        if ($stmt->num_rows > 0) {
-            // Ecobrick found, fetch its data
-            $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url);
-            $stmt->fetch();
-            $stmt->close();
-        } else {
-            // No ecobrick found, show alert and redirect
-            $alert_message = getNoEcobrickAlert($lang);
-            echo "<script>
-                alert('" . addslashes($alert_message) . "');
-                window.location.href = 'log.php';
-            </script>";
-            exit;
-        }
-    } else {
-        echo "No ecobrick ID provided.";
-        exit();
-    }
-} else {
-    // Redirect to login page with the redirect parameter set to the current page
+// Ensure the user is logged in
+if (!isset($is_logged_in) || !$is_logged_in) {
     header('Location: login.php?redirect=log.php');
     exit();
 }
 
+// Include database connections
+require_once '../gobrikconn_env.php';
+require_once '../buwanaconn_env.php';
 
-// Check if the request method is POST and the action is skip (AJAX request handling)
+// Retrieve user details
+$buwana_id = $_SESSION['buwana_id'] ?? '';
+$country_icon = getUserContinent($buwana_conn, $buwana_id);
+$watershed_name = getWatershedName($buwana_conn, $buwana_id, $lang);
+$first_name = getUserFirstName($buwana_conn, $buwana_id);
+
+// Validate ecobrick ID
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $ecobrick_unique_id = (int)$_GET['id'];
+} else {
+    echo "Invalid or missing ecobrick ID.";
+    exit();
+}
+
+// Check ecobrick status
+$status_check_stmt = $gobrik_conn->prepare("SELECT status FROM tb_ecobricks WHERE ecobrick_unique_id = ?");
+if (!$status_check_stmt) {
+    error_log("Failed to prepare status check statement: " . $gobrik_conn->error);
+    echo "An error occurred. Please try again later.";
+    exit();
+}
+$status_check_stmt->bind_param("i", $ecobrick_unique_id);
+$status_check_stmt->execute();
+$status_check_stmt->bind_result($status);
+$status_check_stmt->fetch();
+$status_check_stmt->close();
+
+// Redirect if status is 'Awaiting validation'
+if ($status === "Awaiting validation") {
+    echo "<script>
+        alert('Oops! This ecobrick has already had its serial generated and logged. Please log another ecobrick or manage it on your dashboard.');
+        window.location.href = 'dashboard.php';
+    </script>";
+    exit();
+}
+
+// Fetch ecobrick details
+$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url
+        FROM tb_ecobricks
+        WHERE ecobrick_unique_id = ?";
+$stmt = $gobrik_conn->prepare($sql);
+if (!$stmt) {
+    error_log("Failed to prepare ecobrick detail statement: " . $gobrik_conn->error);
+    echo "An error occurred. Please try again later.";
+    exit();
+}
+$stmt->bind_param("i", $ecobrick_unique_id);
+if ($stmt->execute()) {
+    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url);
+    if (!$stmt->fetch()) {
+        // No ecobrick found
+        $alert_message = getNoEcobrickAlert($lang);
+        echo "<script>
+            alert(" . json_encode($alert_message) . ");
+            window.location.href = 'log.php';
+        </script>";
+        exit();
+    }
+    $stmt->close();
+} else {
+    error_log("Error executing query: " . $stmt->error);
+    echo "An error occurred while fetching ecobrick details.";
+    exit();
+}
+
+// Handle POST AJAX skip action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'skip' && isset($_POST['ecobrick_unique_id'])) {
-    header('Content-Type: application/json'); // Set response headers for JSON response
+    header('Content-Type: application/json');
 
     $ecobrick_unique_id = (int)$_POST['ecobrick_unique_id'];
-
-    // Update the status of the ecobrick to 'Awaiting validation'
     if (setEcobrickStatus('Awaiting validation', $ecobrick_unique_id)) {
         echo json_encode(['success' => true, 'message' => 'Status updated to Awaiting validation.']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to update status.']);
     }
-    exit(); // Exit to prevent the rest of the script from running
+    exit();
 }
 
-
-
 echo '<!DOCTYPE html>
-<html lang="' . $lang . '">
+<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
 <head>
 <meta charset="UTF-8">
 ';
 ?>
+
 
 
 
