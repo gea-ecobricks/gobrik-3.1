@@ -10,8 +10,6 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 startSecureSession(); // Start a secure session with regeneration to prevent session fixation
 
 
-
-
 // Check if user is logged in and session active
 if ($is_logged_in) {
     $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
@@ -61,7 +59,7 @@ if ($is_logged_in) {
     // Calculate net density (total weight divided by total volume)
     $net_density = $total_volume_ml > 0 ? ($total_weight_kg * 1000) / $total_volume_ml : 0; // Convert weight back to grams for density calculation
 
-// Ensure $location_full_txt is a string
+    // Ensure $location_full_txt is a string
 $location_full_txt = $location_full_txt ?? ''; // Default to an empty string if null
 
 // Process locationFullTxt by extracting the last and third-last elements
@@ -69,13 +67,12 @@ $location_parts = explode(',', $location_full_txt);
 $location_parts = array_map('trim', $location_parts); // Trim whitespace from each part
 $location_last = $location_parts[count($location_parts) - 1] ?? '';
 $location_third_last = $location_parts[count($location_parts) - 3] ?? '';
-$locationFullTxt = 'nothing';
+$locationFullTxt = $location_third_last . ', ' . $location_last;
+
 
     // Close the database connections
     $buwana_conn->close();
     $gobrik_conn->close();
-
-
 } else {
     // Redirect to login page with the redirect parameter set to the current page
     echo '<script>
