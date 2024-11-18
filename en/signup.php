@@ -1,5 +1,6 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require_once '../buwanaconn_env.php'; // Sets up buwana_conn database connection
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
@@ -8,7 +9,6 @@ $page = 'signup';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 $is_logged_in = false; // Ensure not logged in for this page
-
 
 // Check if the user is logged in
 if (isLoggedIn()) {
@@ -19,19 +19,10 @@ if (isLoggedIn()) {
     exit();
 }
 
-// Echo the HTML structure
-echo '<!DOCTYPE html>
-<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
-<head>
-<meta charset="UTF-8">
-';
-
 $success = false;
 
+// Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-require_once '../buwanaconn_env.php'; // Sets up buwana_conn database connection
-
     // Retrieve form data and sanitize inputs
     $first_name = trim($_POST['first_name']);
     $credential = trim($_POST['credential']);
@@ -68,30 +59,35 @@ require_once '../buwanaconn_env.php'; // Sets up buwana_conn database connection
                     header("Location: signup-2.php?id=$buwana_id");
                     exit();
                 } else {
-                    // Log error
                     error_log("Error executing credential statement: " . $stmt_credential->error);
-                    echo "An error occurred while creating your account. Please try again.";
+                    $error_message = "An error occurred while creating your account. Please try again.";
                 }
                 $stmt_credential->close();
             } else {
-                // Log error
                 error_log("Error preparing credential statement: " . $buwana_conn->error);
-                echo "An error occurred while creating your account. Please try again.";
+                $error_message = "An error occurred while creating your account. Please try again.";
             }
         } else {
-            // Log error
             error_log("Error executing user statement: " . $stmt_user->error);
-            echo "An error occurred while creating your account. Please try again.";
+            $error_message = "An error occurred while creating your account. Please try again.";
         }
         $stmt_user->close();
     } else {
-        // Log error
         error_log("Error preparing user statement: " . $buwana_conn->error);
-        echo "An error occurred while creating your account. Please try again.";
+        $error_message = "An error occurred while creating your account. Please try again.";
     }
 
     $buwana_conn->close();
 }
+
+// Echo the HTML structure
+echo '<!DOCTYPE html>
+<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
+<head>
+<meta charset="UTF-8">
+';
+
+
 ?>
 
 
