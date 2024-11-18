@@ -86,11 +86,11 @@ if ($is_logged_in) {
         include '../scripts/photo-functions.php';
 
         $upload_dirs = [
-            "basic" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic/',
-            "basic-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic-thumb/',
-            "selfie" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie/',
-            "selfie-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie-thumb/'
-        ];
+    "basic" => '../briks/2024/basic/',
+    "basic-thumb" => '../briks/2024/basic-thumb/',
+    "selfie" => '../briks/2024/selfie/',
+    "selfie-thumb" => '../briks/2024/selfie-thumb/'
+];
 
         $db_fields = [];
         $db_values = [];
