@@ -203,8 +203,19 @@ if (!empty($selfie_photo_url)) {
 $gobrik_conn->close();
 ?>
 
+<?php
+// Get the contents from the Ecobrick table as an ordered View, using the serial_no from the URL.  See: https://www.w3schools.com/php/php_mysql_select_where.asp1
+	$serialNo = $_GET['serial_no'];
 
+	$sql = "SELECT * FROM tb_ecobricks WHERE serial_no = '" . $serialNo . "'";
 
+	$result = $conn->query($sql);
+	if ($result->num_rows > 0) {
+
+    while($array = $result->fetch_assoc()) {
+
+		echo
+		'
 <div id="data-chunk">
 				<div class="ecobrick-data">
 					<p style="margin-left: -32px;font-weight: bold;" data-lang-id="125"> +++ Raw Brikchain Data Record</p><br>
@@ -245,6 +256,7 @@ $gobrik_conn->close();
 				</div>
 			</div>
 			' ;
+			?>
 
 			<!--
 
