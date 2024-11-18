@@ -24,6 +24,8 @@ require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
 
  // Fetch the user's location data
+    $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
+
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
