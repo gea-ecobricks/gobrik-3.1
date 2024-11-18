@@ -1,184 +1,178 @@
 <?php
-ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
-// Set up page variables
-$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.582';
-$page = 'log-2';
-$lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
-
-startSecureSession(); // Start a secure session with regeneration to prevent session fixation
-
-// PART 2: Check if user is logged in and session active
-if ($is_logged_in) {
-    $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
-
-    // Include database connection
-    require_once '../gobrikconn_env.php';
-    require_once '../buwanaconn_env.php';
-
-    // Fetch the user's location data
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
-    $ecobrick_unique_id = '';
-    $first_name = getFirstName($buwana_conn, $buwana_id);
-
-    $error_message = '';
-    $full_urls = [];
-    $thumbnail_paths = [];
-    $main_file_sizes = [];
-    $thumbnail_file_sizes = [];
-
-    if (isset($_GET['id'])) {
-        $ecobrick_unique_id = (int)$_GET['id'];
-
-        // Log the ecobrick_unique_id to ensure it's retrieved correctly
-        error_log("Ecobrick ID retrieved: " . $ecobrick_unique_id);
-
-        // Check if the ecobrick has already been processed
-        $status_check_stmt = $gobrik_conn->prepare("SELECT status FROM tb_ecobricks WHERE ecobrick_unique_id = ?");
-        if ($status_check_stmt) {
-            $status_check_stmt->bind_param("i", $ecobrick_unique_id);
-            $status_check_stmt->execute();
-            $status_check_stmt->bind_result($status);
-            $status_check_stmt->fetch();
-            $status_check_stmt->close();
-
-            // If status is 'authenticated', show an alert and redirect
-            if ($status === "authenticated") {
-                if (ob_get_level() > 0) ob_end_clean();
-                echo "<script>
-                    alert('This ecobrick has been authenticated and cannot be edited.  Please log another.');
-                    window.location.href = 'log.php'; // Redirect to the logging page or any other appropriate page
-                </script>";
-                exit();
-            }
-        } else {
-            error_log("Error preparing status check statement: " . $gobrik_conn->error);
-        }
-
-        // Fetch the ecobrick details from the database if it has not been processed
-        if ($stmt = $gobrik_conn->prepare("SELECT universal_volume_ml, serial_no, density, weight_g FROM tb_ecobricks WHERE ecobrick_unique_id = ?")) {
-            $stmt->bind_param("i", $ecobrick_unique_id);
-            $stmt->execute();
-            $stmt->bind_result($universal_volume_ml, $serial_no, $density, $weight_g);
-            $stmt->fetch();
-
-            // Log the serial number to the error log
-            if (isset($serial_no)) {
-                error_log("Ecobrick Serial Number retrieved: " . $serial_no);
-            } else {
-                error_log("Failed to retrieve ecobrick details for ecobrick_unique_id: " . $ecobrick_unique_id);
-            }
-
-            $stmt->close();
-        } else {
-            error_log("Error preparing ecobrick details statement: " . $gobrik_conn->error);
-        }
-    }
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ecobrick_unique_id'])) {
-        $ecobrick_unique_id = (int)$_POST['ecobrick_unique_id'];
-        $serial_no = $_POST['serial_no']; // Ensure serial_no is passed from the previous step
-        include '../scripts/photo-functions.php';
-
-        $upload_dirs = [
-            "basic" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic/',
-            "basic-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic-thumb/',
-            "selfie" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie/',
-            "selfie-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie-thumb/'
-        ];
-
-        $db_fields = [];
-        $db_values = [];
-        $db_types = "";
-
-        $photo_fields = [
-            ["input" => "ecobrick_photo_main", "full" => "ecobrick_full_photo_url", "thumb" => "ecobrick_thumb_photo_url", "dir" => "basic", "thumb_dir" => "basic-thumb"],
-            ["input" => "selfie_photo_main", "full" => "selfie_photo_url", "thumb" => "selfie_thumb_url", "dir" => "selfie", "thumb_dir" => "selfie-thumb"]
-        ];
-
-        foreach ($photo_fields as $index => $fields) {
-            $file_input_name = $fields["input"];
-            if (isset($_FILES[$file_input_name]) && $_FILES[$file_input_name]['error'] == UPLOAD_ERR_OK) {
-                $file_extension = strtolower(pathinfo($_FILES[$file_input_name]['name'], PATHINFO_EXTENSION));
-                $new_file_name_webp = "ecobrick-{$serial_no}.webp";
-                $thumbnail_file_name_webp = "ecobrick-{$serial_no}.webp";
-                $targetPath = $upload_dirs[$fields["dir"]] . $new_file_name_webp;
-                $thumbnailPath = $upload_dirs[$fields["thumb_dir"]] . $thumbnail_file_name_webp;
-
-                if (resizeAndConvertToWebP($_FILES[$file_input_name]['tmp_name'], $targetPath, 1000, 88)) {
-                    createTrainingThumbnail($targetPath, $thumbnailPath, 250, 250, 77);
-                    $full_urls[] = $targetPath;
-                    $thumbnail_paths[] = $thumbnailPath;
-                    $main_file_sizes[] = filesize($targetPath) / 1024;
-                    $thumbnail_file_sizes[] = filesize($thumbnailPath) / 1024;
-
-                    array_push($db_fields, $fields["full"], $fields["thumb"]);
-                    array_push($db_values, $targetPath, $thumbnailPath);
-                    $db_types .= "ss";
-                } else {
-                    $error_message .= "Error processing image {$index}. Please try again.<br>";
-                }
-            }
-        }
-
-        if (!empty($db_fields) && empty($error_message)) {
-            $fields_for_update = implode(", ", array_map(function($field) { return "{$field} = ?"; }, $db_fields));
-            $fields_for_update .= ", status = ?";
-            array_push($db_values, "step 2 complete");
-            $db_types .= "s";
-
-            $update_sql = "UPDATE tb_ecobricks SET {$fields_for_update} WHERE ecobrick_unique_id = ?";
-            $db_values[] = $ecobrick_unique_id;
-            $db_types .= "i";
-
-            $update_stmt = $gobrik_conn->prepare($update_sql);
-            $update_stmt->bind_param($db_types, ...$db_values);
-            if (!$update_stmt->execute()) {
-                $error_message .= "Database update failed: " . $update_stmt->error;
-            }
-            $update_stmt->close();
-        }
-
-        if (!empty($error_message)) {
-            if (ob_get_level() > 0) ob_end_clean();
-            http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => "An error has occurred: " . $error_message . " END"]);
-            exit;
-        } else {
-            if (ob_get_level() > 0) ob_end_clean();
-            $response = [
-                'ecobrick_unique_id' => $ecobrick_unique_id,
-                'full_urls' => $full_urls,
-                'thumbnail_paths' => $thumbnail_paths,
-                'main_file_sizes' => $main_file_sizes,
-                'thumbnail_file_sizes' => $thumbnail_file_sizes
-            ];
-            header('Content-Type: application/json');
-            echo json_encode($response);
-            exit;
-        }
-    }
-
-    echo "<script>var density = $density, volume = '$universal_volume_ml', weight = '$weight_g';</script>";
-} else {
-    if (ob_get_level() > 0) ob_end_clean();
-    header('Location: login.php?redirect=' . urlencode($page));
+// Ensure the user is logged in (already checked in the helper)
+if (!$is_logged_in) {
+    header('Location: login.php?redirect=log.php');
     exit();
 }
 
+// Set up page variables
+$lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
+$version = '0.448';
+$page = 'log-2';
+$lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
+
+// Include database connections
+require_once '../gobrikconn_env.php';
+require_once '../buwanaconn_env.php';
+
+// Retrieve user-specific information
+$buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+$ecobrick_unique_id = '';
+$first_name = getFirstName($buwana_conn, $buwana_id);
+
+$error_message = '';
+$full_urls = [];
+$thumbnail_paths = [];
+$main_file_sizes = [];
+$thumbnail_file_sizes = [];
+
+if (isset($_GET['id'])) {
+    $ecobrick_unique_id = (int)$_GET['id'];
+
+    // Log the ecobrick_unique_id to ensure it's retrieved correctly
+    error_log("Ecobrick ID retrieved: " . $ecobrick_unique_id);
+
+    // Check if the ecobrick has already been processed
+    $status_check_stmt = $gobrik_conn->prepare("SELECT status FROM tb_ecobricks WHERE ecobrick_unique_id = ?");
+    if ($status_check_stmt) {
+        $status_check_stmt->bind_param("i", $ecobrick_unique_id);
+        $status_check_stmt->execute();
+        $status_check_stmt->bind_result($status);
+        $status_check_stmt->fetch();
+        $status_check_stmt->close();
+
+        // If status is 'authenticated', show an alert and redirect
+        if ($status === "authenticated") {
+            if (ob_get_level() > 0) ob_end_clean();
+            echo "<script>
+                alert('This ecobrick has been authenticated and cannot be edited. Please log another.');
+                window.location.href = 'log.php'; // Redirect to the logging page or any other appropriate page
+            </script>";
+            exit();
+        }
+    } else {
+        error_log("Error preparing status check statement: " . $gobrik_conn->error);
+    }
+
+    // Fetch the ecobrick details from the database if it has not been processed
+    if ($stmt = $gobrik_conn->prepare("SELECT universal_volume_ml, serial_no, density, weight_g FROM tb_ecobricks WHERE ecobrick_unique_id = ?")) {
+        $stmt->bind_param("i", $ecobrick_unique_id);
+        $stmt->execute();
+        $stmt->bind_result($universal_volume_ml, $serial_no, $density, $weight_g);
+        $stmt->fetch();
+
+        // Log the serial number to the error log
+        if (isset($serial_no)) {
+            error_log("Ecobrick Serial Number retrieved: " . $serial_no);
+        } else {
+            error_log("Failed to retrieve ecobrick details for ecobrick_unique_id: " . $ecobrick_unique_id);
+        }
+
+        $stmt->close();
+    } else {
+        error_log("Error preparing ecobrick details statement: " . $gobrik_conn->error);
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ecobrick_unique_id'])) {
+    $ecobrick_unique_id = (int)$_POST['ecobrick_unique_id'];
+    $serial_no = $_POST['serial_no']; // Ensure serial_no is passed from the previous step
+    include '../scripts/photo-functions.php';
+
+    $upload_dirs = [
+        "basic" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic/',
+        "basic-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/basic-thumb/',
+        "selfie" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie/',
+        "selfie-thumb" => '/home/ecobricks/repositories/gobrik-3.1-live/briks/2024/selfie-thumb/'
+    ];
+
+    $db_fields = [];
+    $db_values = [];
+    $db_types = "";
+
+    $photo_fields = [
+        ["input" => "ecobrick_photo_main", "full" => "ecobrick_full_photo_url", "thumb" => "ecobrick_thumb_photo_url", "dir" => "basic", "thumb_dir" => "basic-thumb"],
+        ["input" => "selfie_photo_main", "full" => "selfie_photo_url", "thumb" => "selfie_thumb_url", "dir" => "selfie", "thumb_dir" => "selfie-thumb"]
+    ];
+
+    foreach ($photo_fields as $index => $fields) {
+        $file_input_name = $fields["input"];
+        if (isset($_FILES[$file_input_name]) && $_FILES[$file_input_name]['error'] == UPLOAD_ERR_OK) {
+            $file_extension = strtolower(pathinfo($_FILES[$file_input_name]['name'], PATHINFO_EXTENSION));
+            $new_file_name_webp = "ecobrick-{$serial_no}.webp";
+            $thumbnail_file_name_webp = "ecobrick-{$serial_no}.webp";
+            $targetPath = $upload_dirs[$fields["dir"]] . $new_file_name_webp;
+            $thumbnailPath = $upload_dirs[$fields["thumb_dir"]] . $thumbnail_file_name_webp;
+
+            if (resizeAndConvertToWebP($_FILES[$file_input_name]['tmp_name'], $targetPath, 1000, 88)) {
+                createTrainingThumbnail($targetPath, $thumbnailPath, 250, 250, 77);
+                $full_urls[] = $targetPath;
+                $thumbnail_paths[] = $thumbnailPath;
+                $main_file_sizes[] = filesize($targetPath) / 1024;
+                $thumbnail_file_sizes[] = filesize($thumbnailPath) / 1024;
+
+                array_push($db_fields, $fields["full"], $fields["thumb"]);
+                array_push($db_values, $targetPath, $thumbnailPath);
+                $db_types .= "ss";
+            } else {
+                $error_message .= "Error processing image {$index}. Please try again.<br>";
+            }
+        }
+    }
+
+    if (!empty($db_fields) && empty($error_message)) {
+        $fields_for_update = implode(", ", array_map(function($field) { return "{$field} = ?"; }, $db_fields));
+        $fields_for_update .= ", status = ?";
+        array_push($db_values, "step 2 complete");
+        $db_types .= "s";
+
+        $update_sql = "UPDATE tb_ecobricks SET {$fields_for_update} WHERE ecobrick_unique_id = ?";
+        $db_values[] = $ecobrick_unique_id;
+        $db_types .= "i";
+
+        $update_stmt = $gobrik_conn->prepare($update_sql);
+        $update_stmt->bind_param($db_types, ...$db_values);
+        if (!$update_stmt->execute()) {
+            $error_message .= "Database update failed: " . $update_stmt->error;
+        }
+        $update_stmt->close();
+    }
+
+    if (!empty($error_message)) {
+        if (ob_get_level() > 0) ob_end_clean();
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => "An error has occurred: " . $error_message . " END"]);
+        exit;
+    } else {
+        if (ob_get_level() > 0) ob_end_clean();
+        $response = [
+            'ecobrick_unique_id' => $ecobrick_unique_id,
+            'full_urls' => $full_urls,
+            'thumbnail_paths' => $thumbnail_paths,
+            'main_file_sizes' => $main_file_sizes,
+            'thumbnail_file_sizes' => $thumbnail_file_sizes
+        ];
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+}
+
 echo '<!DOCTYPE html>
-<html lang="' . $lang . '">
+<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
 <head>
 <meta charset="UTF-8">
 ';
 ?>
+
 
 
 <?php require_once ("../includes/log-2-inc.php");?>
