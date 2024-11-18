@@ -1,10 +1,6 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
-startSecureSession(); // Start a secure session with regeneration to prevent session fixation
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.446';
