@@ -11,9 +11,12 @@ TEXT TRANSLATION SNIPPETS FOR GOBRIK.com
 // Forward slash (/): Should be escaped as \/ in </script> tags to prevent prematurely closing a script.
 
 
+// English Translations
 const en_Page_Translations = {
+    "001-offsetting-title": "Plastic Offsetting",
+    "002-under-construction": "🚧 Under construction",
+    "003-apology": "Our plastic offsetting system is offline as we move from GoBrik 2.0 to GoBrik 3.0. Stay tuned... it will be back and better soon!",
+    "001-log-an-ecobrick": "➕ Log an Ecobrick",
+    "002-learn-about-offsetting": "↗️ Learn about Plastic Offsetting",
+};
 
-
-
-
-    };
