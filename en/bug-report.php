@@ -34,7 +34,7 @@ if ($is_logged_in) {
     // Redirect to login page with the redirect parameter set to the current page
     echo '<script>
         alert("Please login before viewing this page.");
-        window.location.href = "login.php?redirect=' . urlencode($page) . '";
+        window.location.href = "login.php?redirect=' . urlencode($page) . '.php";
     </script>';
     exit();
 }
