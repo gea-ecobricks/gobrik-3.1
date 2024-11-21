@@ -56,7 +56,7 @@ echo '<!DOCTYPE html>
 
  <div style="display:flex;flex-flow:row;width:100%;justify-content:center;">
             <a href="log.php" class="confirm-button enabled" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick" style="margin: 10px;">➕ Log an Ecobrick</a>
-             <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="confirm-button enabled" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick" style="margin: 10px;">↗️ Learn about Plastic Offsetting</a>
+             <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="confirm-button enabled" id="log-ecobrick-button" data-lang-id="002-learn-about-offsetting" style="margin: 10px;">↗️ Learn about Plastic Offsetting</a>
 
 
         </div>
