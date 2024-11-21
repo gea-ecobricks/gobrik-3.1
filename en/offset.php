@@ -53,6 +53,8 @@ echo '<!DOCTYPE html>
                 <h4 data-lang-id="002-under-construction">🚧 Under construction</h4>
                 <p data-lang-id="003-apology">Our plastic offsetting system is offline as we move from GoBrik 2.0 to GoBrik 3.0.  Stay tuned... it will be back and better soon!</p>
 
+                <a class="module-btn" data-lang-id="000-dashboard">Dashboard</a> <a class="module-btn" data-lang-id="005-learn-more-offsetting">↗️ Learn about Plastic Offsetting</a>
+
 
 
             </div>
