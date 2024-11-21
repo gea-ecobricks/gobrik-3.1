@@ -39,6 +39,10 @@
   margin-bottom: -200px !important;
 }
 
+.form-container {
+max-width: 800px !important;
+box-shadow: #0000001f 0px 5px 20px;
+}
 
 </style>
 
