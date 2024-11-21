@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.445';
+$version = '0.5';
 $page = 'offset';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -44,14 +44,16 @@ echo '<!DOCTYPE html>
     <div id="splash-bar"></div>
 
     <!-- PAGE CONTENT -->
-    <div id="top-page-image" class="top-page-image"><img src="../svgs/eco-accounting-icon-from-ecobricks-org.svg"></div>
+    <div id="top-page-image" class="offsetting top-page-image"></div>
 
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-                <h4 data-lang-id="001-latest-ecobricks">Under Construction</h4>
-                <h2 data-lang-id="002-as-of-today">Plastic Offsetting</h2>
-                <p>Our plastic offsetting system is offline as we move from GoBrik 2.0 to GoBrik 3.0.  Stay tuned... it will be back and better soon!</p>
+                <h1 data-lang-id="001-offsetting-title">Plastic Offsetting</h1>
+                <h4 data-lang-id="002-under-construction">🚧 Under construction</h4>
+                <p data-lang-id="003-apology">Our plastic offsetting system is offline as we move from GoBrik 2.0 to GoBrik 3.0.  Stay tuned... it will be back and better soon!</p>
+
+
 
             </div>
 

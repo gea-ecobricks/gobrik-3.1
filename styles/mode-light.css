@@ -591,4 +591,9 @@ light.css
   background-size: contain;
 }
 
+.offsetting {
+background: url(../svgs/eco-accounting-icon-from-ecobricks-org.svg) no-repeat center;
+      background-size: contain;
+  }
+
 /* Light mode pastel colors */

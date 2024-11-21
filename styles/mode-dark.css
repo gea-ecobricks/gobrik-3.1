@@ -682,3 +682,8 @@ background-size: contain;
       background: url(../svgs/welcome-casandra-night.svg) no-repeat center;
       background-size: contain;
       }
+
+.offsetting {
+background: url(../svgs/eco-accounting-icon-from-ecobricks-org.svg) no-repeat center;
+      background-size: contain;
+  }
