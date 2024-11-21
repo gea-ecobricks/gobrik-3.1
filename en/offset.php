@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.445';
-$page = 'newest-briks';
+$page = 'offset';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
 
@@ -28,24 +28,7 @@ if (isLoggedIn()) {
 } else {
 
 }
-// Include database connection
-require_once '../gobrikconn_env.php';
 
-
-// Fetch the count of ecobricks and the total weight in kg
-$sql = "SELECT COUNT(*) as ecobrick_count, SUM(weight_g) / 1000 as total_weight FROM tb_ecobricks WHERE status != 'not ready'";
-$result = $gobrik_conn->query($sql);
-
-if ($result && $result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $ecobrick_count = number_format($row['ecobrick_count'] ?? 0);
-    $total_weight = number_format(round($row['total_weight'] ?? 0)); // Format with commas and round to the nearest whole number
-} else {
-    $ecobrick_count = '0';
-    $total_weight = '0';
-}
-
-$gobrik_conn->close();
 
 echo '<!DOCTYPE html>
 <html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
@@ -55,8 +38,7 @@ echo '<!DOCTYPE html>
 ?>
 
 <!-- Page CSS & JS Initialization -->
-<?php require_once("../includes/newest-briks-inc.php"); ?>
-
+<?php require_once("../includes/offset-inc.php"); ?>
 
     <div class="splash-title-block"></div>
     <div id="splash-bar"></div>
@@ -67,28 +49,9 @@ echo '<!DOCTYPE html>
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-                <h2 data-lang-id="001-latest-ecobricks">Newest Ecobricks</h2>
-                <p><span data-lang-id="002-as-of-today">As of today, </span><?php echo $ecobrick_count; ?> <span data-lang-id="002b-have-been">ecobricks have been logged on GoBrik,
-                    representing over </span><?php echo $total_weight; ?> kg <span data-lang-id="002c-of-seq-plastic">of sequestered plastic!</span>
-                </p>
-
-                <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th data-lang-id="1103-brik">Brik</th>
-                            <th data-lang-id="1111-maker">Maker</th>
-                            <th data-lang-id="1105-location">Location</th>
-                            <th data-lang-id="1104-weight">Weight</th>
-                            <th data-lang-id="1108-volume">Volume</th>
-                            <th data-lang-id="1109-density">Density</th>
-                            <th data-lang-id="1106-status">Status</th>
-                            <th data-lang-id="1107-serial">Serial</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- DataTables will populate this via AJAX -->
-                    </tbody>
-                </table>
+                <h2 data-lang-id="001-latest-ecobricks">Under Construction</h2>
+                <h4 data-lang-id="002-as-of-today"></h4>Plastic Offsetting</h4>
+                <p>Our plastic offsetting system is offline as we move from GoBrik 2.0 to GoBrik 3.0.  Stay tuned... it will be back and better soon!</p>
 
             </div>
 

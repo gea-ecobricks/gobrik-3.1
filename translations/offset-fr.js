@@ -11,7 +11,7 @@ TEXT TRANSLATION SNIPPETS FOR GOBRIK.com
 // Forward slash (/): Should be escaped as \/ in </script> tags to prevent prematurely closing a script.
 
 
-const en_Page_Translations = {
+const fr_Page_Translations = {
 
 
 
