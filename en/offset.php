@@ -44,13 +44,13 @@ echo '<!DOCTYPE html>
     <div id="splash-bar"></div>
 
     <!-- PAGE CONTENT -->
-    <div id="top-page-image" class="my-ecobricks top-page-image"></div>
+    <div id="top-page-image" class="top-page-image"><img src="../svgs/eco-accounting-icon-from-ecobricks-org.svg"></div>
 
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-                <h2 data-lang-id="001-latest-ecobricks">Under Construction</h2>
-                <h4 data-lang-id="002-as-of-today"></h4>Plastic Offsetting</h4>
+                <h4 data-lang-id="001-latest-ecobricks">Under Construction</h4>
+                <h2 data-lang-id="002-as-of-today">Plastic Offsetting</h2>
                 <p>Our plastic offsetting system is offline as we move from GoBrik 2.0 to GoBrik 3.0.  Stay tuned... it will be back and better soon!</p>
 
             </div>
