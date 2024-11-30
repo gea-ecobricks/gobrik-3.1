@@ -1,5 +1,6 @@
 <?php
 require_once '../gobrikconn_env.php'; // Include database connection
+
 // Get the request parameters sent by DataTables
 $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 0;
 $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
@@ -11,7 +12,7 @@ $searchValue = isset($_POST['searchValue']) ? $_POST['searchValue'] : '';
 
 // Prepare the base SQL query, including the community_name field
 $sql = "SELECT ecobrick_thumb_photo_url, ecobrick_full_photo_url, weight_g, volume_ml, density, date_logged_ts,
-        location_full, location_watershed, ecobricker_maker, community_name, serial_no, status
+        location_full, location_watershed, ecobricker_maker, community_name, serial_no, status, photo_version
         FROM tb_ecobricks
         WHERE status != 'not ready'";
 
@@ -78,7 +79,8 @@ $stmt->bind_result(
     $ecobricker_maker,
     $community_name,
     $serial_no,
-    $status
+    $status,
+    $photo_version
 );
 
 $data = [];
@@ -98,22 +100,21 @@ while ($stmt->fetch()) {
     $serial_url = "brik.php?serial_no=" . urlencode($serial_no);
 
     $data[] = [
-    'ecobrick_thumb_photo_url' => '<img src="' . htmlspecialchars($ecobrick_thumb_photo_url) . '"
-        alt="' . htmlspecialchars($serial_no) . '"
-        title="Ecobrick ' . htmlspecialchars($serial_no) . '"
-        class="table-thumbnail"
-        onclick="ecobrickPreview(\'' . htmlspecialchars($ecobrick_full_photo_url) . '\', \'' . htmlspecialchars($serial_no) . '\', \'' . htmlspecialchars($weight_g) . ' g\', \'' . htmlspecialchars($ecobricker_maker) . '\', \'' . htmlspecialchars($location_brik) . '\')">',
-    'weight_g' => number_format($weight_g) . ' g',
-    'volume_ml' => number_format($volume_ml) . ' ml',
-    'density' => number_format($density, 2) . ' g/ml',
-    'date_logged_ts' => date("Y-m-d", strtotime($date_logged_ts)),
-    'location_brik' => htmlspecialchars($location_brik),
-    'ecobricker_maker' => htmlspecialchars($ecobricker_maker),
-    'community_name' => htmlspecialchars($community_name),
-    'status' => htmlspecialchars($status),
-    'serial_no' => htmlspecialchars($serial_no) // Pass only the raw serial number
-];
-
+        'ecobrick_thumb_photo_url' => '<img src="' . htmlspecialchars($ecobrick_thumb_photo_url) . '?v=' . htmlspecialchars($photo_version) . '"
+            alt="' . htmlspecialchars($serial_no) . '"
+            title="Ecobrick ' . htmlspecialchars($serial_no) . ' Image version ' . htmlspecialchars($photo_version) . '"
+            class="table-thumbnail"
+            onclick="ecobrickPreview(\'' . htmlspecialchars($ecobrick_full_photo_url) . '?v=' . htmlspecialchars($photo_version) . '\', \'' . htmlspecialchars($serial_no) . '\', \'' . htmlspecialchars($weight_g) . ' g\', \'' . htmlspecialchars($ecobricker_maker) . '\', \'' . htmlspecialchars($location_brik) . '\')">',
+        'weight_g' => number_format($weight_g) . ' g',
+        'volume_ml' => number_format($volume_ml) . ' ml',
+        'density' => number_format($density, 2) . ' g/ml',
+        'date_logged_ts' => date("Y-m-d", strtotime($date_logged_ts)),
+        'location_brik' => htmlspecialchars($location_brik),
+        'ecobricker_maker' => htmlspecialchars($ecobricker_maker),
+        'community_name' => htmlspecialchars($community_name),
+        'status' => htmlspecialchars($status),
+        'serial_no' => htmlspecialchars($serial_no) // Pass only the raw serial number
+    ];
 }
 
 // Get total filtered records
