@@ -14,11 +14,11 @@ $result = $gobrik_conn->query($sql);
             
 
             echo '
-            <div id="aes-image" style="width:30%">
+            <div id="aes-image" style="width:15%">
                 <img src="../svgs/aes-brk-vertical.svg?v=2" style="width:95%; margin-top:20px;"><p style="font-size: 1.0em; margin-top:5px;">
             </div>
 
-            <div id="aes-data" style="width:70%;text-align:left;">
+            <div id="aes-data" style="width:70%;text-align:left;padding-left:15px;">
                 <p>Live Brikcoin value:</p>
             <span class="courier">
                 <span class="blink" style="font-size: 1.0em; padding-bottom: 10px">⬤</span>
