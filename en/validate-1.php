@@ -184,8 +184,8 @@ echo '<!DOCTYPE html>
         <option value="Rejected">Rejected</option>
     </select>
     <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
-    <button type="submit" id="submit-button" style="padding: 10px 20px;" class="enabled">Save</button>
-    <a href="admin-review.php" id="cancel-button" style="padding: 10px 20px;" class="enabled">Cancel</a>
+    <button type="submit" id="submit-button" class="submit-button enabled">Save</button>
+    <a href="admin-review.php" id="cancel-button" class="submit-button cancel">Cancel</a>
 </form>
 
 
