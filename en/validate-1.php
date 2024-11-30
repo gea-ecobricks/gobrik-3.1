@@ -169,12 +169,14 @@ echo '<!DOCTYPE html>
     <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Ecobrick Status:</label>
     <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px;">
         <option value="" disabled selected>Set Ecobrick Status</option>
-        <option value="Ready for validations">Ready for validations</option>
-        <option value="Step 2 complete">Step 2 complete</option>
+        <option value="Awaiting validation">Awaiting validation</option>
+        <option value="Step 2 complete">step 2 complete</option>
+        <option value="Step 2 complete">not ready</option>
         <option value="Rejected">Rejected</option>
     </select>
     <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
-    <button type="submit" id="submit-button" style="padding: 10px 20px;">Save</button>
+    <button type="submit" id="submit-button" style="padding: 10px 20px;" class="enabled">Save</button>
+    <a href="admin-review.php" id="cancel-button" style="padding: 10px 20px;" class="enabled">Cancel</a>
 </form>
 
 
