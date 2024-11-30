@@ -19,6 +19,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Easy set variables
  */
+
+
+// Include database connection
+require_once '../gobrikconn_env.php';
+
  
 // DB table to use
 $table = 'vw_brk_tran_ledgerid_desc';
@@ -83,9 +88,6 @@ array(
   
 );
 
- 
-// Include database connection
-require_once '../gobrikconn_env.php';
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
