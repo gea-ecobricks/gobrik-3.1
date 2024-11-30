@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.445';
+$version = '0.45';
 $page = 'brikchain';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -70,14 +70,14 @@ echo '<!DOCTYPE html>
     <div id="splash-bar"></div>
 
   <!-- PAGE CONTENT -->
-    <div id="top-page-image" class="offsetting top-page-image"></div>
+    <div id="top-page-image" class="brikchain top-page-image"></div>
 
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
                 <h1 data-lang-id="001-brikchain-title">The Brikchain</h1>
                 <h4 data-lang-id="002-under-construction" style="color:orange;">🚧 Under construction</h4>
-                <p data-lang-id="004-lead-page-paragraph">Search and explore the full chain of authenticated ecobricks, blocks and transactions that make up the brikcoin manual blockchain.</p>
+                <div class="splash-sub" data-lang-id="002-splash-subtitle">All the Briks, Blocks & Transactions.</div>
 
             </div>
             <div class="page-paragraph">
