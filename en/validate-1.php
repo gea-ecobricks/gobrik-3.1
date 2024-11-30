@@ -185,7 +185,7 @@ echo '<!DOCTYPE html>
 
 
            <!-- Add the dropdown form -->
-<form id="status-update-form" method="POST" action="../scripts/validation_process.php" style="margin-top: 20px;">
+<form id="status-update-form" method="POST" action="validation_process.php" style="margin-top: 20px;">
     <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Ecobrick Status:</label>
     <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px;max-width:300px;">
         <option value="" disabled selected>Select status...</option>
