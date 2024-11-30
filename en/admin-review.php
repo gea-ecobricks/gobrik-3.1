@@ -134,11 +134,12 @@ echo '<!DOCTYPE html>
             "columns": [
                 { "data": "ecobrick_thumb_photo_url" }, // Brik thumbnail
                 { "data": "ecobricker_maker" }, // Maker
-                { "data": "location_brik" }, // Location
+                { "data": "status" }, // Status
                 { "data": "weight_g" }, // Weight
                 { "data": "volume_ml" }, // Volume
                 { "data": "density" }, // Density
-                { "data": "status" }, // Status
+
+                { "data": "location_brik" }, // Location
                 {
                     "data": "serial_no",
                     "render": function(data, type, row) {
