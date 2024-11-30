@@ -220,8 +220,8 @@ content += '</a>';
 
 // Conditionally display the "Validate" Ecobrick" button if the status is not authenticated
 if (status !== "authenticated") {
-    content += '<a class="ecobrick-action-button" href="validate-1.php?id=' + encodedSerialNo + '" data-lang-id="015-edit-ecobrick">';
-    content += '🧐 ' + translations['018-validate'] || 'Validate');
+    content += '<a class="ecobrick-action-button" href="validate-1.php?id=' + encodedSerialNo + '" data-lang-id="015-validate-ecobrick">';
+    content += '🧐 ' + (translations['018-validate'] || 'Validate');
     content += '</a>';
 }
 
