@@ -218,6 +218,13 @@ content += '<a class="ecobrick-action-button" href="javascript:void(0);" onclick
 content += '🔗 ' + (translations['016-share-ecobrick'] || 'Share Ecobrick');
 content += '</a>';
 
+// Conditionally display the "Validate" Ecobrick" button if the status is not authenticated
+if (status !== "authenticated") {
+    content += '<a class="ecobrick-action-button" href="validate-1.php?id=' + encodedSerialNo + '" data-lang-id="015-edit-ecobrick">';
+    content += '🧐 ' + translations['018-validate'] || 'Validate');;
+    content += '</a>';
+}
+
 // Add the "Delete Ecobrick" button
 content += '<a class="ecobrick-action-button deleter-button" href="javascript:void(0);" onclick="deleteEcobrick(\'' + encodedSerialNo + '\')" data-lang-id="014-delete-ecobrick">';
 content += '❌ ' + translations['014-delete-ecobrick'];
