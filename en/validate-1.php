@@ -228,7 +228,7 @@ echo '<!DOCTYPE html>
         const formData = new FormData(this);
 
         // Send the request to the validation_process.php
-        fetch("validation_process.php", {
+        fetch("../scripts/validation_process.php", {
             method: "POST",
             body: formData
         })
