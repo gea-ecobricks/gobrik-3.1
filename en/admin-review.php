@@ -25,7 +25,7 @@ if (isLoggedIn()) {
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
     // Check if the user is an admin
-    if (strpos($gea_status, 'admin') === false) {
+    if (strpos($gea_status, 'Admin') === false) {
         echo "<script>
             alert('Sorry, this page is for admins only.');
             window.location.href = 'dashboard.php';
