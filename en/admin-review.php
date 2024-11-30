@@ -77,12 +77,14 @@ echo '<!DOCTYPE html>
                         <tr>
                             <th data-lang-id="1103-brik">Brik</th>
                             <th data-lang-id="1111-maker">Maker</th>
-                            <th data-lang-id="1105-location">Location</th>
+                            <th data-lang-id="1106-status">Status</th>
+
                             <th data-lang-id="1104-weight">Weight</th>
                             <th data-lang-id="1108-volume">Volume</th>
                             <th data-lang-id="1109-density">Density</th>
-                            <th data-lang-id="1106-status">Status</th>
+
                             <th data-lang-id="1107-serial">Serial</th>
+                            <th data-lang-id="1105-location">Location</th>
                         </tr>
                     </thead>
                     <tbody>
