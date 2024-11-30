@@ -241,6 +241,8 @@ echo '<!DOCTYPE html>
     });
 </script>
 
+<script src="../scripts/brik-rotation.js?v=<?php echo ($version); ;?>"></script>
+
 </body>
 </html>
 
