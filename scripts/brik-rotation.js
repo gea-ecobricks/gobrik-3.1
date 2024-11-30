@@ -6,7 +6,7 @@
 function rotateEcobrickPhoto(photoUrl, thumbUrl, rotationDegrees, photoId, totalRotationDegrees) {
     // Create an AJAX request to send the rotation degrees to the server
     var xhr = new XMLHttpRequest();
-    var url = "rotate_photo.php"; // PHP file that handles the photo rotation
+    var url = "../scripts/rotate_photo.php"; // PHP file that handles the photo rotation
     var params = "photo_url=" + encodeURIComponent(photoUrl) +
                  "&thumb_url=" + encodeURIComponent(thumbUrl) +
                  "&rotation=" + rotationDegrees;

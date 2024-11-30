@@ -170,7 +170,7 @@ echo '<!DOCTYPE html>
 
 
 
-            <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?>.</h2>
+            <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?></h2>
 
 
            <!-- Add the dropdown form -->
@@ -184,7 +184,7 @@ echo '<!DOCTYPE html>
         <option value="Rejected">Rejected</option>
     </select>
     <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
-    <button type="submit" id="submit-button" class="submit-button enabled">Save</button>
+    <button type="submit" id="submit-button" class="submit-button enabled">✅ Save</button>
     <a href="admin-review.php" id="cancel-button" class="submit-button cancel">Cancel</a>
 </form>
 
