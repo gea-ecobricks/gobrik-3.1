@@ -65,9 +65,9 @@ echo '<!DOCTYPE html>
 	<div class="splash-image" data-lang-id="003b-splash-image-alt"><img src="../webps/brikchain-450px.webp" style="width: 85%" alt="The brikchain explorer: search all the briks, blocks and transactions">
     </div>
 </div>-->
-<div id="splash-bar"></div>
-<div id="top-page-image"></div>
 
+    <div class="splash-title-block"></div>
+    <div id="splash-bar"></div>
 
   <!-- PAGE CONTENT -->
     <div id="top-page-image" class="offsetting top-page-image"></div>
@@ -92,7 +92,7 @@ echo '<!DOCTYPE html>
 
 	<div class="live-data" style="margin-top:30px">
 		<?php
-			$sql = "SELECT * FROM vw_detail_sums_by_year  WHERE year = 2024;"; $result = $conn->query($sql);
+			$sql = "SELECT * FROM vw_detail_sums_by_year  WHERE year = 2024;"; $result = $gobrik_conn->query($sql);
 			if ($result->num_rows > 0) {
 
 				while($row = $result->fetch_assoc()) {
