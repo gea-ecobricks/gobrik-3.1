@@ -104,7 +104,7 @@ $(document).ready(function() {
 }
 
 #header {
-background: none;
+background: none !important;
 }
 
 /* Huh? */

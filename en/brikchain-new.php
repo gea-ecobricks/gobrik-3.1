@@ -66,7 +66,7 @@ echo '<!DOCTYPE html>
     </div>-->
 </div>
 
-    <div id="splash-bar" style="margin-top:-85vh"></div>
+    <div id="splash-bar" style="margin-bottom:-85vh"></div>
 
   <!-- PAGE CONTENT -->
     <div id="top-page-image" class="brikchain top-page-image"></div>
@@ -106,7 +106,7 @@ echo '<!DOCTYPE html>
 	</div>
 
 
-
+<!--BRIKS-->
 	<div class="reg-content-block" id="block2">
     <div class="opener-header">
         <div class="opener-header-text">
@@ -139,20 +139,23 @@ echo '<!DOCTYPE html>
 							<th data-lang-id="017-serial-header"> 🔎 Serial</th>
                         </tr>
 					</thead>
-					<!--<tfoot>
+					<tfoot>
 						<tr>
-							<<th style="max-width: 150px !important;">Brik</th>
+							<th style="max-width: 150px !important;">Brik</th>
 							<th>Logged</th>
 							<th>AES Plastic</th>
 							<th>Value</th>
 							<th>CO2e</th>
 							<th>Serial</th>
 						</tr>
-					</tfoot>-->
+					</tfoot>
 				</table>
 			</div>
 		</div>
 	</div>
+
+
+<!--BLOCKS-->
 
 
 	<div class="reg-content-block" id="block1">
