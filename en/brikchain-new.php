@@ -66,7 +66,6 @@ echo '<!DOCTYPE html>
     </div>-->
 </div>
 
-    <div class="splash-title-block"></div>
     <div id="splash-bar"></div>
 
   <!-- PAGE CONTENT -->
