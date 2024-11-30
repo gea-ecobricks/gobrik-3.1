@@ -103,6 +103,9 @@ $(document).ready(function() {
 	background-color: #2A91DA;
 }
 
+#header {
+background: none;
+}
 
 /* Huh? */
 

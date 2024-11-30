@@ -66,7 +66,7 @@ echo '<!DOCTYPE html>
     </div>-->
 </div>
 
-    <div id="splash-bar"></div>
+    <div id="splash-bar" style="margin-top:-85vh"></div>
 
   <!-- PAGE CONTENT -->
     <div id="top-page-image" class="brikchain top-page-image"></div>
