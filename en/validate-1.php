@@ -181,12 +181,14 @@ echo '<!DOCTYPE html>
 
             <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?></h2>
 
+            <p>The ecobrick validation process is currently under construction!  However, in the meantime designated admins can fix the rotation of photos and update the status of "step 2 complete" ecobricks to "Awaiting validation".</p>
+
 
            <!-- Add the dropdown form -->
 <form id="status-update-form" method="POST" action="../scripts/validation_process.php" style="margin-top: 20px;">
     <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Ecobrick Status:</label>
     <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px;">
-        <option value="" disabled selected>Set Ecobrick Status</option>
+        <option value="" disabled selected>Select status...</option>
         <option value="Awaiting validation">Awaiting validation</option>
         <option value="Step 2 complete">step 2 complete</option>
         <option value="Step 2 complete">not ready</option>
