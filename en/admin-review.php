@@ -82,9 +82,9 @@ echo '<!DOCTYPE html>
                             <th data-lang-id="1104-weight">Weight</th>
                             <th data-lang-id="1108-volume">Volume</th>
                             <th data-lang-id="1109-density">Density</th>
-
-                            <th data-lang-id="1107-serial">Serial</th>
                             <th data-lang-id="1105-location">Location</th>
+                            <th data-lang-id="1107-serial">Serial</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -152,9 +152,9 @@ echo '<!DOCTYPE html>
                 }
             ],
             "columnDefs": [
-                { "orderable": false, "targets": [0, 6] }, // Make the image and status columns unsortable
-                { "className": "all", "targets": [0, 1, 3, 7] }, // Ensure Brik (thumbnail), Maker, Weight, and Serial always display
-                { "className": "min-tablet", "targets": [2, 4, 5] }, // These fields can be hidden first on smaller screens
+                { "orderable": false, "targets": [0, 3, 4, 5] }, // Make the image and status columns unsortable
+                { "className": "all", "targets": [0, 1, 2, 7] }, // Ensure Brik (thumbnail), Maker, Weight, and Serial always display
+                { "className": "min-tablet", "targets": [1, 4, 5, 6] }, // These fields can be hidden first on smaller screens
             ],
             "initComplete": function() {
                 var searchBox = $("div.dataTables_filter input");
