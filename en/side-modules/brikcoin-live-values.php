@@ -3,7 +3,7 @@
 
 $sql = "SELECT * FROM vw_sum_brk_total ;";
 
-$result = $conn->query($sql);
+$result = $gobrik_conn->query($sql);
 
         if ($result->num_rows > 0) {
 
@@ -33,5 +33,3 @@ $result = $conn->query($sql);
             echo "Failed to connect to Brikchain</div>";
         }
         ?>
-
-        <!--<p style="color: grey; font-size: 0.8em; margin-top:10px;">Links open to the GoBrik platform.</p>-->

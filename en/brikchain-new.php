@@ -1,23 +1,63 @@
-
 <?php
-$directory = basename(dirname($_SERVER['SCRIPT_NAME']));
-$lang = $directory;
-$version = '0.35';
-$page='brikchain';
+require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
+// Set page variables
+$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
+$version = '0.445';
+$page = 'brikchain';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
+$is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
+
+
+// Check if the user is logged in
+if (isLoggedIn()) {
+    $buwana_id = $_SESSION['buwana_id'];
+        // Include database connection
+    require_once '../gobrikconn_env.php';
+    require_once '../buwanaconn_env.php';
+
+    // Fetch the user's location data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $first_name = getFirstName($buwana_conn, $buwana_id);
+
+    $buwana_conn->close();  // Close the database connection
+} else {
+
+}
+// Include database connection
+require_once '../gobrikconn_env.php';
+
+
+// Fetch the count of ecobricks and the total weight in kg
+$sql = "SELECT COUNT(*) as ecobrick_count, SUM(weight_g) / 1000 as total_weight FROM tb_ecobricks WHERE status != 'not ready'";
+$result = $gobrik_conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $ecobrick_count = number_format($row['ecobrick_count'] ?? 0);
+    $total_weight = number_format(round($row['total_weight'] ?? 0)); // Format with commas and round to the nearest whole number
+} else {
+    $ecobrick_count = '0';
+    $total_weight = '0';
+}
+
+$gobrik_conn->close();
 
 echo '<!DOCTYPE html>
-<html lang="' . $lang . '">
+<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
 <head>
-<meta charset="UTF-8">';
-require_once ("../includes/brikchain-inc.php");
+<meta charset="UTF-8">
+';
 ?>
 
-
+<!-- Page CSS & JS Initialization -->
+<?php require_once("../includes/brikchain-inc.php"); ?>
 
 <!--TOP PAGE BANNER-->
-
 
 <div class="splash-content-block">
 	<div class="splash-box">
@@ -181,7 +221,7 @@ require_once ("../includes/brikchain-inc.php");
 
 			$sql = "SELECT * FROM vw_detail_sums_by_year Order by `year` DESC;";
 
-			$result = $conn->query($sql);
+			$result = $gobrik_conn->query($sql);
 
 			if ($result->num_rows > 0) {
 
@@ -238,7 +278,7 @@ require_once ("../includes/brikchain-inc.php");
 
 				$sql = "SELECT * FROM vw_sum_brk_total ;";
 
-				$result = $conn->query($sql);
+				$result = $gobrik_conn->query($sql);
 
 				if ($result->num_rows > 0) {
 
