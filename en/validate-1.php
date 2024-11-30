@@ -74,8 +74,8 @@ if ($status === "authenticated") {
     exit();
 }
 
-// Fetch ecobrick details
-$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url
+// Fetch ecobrick details including photo_version
+$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version
         FROM tb_ecobricks
         WHERE ecobrick_unique_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
@@ -86,7 +86,7 @@ if (!$stmt) {
 }
 $stmt->bind_param("i", $ecobrick_unique_id);
 if ($stmt->execute()) {
-    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url);
+    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version);
     if (!$stmt->fetch()) {
         // No ecobrick found
         $alert_message = getNoEcobrickAlert($lang);
@@ -102,6 +102,7 @@ if ($stmt->execute()) {
     echo "An error occurred while fetching ecobrick details.";
     exit();
 }
+
 
 
 echo '<!DOCTYPE html>
@@ -129,7 +130,8 @@ echo '<!DOCTYPE html>
     <!-- Ecobrick Full Photo -->
 <?php if (!empty($ecobrick_full_photo_url) && $ecobrick_full_photo_url !== 'url missing'): ?>
     <div class="photo-container" id="basic-ecobrick-photo">
-        <img src="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>" alt="Basic Ecobrick Photo" style="width:500px; max-width:95%" class="rotatable-photo" id="ecobrick-photo-<?php echo $serial_no; ?>" data-rotation="0">
+        <img src="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>?v=<?php echo htmlspecialchars($photo_version); ?>"
+     title="Version <?php echo htmlspecialchars($photo_version); ?>" alt="Basic Ecobrick Photo" style="width:500px; max-width:95%" class="rotatable-photo" id="ecobrick-photo-<?php echo $serial_no; ?>" data-rotation="0">
 
         <!-- Rotate buttons for the full ecobrick photo -->
         <div class="rotate-controls">
@@ -148,7 +150,14 @@ echo '<!DOCTYPE html>
 <!-- Selfie Photo -->
 <?php if ($selfie_photo_url): ?>
     <div class="photo-container" id="selfie-ecobrick-photo">
-        <img src="<?php echo htmlspecialchars($selfie_photo_url); ?>" alt="Ecobrick Selfie Photo" style="max-width:500px;" class="rotatable-photo" id="selfie-photo-<?php echo $serial_no; ?>" data-rotation="0">
+        <img src="<?php echo htmlspecialchars($selfie_photo_url); ?>?v=<?php echo htmlspecialchars($photo_version); ?>"
+     title="Version <?php echo htmlspecialchars($photo_version); ?>"
+     alt="Ecobrick Selfie Photo"
+     style="max-width:500px;"
+     class="rotatable-photo"
+     id="selfie-photo-<?php echo $serial_no; ?>"
+     data-rotation="0">
+
 
         <!-- Rotate buttons for the selfie photo -->
         <div class="rotate-controls">
@@ -174,7 +183,7 @@ echo '<!DOCTYPE html>
 
 
            <!-- Add the dropdown form -->
-<form id="status-update-form" method="POST" action="validation_process.php" style="margin-top: 20px;">
+<form id="status-update-form" method="POST" action="../scripts/validation_process.php" style="margin-top: 20px;">
     <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Ecobrick Status:</label>
     <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px;">
         <option value="" disabled selected>Set Ecobrick Status</option>
