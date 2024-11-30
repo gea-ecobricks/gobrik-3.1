@@ -94,9 +94,8 @@ $columns = array(
     */
 
 
-
-include '../datables_env.php';
-
+// Include database connection
+require_once '../gobrikconn_env.php';
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

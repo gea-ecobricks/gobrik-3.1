@@ -69,13 +69,8 @@ $columns = array(
 );
 
  
-// SQL server connection information
-$sql_details = array(
-    'user' => 'ecobricks_russs',
-    'pass' => '1ecobricks!',
-    'db'   => 'ecobricks_gobrik_msql_db',
-    'host' => 'localhost'
-);
+// Include database connection
+require_once '../gobrikconn_env.php';
  
 
 
