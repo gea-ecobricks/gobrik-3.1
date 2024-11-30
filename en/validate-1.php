@@ -181,13 +181,13 @@ echo '<!DOCTYPE html>
 
             <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?></h2>
 
-            <p>The ecobrick validation process is currently under construction!  However, in the meantime designated admins can fix the rotation of photos and update the status of "step 2 complete" ecobricks to "Awaiting validation".</p>
+            <p>🚧 The ecobrick validation process is currently under construction!  However, in the meantime designated admins can fix the rotation of photos and update the status of "step 2 complete" ecobricks to "Awaiting validation".</p>
 
 
            <!-- Add the dropdown form -->
 <form id="status-update-form" method="POST" action="../scripts/validation_process.php" style="margin-top: 20px;">
     <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Ecobrick Status:</label>
-    <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px;">
+    <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px;max-width:300px;">
         <option value="" disabled selected>Select status...</option>
         <option value="Awaiting validation">Awaiting validation</option>
         <option value="Step 2 complete">step 2 complete</option>
@@ -196,7 +196,7 @@ echo '<!DOCTYPE html>
     </select>
     <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
     <button type="submit" id="submit-button" class="submit-button enabled">✅ Save</button>
-    <a href="admin-review.php" id="cancel-button" class="submit-button cancel">Cancel</a>
+    <a href="admin-review.php" id="cancel-button" class="submit-button cancel" style="tex-decoration:none;">Cancel</a>
 </form>
 
 
