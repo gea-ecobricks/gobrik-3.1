@@ -55,16 +55,16 @@ echo '<!DOCTYPE html>
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/brikchain-inc.php"); ?>
 
-<!--TOP PAGE BANNER
+<!--TOP PAGE BANNER-->
 
 <div class="splash-content-block">
-	<div class="splash-box">
+	<!--<div class="splash-box">
 		<div class="splash-heading" data-lang-id="001-splash-title">The Brikchain</div>
 	    <div class="splash-sub" data-lang-id="002-splash-subtitle">All the Briks, Blocks & Transactions.</div>
 	</div>
 	<div class="splash-image" data-lang-id="003b-splash-image-alt"><img src="../webps/brikchain-450px.webp" style="width: 85%" alt="The brikchain explorer: search all the briks, blocks and transactions">
-    </div>
-</div>-->
+    </div>-->
+</div>
 
     <div class="splash-title-block"></div>
     <div id="splash-bar"></div>

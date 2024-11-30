@@ -99,9 +99,9 @@ $(document).ready(function() {
 }
 
 
-/* #splash-bar { */
-/* 	background-color: #2A91DA; */
-/* } */
+#splash-bar {
+	background-color: #2A91DA;
+}
 
 
 /* Huh? */
