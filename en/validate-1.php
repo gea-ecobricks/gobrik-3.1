@@ -3,14 +3,14 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Ensure the user is logged in (handled by $is_logged_in from helper)
 if (!$is_logged_in) {
-    header('Location: login.php?redirect=log.php');
+    header('Location: login.php?redirect=admin-review.php');
     exit();
 }
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
 $version = '0.448';
-$page = 'log-3';
+$page = 'validate-1';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 // Include database connections
@@ -93,19 +93,7 @@ if ($stmt->execute()) {
     echo "An error occurred while fetching ecobrick details.";
     exit();
 }
-//
-// // Handle POST AJAX skip action
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'skip' && isset($_POST['ecobrick_unique_id'])) {
-//     header('Content-Type: application/json');
-//
-//     $ecobrick_unique_id = (int)$_POST['ecobrick_unique_id'];
-//     if (setEcobrickStatus('Awaiting validation', $ecobrick_unique_id)) {
-//         echo json_encode(['success' => true, 'message' => 'Status updated to Awaiting validation.']);
-//     } else {
-//         echo json_encode(['success' => false, 'message' => 'Failed to update status.']);
-//     }
-//     exit();
-// }
+
 
 echo '<!DOCTYPE html>
 <html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
@@ -115,10 +103,7 @@ echo '<!DOCTYPE html>
 ?>
 
 
-
-
-
-<?php require_once ("../includes/log-3-inc.php");?>
+<?php require_once ("../includes/validate-1.php");?>
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
@@ -131,7 +116,7 @@ echo '<!DOCTYPE html>
 
 
 
-            <div id="upload-success-message">
+            <div id="validate-introduction">
     <!-- Ecobrick Full Photo -->
 <?php if (!empty($ecobrick_full_photo_url) && $ecobrick_full_photo_url !== 'url missing'): ?>
     <div class="photo-container" id="basic-ecobrick-photo">
@@ -176,7 +161,25 @@ echo '<!DOCTYPE html>
 
 
 
-            <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?> <span data-lang-id="001-form-title"> is ready to be rviewed</span>.</h2>
+            <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?>.</h2>
+
+
+           <!-- Add the dropdown form -->
+<form id="status-update-form" method="POST" action="validation_process.php" style="margin-top: 20px;">
+    <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Ecobrick Status:</label>
+    <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px;">
+        <option value="" disabled selected>Set Ecobrick Status</option>
+        <option value="Ready for validations">Ready for validations</option>
+        <option value="Step 2 complete">Step 2 complete</option>
+        <option value="Rejected">Rejected</option>
+    </select>
+    <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
+    <button type="submit" id="submit-button" style="padding: 10px 20px;">Save</button>
+</form>
+
+
+
+
 
 
 
@@ -192,122 +195,43 @@ echo '<!DOCTYPE html>
 <?php require_once ("../footer-2024.php");?>
 
 
-
 <script>
+    document.getElementById("status-update-form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        const submitButton = document.getElementById("submit-button");
+        submitButton.textContent = "Processing...";
+        submitButton.disabled = true;
 
-// ROTATE Photo
+        // Prepare the form data
+        const formData = new FormData(this);
 
-// SECTION 1: Function to send rotation request to the PHP function
-function rotateEcobrickPhoto(photoUrl, thumbUrl, rotationDegrees, photoId, totalRotationDegrees) {
-    // Create an AJAX request to send the rotation degrees to the server
-    var xhr = new XMLHttpRequest();
-    var url = "rotate_photo.php"; // PHP file that handles the photo rotation
-    var params = "photo_url=" + encodeURIComponent(photoUrl) +
-                 "&thumb_url=" + encodeURIComponent(thumbUrl) +
-                 "&rotation=" + rotationDegrees;
-
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-    // Handle the server's response
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-                console.log("Server response: " + xhr.responseText);
-
-                // Check if the response contains a success message
-                if (xhr.responseText.trim().includes("rotated successfully")) {
-                    // Alert the user of the successful rotation
-                    alert("Your photo has been rotated " + totalRotationDegrees + " degrees clockwise and saved to the server.");
-                    console.log("Image rotation successful for: " + photoUrl);
-
-                    // SECTION 2: Preserve the current rotation after confirmation
-                    // Do not reset the image to 0 degrees after confirmation.
-                    // The image will stay at its current rotation.
-
-                } else {
-                    // Handle error response from the server
-                    alert("Something went wrong saving your rotation. Error: " + xhr.responseText);
-                }
+        // Send the request to the validation_process.php
+        fetch("validation_process.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                submitButton.textContent = "Status Updated!";
+                setTimeout(() => {
+                    window.location.href = "admin-review.php";
+                }, 2000); // Redirect after 2 seconds
             } else {
-                // Handle the error if the request was unsuccessful
-                alert("An error occurred. Status: " + xhr.status);
+                submitButton.textContent = "Request Failed";
+                submitButton.disabled = false; // Re-enable the button
             }
-        }
-    };
-
-
-    // Send the rotation degrees to the server
-    xhr.send(params);
-}
-
-// SECTION 3: Function to adjust the height of the container after the image rotates
-function adjustContainerHeight(photo, container) {
-    var currentRotation = parseInt(photo.getAttribute('data-rotation')) || 0;
-
-    // Adjust height when the image is rotated by 90 or 270 degrees
-    if (currentRotation % 180 !== 0) {
-        var newHeight = photo.width;
-        container.style.height = newHeight + 'px';
-    } else {
-        // Set container height to auto when image is not rotated (0 or 180 degrees)
-        container.style.height = 'auto';
-    }
-}
-
-// SECTION 4: Function to handle the rotate button clicks
-document.querySelectorAll('.rotate-button').forEach(function(button) {
-    button.addEventListener('click', function() {
-        var photoContainer = this.closest('.photo-container');
-        var photo = photoContainer.querySelector('.rotatable-photo');
-        var confirmButton = photoContainer.querySelector('.confirm-rotate-button');
-
-        // Get the current rotation from the data attribute
-        var currentRotation = parseInt(photo.getAttribute('data-rotation')) || 0;
-        var direction = this.getAttribute('data-direction');
-
-        // Rotate the image based on the direction
-        if (direction === 'left') {
-            currentRotation = (currentRotation - 90) % 360;
-        } else if (direction === 'right') {
-            currentRotation = (currentRotation + 90) % 360;
-        }
-
-        // Apply the rotation and update the data-rotation attribute
-        photo.style.transform = 'rotate(' + currentRotation + 'deg)';
-        photo.setAttribute('data-rotation', currentRotation);
-
-        // Show the confirm button
-        confirmButton.style.display = 'block';
-
-        // Adjust the container height based on the new image rotation
-        adjustContainerHeight(photo, photoContainer);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            submitButton.textContent = "Request Failed";
+            submitButton.disabled = false; // Re-enable the button
+        });
     });
-});
-
-// SECTION 5: Handle the confirmation button click to send the rotation to the server
-document.querySelectorAll('.confirm-rotate-button').forEach(function(button) {
-    button.addEventListener('click', function() {
-        var photoContainer = this.closest('.photo-container');
-        var photo = photoContainer.querySelector('.rotatable-photo');
-        var currentRotation = parseInt(photo.getAttribute('data-rotation')) || 0;
-        var photoUrl = this.previousElementSibling.getAttribute('data-photo-url'); // Get the original photo URL from the rotate button
-        var thumbUrl = this.getAttribute('data-thumb-url'); // Get the thumbnail URL from the confirm button
-
-        // Calculate total clockwise rotation (normalize it to 0-360)
-        var totalRotationDegrees = (currentRotation + 360) % 360;
-
-        // Trigger the PHP function to rotate the actual photo
-        var photoId = photo.getAttribute('id'); // Assuming the photo ID corresponds to the ecobrick ID or serial_no
-        rotateEcobrickPhoto(photoUrl, thumbUrl, currentRotation, photoId, totalRotationDegrees);
-    });
-});
-
-
-
 </script>
-
-
 
 </body>
 </html>
+
+
+
