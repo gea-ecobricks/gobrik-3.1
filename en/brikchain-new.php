@@ -45,8 +45,6 @@ if ($result && $result->num_rows > 0) {
     $total_weight = '0';
 }
 
-$gobrik_conn->close();
-
 echo '<!DOCTYPE html>
 <html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
 <head>
@@ -57,7 +55,7 @@ echo '<!DOCTYPE html>
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/brikchain-inc.php"); ?>
 
-<!--TOP PAGE BANNER-->
+<!--TOP PAGE BANNER
 
 <div class="splash-content-block">
 	<div class="splash-box">
@@ -66,7 +64,7 @@ echo '<!DOCTYPE html>
 	</div>
 	<div class="splash-image" data-lang-id="003b-splash-image-alt"><img src="../webps/brikchain-450px.webp" style="width: 85%" alt="The brikchain explorer: search all the briks, blocks and transactions">
     </div>
-</div>
+</div>-->
 <div id="splash-bar"></div>
 <div id="top-page-image"></div>
 
