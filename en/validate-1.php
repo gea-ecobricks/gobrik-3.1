@@ -103,7 +103,7 @@ echo '<!DOCTYPE html>
 ?>
 
 
-<?php require_once ("../includes/validate-1.php");?>
+<?php require_once ("../includes/validate-1-inc.php");?>
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
