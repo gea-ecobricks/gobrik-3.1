@@ -379,9 +379,9 @@ function loadMessages(conversationId, allMsgsPosted) {
             console.log('Refreshing messages with:', { conversationId, allMsgsPosted });
 
             // Schedule the next message load after 5 seconds
-            setTimeout(function() {
-                refreshMessages(conversationId, allMsgsPosted);
-            }, 5000);
+//             setTimeout(function() {
+//                 refreshMessages(conversationId, allMsgsPosted);
+//             }, 5000);
         }
     });
 }
