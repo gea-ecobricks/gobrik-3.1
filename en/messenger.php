@@ -377,6 +377,12 @@ function loadMessages(conversationId, allMsgsPosted) {
         complete: function() {
             // Schedule the next message load after 5 seconds
             setTimeout(function() {
+            const conversationId = $(this).data('conversation-id');
+            const allMsgsPosted = $(this).data('all-msgs-posted');
+
+        // Show alert to confirm the value of all_msgs_posted
+       alert(`Refresh Conversation ID: ${conversationId}\nAll Messages Posted: ${allMsgsPosted}`);
+//
                 refreshMessages(conversationId, allMsgsPosted);
             }, 5000);
         }
