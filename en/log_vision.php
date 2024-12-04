@@ -8,35 +8,49 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Check if the request method is POST and the required fields are set
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vision_message']) && isset($_POST['ecobrick_unique_id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ecobrick_unique_id'])) {
 
     // Sanitize and assign POST variables
-    $vision = trim($_POST['vision_message']); // Use 'vision_message' from the form, mapped to 'vision' in the DB
+    $vision = isset($_POST['vision_message']) ? trim($_POST['vision_message']) : null; // Allow vision to be blank
     $ecobrick_unique_id = (int)$_POST['ecobrick_unique_id'];
 
-    // Validate that the vision message isn't empty and the ecobrick_unique_id is a valid integer
-    if (!empty($vision) && $ecobrick_unique_id > 0) {
+    // Validate the ecobrick_unique_id
+    if ($ecobrick_unique_id > 0) {
 
-        // Prepare SQL query to update the ecobrick record and set status to 'Awaiting validation'
-        $sql = "UPDATE tb_ecobricks SET vision = ?, status = 'Awaiting validation' WHERE ecobrick_unique_id = ?";
+        // Prepare the base SQL query
+        $sql = "UPDATE tb_ecobricks SET ";
+        $params = [];
+        $types = '';
+
+        // Add the vision field only if it is not empty
+        if (!empty($vision)) {
+            $sql .= "vision = ?, ";
+            $params[] = $vision;
+            $types .= 's'; // 's' for string
+        }
+
+        // Add the status field to the update
+        $sql .= "status = 'Awaiting validation' WHERE ecobrick_unique_id = ?";
+        $params[] = $ecobrick_unique_id;
+        $types .= 'i'; // 'i' for integer
 
         // Prepare the statement
         if ($stmt = $gobrik_conn->prepare($sql)) {
 
-            // Bind parameters (s = string, i = integer)
-            $stmt->bind_param('si', $vision, $ecobrick_unique_id);
+            // Bind the parameters dynamically
+            $stmt->bind_param($types, ...$params);
 
             // Execute the statement
             if ($stmt->execute()) {
-                // Check if any rows were affected (if the ecobrick exists and was updated)
+                // Check if any rows were affected
                 if ($stmt->affected_rows > 0) {
                     // Success response
                     echo json_encode([
                         'success' => true,
-                        'message' => 'Vision successfully added and status updated.'
+                        'message' => 'Record successfully updated.'
                     ]);
                 } else {
-                    // No rows were affected, meaning ecobrick_unique_id may not exist
+                    // No rows were affected
                     echo json_encode([
                         'success' => false,
                         'message' => 'No matching ecobrick found to update.'
@@ -61,10 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vision_message']) && 
         }
 
     } else {
-        // Invalid input data
+        // Invalid ecobrick_unique_id
         echo json_encode([
             'success' => false,
-            'message' => 'Invalid input data. Please provide a valid vision and ecobrick ID.'
+            'message' => 'Invalid ecobrick ID provided.'
         ]);
     }
 
@@ -72,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vision_message']) && 
     $gobrik_conn->close();
 
 } else {
-    // Invalid request method or missing fields
+    // Invalid request method or missing required fields
     echo json_encode([
         'success' => false,
         'message' => 'Invalid request. Please submit the form correctly.'
     ]);
 }
-
+?>

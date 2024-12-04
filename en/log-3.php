@@ -168,6 +168,7 @@ echo '<!DOCTYPE html>
             </button>
             <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($selfie_photo_url); ?>" data-photo-id="selfie-photo-<?php echo $serial_no; ?>">↩️</button>
         </div>
+     <p>Does your ecobrick photo need rotating?  If so use the arrows.</p>
     </div>
 <?php endif; ?>
 
@@ -177,7 +178,7 @@ echo '<!DOCTYPE html>
 
 
 
-            <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?> <span data-lang-id="001-form-title"> is logged! </span>🎉</h2>
+            <h4 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?> data saved.</h4>
 
 
             <!-- Vision Form -->
@@ -325,6 +326,7 @@ document.addEventListener('DOMContentLoaded', function () {
         visionForm.style.display = 'none';
         nextOptions.style.display = 'block';
     }
+
 //
 //     // Event listener for the 'Skip: Complete Logging' button
 //     skipButton.addEventListener('click', function (event) {
