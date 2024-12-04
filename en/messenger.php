@@ -338,7 +338,7 @@ function formatTimestamp(timestamp, serverTime) {
 
 // SECTION 3: Load messages using AJAX to fetch from the database using get_messages.php.
 // Then, Render Messages is called, and conversations are updated.
-function loadMessages(conversationId, allMsgsPosted) {
+function refreshMessages(conversationId, allMsgsPosted) {
     $.ajax({
         url: '../messenger/get_messages.php',
         method: 'GET',
@@ -392,43 +392,41 @@ function loadMessages(conversationId, allMsgsPosted) {
 
 
 
-/*
-//
-// function loadMessages(conversationId) {
-//     $.ajax({
-//         url: '../messenger/get_messages.php',
-//         method: 'GET',
-//         data: { conversation_id: conversationId, user_id: userId },
-//         success: function(response) {
-//             if (response.status === 'success') {
-//                 const messages = response.messages;
-//                 const firstName = response.first_name; // Retrieve first name
-//                 const otherParticipants = response.other_participants; // Retrieve other participants
-//                 const serverTime = response.server_time; // Retrieve server time for consistent display
-//
-//                 // Pass conversationId and serverTime to renderMessages
-//                 renderMessages(messages, conversationId, serverTime);
-//
-//                 // Check if the conversation is empty and display the "New Chat" message if needed
-//                 if (messages.length === 0) {
-//                     showNewChatMessage(firstName, otherParticipants);
-//                 } else {
-//                     hideNewChatMessage();
-//
-//                     // Update conversation details with the latest message and timestamp
-//                     const lastMessage = messages[messages.length - 1];
-//                     updateConversationDetails(conversationId, lastMessage);
-//                 }
-//             } else {
-//                 alert(response.message);
-//             }
-//         },
-//         error: function(error) {
-//             console.error('Error fetching messages:', error);
-//         }
-//     });
-// }
- */
+function loadMessages(conversationId) {
+    $.ajax({
+        url: '../messenger/get_messages.php',
+        method: 'GET',
+        data: { conversation_id: conversationId, user_id: userId },
+        success: function(response) {
+            if (response.status === 'success') {
+                const messages = response.messages;
+                const firstName = response.first_name; // Retrieve first name
+                const otherParticipants = response.other_participants; // Retrieve other participants
+                const serverTime = response.server_time; // Retrieve server time for consistent display
+
+                // Pass conversationId and serverTime to renderMessages
+                renderMessages(messages, conversationId, serverTime);
+
+                // Check if the conversation is empty and display the "New Chat" message if needed
+                if (messages.length === 0) {
+                    showNewChatMessage(firstName, otherParticipants);
+                } else {
+                    hideNewChatMessage();
+
+                    // Update conversation details with the latest message and timestamp
+                    const lastMessage = messages[messages.length - 1];
+                    updateConversationDetails(conversationId, lastMessage);
+                }
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(error) {
+            console.error('Error fetching messages:', error);
+        }
+    });
+}
+
 
 
 
@@ -764,15 +762,6 @@ $(document).ready(function() {
             $('#createConversationButton').prop('disabled', true).addClass('hidden'); // Disable the create button if no users are selected
         }
     }
-
-
-
-
-
-
-
-
-
 
 
 
