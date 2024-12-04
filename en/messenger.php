@@ -338,6 +338,51 @@ function formatTimestamp(timestamp, serverTime) {
 
 // SECTION 3: Load messages using AJAX to fetch from the database using get_messages.php.
 // Then, Render Messages is called, and conversations are updated.
+
+
+
+
+function loadMessages(conversationId, allMsgsPosted) {
+    $.ajax({
+        url: '../messenger/get_messages.php',
+        method: 'GET',
+        data: { conversation_id: conversationId, user_id: userId },
+        success: function(response) {
+            if (response.status === 'success') {
+                const messages = response.messages;
+                const firstName = response.first_name; // Retrieve first name
+                const otherParticipants = response.other_participants; // Retrieve other participants
+                const serverTime = response.server_time; // Retrieve server time for consistent display
+
+                // Pass conversationId and serverTime to renderMessages
+                renderMessages(messages, conversationId, serverTime);
+
+                // Check if the conversation is empty and display the "New Chat" message if needed
+                if (messages.length === 0) {
+                    showNewChatMessage(firstName, otherParticipants);
+                } else {
+                    hideNewChatMessage();
+
+                    // Update conversation details with the latest message and timestamp
+                    const lastMessage = messages[messages.length - 1];
+                    updateConversationDetails(conversationId, lastMessage);
+                }
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(error) {
+            console.error('Error fetching messages:', error);
+        },
+        complete: function() {
+            // Schedule the next message load after 5 seconds
+            setTimeout(function() {
+                refreshMessages(conversationId, allMsgsPosted);
+            }, 5000);
+        }
+    });
+}
+
 function refreshMessages(conversationId, allMsgsPosted) {
     $.ajax({
         url: '../messenger/get_messages.php',
@@ -384,45 +429,8 @@ function refreshMessages(conversationId, allMsgsPosted) {
         complete: function() {
             // Schedule the next message load after 4 seconds
             setTimeout(function() {
-                loadMessages(conversationId, allMsgsPosted);
-            }, 4000);
-        }
-    });
-}
-
-
-
-function loadMessages(conversationId) {
-    $.ajax({
-        url: '../messenger/get_messages.php',
-        method: 'GET',
-        data: { conversation_id: conversationId, user_id: userId },
-        success: function(response) {
-            if (response.status === 'success') {
-                const messages = response.messages;
-                const firstName = response.first_name; // Retrieve first name
-                const otherParticipants = response.other_participants; // Retrieve other participants
-                const serverTime = response.server_time; // Retrieve server time for consistent display
-
-                // Pass conversationId and serverTime to renderMessages
-                renderMessages(messages, conversationId, serverTime);
-
-                // Check if the conversation is empty and display the "New Chat" message if needed
-                if (messages.length === 0) {
-                    showNewChatMessage(firstName, otherParticipants);
-                } else {
-                    hideNewChatMessage();
-
-                    // Update conversation details with the latest message and timestamp
-                    const lastMessage = messages[messages.length - 1];
-                    updateConversationDetails(conversationId, lastMessage);
-                }
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function(error) {
-            console.error('Error fetching messages:', error);
+                refreshMessages(conversationId, allMsgsPosted);
+            }, 5000);
         }
     });
 }
