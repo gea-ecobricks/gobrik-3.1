@@ -291,7 +291,8 @@ function renderConversations(conversations, serverTime) {
         const allMsgsPosted = $(this).data('all-msgs-posted');
 
         // Show alert to confirm the value of all_msgs_posted
-//         alert(`Conversation ID: ${conversationId}\nAll Messages Posted: ${allMsgsPosted}`);
+       alert(`Conversation ID: ${conversationId}\nAll Messages Posted: ${allMsgsPosted}`);
+//
 
         // Trigger mobile view if the viewport is below 769px
         if (window.innerWidth < 769) {
