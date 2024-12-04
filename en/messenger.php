@@ -375,15 +375,12 @@ function loadMessages(conversationId, allMsgsPosted) {
             console.error('Error fetching messages:', error);
         },
         complete: function() {
-        const conversationId = $(this).data('conversation-id');
-            const allMsgsPosted = $(this).data('all-msgs-posted');
 
         // Show alert to confirm the value of all_msgs_posted
-       alert(`Refresh Conversation ID: ${conversationId}\nAll Messages Posted: ${allMsgsPosted}`);
             // Schedule the next message load after 5 seconds
             setTimeout(function() {
 
-//
+console.log('Refreshing messages with:', { conversationId, allMsgsPosted });
                 refreshMessages(conversationId, allMsgsPosted);
             }, 5000);
         }
