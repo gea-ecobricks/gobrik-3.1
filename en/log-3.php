@@ -149,7 +149,6 @@ echo '<!DOCTYPE html>
             </button>
             <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>" data-photo-id="ecobrick-photo-<?php echo $serial_no; ?>">↩️</button>
         </div>
-    <p>Does your ecobrick photo need rotating?  If so use the arrows.</p>
     </div>
 <?php endif; ?>
 
@@ -169,18 +168,16 @@ echo '<!DOCTYPE html>
             </button>
             <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($selfie_photo_url); ?>" data-photo-id="selfie-photo-<?php echo $serial_no; ?>">↩️</button>
         </div>
-     <p>Does your ecobrick photo need rotating?  If so use the arrows.</p>
     </div>
+
 <?php endif; ?>
+
+     <p>Does your ecobrick photo need rotating?  If so use the arrows.</p>
 
 </div>
 
 
-
-
-
-            <h4 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?></h4>
-
+            <h4 id="ecobrick-logged-title"></h4>
 
             <!-- Vision Form -->
             <form id="add-vision-form">
