@@ -340,8 +340,6 @@ function formatTimestamp(timestamp, serverTime) {
 // Then, Render Messages is called, and conversations are updated.
 
 
-
-
 function loadMessages(conversationId, allMsgsPosted) {
     $.ajax({
         url: '../messenger/get_messages.php',
@@ -375,17 +373,20 @@ function loadMessages(conversationId, allMsgsPosted) {
             console.error('Error fetching messages:', error);
         },
         complete: function() {
+            // Explicitly set allMsgsPosted to 1 before passing it
+            allMsgsPosted = 1;
 
-        // Show alert to confirm the value of all_msgs_posted
+            console.log('Refreshing messages with:', { conversationId, allMsgsPosted });
+
             // Schedule the next message load after 5 seconds
             setTimeout(function() {
-
-console.log('Refreshing messages with:', { conversationId, allMsgsPosted });
                 refreshMessages(conversationId, allMsgsPosted);
             }, 5000);
         }
     });
 }
+
+
 
 function refreshMessages(conversationId, allMsgsPosted) {
     $.ajax({
