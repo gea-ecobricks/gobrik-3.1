@@ -149,6 +149,7 @@ echo '<!DOCTYPE html>
             </button>
             <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>" data-photo-id="ecobrick-photo-<?php echo $serial_no; ?>">↩️</button>
         </div>
+    <p>Does your ecobrick photo need rotating?  If so use the arrows.</p>
     </div>
 <?php endif; ?>
 
@@ -178,7 +179,7 @@ echo '<!DOCTYPE html>
 
 
 
-            <h4 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?> data saved.</h4>
+            <h4 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?></h4>
 
 
             <!-- Vision Form -->
@@ -291,10 +292,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const charCounter = document.getElementById('character-counter');
     const maxLength = 255;
 
-    // Fetch the translation string for "characters remaining"
-//     const charRemainingTextElement = document.id('[data-lang-id="024-char-remaining"]');
-//     const charRemainingText = charRemainingTextElement.textContent;
-
     // Update character counter on input
     visionTextarea.addEventListener('input', function () {
         const remainingChars = maxLength - visionTextarea.value.length;
@@ -327,45 +324,11 @@ document.addEventListener('DOMContentLoaded', function () {
         nextOptions.style.display = 'block';
     }
 
-//
-//     // Event listener for the 'Skip: Complete Logging' button
-//     skipButton.addEventListener('click', function (event) {
-//         event.preventDefault();
-//
-//         // Send a request to update the status without adding a vision
-//         fetch('update_brik_status.php', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/x-www-form-urlencoded',
-//             },
-//             body: new URLSearchParams({
-//                 'action': 'skip',
-//                 'ecobrick_unique_id': document.querySelector('[name="ecobrick_unique_id"]').value
-//             })
-//         })
-//             .then(response => response.json())
-//             .then(data => {
-//                 if (data.success) {
-//                     showNextOptions();
-//                 } else {
-//                     alert('Error: ' + data.message);
-//                 }
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//                 alert('A network error occurred. Please try again later.');
-//             });
-//     });
 
     // Event listener for the form submission
     visionForm.addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent default form submission
 
-        // Check if the vision message is empty
-//         if (visionMessage.value.trim() === '') {
-//             alert("Seems you forgot to actually add a vision! Please try again or hit Skip.");
-//             return;
-//         }
 
         // Send form data to log_vision.php
         const formData = new FormData(visionForm);
