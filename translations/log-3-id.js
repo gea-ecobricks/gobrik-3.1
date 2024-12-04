@@ -26,7 +26,7 @@ const id_Page_Translations = {
     "014-delete-ecobrick": "❌ Hapus Ecobrick",
     "015-error-happened": "😭 Hmm... terjadi kesalahan saat menambahkan visi Anda ke",
     "016-error-happened": "rekor. Beri tahu kami melalui formulir uji beta atau ulasan bug, tolong!",
-    "015-vision-added": "Visi berhasil ditambahkan ke catatan ecobrick",
+    "015-vision-added": "Visi (jika di tulis) berhasil ditambahkan ke catatan ecobrick",
     "003-recorded-ready": "Ecobrick Anda sekarang ada di antrian validasi, menunggu tinjauan oleh rekan."
 };
 

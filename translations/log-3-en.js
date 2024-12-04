@@ -27,7 +27,7 @@ const en_Page_Translations = {
     "014-delete-ecobrick": "❌ Delete Ecobrick",
     "015-error-happened": "😭 Hmmm... something went wrong adding your vision to",
     "016-error-happened": "'s record. Let us know on the beta test or bug review form, please!",
-    "015-vision-added": "Vision successfully added to ecobrick record",
+    "015-vision-added": "Vision (if set) successfully added to ecobrick record",
     "003-recorded-ready": "Your ecobrick is now in the validation queue now pending peer review.",
      "077-earth-thanks-you": "The Earth Thanks You."
      };

@@ -222,7 +222,7 @@ echo '<!DOCTYPE html>
             </div>
         <h3>🙏 💚 🌏</h3>
                 <div id="vision-added-success" style="display:none;font-family:'Mulish',sans-serif; font-size:1.2em;color:var(--text-color);">
-                <span style="color:green;">✔</span> <span data-lang-id="015-vision-added">Vision successfully added to ecobrick record </span> <?php echo $ecobrick_unique_id; ?>.
+                <span style="color:green;">✔</span> <span data-lang-id="015-vision-added">Vision (if set) was successfully added to ecobrick record </span> <?php echo $ecobrick_unique_id; ?>.
             </div>
                 <div id="conclusion-message" style="font-family:'Mulish',sans-serif; font-size:1.2em;color:var(--text-color);"><span style="color:green;">✔</span> <span data-lang-id="003-recorded-ready" >Your ecobrick is now in the validation queue now pending peer review.</span></div>
             </div>

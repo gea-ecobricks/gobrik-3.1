@@ -357,6 +357,7 @@ require_once ("../includes/log-inc.php");
                         <option value="1000">1000 ml</option>
                         <option value="1100">1100 ml</option>
                         <option value="1250">1250 ml</option>
+                        <option value="1350">1350 ml</option>
                         <option value="1500">1500 ml</option>
                         <option value="1750">1750 ml</option>
                         <option value="2000">2000 ml</option>
