@@ -171,7 +171,7 @@ echo '<!DOCTYPE html>
         </div>
     </div>
 <?php endif; ?>
-         <p style="font-size:smaler;">Does your ecobrick photo need rotating?  If so use the arrows above.</p>
+         <p style="font-size:smaller;color:var(--subdued-text);">Does your ecobrick photo need rotating?  If so use the arrows above.</p>
 
 </div>
 
