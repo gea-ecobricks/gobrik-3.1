@@ -149,7 +149,6 @@ echo '<!DOCTYPE html>
             </button>
             <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>" data-photo-id="ecobrick-photo-<?php echo $serial_no; ?>">↩️</button>
         </div>
-         <p>Does your ecobrick photo need rotating?  If so use the arrows above.</p>
 
     </div>
 <?php endif; ?>
@@ -172,6 +171,7 @@ echo '<!DOCTYPE html>
         </div>
     </div>
 <?php endif; ?>
+         <p style="font-size:smaler;">Does your ecobrick photo need rotating?  If so use the arrows above.</p>
 
 </div>
 
