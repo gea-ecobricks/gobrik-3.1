@@ -34,6 +34,8 @@
     #latest-ecobricks th:nth-child(4), /* Receivers */
     #latest-ecobricks th:nth-child(5)  /* Location column header */ {
         display: none;
+        }
+
         /* Hide the "Location" and "Weight" table cells */
     #latest-ecobricks td:nth-child(4), /* Receivers column cell */
     #latest-ecobricks td:nth-child(5)  /* Location column cell */ {
