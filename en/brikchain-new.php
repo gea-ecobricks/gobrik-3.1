@@ -270,18 +270,7 @@ echo '<!DOCTYPE html>
                 { data: 'block_tran_type', title: 'Type' },
                 { data: 'block_amt', title: 'Block' },
                 { data: 'individual_amt', title: 'Shard' },
-                {
-                    data: 'ecobrick_serial_no',
-                    title: 'Ecobrick',
-                    render: function(data, type, row) {
-                        if (data && data.trim() !== '') {
-                            // Create a link if the serial number is not blank
-                            return `<a href="brik.php?$serial_no=${data}" target="_blank">${data}</a>`;
-                        }
-                        // Return an empty string if the serial number is blank
-                        return '';
-                    }
-                }
+                { data: 'ecobrick_serial_no', title: 'Brik' }
             ],
             order: [[0, 'asc']], // Sort by the first column (`tran_id`) in descending order
             pageLength: 12, // Number of rows per page

@@ -6,7 +6,22 @@ try {
     // Get DataTables parameters
     $start = intval($_POST['start'] ?? 0); // Starting row index
     $length = intval($_POST['length'] ?? 10); // Number of rows to fetch
+    $orderColumnIndex = intval($_POST['order'][0]['column'] ?? 0); // Column index for ordering
+    $orderDir = $_POST['order'][0]['dir'] ?? 'asc'; // Sort direction ('asc' or 'desc')
     $searchValue = $_POST['search']['value'] ?? ''; // Search value, if any
+
+    // Map column indexes to database fields
+    $columns = [
+        'tran_id',
+        'send_ts',
+        'sender',
+        'receiver_or_receivers',
+        'block_tran_type',
+        'block_amt',
+        'individual_amt',
+        'ecobrick_serial_no'
+    ];
+    $orderColumn = $columns[$orderColumnIndex] ?? 'tran_id'; // Default to `tran_id` if index is invalid
 
     // Base query
     $sql = "SELECT
@@ -49,6 +64,9 @@ try {
     if (!empty($searchValue)) {
         $sql .= " WHERE tran_id LIKE ? OR sender LIKE ? OR receiver_or_receivers LIKE ?";
     }
+
+    // Add ORDER BY clause for sorting
+    $sql .= " ORDER BY $orderColumn $orderDir";
 
     // Add LIMIT for pagination
     $sql .= " LIMIT ?, ?";

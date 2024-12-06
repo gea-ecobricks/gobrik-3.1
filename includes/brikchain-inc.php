@@ -24,6 +24,9 @@
 
 <style>
 
+.landing-page-form {
+height: auto !important;
+}
             #main {
         height: fit-content !important;
         padding-bottom: 100px;
