@@ -114,7 +114,7 @@ echo '<!DOCTYPE html>
         <button onclick="preclosed1()" class="block-toggle" id="block-toggle-show1">+</button>
     </div>
 
-    <div id="preclosed1">
+    <div id="preclosed1-not">
         <div class="overflow">
             <table id="brikchain-transactions" class="display" style="width:100%">
                 <thead>
@@ -270,11 +270,11 @@ echo '<!DOCTYPE html>
                 { data: 'block_tran_type', title: 'Type' },
                 { data: 'block_amt', title: 'Block' },
                 { data: 'individual_amt', title: 'Shard' },
-                { data: 'ecobrick_serial_no', title: 'Ecobrick' }
+                { data: 'ecobrick_serial_no', title: 'Brik' }
             ],
-            order: [[0, 'desc']], // Sort by the first column (`tran_id`) in descending order
-            pageLength: 10, // Number of rows per page
-            lengthMenu: [10, 25, 50, 100] // Options for rows per page
+            order: [[0, 'asc']], // Sort by the first column (`tran_id`) in descending order
+            pageLength: 12, // Number of rows per page
+            lengthMenu: [12, 25, 50, 100] // Options for rows per page
         });
     });
 </script>
