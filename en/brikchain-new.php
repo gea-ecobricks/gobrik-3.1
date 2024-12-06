@@ -263,7 +263,7 @@ echo '<!DOCTYPE html>
                 type: 'POST' // HTTP method
             },
             columns: [
-                { data: 'tran_id', title: 'Transaction' },
+                { data: 'tran_id', title: '🔎 Transaction' },
                 { data: 'send_ts', title: 'Issued' },
                 { data: 'sender', title: 'Sender' },
                 { data: 'receiver_or_receivers', title: 'Recipient' },
@@ -272,19 +272,30 @@ echo '<!DOCTYPE html>
                     data: 'block_amt',
                     title: 'Block',
                     render: function(data, type, row) {
-                        // Format number with 2 decimal points and add a dollar sign
-                        return `$ß{parseFloat(data).toFixed(2)}`;
+                        // Format number with 2 decimal points and add ß with a half-space
+                        return `${parseFloat(data).toFixed(2)}&#8202;ß`;
                     }
                 },
                 {
                     data: 'individual_amt',
                     title: 'Shard',
                     render: function(data, type, row) {
-                        // Format number with 2 decimal points and add a dollar sign
-                        return `$ß{parseFloat(data).toFixed(2)}`;
+                        // Format number with 2 decimal points and add ß with a half-space
+                        return `${parseFloat(data).toFixed(2)}&#8202;ß`;
                     }
                 },
-                { data: 'ecobrick_serial_no', title: 'Brik' }
+                {
+                    data: 'ecobrick_serial_no',
+                    title: 'Brik',
+                    render: function(data, type, row) {
+                        if (data && data.trim() !== '') {
+                            // Create a link if the serial number is not blank
+                            return `<a href="brik.php?$serial_no=${data}" target="_blank">${data}</a>`;
+                        }
+                        // Return an empty string if the serial number is blank
+                        return '';
+                    }
+                }
             ],
             order: [[0, 'desc']], // Sort by the first column (`tran_id`) in descending order
             pageLength: 12, // Number of rows per page
@@ -292,6 +303,7 @@ echo '<!DOCTYPE html>
         });
     });
 </script>
+
 
 
 
