@@ -256,10 +256,11 @@ echo '<!DOCTYPE html>
 <script>
     $(document).ready(function () {
         $('#brikchain-transactions').DataTable({
+            serverSide: true, // Enable server-side processing
+            processing: true, // Show a processing indicator
             ajax: {
                 url: '../api/fetch_brik_transactions.php', // Server endpoint to fetch data
-                type: 'POST', // HTTP method
-                dataSrc: '' // Adjust if the server returns nested JSON
+                type: 'POST' // HTTP method
             },
             columns: [
                 { data: 'tran_id', title: '🔎 Transaction' },
@@ -271,13 +272,12 @@ echo '<!DOCTYPE html>
                 { data: 'individual_amt', title: 'Shard' },
                 { data: 'ecobrick_serial_no', title: 'Ecobrick' }
             ],
-            responsive: true, // Enables responsive design
-            pageLength: 10, // Default number of rows
-            lengthMenu: [10, 25, 50, 100], // Options for rows per page
-
+            pageLength: 10, // Number of rows per page
+            lengthMenu: [10, 25, 50, 100] // Options for rows per page
         });
     });
 </script>
+
 
 
 <!-- This script is for pages that use the accordion content system-->

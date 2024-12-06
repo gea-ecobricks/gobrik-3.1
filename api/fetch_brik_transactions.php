@@ -3,7 +3,12 @@
 require_once '../gobrikconn_env.php';
 
 try {
-    // Prepare the SQL query
+    // Get DataTables parameters
+    $start = intval($_POST['start'] ?? 0); // Starting row index
+    $length = intval($_POST['length'] ?? 10); // Number of rows to fetch
+    $searchValue = $_POST['search']['value'] ?? ''; // Search value, if any
+
+    // Base query
     $sql = "SELECT
                 chain_ledger_id,
                 tran_id,
@@ -40,6 +45,14 @@ try {
                 catalyst_name
             FROM tb_brk_transaction";
 
+    // Apply search filter
+    if (!empty($searchValue)) {
+        $sql .= " WHERE tran_id LIKE ? OR sender LIKE ? OR receiver_or_receivers LIKE ?";
+    }
+
+    // Add LIMIT for pagination
+    $sql .= " LIMIT ?, ?";
+
     // Prepare the statement
     $stmt = $gobrik_conn->prepare($sql);
 
@@ -47,24 +60,39 @@ try {
         throw new Exception("Failed to prepare the statement: " . $gobrik_conn->error);
     }
 
+    // Bind parameters
+    if (!empty($searchValue)) {
+        $searchParam = "%$searchValue%";
+        $stmt->bind_param("sssii", $searchParam, $searchParam, $searchParam, $start, $length);
+    } else {
+        $stmt->bind_param("ii", $start, $length);
+    }
+
     // Execute the query
     $stmt->execute();
 
-    // Bind result variables
-    $stmt->store_result();
-    $data = [];
+    // Fetch data
     $result = $stmt->get_result();
-
-    // Fetch data row by row
+    $data = [];
     while ($row = $result->fetch_assoc()) {
         $data[] = $row;
-
-        // Optional: Limit the number of rows fetched (for testing purposes)
-        if (count($data) > 1000) break;
     }
 
+    // Get total record count
+    $totalQuery = "SELECT COUNT(*) as total FROM tb_brk_transaction";
+    $totalResult = $gobrik_conn->query($totalQuery);
+    $totalRecords = $totalResult->fetch_assoc()['total'];
+
+    // Prepare the response
+    $response = [
+        "draw" => intval($_POST['draw'] ?? 1), // DataTables draw counter
+        "recordsTotal" => $totalRecords, // Total number of records
+        "recordsFiltered" => $totalRecords, // Total records after filtering (same if no filter applied)
+        "data" => $data // Data to display
+    ];
+
     // Return the data as JSON
-    echo json_encode($data);
+    echo json_encode($response);
 
 } catch (Exception $e) {
     // Return the error as JSON
