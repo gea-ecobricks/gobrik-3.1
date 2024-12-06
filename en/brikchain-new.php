@@ -300,35 +300,33 @@ echo '<!DOCTYPE html>
 
 <!-- CUSTOM PAGE SCRIPTS-->
 <script>
-    // Include the jQuery DataTables library
-$(document).ready(function () {
-    $('#brikchain').DataTable({
-        ajax: {
-            url: '../api/fetch_brik_transactions.php', // Replace with your server endpoint to fetch data
-            type: 'POST', // Adjust to the method used in your API
-            dataSrc: '' // Assuming the API returns an array of objects; modify if needed
-        },
-        columns: [
-            { data: 'tran_id', title: '🔎 Transaction' },
-            { data: 'send_ts', title: 'Issued' },
-            { data: 'sender', title: 'Sender' },
-            { data: 'receiver_or_receivers', title: 'Recipient' },
-            { data: 'block_tran_type', title: 'Type' },
-            { data: 'block_amt', title: 'Block' },
-            { data: 'individual_amt', title: 'Shard' },
-            { data: 'ecobrick_serial_no', title: 'Ecobrick' }
-        ],
-        language: {
-            // Add translation support for column headers, if needed
-            "url": "/path-to-language-file.json" // Optional: replace with your language file path
-        },
-        responsive: true, // Enables responsive tables
-        pageLength: 10, // Number of rows per page
-        lengthMenu: [10, 25, 50, 100] // Page length options
+    $(document).ready(function () {
+        $('#brikchain').DataTable({
+            ajax: {
+                url: '../api/fetch_brik_transactions.php', // Server endpoint to fetch data
+                type: 'POST', // HTTP method
+                dataSrc: '' // Adjust if the server returns nested JSON
+            },
+            columns: [
+                { data: 'tran_id', title: '🔎 Transaction' },
+                { data: 'send_ts', title: 'Issued' },
+                { data: 'sender', title: 'Sender' },
+                { data: 'receiver_or_receivers', title: 'Recipient' },
+                { data: 'block_tran_type', title: 'Type' },
+                { data: 'block_amt', title: 'Block' },
+                { data: 'individual_amt', title: 'Shard' },
+                { data: 'ecobrick_serial_no', title: 'Ecobrick' }
+            ],
+            responsive: true, // Enables responsive design
+            pageLength: 10, // Default number of rows
+            lengthMenu: [10, 25, 50, 100], // Options for rows per page
+            language: {
+                url: '/path-to-language-file.json' // Optional: add a path to a language file if needed
+            }
+        });
     });
-});
-
 </script>
+
 
 <!-- This script is for pages that use the accordion content system-->
 <script src="../scripts/accordion-scripts.js" defer></script>
