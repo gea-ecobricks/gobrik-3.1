@@ -102,63 +102,41 @@ echo '<!DOCTYPE html>
 
 
 <script>
-    $(document).ready(function() {
-        $("#latest-ecobricks").DataTable({
-            "responsive": true,
-            "serverSide": true,
-            "processing": true,
-            "ajax": {
-                "url": "../api/fetch_newest_briks.php",
-                "type": "POST"
+    $(document).ready(function () {
+        $('#brikchain-transactions').DataTable({
+            serverSide: true, // Enable server-side processing
+            processing: true, // Show a processing indicator
+            ajax: {
+                url: '../api/fetch_brik_transactions.php', // Server endpoint to fetch data
+                type: 'POST' // HTTP method
             },
-            "pageLength": 10, // Set default number of rows per page to 10
-            "language": {
-                "emptyTable": "It looks like no ecobricks have been logged yet!",
-                "info": "Showing _START_ to _END_ of _TOTAL_ ecobricks",
-                "infoEmpty": "No ecobricks available",
-                "loadingRecords": "Loading ecobricks...",
-                "processing": "Processing...",
-                "search": "",
-                "paginate": {
-                    "first": "First",
-                    "last": "Last",
-                    "next": "Next",
-                    "previous": "Previous"
-                }
-            },
-            "columns": [
-                { "data": "ecobrick_thumb_photo_url" }, // Brik thumbnail
-                { "data": "ecobricker_maker" }, // Maker
-                { "data": "location_brik" }, // Location
-                { "data": "weight_g" }, // Weight
-                { "data": "volume_ml" }, // Volume
-                { "data": "density" }, // Density
-                { "data": "status" }, // Status
+            columns: [
+                { data: 'tran_id', title: '🔎 Transaction' },
+                { data: 'send_ts', title: 'Issued' },
+                { data: 'sender', title: 'Sender' },
+                { data: 'receiver_or_receivers', title: 'Recipient' },
+                { data: 'block_tran_type', title: 'Type' },
+                { data: 'block_amt', title: 'Block' },
+                { data: 'individual_amt', title: 'Shard' },
                 {
-            "data": "serial_no",
-            "render": function(data, type, row) {
-                // Construct the URL for the serial_no
-                const serialUrl = 'brik.php?serial_no=' + encodeURIComponent(data);
-
-                // Return a button with the serial number
-                return '<a href="' + serialUrl + '" class="serial-button" data-text="' + data + '">'
-                    + '<span>' + data + '</span>'
-                    + '</a>';
-            }
-        }
+                    data: 'ecobrick_serial_no',
+                    title: 'Ecobrick',
+                    render: function(data, type, row) {
+                        if (data && data.trim() !== '') {
+                            return `<a href="brik.php?$serial_no=${data}" target="_blank">${data}</a>`;
+                        }
+                        return '';
+                    }
+                }
             ],
-            "columnDefs": [
-                { "orderable": false, "targets": [0, 6] }, // Make the image and status columns unsortable
-                { "className": "all", "targets": [0, 1, 3, 7] }, // Ensure Brik (thumbnail), Maker, Weight, and Serial always display
-                { "className": "min-tablet", "targets": [2, 4, 5] }, // These fields can be hidden first on smaller screens
-            ],
-            "initComplete": function() {
-                var searchBox = $("div.dataTables_filter input");
-                searchBox.attr("placeholder", "Search briks...");
-            }
+            order: [[0, 'desc']], // Sort by `tran_id` in descending order
+            pageLength: 10, // Default number of rows per page
+            lengthMenu: [10, 25, 50, 100] // Options for rows per page
         });
     });
 </script>
+
+
 
 
 
