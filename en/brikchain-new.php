@@ -252,7 +252,7 @@ echo '<!DOCTYPE html>
 	<?php require_once ("../footer-2024.php");?>
 
 
-<!-- CUSTOM PAGE SCRIPTS-->
+<!-- BRK TRANS DATATABLE -->
 <script>
     $(document).ready(function () {
         $('#brikchain-transactions').DataTable({
@@ -303,6 +303,7 @@ echo '<!DOCTYPE html>
         });
     });
 </script>
+
 
 
 
