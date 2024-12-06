@@ -157,7 +157,7 @@ echo '<!DOCTYPE html>
 
     <div id="preclosed1">
         <div class="overflow">
-            <table id="brikchain" class="display" style="width:100%">
+            <table id="brikchain-transactions" class="display" style="width:100%">
                 <thead>
                     <tr>
                         <th data-lang-id="021-transaction-header">🔎 Transaction</th>
@@ -301,7 +301,7 @@ echo '<!DOCTYPE html>
 <!-- CUSTOM PAGE SCRIPTS-->
 <script>
     $(document).ready(function () {
-        $('#brikchain').DataTable({
+        $('#brikchain-transactions').DataTable({
             ajax: {
                 url: '../api/fetch_brik_transactions.php', // Server endpoint to fetch data
                 type: 'POST', // HTTP method
