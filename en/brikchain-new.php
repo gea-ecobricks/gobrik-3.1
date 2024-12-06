@@ -304,6 +304,9 @@ echo '<!DOCTYPE html>
     });
 
     function openTransactionModal(tran_id) {
+    const modal = document.getElementById('form-modal-message');
+    // Show the modal
+    modal.style.display = 'flex';
         // Blur the background and prepare the modal
         document.getElementById('page-content')?.classList.add('blurred');
         document.getElementById('footer-full')?.classList.add('blurred');
