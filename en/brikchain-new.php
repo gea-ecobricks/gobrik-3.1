@@ -270,24 +270,13 @@ echo '<!DOCTYPE html>
                 { data: 'block_tran_type', title: 'Type' },
                 { data: 'block_amt', title: 'Block' },
                 { data: 'individual_amt', title: 'Shard' },
-                {
-                    data: 'ecobrick_serial_no',
-                    title: 'Ecobrick',
-                    render: function(data, type, row) {
-                        if (data && data.trim() !== '') {
-                            return `<a href="brik.php?$serial_no=${data}" target="_blank">${data}</a>`;
-                        }
-                        return '';
-                    }
-                }
+                { data: 'ecobrick_serial_no', title: 'Ecobrick' }
             ],
-            order: [[0, 'desc']], // Sort by `tran_id` in descending order
-            pageLength: 10, // Default number of rows per page
+            pageLength: 10, // Number of rows per page
             lengthMenu: [10, 25, 50, 100] // Options for rows per page
         });
     });
 </script>
-
 
 
 
