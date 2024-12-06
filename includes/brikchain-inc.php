@@ -28,6 +28,16 @@
 
 <style>
 
+    /* Media query for screens less than 1000px wide */
+@media screen and (max-width: 1000px) {
+    /* Hide the "Location" and "Weight" table headers */
+    #latest-ecobricks th:nth-child(4), /* Receivers */
+    #latest-ecobricks th:nth-child(5)  /* Location column header */ {
+        display: none;
+    }
+
+}
+
 .landing-page-form {
 height: auto !important;
 }

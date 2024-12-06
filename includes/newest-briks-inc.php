@@ -30,8 +30,8 @@
 
 
 
-/* Media query for screens less than 769px wide */
-@media screen and (max-width: 768px) {
+/* Media query for screens less than 1000px wide */
+@media screen and (max-width: 1000px) {
     /* Hide the "Location" and "Weight" table headers */
     #latest-ecobricks th:nth-child(2), /* Weight column header */
     #latest-ecobricks th:nth-child(3)  /* Location column header */ {
