@@ -303,46 +303,57 @@ echo '<!DOCTYPE html>
         });
     });
 
-    function openTransactionModal(tran_id) {
+  function openTransactionModal(tran_id) {
     const modal = document.getElementById('form-modal-message');
+
     // Show the modal
     modal.style.display = 'flex';
-        // Blur the background and prepare the modal
-        document.getElementById('page-content')?.classList.add('blurred');
-        document.getElementById('footer-full')?.classList.add('blurred');
-        document.body.classList.add('modal-open');
 
-        // Clear previous modal content
-        const modalMessage = document.querySelector('.modal-message');
-        modalMessage.innerHTML = '<p>Loading transaction details...</p>';
+    // Lock scrolling for the body and blur background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open'); // Locks scrolling
 
-        // Fetch transaction details
-        fetch(`../api/fetch_brik_transactions.php?tran_id=${tran_id}`)
-            .then(response => response.json())
-            .then(data => {
-                let tableHTML = '<table id="transaction-details-table" class="display" style="width:100%">';
-                tableHTML += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
+    // Set up the modal-content-box styles
+    const modalContentBox = document.getElementById('modal-content-box');
+    modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
+    modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
 
-                for (const [field, value] of Object.entries(data)) {
-                    tableHTML += `<tr><td>${field}</td><td>${value}</td></tr>`;
-                }
+    // Clear previous modal content
+    modalContentBox.innerHTML = '<p>Loading transaction details...</p>';
 
-                tableHTML += '</tbody></table>';
+    // Fetch transaction details
+    fetch(`../api/fetch_brik_transactions.php?tran_id=${tran_id}`)
+        .then(response => response.json())
+        .then(data => {
+            // Build the DataTable HTML
+            let tableHTML = '<table id="transaction-details-table" class="display" style="width:100%">';
+            tableHTML += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
 
-                modalMessage.innerHTML = tableHTML;
+            for (const [field, value] of Object.entries(data)) {
+                tableHTML += `<tr><td>${field}</td><td>${value}</td></tr>`;
+            }
 
-                $('#transaction-details-table').DataTable({
-                    paging: false,
-                    searching: false,
-                    info: false
-                });
-            })
-            .catch(error => {
-                modalMessage.innerHTML = `<p>Error loading transaction details: ${error.message}</p>`;
+            tableHTML += '</tbody></table>';
+
+            // Insert the table into the modal-content-box
+            modalContentBox.innerHTML = tableHTML;
+
+            // Initialize the DataTable
+            $('#transaction-details-table').DataTable({
+                paging: false, // Disable pagination
+                searching: false, // Disable search
+                info: false // Disable table info
             });
+        })
+        .catch(error => {
+            modalContentBox.innerHTML = `<p>Error loading transaction details: ${error.message}</p>`;
+        });
 
-        document.getElementById('form-modal-message').classList.remove('modal-hidden');
-    }
+    // Display the modal
+    modal.classList.remove('modal-hidden');
+}
+
 </script>
 
 
