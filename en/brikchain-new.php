@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.45';
+$version = '0.46';
 $page = 'brikchain';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -272,7 +272,7 @@ echo '<!DOCTYPE html>
                 { data: 'individual_amt', title: 'Shard' },
                 { data: 'ecobrick_serial_no', title: 'Brik' }
             ],
-            order: [[0, 'asc']], // Sort by the first column (`tran_id`) in descending order
+            order: [[0, 'desc']], // Sort by the first column (`tran_id`) in descending order
             pageLength: 12, // Number of rows per page
             lengthMenu: [12, 25, 50, 100] // Options for rows per page
         });
