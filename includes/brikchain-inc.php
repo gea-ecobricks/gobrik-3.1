@@ -20,9 +20,6 @@
 <script type="text/javascript" charset="utf8" src="../scripts/jquery.dataTables.js"></script>
 
 
-
-
-
 <!--This loads CSS specific to this page-->
 
 <style>
