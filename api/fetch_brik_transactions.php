@@ -3,9 +3,11 @@
 require_once '../gobrikconn_env.php';
 
 try {
-    // Create a new PDO connection using credentials from gobrikconn_env.php
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Use the existing database connection from gobrikconn_env.php
+    // Assuming $gobrik_conn is the PDO object
+    if (!$gobrik_conn) {
+        throw new Exception('Database connection not initialized.');
+    }
 
     // Query to fetch all fields from tb_brk_transaction
     $sql = "SELECT
@@ -44,8 +46,8 @@ try {
                 catalyst_name
             FROM tb_brk_transaction";
 
-    // Execute the query
-    $stmt = $pdo->prepare($sql);
+    // Execute the query using the existing connection
+    $stmt = $gobrik_conn->prepare($sql);
     $stmt->execute();
 
     // Fetch all data as an associative array
@@ -54,7 +56,7 @@ try {
     // Return data as JSON
     echo json_encode($result);
 
-} catch (PDOException $e) {
+} catch (Exception $e) {
     // Return error message if connection or query fails
     echo json_encode(['error' => $e->getMessage()]);
 }

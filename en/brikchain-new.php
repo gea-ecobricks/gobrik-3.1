@@ -320,9 +320,7 @@ echo '<!DOCTYPE html>
             responsive: true, // Enables responsive design
             pageLength: 10, // Default number of rows
             lengthMenu: [10, 25, 50, 100], // Options for rows per page
-            language: {
-                url: '/path-to-language-file.json' // Optional: add a path to a language file if needed
-            }
+
         });
     });
 </script>
