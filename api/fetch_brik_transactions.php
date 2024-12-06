@@ -3,13 +3,7 @@
 require_once '../gobrikconn_env.php';
 
 try {
-    // Use the existing database connection from gobrikconn_env.php
-    // Assuming $gobrik_conn is the PDO object
-    if (!$gobrik_conn) {
-        throw new Exception('Database connection not initialized.');
-    }
-
-    // Query to fetch all fields from tb_brk_transaction
+    // Prepare the SQL query
     $sql = "SELECT
                 chain_ledger_id,
                 tran_id,
@@ -46,19 +40,34 @@ try {
                 catalyst_name
             FROM tb_brk_transaction";
 
-    // Execute the query using the existing connection
+    // Prepare the statement
     $stmt = $gobrik_conn->prepare($sql);
+
+    if (!$stmt) {
+        throw new Exception("Failed to prepare the statement: " . $gobrik_conn->error);
+    }
+
+    // Execute the query
     $stmt->execute();
 
-    // Fetch all data as an associative array
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Bind result variables
+    $stmt->store_result();
+    $data = [];
+    $result = $stmt->get_result();
 
-    // Return data as JSON
-    echo json_encode($result);
+    // Fetch data row by row
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+
+        // Optional: Limit the number of rows fetched (for testing purposes)
+        if (count($data) > 1000) break;
+    }
+
+    // Return the data as JSON
+    echo json_encode($data);
 
 } catch (Exception $e) {
-    // Return error message if connection or query fails
+    // Return the error as JSON
     echo json_encode(['error' => $e->getMessage()]);
 }
-
 ?>
