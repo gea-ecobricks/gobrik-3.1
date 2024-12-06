@@ -27,6 +27,11 @@
 
 <style>
 
+            #main {
+        height: fit-content !important;
+        padding-bottom: 100px;
+    }
+
 @media screen and (max-width: 700px) {
 #block1, #block2, #block3, #block4, #block5, #block6 {
 	overflow: scroll ;

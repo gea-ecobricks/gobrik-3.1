@@ -304,7 +304,7 @@ echo '<!DOCTYPE html>
 $(document).ready(function () {
     $('#brikchain').DataTable({
         ajax: {
-            url: '/path-to-your-server-endpoint', // Replace with your server endpoint to fetch data
+            url: '../api/fetch_brik_transactions.php', // Replace with your server endpoint to fetch data
             type: 'POST', // Adjust to the method used in your API
             dataSrc: '' // Assuming the API returns an array of objects; modify if needed
         },
