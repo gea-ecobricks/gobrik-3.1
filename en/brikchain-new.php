@@ -305,10 +305,11 @@ echo '<!DOCTYPE html>
 
   function openTransactionModal(tran_id) {
     const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
 
     // Show the modal
     modal.style.display = 'flex';
-    modal.style.flexFlow = 'column';
+    modalBox.style.flexFlow = 'column';
 
     // Lock scrolling for the body and blur background
     document.getElementById('page-content')?.classList.add('blurred');
