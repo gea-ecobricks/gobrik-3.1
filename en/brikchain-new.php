@@ -319,8 +319,8 @@ echo '<!DOCTYPE html>
     modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
     modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
 
-    // Clear previous modal content
-    modalContentBox.innerHTML = '<p>Loading transaction details...</p>';
+    // Clear previous modal content and set up structure
+    modalContentBox.innerHTML = `<h4>Brikcoin Transaction ${tran_id}</h4><div id="transaction-table-container"></div>`;
 
     // Fetch transaction details
     fetch(`../api/fetch_brik_transactions.php?tran_id=${tran_id}`)
@@ -336,14 +336,15 @@ echo '<!DOCTYPE html>
 
             tableHTML += '</tbody></table>';
 
-            // Insert the table into the modal-content-box
-            modalContentBox.innerHTML = tableHTML;
+            // Insert the table into the transaction-table-container
+            document.getElementById('transaction-table-container').innerHTML = tableHTML;
 
             // Initialize the DataTable
             $('#transaction-details-table').DataTable({
                 paging: false, // Disable pagination
                 searching: false, // Disable search
-                info: false // Disable table info
+                info: false, // Disable table info
+                scrollX: true // Enable horizontal scrolling
             });
         })
         .catch(error => {
@@ -353,6 +354,7 @@ echo '<!DOCTYPE html>
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 </script>
 
