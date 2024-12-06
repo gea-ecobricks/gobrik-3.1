@@ -263,13 +263,27 @@ echo '<!DOCTYPE html>
                 type: 'POST' // HTTP method
             },
             columns: [
-                { data: 'tran_id', title: '🔎 Transaction' },
+                { data: 'tran_id', title: 'Transaction' },
                 { data: 'send_ts', title: 'Issued' },
                 { data: 'sender', title: 'Sender' },
                 { data: 'receiver_or_receivers', title: 'Recipient' },
                 { data: 'block_tran_type', title: 'Type' },
-                { data: 'block_amt', title: 'Block' },
-                { data: 'individual_amt', title: 'Shard' },
+                {
+                    data: 'block_amt',
+                    title: 'Block',
+                    render: function(data, type, row) {
+                        // Format number with 2 decimal points and add a dollar sign
+                        return `$ß{parseFloat(data).toFixed(2)}`;
+                    }
+                },
+                {
+                    data: 'individual_amt',
+                    title: 'Shard',
+                    render: function(data, type, row) {
+                        // Format number with 2 decimal points and add a dollar sign
+                        return `$ß{parseFloat(data).toFixed(2)}`;
+                    }
+                },
                 { data: 'ecobrick_serial_no', title: 'Brik' }
             ],
             order: [[0, 'desc']], // Sort by the first column (`tran_id`) in descending order
@@ -278,6 +292,7 @@ echo '<!DOCTYPE html>
         });
     });
 </script>
+
 
 
 

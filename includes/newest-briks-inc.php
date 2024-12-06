@@ -37,7 +37,9 @@
     #latest-ecobricks th:nth-child(3)  /* Location column header */ {
         display: none;
     }
+}
 
+@media screen and (max-width: 1200px) {
     /* Hide the "Location" and "Weight" table cells */
     #latest-ecobricks td:nth-child(2), /* Weight column cell */
     #latest-ecobricks td:nth-child(3)  /* Location column cell */ {
