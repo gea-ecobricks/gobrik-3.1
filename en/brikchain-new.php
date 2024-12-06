@@ -272,6 +272,7 @@ echo '<!DOCTYPE html>
                 { data: 'individual_amt', title: 'Shard' },
                 { data: 'ecobrick_serial_no', title: 'Ecobrick' }
             ],
+            order: [[0, 'desc']], // Sort by the first column (`tran_id`) in descending order
             pageLength: 10, // Number of rows per page
             lengthMenu: [10, 25, 50, 100] // Options for rows per page
         });
