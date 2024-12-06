@@ -15,9 +15,12 @@
 
 <!-- CUSTOM PAGE SCRIPTS
 -->
-<link rel="stylesheet" type="text/css" href="../styles/jquery.dataTables.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script type="text/javascript" charset="utf8" src="../scripts/jquery.dataTables.js"></script>
+<!-- Include DataTables and jQuery Libraries -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+
 
 
 <!--This loads CSS specific to this page-->
