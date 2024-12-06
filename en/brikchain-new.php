@@ -288,12 +288,8 @@ echo '<!DOCTYPE html>
                     data: 'ecobrick_serial_no',
                     title: 'Brik',
                     render: function(data, type, row) {
-                        if (data && data.trim() !== '') {
-                            // Create a link if the serial number is not blank
-                            return `<a href="brik.php?$serial_no=${data}" target="_blank">${data}</a>`;
-                        }
-                        // Return an empty string if the serial number is blank
-                        return '';
+                        // Always link to brik.php regardless of serial number value
+                        return `<a href="brik.php" target="_blank">${data}</a>`;
                     }
                 }
             ],
@@ -303,6 +299,7 @@ echo '<!DOCTYPE html>
         });
     });
 </script>
+
 
 
 
