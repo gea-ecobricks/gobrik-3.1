@@ -102,7 +102,7 @@ while ($stmt->fetch()) {
     $data[] = [
         'ecobrick_thumb_photo_url' => '<img src="' . htmlspecialchars($ecobrick_thumb_photo_url) . '?v=' . htmlspecialchars($photo_version) . '"
             alt="' . htmlspecialchars($serial_no) . '"
-            title="Ecobrick ' . htmlspecialchars($serial_no) . ' Image version ' . htmlspecialchars($photo_version) . '"
+            title="Ecobrick ' . htmlspecialchars($serial_no) . '"
             class="table-thumbnail"
             onclick="ecobrickPreview(\'' . htmlspecialchars($ecobrick_full_photo_url) . '?v=' . htmlspecialchars($photo_version) . '\', \'' . htmlspecialchars($serial_no) . '\', \'' . htmlspecialchars($weight_g) . ' g\', \'' . htmlspecialchars($ecobricker_maker) . '\', \'' . htmlspecialchars($location_brik) . '\')">',
         'weight_g' => number_format($weight_g) . ' g',

@@ -30,9 +30,13 @@
 
     /* Media query for screens less than 1000px wide */
 @media screen and (max-width: 1000px) {
-    /* Hide the "Location" and "Weight" table headers */
+    /* Hide the "Receivers" and "Location" table headers */
     #latest-ecobricks th:nth-child(4), /* Receivers */
     #latest-ecobricks th:nth-child(5)  /* Location column header */ {
+        display: none;
+        /* Hide the "Location" and "Weight" table cells */
+    #latest-ecobricks td:nth-child(4), /* Receivers column cell */
+    #latest-ecobricks td:nth-child(5)  /* Location column cell */ {
         display: none;
     }
 

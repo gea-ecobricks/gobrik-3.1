@@ -263,7 +263,14 @@ echo '<!DOCTYPE html>
                 type: 'POST' // HTTP method
             },
             columns: [
-                { data: 'tran_id', title: '🔎 Transaction' },
+                {
+                    data: 'tran_id',
+                    title: '🔎 Transaction',
+                    render: function(data, type, row) {
+                        // Make tran_id clickable
+                        return `<a href="#" onclick="openTransactionModal(${data})">${data}</a>`;
+                    }
+                },
                 { data: 'send_ts', title: 'Issued' },
                 { data: 'sender', title: 'Sender' },
                 { data: 'receiver_or_receivers', title: 'Recipient' },
@@ -272,7 +279,6 @@ echo '<!DOCTYPE html>
                     data: 'block_amt',
                     title: 'Block',
                     render: function(data, type, row) {
-                        // Format number with 2 decimal points and add ß with a half-space
                         return `${parseFloat(data).toFixed(2)}&#8202;ß`;
                     }
                 },
@@ -280,7 +286,6 @@ echo '<!DOCTYPE html>
                     data: 'individual_amt',
                     title: 'Shard',
                     render: function(data, type, row) {
-                        // Format number with 2 decimal points and add ß with a half-space
                         return `${parseFloat(data).toFixed(2)}&#8202;ß`;
                     }
                 },
@@ -288,7 +293,6 @@ echo '<!DOCTYPE html>
                     data: 'ecobrick_serial_no',
                     title: 'Brik',
                     render: function(data, type, row) {
-                        // Always link to brik.php regardless of serial number value
                         return `<a href="brik.php" target="_blank">${data}</a>`;
                     }
                 }
@@ -298,7 +302,47 @@ echo '<!DOCTYPE html>
             lengthMenu: [12, 25, 50, 100] // Options for rows per page
         });
     });
+
+    function openTransactionModal(tran_id) {
+        // Blur the background and prepare the modal
+        document.getElementById('page-content')?.classList.add('blurred');
+        document.getElementById('footer-full')?.classList.add('blurred');
+        document.body.classList.add('modal-open');
+
+        // Clear previous modal content
+        const modalMessage = document.querySelector('.modal-message');
+        modalMessage.innerHTML = '<p>Loading transaction details...</p>';
+
+        // Fetch transaction details
+        fetch(`../api/fetch_brik_transactions.php?tran_id=${tran_id}`)
+            .then(response => response.json())
+            .then(data => {
+                let tableHTML = '<table id="transaction-details-table" class="display" style="width:100%">';
+                tableHTML += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
+
+                for (const [field, value] of Object.entries(data)) {
+                    tableHTML += `<tr><td>${field}</td><td>${value}</td></tr>`;
+                }
+
+                tableHTML += '</tbody></table>';
+
+                modalMessage.innerHTML = tableHTML;
+
+                $('#transaction-details-table').DataTable({
+                    paging: false,
+                    searching: false,
+                    info: false
+                });
+            })
+            .catch(error => {
+                modalMessage.innerHTML = `<p>Error loading transaction details: ${error.message}</p>`;
+            });
+
+        document.getElementById('form-modal-message').classList.remove('modal-hidden');
+    }
 </script>
+
+
 
 
 
