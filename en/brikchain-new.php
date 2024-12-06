@@ -308,6 +308,7 @@ echo '<!DOCTYPE html>
 
 
 
+
 <!-- This script is for pages that use the accordion content system-->
 <script src="../scripts/accordion-scripts.js" defer></script>
 
