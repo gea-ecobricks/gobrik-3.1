@@ -100,47 +100,6 @@ echo '<!DOCTYPE html>
 	</div>
 
 
-<!--BRIKS
-	<div class="reg-content-block" id="block2">
-    <div class="opener-header">
-        <div class="opener-header-text">
-            <h4 data-lang-id="007-authenticated-header">Authenticated Ecobricks</h4>
-            <h6 data-lang-id="008-authenticated-description">The archival chain of authenticated ecobricks.  Updated every six hours with the latest confirmed authentications.</h6>
-            <div class="ecobrick-data"><p data-lang-id="009-data-live"><span class="blink">⬤  </span> Data live</p></div>
-            <div class="ecobrick-data"><p data-lang-id="010-historical-data">🟠 Historical Data pending transfer</p></div>
-        </div>
-		<button onclick="preclosed2()" class="block-toggle" id="block-toggle-show2">+</button>
-	</div>
-    <div id="preclosed2">
-        <div class="overflow">
-            <table id="ecobricks" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th style="max-width: 150px !important;" data-lang-id="011-brik-header">Brik</th>
-                        <th data-lang-id="012-authenticated-header">Authenticated</th>
-                        <th data-lang-id="013-aes-plastic-header">AES Plastic</th>
-                        <th data-lang-id="014-maker-header">Maker</th>
-                        <th data-lang-id="015-value-header">Value</th>
-                        <th data-lang-id="016-co2e-header">CO2e</th>
-                        <th data-lang-id="017-serial-header"> 🔎 Serial</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                    <tr>
-                        <th style="max-width: 150px !important;">Brik</th>
-                        <th>Logged</th>
-                        <th>AES Plastic</th>
-                        <th>Value</th>
-                        <th>CO2e</th>
-                        <th>Serial</th>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-</div>
--->
-
 <!--BLOCKS-->
 
 
@@ -274,11 +233,6 @@ echo '<!DOCTYPE html>
 			</div>
 		</div>
 	</div>
-
-
-	<?php $gobrik_conn->close();?>
-
-
 
 
             </div>
