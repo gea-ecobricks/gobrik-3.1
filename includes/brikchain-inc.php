@@ -17,40 +17,9 @@
 -->
 <link rel="stylesheet" type="text/css" href="../styles/jquery.dataTables.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-
-
 <script type="text/javascript" charset="utf8" src="../scripts/jquery.dataTables.js"></script>
 
 
-<script>
-$(document).ready(function() {
-    $('#brikchain').DataTable( {
-		"processing": true,
-        "serverSide": true,
-		"ajax": "../scripts/ajax-brk-trans.php"
-    } );
-} );
-
-
-
-	$.extend( $.fn.dataTable.defaults, {
-    ordering:  false
-
-} );
-
-
-
-$(document).ready(function() {
-    $('#ecobricks').DataTable( {
-		"processing": true,
-        "serverSide": true,
-		"ajax": "../scripts/ajax-ecobricks.php"
-
-    } );
-} );
-
-</script>
 
 
 

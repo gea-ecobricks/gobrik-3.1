@@ -58,12 +58,6 @@ echo '<!DOCTYPE html>
 <!--TOP PAGE BANNER-->
 
 <div class="splash-content-block">
-	<!--<div class="splash-box">
-		<div class="splash-heading" data-lang-id="001-splash-title">The Brikchain</div>
-	    <div class="splash-sub" data-lang-id="002-splash-subtitle">All the Briks, Blocks & Transactions.</div>
-	</div>
-	<div class="splash-image" data-lang-id="003b-splash-image-alt"><img src="../webps/brikchain-450px.webp" style="width: 85%" alt="The brikchain explorer: search all the briks, blocks and transactions">
-    </div>-->
 </div>
 
     <div id="splash-bar" style="margin-bottom:-80vh"></div>
@@ -106,7 +100,7 @@ echo '<!DOCTYPE html>
 	</div>
 
 
-<!--BRIKS-->
+<!--BRIKS
 	<div class="reg-content-block" id="block2">
     <div class="opener-header">
         <div class="opener-header-text">
@@ -115,45 +109,37 @@ echo '<!DOCTYPE html>
             <div class="ecobrick-data"><p data-lang-id="009-data-live"><span class="blink">⬤  </span> Data live</p></div>
             <div class="ecobrick-data"><p data-lang-id="010-historical-data">🟠 Historical Data pending transfer</p></div>
         </div>
-
-
-
-			<button onclick="preclosed2()" class="block-toggle" id="block-toggle-show2">+</button>
-
-		</div>
-
-		<div id="preclosed2">
-
-			<div class="overflow">
-
-				<table id="ecobricks" class="display" style="width:100%">
-					<thead>
-
-						<tr>
-							<th style="max-width: 150px !important;" data-lang-id="011-brik-header">Brik</th>
-							<th data-lang-id="012-authenticated-header">Authenticated</th>
-							<th data-lang-id="013-aes-plastic-header">AES Plastic</th>
-							<th data-lang-id="014-maker-header">Maker</th>
-							<th data-lang-id="015-value-header">Value</th>
-							<th data-lang-id="016-co2e-header">CO2e</th>
-							<th data-lang-id="017-serial-header"> 🔎 Serial</th>
-                        </tr>
-					</thead>
-					<tfoot>
-						<tr>
-							<th style="max-width: 150px !important;">Brik</th>
-							<th>Logged</th>
-							<th>AES Plastic</th>
-							<th>Value</th>
-							<th>CO2e</th>
-							<th>Serial</th>
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-		</div>
+		<button onclick="preclosed2()" class="block-toggle" id="block-toggle-show2">+</button>
 	</div>
-
+    <div id="preclosed2">
+        <div class="overflow">
+            <table id="ecobricks" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th style="max-width: 150px !important;" data-lang-id="011-brik-header">Brik</th>
+                        <th data-lang-id="012-authenticated-header">Authenticated</th>
+                        <th data-lang-id="013-aes-plastic-header">AES Plastic</th>
+                        <th data-lang-id="014-maker-header">Maker</th>
+                        <th data-lang-id="015-value-header">Value</th>
+                        <th data-lang-id="016-co2e-header">CO2e</th>
+                        <th data-lang-id="017-serial-header"> 🔎 Serial</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th style="max-width: 150px !important;">Brik</th>
+                        <th>Logged</th>
+                        <th>AES Plastic</th>
+                        <th>Value</th>
+                        <th>CO2e</th>
+                        <th>Serial</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+-->
 
 <!--BLOCKS-->
 
@@ -184,17 +170,7 @@ echo '<!DOCTYPE html>
                         <th data-lang-id="028-ecobrick-header">Ecobrick</th>
                     </tr>
                 </thead>
-					<!--<tfoot>
-						<tr>
-						<th>Transaction</th>
-						<th>Issued</th>
-							<th>Sender</th>
-							<th>Type</th>
-							<th>Block</th>
-							<th>Shard</th>
-							<th>Ecobrick</th>
-						</tr>
-					</tfoot>-->
+
 				</table>
 			</div>
 		</div>
@@ -323,7 +299,36 @@ echo '<!DOCTYPE html>
 
 
 <!-- CUSTOM PAGE SCRIPTS-->
+<script>
+    // Include the jQuery DataTables library
+$(document).ready(function () {
+    $('#brikchain').DataTable({
+        ajax: {
+            url: '/path-to-your-server-endpoint', // Replace with your server endpoint to fetch data
+            type: 'POST', // Adjust to the method used in your API
+            dataSrc: '' // Assuming the API returns an array of objects; modify if needed
+        },
+        columns: [
+            { data: 'tran_id', title: '🔎 Transaction' },
+            { data: 'send_ts', title: 'Issued' },
+            { data: 'sender', title: 'Sender' },
+            { data: 'receiver_or_receivers', title: 'Recipient' },
+            { data: 'block_tran_type', title: 'Type' },
+            { data: 'block_amt', title: 'Block' },
+            { data: 'individual_amt', title: 'Shard' },
+            { data: 'ecobrick_serial_no', title: 'Ecobrick' }
+        ],
+        language: {
+            // Add translation support for column headers, if needed
+            "url": "/path-to-language-file.json" // Optional: replace with your language file path
+        },
+        responsive: true, // Enables responsive tables
+        pageLength: 10, // Number of rows per page
+        lengthMenu: [10, 25, 50, 100] // Page length options
+    });
+});
 
+</script>
 
 <!-- This script is for pages that use the accordion content system-->
 <script src="../scripts/accordion-scripts.js" defer></script>
