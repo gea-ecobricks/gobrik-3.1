@@ -141,7 +141,7 @@ try {
                 <li>Avg AES Price: $' . number_format($avg_cost, 2) . '</li>
             </ul>
             <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="006-current-pricing">
-                This is the current price for the <a href="offsets.php" target="_blank">sale of AES plastic offsets</a>.
+                This data is used to generate the <a href="offset.php">sale of AES plastic offsets</a>.
             </p>
         </div>
     </div>';
