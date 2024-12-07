@@ -360,7 +360,7 @@ try {
                     }
                 }
 
-                }
+
             ],
             order: [[0, 'desc']], // Sort by the first column (`tran_id`) in descending order
             pageLength: 12, // Number of rows per page
