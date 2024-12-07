@@ -3,11 +3,11 @@
 require_once '../gobrikconn_env.php';
 
 try {
-    // Get the serial number from the request
-    $serial_number = $_GET['serial_number'] ?? null;
+    // Get the ecobrick_unique_id from the request
+    $ecobrick_unique_id = $_GET['ecobrick_unique_id'] ?? null;
 
-    if (!$serial_number) {
-        throw new Exception("Serial number is required.");
+    if (!$ecobrick_unique_id) {
+        throw new Exception("Ecobrick unique ID is required.");
     }
 
     // Query to fetch ecobrick details
@@ -20,7 +20,7 @@ try {
         throw new Exception("Failed to prepare statement: " . $gobrik_conn->error);
     }
 
-    $stmt->bind_param("s", $serial_number);
+    $stmt->bind_param("s", $ecobrick_unique_id);
     $stmt->execute();
     $result = $stmt->get_result();
 

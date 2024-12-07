@@ -352,8 +352,14 @@ try {
                     data: 'ecobrick_serial_no',
                     title: 'Brik',
                     render: function(data, type, row) {
-                        return `<a href="brik.php?=${data}">${data}</a>`;
+                        if (data) {
+                            // Add a clickable link that triggers the modal function
+                            return `<a href="#" onclick="openEcobrickPreviewModal('${data}')">${data}</a>`;
+                        }
+                        return ''; // Return an empty string if there's no serial number
                     }
+                }
+
                 }
             ],
             order: [[0, 'desc']], // Sort by the first column (`tran_id`) in descending order
@@ -455,7 +461,9 @@ function openTransactionModal(tran_id) {
 }
 
 
-function openEcobrickPreviewModal(serialNumber) {
+
+
+function openEcobrickPreviewModal(ecobrickUniqueId) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
@@ -476,8 +484,8 @@ function openEcobrickPreviewModal(serialNumber) {
     // Clear previous modal content and set up structure
     modalContentBox.innerHTML = '<p>Loading ecobrick details...</p>';
 
-    // Fetch ecobrick details by serial number
-    fetch(`../api/fetch_ecobrick_details.php?serial_number=${serialNumber}`)
+    // Fetch ecobrick details by unique ID
+    fetch(`../api/fetch_ecobrick_details.php?ecobrick_unique_id=${ecobrickUniqueId}`)
         .then(response => response.json())
         .then(data => {
             // Destructure relevant data from the response
