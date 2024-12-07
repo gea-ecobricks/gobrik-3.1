@@ -134,9 +134,9 @@ try {
             <p><span class="blink">◉  </span> ' . number_format($aes_rolling, 2) . ' &#8202;$ USD per 1 Kg of AES Plastic</p>
             <ul>
                 <li>Total Ecobricks Authenticated: ' . number_format($sum_ecobricks) . '</li>
-                <li>Total Brikcoins Generated: ' . number_format($sum_brikcoins) . '</li>
-                <li>Total Authenticatd Sequestered Plastic: ' . number_format($sum_weight, 2) . ' Kg</li>
-                <li>Total System Expenses: $' . number_format($sum_expenses, 2) . '</li>
+                <li>Total Brikcoins Generated: ' . number_format($sum_brikcoins) . '&#8202;ß</li>
+                <li>Total Authenticatd Sequestered Plastic: ' . number_format($sum_weight, 2) . '&#8202;kg</li>
+                <li>Total System Expenses: $' . number_format($sum_expenses, 2) . '&#8202;USD</li>
 
                 <!--
                 <li>Total AES Sales: $' . number_format($sum_revenue, 2) . '</li>
@@ -352,7 +352,7 @@ try {
                     data: 'ecobrick_serial_no',
                     title: 'Brik',
                     render: function(data, type, row) {
-                        return `<a href="brik.php?${data}=">${data}</a>`;
+                        return `<a href="brik.php?=${data}">${data}</a>`;
                     }
                 }
             ],
