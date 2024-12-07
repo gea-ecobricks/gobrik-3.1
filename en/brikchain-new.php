@@ -503,7 +503,7 @@ function openEcobrickPreviewModal(ecobrickUniqueId) {
                         data-lang-id="000-view"
                         style="margin-bottom: 50px; height: 25px; padding: 5px; border: none; padding: 5px 12px; text-decoration: none; color: white; background-color: #007BFF; border-radius: 4px;"
                         aria-label="View ecobrick"
-                        href="brik.php?ecobrick_unique_id=${ecobrick_unique_id}">
+                        href="brik.php?serial_no=${ecobrick_unique_id}">
                         ℹ️ View Full Details
                     </a>
                 </div>
