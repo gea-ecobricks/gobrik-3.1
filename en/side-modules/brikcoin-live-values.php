@@ -2,17 +2,10 @@
 <?php
 
 $sql = "SELECT * FROM vw_sum_brk_total ;";
-
 $result = $gobrik_conn->query($sql);
-
         if ($result->num_rows > 0) {
-
             echo'<div class="side-module-desktop-mobile" style="display:flex;flex-flow:row">';
-
-        // output data of each row
         while($row = $result->fetch_assoc()) {
-            
-
             echo '
             <div id="aes-image" style="width:15%">
                 <img src="../svgs/aes-brk-vertical.svg?v=2" style="width:95%; margin-top:20px;"><p style="font-size: 1.0em; margin-top:5px;">

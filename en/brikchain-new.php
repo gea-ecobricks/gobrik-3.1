@@ -69,35 +69,85 @@ echo '<!DOCTYPE html>
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
                 <h1 data-lang-id="001-brikchain-title">The Brikchain</h1>
-                <h4 data-lang-id="002-under-construction" style="color:orange;">🚧 Under construction</h4>
-                <div class="splash-sub" data-lang-id="002-splash-subtitle">All the Briks, Blocks & Transactions.</div>
-
             </div>
             <div class="page-paragraph">
 
 				<p data-lang-id="005-first-page-paragraph">The Brikchain is a manual blockchain that quantifies the ecological value of plastic <a href="sequest.php">sequestered</a> out of the biosphere and out of industry.  Every ecobrick that is authenticated on the GoBrik platform is permanently recorded on the <a href="https://ecobricks.org/en/brikcoins.php">Brikcoin Manual Blockchain</a>.  With each authentication, the corresponding value of sequestered plastic (<a href="https://ecobricks.org/aes">AES plastic</a>) is issued in brikcoins</a>.  Each issuance is made through a block of transactions that are recorded sequentially.  This chain of blocks, transaction and ecobricks is fully searchable here.</p>
-
-				<p data-lang-id="005b-second-page-paragraph">Use the tools below to browse the Brikchain.  You can also view our <a href="open-books.php">Open Books</a> financial accounting.  To learn how the combination of our financial and <a href="regen-reports.php">ecological accounting</a> generates the price per Kg of AES sales see our <a href="https://ecobricks.org/en/offsets.php">offsetting page</a>.</p> </p>
 			</div>
 
-        <?php require_once ("side-modules/brikcoin-live-values.php");?>
+
+        <?php
+// Include the GoBrik database connection credentials
+require_once '../gobrikconn_env.php';
+
+try {
+    // Query the view to fetch all rows for aggregation
+    $sql = "SELECT year,
+                   brick_count,
+                   total_brk,
+                   weight,
+                   tot_usd_exp_amt,
+                   tot_usd_rev_amt,
+                   final_aes_plastic_cost
+            FROM vw_detail_sums_by_year";
+
+    $result = $gobrik_conn->query($sql);
+
+    if (!$result || $result->num_rows === 0) {
+        throw new Exception("Failed to retrieve data or no data available.");
+    }
+
+    // Initialize sum variables
+    $sum_ecobricks = 0;
+    $sum_brikcoins = 0;
+    $sum_weight = 0;
+    $sum_expenses = 0;
+    $sum_revenue = 0;
+    $sum_costs = 0;
+    $row_count = 0;
+
+    // Aggregate data
+    while ($row = $result->fetch_assoc()) {
+        $sum_ecobricks += (float)$row['brick_count'];
+        $sum_brikcoins += (float)$row['total_brk'];
+        $sum_weight += (float)$row['weight'];
+        $sum_expenses += (float)$row['tot_usd_exp_amt'];
+        $sum_revenue += (float)$row['tot_usd_rev_amt'];
+        $sum_costs += (float)$row['final_aes_plastic_cost'];
+        $row_count++;
+    }
+
+    // Calculate average cost
+    $avg_cost = $row_count > 0 ? $sum_costs / $row_count : 0;
+
+    // Calculate AES rolling cost
+    $aes_rolling = $sum_weight > 0 ? $sum_expenses / $sum_weight : 0;
+
+    // Output the HTML
+    echo '
+    <div class="live-data" style="margin-top:30px">
+        <p><span class="blink">◉  </span> ' . number_format($aes_rolling, 2) . ' &#8202;$ USD per 1 Kg of AES Plastic</p>
+        <ul>
+            <li>Total Ecobricks Authenticated: ' . number_format($sum_ecobricks) . '</li>
+            <li>Total Brikcoins Generated: ' . number_format($sum_brikcoins) . '</li>
+            <li>Total Plastic Sequestered: ' . number_format($sum_weight, 2) . ' Kg</li>
+            <li>Total System Expenses: $' . number_format($sum_expenses, 2) . '</li>
+            <li>Total AES Sales: $' . number_format($sum_revenue, 2) . '</li>
+            <li>Avg AES Price: $' . number_format($avg_cost, 2) . '</li>
+        </ul>
+        <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="006-current-pricing">
+            This is the current price for the <a href="offsets.php" target="_blank">sale of AES plastic offsets</a>.
+        </p>
+    </div>';
+} catch (Exception $e) {
+    // Handle any errors and output a friendly message
+    echo '<p>Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
+}
+?>
 
 
-	<div class="live-data" style="margin-top:30px">
-		<?php
-			$sql = "SELECT * FROM vw_detail_sums_by_year  WHERE year = 2024;"; $result = $gobrik_conn->query($sql);
-			if ($result->num_rows > 0) {
 
-				while($row = $result->fetch_assoc()) {
-				echo '<p><span class="blink">◉  </span>  '.$row["final_aes_plastic_cost"].' &#8202;$ USD per 1 Kg of AES Plastic</p>'  ;
-				}
-					} else {
-						echo "0 results";
-					}
-		?>
 
-		<p style="font-size: 0.85em; margin-top:20px;" data-lang-id="006-current-pricing">This is the current price for the <a href="offsets.php" target="_blank">sale of AES plastic offsets</a>.</p>
-	</div>
 
 
 <!--BLOCKS-->
