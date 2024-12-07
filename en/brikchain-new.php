@@ -464,6 +464,12 @@ function openTransactionModal(tran_id) {
 
 
 function openEcobrickPreviewModal(ecobrickUniqueId) {
+    console.log("Fetching ecobrick details for:", ecobrickUniqueId); // Debug
+    fetch(`../api/fetch_ecobrick_details.php?ecobrick_unique_id=${ecobrickUniqueId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Fetched data:", data); // Debug fetched data
+
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
