@@ -465,7 +465,7 @@ function openTransactionModal(tran_id) {
 
 
 function openEcobrickPreviewModal(ecobrickUniqueId) {
-    alert(ecobrickUniqueID);
+    alert('${ecobrickUniqueId}');
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
