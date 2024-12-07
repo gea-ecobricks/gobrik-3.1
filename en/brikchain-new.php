@@ -455,6 +455,62 @@ function openTransactionModal(tran_id) {
 }
 
 
+function openEcobrickPreviewModal(serialNumber) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    // Lock scrolling for the body and blur background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open'); // Locks scrolling
+
+    // Set up the modal-content-box styles
+    const modalContentBox = document.getElementById('modal-content-box');
+    modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
+    modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
+
+    // Clear previous modal content and set up structure
+    modalContentBox.innerHTML = '<p>Loading ecobrick details...</p>';
+
+    // Fetch ecobrick details by serial number
+    fetch(`../api/fetch_ecobrick_details.php?serial_number=${serialNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            // Destructure relevant data from the response
+            const { ecobrick_unique_id, full_photo_url, weight_g, volume_ml, ecobrick_maker } = data;
+
+            // Build the modal content
+            const modalContent = `
+                <div style="text-align: center;">
+                    <img src="${full_photo_url}" alt="Ecobrick Photo" style="max-width: 100%; border-radius: 8px; margin-bottom: 15px;">
+                    <p>Ecobrick <strong>${ecobrick_unique_id}</strong> made by <strong>${ecobrick_maker}</strong> |
+                    Volume: <strong>${volume_ml} ml</strong> | Weight: <strong>${weight_g} g</strong></p>
+                    <a class="preview-btn"
+                        data-lang-id="000-view"
+                        style="margin-bottom: 50px; height: 25px; padding: 5px; border: none; padding: 5px 12px; text-decoration: none; color: white; background-color: #007BFF; border-radius: 4px;"
+                        aria-label="View ecobrick"
+                        href="brik.php?ecobrick_unique_id=${ecobrick_unique_id}">
+                        ℹ️ View Full Details
+                    </a>
+                </div>
+            `;
+
+            // Insert the content into the modal
+            modalContentBox.innerHTML = modalContent;
+        })
+        .catch(error => {
+            modalContentBox.innerHTML = `<p>Error loading ecobrick details: ${error.message}</p>`;
+        });
+
+    // Display the modal
+    modal.classList.remove('modal-hidden');
+}
+
+
 
 </script>
 
