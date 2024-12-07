@@ -135,13 +135,15 @@ try {
             <ul>
                 <li>Total Ecobricks Authenticated: ' . number_format($sum_ecobricks) . '</li>
                 <li>Total Brikcoins Generated: ' . number_format($sum_brikcoins) . '</li>
-                <li>Total Plastic Sequestered: ' . number_format($sum_weight, 2) . ' Kg</li>
+                <li>Total Authenticatd Sequestered Plastic: ' . number_format($sum_weight, 2) . ' Kg</li>
                 <li>Total System Expenses: $' . number_format($sum_expenses, 2) . '</li>
+
+                <!--
                 <li>Total AES Sales: $' . number_format($sum_revenue, 2) . '</li>
-                <li>Avg AES Price: $' . number_format($avg_cost, 2) . '</li>
+                <li>Avg AES Price: $' . number_format($avg_cost, 2) . '</li>-->
             </ul>
             <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="006-current-pricing">
-                This data is used to generate the <a href="offset.php">sale of AES plastic offsets</a>.
+                The price per kg of <a href="offset.php">of AES plastic offsets</a> is a function of system authenticataed plastic and GEA system expenses.
             </p>
         </div>
     </div>';
@@ -350,7 +352,7 @@ try {
                     data: 'ecobrick_serial_no',
                     title: 'Brik',
                     render: function(data, type, row) {
-                        return `<a href="brik.php" target="_blank">${data}</a>`;
+                        return `<a href="brik.php?${data}=">${data}</a>`;
                     }
                 }
             ],
