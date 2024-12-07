@@ -361,8 +361,7 @@ try {
             lengthMenu: [12, 25, 50, 100] // Options for rows per page
         });
     });
-
-  function openTransactionModal(tran_id) {
+function openTransactionModal(tran_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
@@ -383,6 +382,43 @@ try {
     // Clear previous modal content and set up structure
     modalContentBox.innerHTML = `<h4>Brikcoin Transaction ${tran_id}</h4><div id="transaction-table-container"></div>`;
 
+    // Define a mapping of database field names to human-readable field names
+    const fieldNameMap = {
+        //chain_ledger_id: "Chain Ledger ID",
+        tran_id: "Transaction ID",
+        tran_name: "Transaction Name",
+        individual_amt: "Individual Amount",
+        status: "Status",
+        send_ts: "Timestamp Sent",
+        sender_ecobricker: "Sender Ecobricker",
+        block_tran_type: "Block Transaction Type",
+        block_amt: "Block Amount",
+        sender: "Sender",
+        receiver_or_receivers: "Recipient(s)",
+        receiver_1: "Recipient 1",
+        receiver_2: "Recipient 2",
+        receiver_3: "Recipient 3",
+        receiver_central_reserve: "Receiver (Central Reserve)",
+        sender_central_reserve: "Sender (Central Reserve)",
+        ecobrick_serial_no: "Ecobrick Serial Number",
+        tran_sender_note: "Transaction Note",
+        product: "Product",
+        send_dt: "Send Date",
+        accomp_payment: "Accompanying Payment",
+        authenticator_version: "Authenticator Version",
+        expense_type: "Expense Type",
+        gea_accounting_category: "GEA Accounting Category",
+        shipping_cost_brk: "Shipping Cost (BRK)",
+        product_cost_brk: "Product Cost (BRK)",
+        total_cost_incl_shipping: "Total Cost (Incl. Shipping)",
+        shipping_with_currency: "Shipping Cost (With Currency)",
+        aes_officially_purchased: "AES Officially Purchased",
+        country_of_buyer: "Buyer's Country",
+        currency_for_shipping: "Currency for Shipping",
+        credit_other_ecobricker_yn: "Credit Other Ecobricker (Yes/No)",
+        catalyst_name: "Catalyst Name",
+    };
+
     // Fetch transaction details
     fetch(`../api/fetch_brik_transactions.php?tran_id=${tran_id}`)
         .then(response => response.json())
@@ -392,7 +428,9 @@ try {
             tableHTML += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
 
             for (const [field, value] of Object.entries(data)) {
-                tableHTML += `<tr><td>${field}</td><td>${value}</td></tr>`;
+                // Use the fieldNameMap for human-readable field names, fallback to original field name if not mapped
+                const displayName = fieldNameMap[field] || field;
+                tableHTML += `<tr><td>${displayName}</td><td>${value}</td></tr>`;
             }
 
             tableHTML += '</tbody></table>';
@@ -415,6 +453,7 @@ try {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 </script>
