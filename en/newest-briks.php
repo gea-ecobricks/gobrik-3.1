@@ -108,7 +108,7 @@ echo '<!DOCTYPE html>
             "serverSide": true,
             "processing": true,
             "ajax": {
-                "url": "../api/fetch_newest_briks_o.php",
+                "url": "../api/fetch_newest_briks.php",
                 "type": "POST"
             },
             "pageLength": 10, // Set default number of rows per page to 10
