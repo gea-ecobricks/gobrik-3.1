@@ -11,7 +11,7 @@ try {
     }
 
     // Query to fetch ecobrick details
-    $sql = "SELECT ecobrick_unique_id, full_photo_url, weight_g, volume_ml, ecobrick_maker
+    $sql = "SELECT ecobrick_unique_id, ecobrick_full_photo_url AS full_photo_url, weight_g, volume_ml, ecobricker_maker
             FROM tb_ecobricks
             WHERE ecobrick_unique_id = ?";
     $stmt = $gobrik_conn->prepare($sql);
@@ -20,7 +20,8 @@ try {
         throw new Exception("Failed to prepare statement: " . $gobrik_conn->error);
     }
 
-    $stmt->bind_param("s", $ecobrick_unique_id);
+    // Bind parameter as an integer
+    $stmt->bind_param("i", $ecobrick_unique_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
