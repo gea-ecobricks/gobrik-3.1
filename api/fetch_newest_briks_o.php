@@ -19,9 +19,9 @@ $sql = "SELECT ecobrick_thumb_photo_url, ecobricker_maker, location_full, weight
         WHERE status != 'not ready'";
 
 // Search filter
+$searchTerm = $searchValue ? "%$searchValue%" : null;
 if (!empty($searchValue)) {
     $sql .= " AND (serial_no LIKE ? OR location_full LIKE ? OR ecobricker_maker LIKE ?)";
-    $searchTerm = "%$searchValue%";
 }
 
 // Add ordering and pagination
@@ -29,6 +29,7 @@ $sql .= " ORDER BY date_logged_ts DESC LIMIT ?, ?";
 $stmt = $gobrik_conn->prepare($sql);
 
 if (!$stmt) {
+    error_log("SQL prepare failed: " . $gobrik_conn->error);
     echo json_encode([
         "draw" => $draw,
         "recordsTotal" => 0,
@@ -51,17 +52,22 @@ if (!empty($searchValue)) {
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Define a safe HTML helper
+function safe_html($string) {
+    return $string !== null ? htmlspecialchars($string, ENT_QUOTES, 'UTF-8') : '';
+}
+
 $data = [];
 while ($row = $result->fetch_assoc()) {
     $data[] = [
-        'ecobrick_thumb_photo_url' => '<img src="' . htmlspecialchars($row['ecobrick_thumb_photo_url']) . '" alt="Thumbnail">',
-        'ecobricker_maker' => htmlspecialchars($row['ecobricker_maker']),
-        'location_brik' => htmlspecialchars($row['location_full']),
+        'ecobrick_thumb_photo_url' => '<img src="' . safe_html($row['ecobrick_thumb_photo_url']) . '" alt="Thumbnail">',
+        'ecobricker_maker' => safe_html($row['ecobricker_maker']),
+        'location_brik' => safe_html($row['location_full']),
         'weight_g' => number_format($row['weight_g']) . ' g',
         'volume_ml' => number_format($row['volume_ml']) . ' ml',
         'density' => number_format($row['density'], 2) . ' g/ml',
-        'status' => htmlspecialchars($row['status']),
-        'serial_no' => htmlspecialchars($row['serial_no'])
+        'status' => safe_html($row['status']),
+        'serial_no' => safe_html($row['serial_no'])
     ];
 }
 
@@ -70,13 +76,11 @@ $totalRecordsQuery = "SELECT COUNT(*) AS total FROM tb_ecobricks WHERE status !=
 $totalRecordsResult = $gobrik_conn->query($totalRecordsQuery);
 $totalRecords = $totalRecordsResult->fetch_assoc()['total'] ?? 0;
 
-// Get filtered records
-$totalFilteredRecords = count($data); // Filtered rows are equal to fetched rows here
-
+// Prepare the JSON response
 $response = [
-    "draw" => $draw,
-    "recordsTotal" => $totalRecords,
-    "recordsFiltered" => $totalFilteredRecords,
+    "draw" => intval($draw),
+    "recordsTotal" => intval($totalRecords),
+    "recordsFiltered" => count($data), // Use filtered row count
     "data" => $data
 ];
 
