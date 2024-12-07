@@ -76,7 +76,7 @@ echo '<!DOCTYPE html>
 			</div>
 
 
-        <?php
+       <?php
 // Include the GoBrik database connection credentials
 require_once '../gobrikconn_env.php';
 
@@ -108,12 +108,13 @@ try {
 
     // Aggregate data
     while ($row = $result->fetch_assoc()) {
-        $sum_ecobricks += (float)$row['brick_count'];
-        $sum_brikcoins += (float)$row['total_brk'];
-        $sum_weight += (float)$row['weight'];
-        $sum_expenses += (float)$row['tot_usd_exp_amt'];
-        $sum_revenue += (float)$row['tot_usd_rev_amt'];
-        $sum_costs += (float)$row['final_aes_plastic_cost'];
+        // Normalize values by removing commas and converting to float
+        $sum_ecobricks += (float)str_replace(',', '', $row['brick_count']);
+        $sum_brikcoins += (float)str_replace(',', '', $row['total_brk']);
+        $sum_weight += (float)str_replace(',', '', $row['weight']);
+        $sum_expenses += (float)str_replace(',', '', $row['tot_usd_exp_amt']);
+        $sum_revenue += (float)str_replace(',', '', $row['tot_usd_rev_amt']);
+        $sum_costs += (float)str_replace(',', '', $row['final_aes_plastic_cost']);
         $row_count++;
     }
 
@@ -144,6 +145,7 @@ try {
     echo '<p>Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
 }
 ?>
+
 
 
 
