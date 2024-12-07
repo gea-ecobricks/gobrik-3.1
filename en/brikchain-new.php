@@ -126,19 +126,24 @@ try {
 
     // Output the HTML
     echo '
-    <div class="live-data" style="margin-top:30px">
-        <p><span class="blink">◉  </span> ' . number_format($aes_rolling, 2) . ' &#8202;$ USD per 1 Kg of AES Plastic</p>
-        <ul>
-            <li>Total Ecobricks Authenticated: ' . number_format($sum_ecobricks) . '</li>
-            <li>Total Brikcoins Generated: ' . number_format($sum_brikcoins) . '</li>
-            <li>Total Plastic Sequestered: ' . number_format($sum_weight, 2) . ' Kg</li>
-            <li>Total System Expenses: $' . number_format($sum_expenses, 2) . '</li>
-            <li>Total AES Sales: $' . number_format($sum_revenue, 2) . '</li>
-            <li>Avg AES Price: $' . number_format($avg_cost, 2) . '</li>
-        </ul>
-        <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="006-current-pricing">
-            This is the current price for the <a href="offsets.php" target="_blank">sale of AES plastic offsets</a>.
-        </p>
+    <div class="live-data" style="margin-top:30px;display:flex;flex-flow:row"">
+        <div id="aes-image" style="width:15%">
+                <img src="../svgs/aes-brk-vertical.svg?v=2" style="width:95%; margin-top:20px;"><p style="font-size: 1.0em; margin-top:5px;">
+            </div>
+        <div id="brikchain-totals">
+            <p><span class="blink">◉  </span> ' . number_format($aes_rolling, 2) . ' &#8202;$ USD per 1 Kg of AES Plastic</p>
+            <ul>
+                <li>Total Ecobricks Authenticated: ' . number_format($sum_ecobricks) . '</li>
+                <li>Total Brikcoins Generated: ' . number_format($sum_brikcoins) . '</li>
+                <li>Total Plastic Sequestered: ' . number_format($sum_weight, 2) . ' Kg</li>
+                <li>Total System Expenses: $' . number_format($sum_expenses, 2) . '</li>
+                <li>Total AES Sales: $' . number_format($sum_revenue, 2) . '</li>
+                <li>Avg AES Price: $' . number_format($avg_cost, 2) . '</li>
+            </ul>
+            <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="006-current-pricing">
+                This is the current price for the <a href="offsets.php" target="_blank">sale of AES plastic offsets</a>.
+            </p>
+        </div>
     </div>';
 } catch (Exception $e) {
     // Handle any errors and output a friendly message
