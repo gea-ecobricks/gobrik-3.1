@@ -353,11 +353,12 @@ try {
                     title: 'Brik',
                     render: function(data, type, row) {
                         if (data) {
-                            // Add a clickable link that triggers the modal function
                             return `<a href="#" onclick="openEcobrickPreviewModal('${data}')">${data}</a>`;
                         }
-                        return ''; // Return an empty string if there's no serial number
+                        return '';
                     }
+                }
+
                 }
 
 
@@ -464,12 +465,7 @@ function openTransactionModal(tran_id) {
 
 
 function openEcobrickPreviewModal(ecobrickUniqueId) {
-    console.log("Fetching ecobrick details for:", ecobrickUniqueId); // Debug
-    fetch(`../api/fetch_ecobrick_details.php?ecobrick_unique_id=${ecobrickUniqueId}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log("Fetched data:", data); // Debug fetched data
-
+    alert('ecobrickUniqueID');
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
