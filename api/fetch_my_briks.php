@@ -23,30 +23,31 @@ function safe_html($string) {
 // Prepare the base SQL query, including the community_name field
 $sql = "SELECT ecobrick_thumb_photo_url, ecobrick_full_photo_url, weight_g, volume_ml, density, date_logged_ts,
         location_full, location_watershed, ecobricker_maker, community_name, serial_no, status, photo_version
-        FROM tb_ecobricks ";
+        FROM tb_ecobricks";
 
 $bindTypes = "";
 $bindValues = [];
 
 // If ecobricker_id is provided, use it to filter by maker_id in the SQL query
 if (!empty($ecobricker_id)) {
-    $sql .= " AND maker_id = ?";
+    $sql .= " WHERE maker_id = ?";
     $bindTypes .= "s";
     $bindValues[] = $ecobricker_id;
 }
 
 // Add search filter if there is a search term
 if (!empty($searchValue)) {
-    $sql .= " AND (serial_no LIKE ? OR location_full LIKE ? OR ecobricker_maker LIKE ? OR community_name LIKE ?)";
+    $sql .= (!empty($ecobricker_id) ? " AND " : " WHERE ") .
+            "(serial_no LIKE ? OR location_full LIKE ? OR ecobricker_maker LIKE ? OR community_name LIKE ?)";
     $bindTypes .= "ssss";
     $searchTerm = "%" . $searchValue . "%";
     $bindValues = array_merge($bindValues, [$searchTerm, $searchTerm, $searchTerm, $searchTerm]);
 }
 
 // Count total records before filtering
-$totalRecordsQuery = "SELECT COUNT(*) as total FROM tb_ecobricks ";
+$totalRecordsQuery = "SELECT COUNT(*) as total FROM tb_ecobricks";
 if (!empty($ecobricker_id)) {
-    $totalRecordsQuery .= " AND maker_id = ?";
+    $totalRecordsQuery .= " WHERE maker_id = ?";
     $stmtTotal = $gobrik_conn->prepare($totalRecordsQuery);
     $stmtTotal->bind_param("s", $ecobricker_id);
 } else {
@@ -117,12 +118,13 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Get total filtered records
-$totalFilteredQuery = "SELECT COUNT(*) as total FROM tb_ecobricks ";
+$totalFilteredQuery = "SELECT COUNT(*) as total FROM tb_ecobricks";
 if (!empty($ecobricker_id)) {
-    $totalFilteredQuery .= " AND maker_id = ?";
+    $totalFilteredQuery .= " WHERE maker_id = ?";
 }
 if (!empty($searchValue)) {
-    $totalFilteredQuery .= " AND (serial_no LIKE ? OR location_full LIKE ? OR ecobricker_maker LIKE ? OR community_name LIKE ?)";
+    $totalFilteredQuery .= (!empty($ecobricker_id) ? " AND " : " WHERE ") .
+                           "(serial_no LIKE ? OR location_full LIKE ? OR ecobricker_maker LIKE ? OR community_name LIKE ?)";
 }
 $stmtFiltered = $gobrik_conn->prepare($totalFilteredQuery);
 
