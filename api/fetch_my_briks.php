@@ -23,8 +23,7 @@ function safe_html($string) {
 // Prepare the base SQL query, including the community_name field
 $sql = "SELECT ecobrick_thumb_photo_url, ecobrick_full_photo_url, weight_g, volume_ml, density, date_logged_ts,
         location_full, location_watershed, ecobricker_maker, community_name, serial_no, status, photo_version
-        FROM tb_ecobricks
-
+        FROM tb_ecobricks ";
 
 $bindTypes = "";
 $bindValues = [];
@@ -45,7 +44,7 @@ if (!empty($searchValue)) {
 }
 
 // Count total records before filtering
-$totalRecordsQuery = "SELECT COUNT(*) as total FROM tb_ecobricks WHERE status != 'not ready'";
+$totalRecordsQuery = "SELECT COUNT(*) as total FROM tb_ecobricks ";
 if (!empty($ecobricker_id)) {
     $totalRecordsQuery .= " AND maker_id = ?";
     $stmtTotal = $gobrik_conn->prepare($totalRecordsQuery);
@@ -118,7 +117,7 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Get total filtered records
-$totalFilteredQuery = "SELECT COUNT(*) as total FROM tb_ecobricks WHERE status != 'not ready'";
+$totalFilteredQuery = "SELECT COUNT(*) as total FROM tb_ecobricks ";
 if (!empty($ecobricker_id)) {
     $totalFilteredQuery .= " AND maker_id = ?";
 }
