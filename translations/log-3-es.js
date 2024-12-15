@@ -12,7 +12,7 @@ TEXT TRANSLATION SNIPPETS FOR GOBRIK.com
 
 
 const es_Page_Translations = {
-    "001-form-title": "ha sido registrado!",
+    "001-form-title": "esta casi listo...",
     "077-earth-thanks-you": "La Tierra Te Agradece.",
     "vision-form-into": "Opcionalmente, ahora puede agregar una visión a su ecoladrillo. Este es un mensaje corto: una visión, un deseo o una oración para el futuro. El mensaje se agregará al registro de su ecoladrillo en la brikchain y será visible para cualquiera que revise los datos de su ecoladrillo.",
     "024-char-remaining": "caracteres restantes",

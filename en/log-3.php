@@ -9,7 +9,7 @@ if (!$is_logged_in) {
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
-$version = '0.5';
+$version = '0.51';
 $page = 'log-3';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -178,7 +178,7 @@ echo '<!DOCTYPE html>
 
 
 
-            <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?> <span data-lang-id="001-form-title"> is logged! </span>🎉</h2>
+            <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?> <span data-lang-id="001-form-title"> is almost logged...</span></h2>
 
 
             <!-- Vision Form -->

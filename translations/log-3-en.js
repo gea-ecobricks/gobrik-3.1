@@ -14,7 +14,7 @@ TEXT TRANSLATION SNIPPETS FOR GOBRIK.com
 // Extracted Text and HTML Snippets for Translation
 
 const en_Page_Translations = {
-    "001-form-title": "is logged!",
+    "001-form-title": "is almost logged...",
     "vision-form-into": "Optionally, you may now add a vision to your ecobrick. This is a short message: a vision, a wish, or a prayer for the future. The message will be added to your ecobrick's record on the brikchain and visible to anyone who reviews your ecobrick's data.",
     "024-char-remaining": "characters remaining",
     "027-save-button-text": "Save",

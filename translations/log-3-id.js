@@ -12,7 +12,7 @@ TEXT TRANSLATION SNIPPETS FOR GOBRIK.com
 
 
 const id_Page_Translations = {
-    "001-form-title": "telah dicatat!",
+    "001-form-title": "hampir siap",
     "077-earth-thanks-you": "Bumi Berterima Kasih Kepada Anda.",
     "vision-form-into": "Opsional, Anda sekarang dapat menambahkan visi ke ecobrick Anda. Ini adalah pesan singkat: sebuah visi, harapan, atau doa untuk masa depan. Pesan ini akan ditambahkan ke catatan ecobrick Anda di brikchain dan terlihat oleh siapa saja yang meninjau data ecobrick Anda.",
     "024-char-remaining": "karakter tersisa",

@@ -13,7 +13,7 @@ TEXT TRANSLATION SNIPPETS FOR GOBRIK.com
 
 const fr_Page_Translations = {
     "077-earth-thanks-you": "La Terre Vous Remercie.",
-    "001-form-title": "est enregistré!",
+    "001-form-title": "est presque prêt...",
     "vision-form-into": "Vous pouvez maintenant ajouter une vision à votre écobrique, de façon optionnelle. C'est un message court: une vision, un souhait ou une prière pour l'avenir. Le message sera ajouté à l'enregistrement de votre écobrique sur la brikchain et visible par tous ceux qui consultent les données de votre écobrique.",
     "024-char-remaining": "caractères restants",
     "027-save-button-text": "Enregistrer",
