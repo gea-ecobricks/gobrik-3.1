@@ -168,7 +168,7 @@ if ($is_logged_in) {
     echo "<script>var density = $density, volume = '$universal_volume_ml', weight = '$weight_g';</script>";
 } else {
     if (ob_get_level() > 0) ob_end_clean();
-    header('Location: login.php?redirect=' . urlencode($page));
+    header('Location: login.php?redirect=log.php');
     exit();
 }
 
