@@ -16,7 +16,7 @@ const es_Page_Translations = {
     "077-earth-thanks-you": "La Tierra Te Agradece.",
     "vision-form-into": "Opcionalmente, ahora puede agregar una visión a su ecoladrillo. Este es un mensaje corto: una visión, un deseo o una oración para el futuro. El mensaje se agregará al registro de su ecoladrillo en la brikchain y será visible para cualquiera que revise los datos de su ecoladrillo.",
     "024-char-remaining": "caracteres restantes",
-    "027-save-button-text": "Guardar",
+    "027-save-button-text": "Guardar y finalizar",
     "014-skip-button": "Omitir: Completar Registro",
     "003-logging-is": "Registro de ecoladrillo",
     "003-complete": "está completo. 👍",

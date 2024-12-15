@@ -16,7 +16,7 @@ const id_Page_Translations = {
     "077-earth-thanks-you": "Bumi Berterima Kasih Kepada Anda.",
     "vision-form-into": "Opsional, Anda sekarang dapat menambahkan visi ke ecobrick Anda. Ini adalah pesan singkat: sebuah visi, harapan, atau doa untuk masa depan. Pesan ini akan ditambahkan ke catatan ecobrick Anda di brikchain dan terlihat oleh siapa saja yang meninjau data ecobrick Anda.",
     "024-char-remaining": "karakter tersisa",
-    "027-save-button-text": "Simpan",
+    "027-save-button-text": "Simpan & Selesai",
     "014-skip-button": "Lewati: Selesaikan Pencatatan",
     "003-logging-is": "Pencatatan ecobrick",
     "003-complete": "telah selesai. 👍",

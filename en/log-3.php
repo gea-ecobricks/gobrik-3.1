@@ -9,7 +9,7 @@ if (!$is_logged_in) {
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
-$version = '0.51';
+$version = '0.52';
 $page = 'log-3';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -192,7 +192,7 @@ echo '<!DOCTYPE html>
                 <input type="hidden" name="ecobrick_unique_id" value="<?php echo htmlspecialchars($ecobrick_unique_id); ?>">
 
                 <div class="button-group">
-                    <button type="submit" class="confirm-button" data-lang-id="027-save-button-text">Save</button>
+                    <button type="submit" class="confirm-button" data-lang-id="027-save-button-text">Save & Finish</button>
                     <!--<a class="confirm-button" id="skip-button" data-lang-id="014-skip-button">Skip: Complete Logging</a>-->
                 </div>
             </form>
