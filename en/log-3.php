@@ -9,7 +9,7 @@ if (!$is_logged_in) {
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
-$version = '0.52';
+$version = '0.53';
 $page = 'log-3';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 

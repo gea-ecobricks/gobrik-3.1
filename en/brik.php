@@ -48,7 +48,7 @@ echo '<div class="splash-title-block"></div>
 $serialNo = isset($_GET['serial_no']) ? $_GET['serial_no'] : null;
 
 if ($serialNo) {
-    $sql = "SELECT serial_no, weight_g, location_full, ecobrick_full_photo_url, date_logged_ts, last_validation_ts, status, vision, owner, volume_ml, sequestration_type, density, CO2_kg, selfie_photo_url, ecobrick_dec_brk_val, brand_name, bottom_colour, plastic_from, community_name, location_city, location_region, location_country, validator_1, validator_2, validator_3, validation_score_avg, catalyst, final_validation_score, weight_authenticated_kg FROM tb_ecobricks WHERE serial_no = ?";
+    $sql = "SELECT serial_no, weight_g, location_full, ecobrick_full_photo_url, date_logged_ts, last_validation_ts, status, vision, owner, volume_ml, sequestration_type, density, CO2_kg, selfie_photo_url, ecobrick_dec_brk_val, brand_name, bottom_colour, plastic_from, community_name, location_city, location_region, location_country, validator_1, validator_2, validator_3, validation_score_avg, catalyst, final_validation_score, weight_authenticated_kg, photo_version FROM tb_ecobricks WHERE serial_no = ?";
     $stmt = $gobrik_conn->prepare($sql);
 
     if ($stmt) {
@@ -72,7 +72,8 @@ if ($serialNo) {
             $serial_no, $weight_g, $location_full, $ecobrick_full_photo_url, $date_logged_ts, $last_validation_ts, $status,
             $vision, $owner, $volume_ml, $sequestration_type, $density, $CO2_kg, $selfie_photo_url, $ecobrick_dec_brk_val,
             $brand_name, $bottom_colour, $plastic_from, $community_name, $location_city, $location_region, $location_country,
-            $validator_1, $validator_2, $validator_3, $validation_score_avg, $catalyst, $final_validation_score, $weight_authenticated_kg
+            $validator_1, $validator_2, $validator_3, $validation_score_avg, $catalyst, $final_validation_score, $weight_authenticated_kg,
+            $photo_version // New field
         );
 
         // Fetch the results
@@ -83,11 +84,11 @@ if ($serialNo) {
 
             // AUTHENTICATED ECOBRICK
             if ($isAuthenticated) {
-    echo '
-    <div class="brik-content-block">
-        <div class="brik-info-box">
-            <div class="brik-serial-no"><span data-lang-id="001-splash-title">Ecobrick</span> ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . '</div>
-            <div class="brik-sub-title">';
+                echo '
+                <div class="brik-content-block">
+                    <div class="brik-info-box">
+                        <div class="brik-serial-no"><span data-lang-id="001-splash-title">Ecobrick</span> ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . '</div>
+                        <div class="brik-sub-title">';
 
                 // VISION
                 if (!empty(trim($vision))) {
@@ -97,8 +98,8 @@ if ($serialNo) {
                 } else {
                     // If $vision is empty, display the alternative message
                     echo htmlspecialchars($weight_g, ENT_QUOTES, 'UTF-8') .
-                         '&#8202;g <span data-lang-id="002-splash-subtitle">of plastic has been secured out of the biosphere in</span> ' .
-                         htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8');
+                        '&#8202;g <span data-lang-id="002-splash-subtitle">of plastic has been secured out of the biosphere in</span> ' .
+                        htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8');
                 }
 
                 echo '
@@ -106,8 +107,8 @@ if ($serialNo) {
                         <div class="brik-status authenticated">✅ Authenticated</div>
                     </div>
                     <div class="brik-image">
-                        <a href="javascript:void(0);" onclick="viewGalleryImage(\'' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '\'?v=3, \'Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '\')">
-                            <img src="../' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=3" alt="Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . '" title="Ecobrick Serial ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and authenticated on ' . htmlspecialchars($last_validation_ts, ENT_QUOTES, 'UTF-8') . '">
+                        <a href="javascript:void(0);" onclick="viewGalleryImage(\'' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=' . htmlspecialchars($photo_version, ENT_QUOTES, 'UTF-8') . '\', \'Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '\')">
+                            <img src="../' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=' . htmlspecialchars($photo_version, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . '" title="Ecobrick Serial ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and authenticated on ' . htmlspecialchars($last_validation_ts, ENT_QUOTES, 'UTF-8') . '">
                         </a>
                     </div>
                 </div>';
