@@ -2,10 +2,17 @@
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 require_once '../buwanaconn_env.php';   // Database connection
 
-header('Content-Type: application/json'); // Set JSON response
-header('Access-Control-Allow-Origin: https://cycles.earthen.io'); // Allow requests from Earthcal
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
+$allowed_origins = [
+    'https://cycles.earthen.io',
+    'https://ecobricks.org'
+];
+
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+}
 
 // Start a secure session
 startSecureSession();
