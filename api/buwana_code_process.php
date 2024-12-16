@@ -1,4 +1,37 @@
 <?php
+
+
+$allowed_origins = [
+    'https://cycles.earthen.io',
+    'https://ecobricks.org',
+    'http://localhost:8000' // Added for local testing
+];
+
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+} else {
+    // Handle missing or invalid HTTP_ORIGIN
+    error_log('CORS error: Missing or invalid HTTP_ORIGIN');
+    // For debugging purposes, you can temporarily allow all origins:
+    header('Access-Control-Allow-Origin: *'); // DEBUG ONLY, REMOVE IN PRODUCTION
+}
+
+// Handle preflight (OPTIONS) requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    // Ensure the headers are included for preflight requests
+    if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+        header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    } else {
+        header('Access-Control-Allow-Origin: *'); // DEBUG ONLY, REMOVE IN PRODUCTION
+    }
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+    exit(0); // Stop execution for preflight
+}
 //Sends the actiavtion code via MailGun API
 session_start();
 error_reporting(E_ALL);
@@ -38,7 +71,7 @@ function sendVerificationCode($email_addr, $login_code, $buwana_id, $first_name)
     $mailgunDomain = 'mail.gobrik.com'; // Your Mailgun domain
 
     // Generate the login URL with the buwana_id and login_code as parameters
-    $loginUrl = "https://gobrik.com/en/login.php?id=" . urlencode($buwana_id) . "&code=" . urlencode($login_code);
+    $loginUrl = "https://cycles.earthen.io/index.html?id=" . urlencode($buwana_id) . "&code=" . urlencode($login_code);
 
     $subject = 'GoBrik Login Code';
     $html_body = "Hello " . htmlspecialchars($first_name) . ",<br><br>Your code to log in to your account is: <b>$login_code</b><br><br>" .
