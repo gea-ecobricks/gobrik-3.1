@@ -195,7 +195,7 @@ echo '</script>';
 
     is this needed?!*/
 
-        var siteName = 'beta.gobrik.com';
+        var siteName = 'gobrik.com';
     var currentLanguage = '<?php echo ($lang); ?>'; // Default language code
     switchLanguage(currentLanguage);
 
