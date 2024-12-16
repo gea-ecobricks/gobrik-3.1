@@ -4,7 +4,8 @@ require_once '../buwanaconn_env.php';   // Database connection
 
 $allowed_origins = [
     'https://cycles.earthen.io',
-    'https://ecobricks.org'
+    'https://ecobricks.org',
+    'http://localhost:8000' // Added for local testing
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
@@ -13,6 +14,16 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
 }
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+    exit(0); // Stop execution for preflight
+}
+
 
 // Start a secure session
 startSecureSession();
