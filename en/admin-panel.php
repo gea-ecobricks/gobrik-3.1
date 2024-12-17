@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.445';
+$version = '0.45';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn();
@@ -46,7 +46,7 @@ echo '<!DOCTYPE html>
         <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
             <h2 data-lang-id="001-main-title">Admin Panel</h2>
             <p>
-                Review and authenticate the newest activated ecobrickers.
+                Review ecobrickers and the status of the test welcome email.
             </p>
 
             <table id="newest-ecobrickers" class="display responsive nowrap" style="width:100%">
