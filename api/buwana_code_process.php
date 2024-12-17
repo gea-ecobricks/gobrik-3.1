@@ -3,7 +3,8 @@
 $allowed_origins = [
     'https://cycles.earthen.io',
     'https://ecobricks.org',
-    'http://localhost:8000' // Added for local testing
+    'http://localhost:8000',  // Localhost
+    'http://0.0.0.0:8000'     // Local test server
 ];
 
 // CORS headers
@@ -13,13 +14,13 @@ if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
 } else {
-    header('Access-Control-Allow-Origin: *'); // Debugging only
+    // Fallback for debugging in local environments
+    header('Access-Control-Allow-Origin: *'); // DEBUG ONLY, REMOVE IN PRODUCTION
     error_log('CORS error: Missing or invalid HTTP_ORIGIN');
 }
 
-// Preflight requests
+// Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Origin: ' . ($_SERVER['HTTP_ORIGIN'] ?? '*'));
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
