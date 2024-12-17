@@ -44,7 +44,7 @@ echo '<!DOCTYPE html>
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-            <h2 data-lang-id="001-main-title">Admin Review - New Ecobrickers</h2>
+            <h2 data-lang-id="001-main-title">Admin Panel</h2>
             <p>
                 Review and authenticate the newest activated ecobrickers.
             </p>
