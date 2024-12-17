@@ -8,15 +8,15 @@ $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
 $searchValue = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
 
 // Base SQL query to fetch activated ecobrickers
-$sql = "SELECT full_name, gea_status, user_roles, ecobricks_made, login_count, location_full, community_id, country_id
+$sql = "SELECT full_name, gea_status, user_roles, ecobricks_made, login_count, location_full, buwana_id, test_email_status
         FROM tb_ecobrickers
         WHERE buwana_activated = 1";
 
 // Add search filter if any
 if (!empty($searchValue)) {
-    $sql .= " AND (full_name LIKE ? OR gea_status LIKE ? OR user_roles LIKE ?)";
-    $bindTypes = "sss";
-    $bindValues = array_fill(0, 3, "%$searchValue%");
+    $sql .= " AND (full_name LIKE ? OR gea_status LIKE ? OR user_roles LIKE ? OR test_email_status LIKE ?)";
+    $bindTypes = "ssss";
+    $bindValues = array_fill(0, 4, "%$searchValue%");
 } else {
     $bindTypes = "";
     $bindValues = [];
@@ -57,7 +57,7 @@ if (!empty($searchValue)) {
 }
 
 $stmt->execute();
-$stmt->bind_result($full_name, $gea_status, $user_roles, $ecobricks_made, $login_count, $location_full, $community_id, $country_id);
+$stmt->bind_result($full_name, $gea_status, $user_roles, $ecobricks_made, $login_count, $location_full, $buwana_id, $test_email_status);
 
 $data = [];
 while ($stmt->fetch()) {
@@ -68,15 +68,15 @@ while ($stmt->fetch()) {
         'ecobricks_made' => intval($ecobricks_made),
         'login_count' => intval($login_count),
         'location_full' => htmlspecialchars($location_full),
-        'community_id' => htmlspecialchars($community_id),
-        'country_id' => htmlspecialchars($country_id)
+        'buwana_id' => htmlspecialchars($buwana_id),
+        'test_email_status' => htmlspecialchars($test_email_status)
     ];
 }
 
 // Get total filtered records
 $filteredSql = "SELECT COUNT(*) as total FROM tb_ecobrickers WHERE buwana_activated = 1";
 if (!empty($searchValue)) {
-    $filteredSql .= " AND (full_name LIKE '%$searchValue%' OR gea_status LIKE '%$searchValue%' OR user_roles LIKE '%$searchValue%')";
+    $filteredSql .= " AND (full_name LIKE '%$searchValue%' OR gea_status LIKE '%$searchValue%' OR user_roles LIKE '%$searchValue%' OR test_email_status LIKE '%$searchValue%')";
 }
 $filteredResult = $gobrik_conn->query($filteredSql);
 $totalFilteredRecords = $filteredResult->fetch_assoc()['total'] ?? 0;
