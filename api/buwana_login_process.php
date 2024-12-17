@@ -8,34 +8,23 @@ $allowed_origins = [
     'http://localhost:8000' // Added for local testing
 ];
 
+// CORS headers
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
     header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
-} else {
-    // Handle missing or invalid HTTP_ORIGIN
-    error_log('CORS error: Missing or invalid HTTP_ORIGIN');
-    // For debugging purposes, you can temporarily allow all origins:
-    header('Access-Control-Allow-Origin: *'); // DEBUG ONLY, REMOVE IN PRODUCTION
 }
 
-// Handle preflight (OPTIONS) requests
+// Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    // Ensure the headers are included for preflight requests
-    if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
-        header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-    } else {
-        header('Access-Control-Allow-Origin: *'); // DEBUG ONLY, REMOVE IN PRODUCTION
-    }
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
     exit(0); // Stop execution for preflight
 }
 
-
-// Start a secure session
 startSecureSession();
 
 // PART 1: Grab user credentials from the POST request
@@ -53,7 +42,6 @@ if (empty($credential_key) || empty($password)) {
 
 try {
     // PART 2: Check Buwana Database
-    // SQL query to get buwana_id from credentials_tb using credential_key
     $sql_credential = "SELECT buwana_id FROM credentials_tb WHERE credential_key = ?";
     $stmt_credential = $buwana_conn->prepare($sql_credential);
 
@@ -70,8 +58,8 @@ try {
         $stmt_credential->fetch();
         $stmt_credential->close();
 
-        // SQL query to get password_hash from users_tb using buwana_id
-        $sql_user = "SELECT password_hash FROM users_tb WHERE buwana_id = ?";
+        // Retrieve user details: first_name, continent_code, location_full
+        $sql_user = "SELECT password_hash, first_name, continent_code, location_full FROM users_tb WHERE buwana_id = ?";
         $stmt_user = $buwana_conn->prepare($sql_user);
 
         if (!$stmt_user) {
@@ -83,38 +71,28 @@ try {
         $stmt_user->store_result();
 
         if ($stmt_user->num_rows === 1) {
-            $stmt_user->bind_result($password_hash);
+            $stmt_user->bind_result($password_hash, $first_name, $continent_code, $location_full);
             $stmt_user->fetch();
 
             // Verify the password entered by the user
             if (password_verify($password, $password_hash)) {
-                // PART 4: Update Buwana Account
+                // PART 4: Update last_login and login_count
                 $sql_update_user = "UPDATE users_tb SET last_login = NOW(), login_count = login_count + 1 WHERE buwana_id = ?";
                 $stmt_update_user = $buwana_conn->prepare($sql_update_user);
-
                 if ($stmt_update_user) {
                     $stmt_update_user->bind_param('i', $buwana_id);
                     $stmt_update_user->execute();
                     $stmt_update_user->close();
                 }
 
-                $sql_update_credential = "UPDATE credentials_tb SET last_login = NOW(), times_used = times_used + 1 WHERE credential_key = ?";
-                $stmt_update_credential = $buwana_conn->prepare($sql_update_credential);
-
-                if ($stmt_update_credential) {
-                    $stmt_update_credential->bind_param('s', $credential_key);
-                    $stmt_update_credential->execute();
-                    $stmt_update_credential->close();
-                }
-
-                // Set session variable
-                $_SESSION['buwana_id'] = $buwana_id;
-
-                // Respond with success
+                // Respond with success and user details
                 echo json_encode([
                     'success' => true,
                     'message' => 'Login successful',
-                    'buwana_id' => $buwana_id
+                    'buwana_id' => $buwana_id,
+                    'first_name' => $first_name,
+                    'continent_code' => $continent_code,
+                    'location_full' => $location_full
                 ]);
                 exit();
             } else {
