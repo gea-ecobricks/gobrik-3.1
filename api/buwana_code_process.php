@@ -112,6 +112,7 @@ if ($stmt_credential) {
             $stmt_user->close();
         }
 
+
         // Generate a new 2FA code
         $temp_code = generateCode();
         $issued_datetime = date('Y-m-d H:i:s');
