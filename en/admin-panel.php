@@ -3,33 +3,65 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.45';
+$version = '0.5';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
-$is_logged_in = isLoggedIn();
+$is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
+
 
 // Check if the user is logged in
-if ($is_logged_in) {
+if (isLoggedIn()) {
     $buwana_id = $_SESSION['buwana_id'];
+        // Include database connection
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch user's location and other details
+    // Fetch the user's location data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
-    $buwana_conn->close();
+    // Check if the user is an admin
+    if (strpos($gea_status, 'Admin') === false) {
+        echo "<script>
+            alert('Sorry, this page is for admins only.');
+            window.location.href = 'dashboard.php';
+        </script>";
+        exit();
+    }
+
+    $buwana_conn->close();  // Close the database connection
+} else {
+
 }
 
+// Include database connection
 require_once '../gobrikconn_env.php';
+
+
+// Fetch the count of ecobricks and the total weight in kg
+$sql = "SELECT COUNT(*) as ecobrick_count, SUM(weight_g) / 1000 as total_weight FROM tb_ecobricks WHERE status != 'not ready'";
+$result = $gobrik_conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $ecobrick_count = number_format($row['ecobrick_count'] ?? 0);
+    $total_weight = number_format(round($row['total_weight'] ?? 0)); // Format with commas and round to the nearest whole number
+} else {
+    $ecobrick_count = '0';
+    $total_weight = '0';
+}
+
 $gobrik_conn->close();
 
 echo '<!DOCTYPE html>
 <html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
 <head>
 <meta charset="UTF-8">
-<title>Admin Review - New Ecobrickers</title>
-</head>';
+';
 ?>
 
 <!-- Page CSS & JS Initialization -->
