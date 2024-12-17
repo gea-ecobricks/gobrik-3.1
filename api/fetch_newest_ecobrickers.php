@@ -62,15 +62,16 @@ $stmt->bind_result($full_name, $gea_status, $user_roles, $ecobricks_made, $login
 $data = [];
 while ($stmt->fetch()) {
     $data[] = [
-        'full_name' => htmlspecialchars($full_name),
-        'gea_status' => htmlspecialchars($gea_status),
-        'user_roles' => htmlspecialchars($user_roles),
-        'ecobricks_made' => intval($ecobricks_made),
-        'login_count' => intval($login_count),
-        'location_full' => htmlspecialchars($location_full),
-        'buwana_id' => htmlspecialchars($buwana_id),
-        'test_email_status' => htmlspecialchars($test_email_status)
-    ];
+    'full_name' => htmlspecialchars($full_name ?? '', ENT_QUOTES, 'UTF-8'),
+    'gea_status' => htmlspecialchars($gea_status ?? '', ENT_QUOTES, 'UTF-8'),
+    'user_roles' => htmlspecialchars($user_roles ?? '', ENT_QUOTES, 'UTF-8'),
+    'ecobricks_made' => intval($ecobricks_made ?? 0),
+    'login_count' => intval($login_count ?? 0),
+    'location_full' => htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'),
+    'buwana_id' => htmlspecialchars($buwana_id ?? '', ENT_QUOTES, 'UTF-8'),
+    'test_email_status' => htmlspecialchars($test_email_status ?? '', ENT_QUOTES, 'UTF-8')
+];
+
 }
 
 // Get total filtered records
