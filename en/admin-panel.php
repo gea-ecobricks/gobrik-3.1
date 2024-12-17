@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.445';
-$page = 'admin-review';
+$page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn();
 
@@ -33,7 +33,7 @@ echo '<!DOCTYPE html>
 ?>
 
 <!-- Page CSS & JS Initialization -->
-<?php require_once("../includes/admin-review-inc.php"); ?>
+<?php require_once("../includes/admin-panel-inc.php"); ?>
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>

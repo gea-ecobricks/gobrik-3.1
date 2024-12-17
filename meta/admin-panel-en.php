@@ -1,6 +1,6 @@
 <!-- Meta tags for page display and search engine listing-->
 
-<title>Admin Review | GoBrik</title>
+<title>Admin Panel | GoBrik</title>
 <meta name="keywords" content="Review, validate, authenticate, Ecobricks, Log, Record, submit, ecobrick, Gobrik">
 <meta name="description" content="Review ecobricks for authentication on the brikchain.">
 <meta name="author" content="GoBrik.com">
