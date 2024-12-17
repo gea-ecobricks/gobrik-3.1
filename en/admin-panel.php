@@ -134,15 +134,16 @@ $(document).ready(function() {
             }
         },
         "columns": [
-            { "data": "full_name" },
-            { "data": "gea_status" },
-            { "data": "user_roles" },
-            { "data": "ecobricks_made" },
-            { "data": "login_count" },
-            { "data": "location_full" },
-            { "data": "community_id" },
-            { "data": "country_id" }
-        ]
+    { "data": "full_name" },
+    { "data": "gea_status" },
+    { "data": "user_roles" },
+    { "data": "ecobricks_made" },
+    { "data": "login_count" },
+    { "data": "location_full" },
+    { "data": "buwana_id" },
+    { "data": "test_email_status" }
+]
+
     });
 });
 </script>
