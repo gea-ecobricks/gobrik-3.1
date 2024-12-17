@@ -5,20 +5,26 @@ require_once '../buwanaconn_env.php';
 $allowed_origins = [
     'https://cycles.earthen.io',
     'https://ecobricks.org',
-    'http://localhost:8000',  // Localhost
-    'http://0.0.0.0:8000'     // Local test server
+    'https://gobrik.com',
+    'http://localhost:8000',   // Localhost
+    'http://0.0.0.0:8000'      // Local test server
 ];
 
-// CORS headers
-if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
-    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
+
+// Check if the origin is in the allowed list
+if ($origin && in_array($origin, $allowed_origins)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
 } else {
-    // Fallback for debugging in local environments
-    header('Access-Control-Allow-Origin: *'); // DEBUG ONLY, REMOVE IN PRODUCTION
-    error_log('CORS error: Missing or invalid HTTP_ORIGIN');
+    error_log('CORS error: Invalid or missing HTTP_ORIGIN - ' . $origin);
+    // Do not send the headers for invalid origins
+    header('HTTP/1.1 403 Forbidden');
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
+    exit();
 }
 
 // Handle preflight requests
@@ -26,9 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
-    exit(0);
+    exit(0); // Stop execution for preflight
 }
-
 
 startSecureSession();
 
@@ -130,4 +135,3 @@ try {
 } finally {
     $buwana_conn->close();
 }
-?>
