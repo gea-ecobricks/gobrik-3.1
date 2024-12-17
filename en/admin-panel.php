@@ -84,14 +84,14 @@ echo '<!DOCTYPE html>
             <table id="newest-ecobrickers" class="display responsive nowrap" style="width:100%">
                 <thead>
                     <tr>
-                        <th>Full Name</th>
+                        <th>Buwana</th>
+                        <th>Name</th>
                         <th>GEA Status</th>
-                        <th>User Roles</th>
-                        <th>Ecobricks Made</th>
-                        <th>Login Count</th>
-                        <th>Location</th>
-                        <th>Community ID</th>
-                        <th>Country ID</th>
+                        <th>Roles</th>
+                        <th>Briks</th>
+                        <th>Logins</th>
+                        <th>Email</th>
+                        <th>Location</th> <!-- Hidden initially -->
                     </tr>
                 </thead>
                 <tbody>
@@ -118,7 +118,8 @@ $(document).ready(function() {
             "url": "../api/fetch_newest_ecobrickers.php",
             "type": "POST"
         },
-        "pageLength": 10,
+        "pageLength": 100, // Show 100 results per page by default
+        "order": [[0, "desc"]], // Sort by Buwana ID (highest first)
         "language": {
             "emptyTable": "It looks like no ecobrickers have activated their accounts yet!",
             "info": "Showing _START_ to _END_ of _TOTAL_ ecobrickers",
@@ -134,16 +135,23 @@ $(document).ready(function() {
             }
         },
         "columns": [
-    { "data": "full_name" },
-    { "data": "gea_status" },
-    { "data": "user_roles" },
-    { "data": "ecobricks_made" },
-    { "data": "login_count" },
-    { "data": "location_full" },
-    { "data": "buwana_id" },
-    { "data": "test_email_status" }
-]
-
+            { "data": "buwana_id" },        // Buwana
+            { "data": "full_name" },        // Name
+            { "data": "gea_status" },       // GEA Status
+            { "data": "user_roles" },       // Roles
+            { "data": "ecobricks_made" },   // Briks
+            { "data": "login_count" },      // Logins
+            { "data": "test_email_status" },// Email
+            { "data": "location_full",      // Location (hidden initially)
+              "responsivePriority": 2 }     // Ensures it's shown via the green "+" button
+        ],
+        "columnDefs": [
+            {
+                "targets": [7],        // Target the "Location" column
+                "visible": false,      // Hide it by default
+                "responsivePriority": 2 // Show it on row expansion
+            }
+        ]
     });
 });
 </script>
