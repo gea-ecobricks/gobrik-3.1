@@ -13,14 +13,14 @@ require_once '../buwanaconn_env.php'; // Buwana database connection
 $response = []; // Initialize response array
 
 // Check if the user is logged in and has admin privileges
-if (!isset($_SESSION['buwana_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    $response = [
-        'success' => false,
-        'error' => 'Unauthorized access. Please login as an admin.'
-    ];
-    echo json_encode($response);
-    exit();
-}
+    // Check if the user is an admin
+    if (strpos($gea_status, 'Admin') === false) {
+        echo "<script>
+            alert('Sorry, this page is for admins only.');
+            window.location.href = 'dashboard.php';
+        </script>";
+        exit();
+    }
 
 $buwana_id = $_GET['id'] ?? '';
 
