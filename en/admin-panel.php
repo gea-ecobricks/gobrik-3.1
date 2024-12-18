@@ -22,14 +22,8 @@ if (isLoggedIn()) {
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
-    // Check if the user is an admin
-    if (strpos($gea_status, 'Admin') === false) {
-        echo "<script>
-            alert('Sorry, this page is for admins only.');
-            window.location.href = 'dashboard.php';
-        </script>";
-        exit();
-    }
+    // Check if the user is logged in and has admin privileges
+    checkAdminStatus(); // Call the reusable function
 
     $buwana_conn->close(); // Close the database connection
 }

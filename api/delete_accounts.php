@@ -1,35 +1,28 @@
 <?php
-session_start();
+
+require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require_once '../gobrikconn_env.php'; // GoBrik database connection
+require_once '../buwanaconn_env.php'; // Buwana database connection
+
 header('Content-Type: application/json'); // Ensure JSON response
 ob_start(); // Start output buffering to catch extraneous output
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Include database connections
-require_once '../gobrikconn_env.php'; // GoBrik database connection
-require_once '../buwanaconn_env.php'; // Buwana database connection
-
 $response = []; // Initialize response array
 
 // Check if the user is logged in and has admin privileges
-    // Check if the user is an admin
-    if (strpos($gea_status, 'Admin') === false) {
-        echo "<script>
-            alert('Sorry, this page is for admins only.');
-            window.location.href = 'dashboard.php';
-        </script>";
-        exit();
-    }
-
-$buwana_id = $_GET['id'] ?? '';
+checkAdminStatus(); // Call the reusable function
 
 // Validate buwana_id
+$buwana_id = $_GET['id'] ?? '';
 if (empty($buwana_id) || !is_numeric($buwana_id)) {
     $response = [
         'success' => false,
         'error' => 'Invalid account ID. Please provide a valid ID.'
     ];
+    ob_end_clean();
     echo json_encode($response);
     exit();
 }
@@ -96,4 +89,5 @@ echo json_encode($response);
 // Close the database connections
 $buwana_conn->close();
 $gobrik_conn->close();
+
 ?>

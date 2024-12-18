@@ -4,6 +4,32 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 
+function checkAdminStatus() {
+    session_start();
+
+    // Check if the user is logged in
+    if (!isset($_SESSION['buwana_id']) || !isset($_SESSION['gea_status'])) {
+        // Redirect to login if not logged in
+        header('Location: login.php?redirect=dashboard');
+        exit();
+    }
+
+    // Check if the user has admin privileges
+    $gea_status = $_SESSION['gea_status']; // Assuming GEA status is stored in session
+    if (strpos($gea_status, 'Admin') === false) {
+        // Redirect if not an admin
+        echo "<script>
+            alert('Sorry, this page is for admins only.');
+            window.location.href = 'dashboard.php';
+        </script>";
+        exit();
+    }
+
+    // If everything is fine, return true
+    return true;
+}
+
+
 function startSecureSession() {
     // Start the session if it's not already started
     if (session_status() === PHP_SESSION_NONE) {
