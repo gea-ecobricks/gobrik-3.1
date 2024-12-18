@@ -7,15 +7,7 @@ ini_set('display_errors', 1);
 
 function checkAdminStatus() {
 
-    // Check if the user is logged in
-    if (!isset($_SESSION['buwana_id']) || !isset($_SESSION['gea_status'])) {
-        // Redirect to login if not logged in
-        header('Location: login.php?redirect=dashboard');
-        exit();
-    }
 
-    // Check if the user's gea_status contains "Admin"
-    $gea_status = $_SESSION['gea_status'];
     if (stripos($gea_status, 'Admin') === false) { // Case-insensitive check for "Admin"
         // Redirect if "Admin" is not found in gea_status
         echo "<script>
