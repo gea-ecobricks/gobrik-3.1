@@ -3,8 +3,10 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+<?php
 
 function checkAdminStatus() {
+    session_start();
 
     // Check if the user is logged in
     if (!isset($_SESSION['buwana_id']) || !isset($_SESSION['gea_status'])) {
@@ -13,10 +15,10 @@ function checkAdminStatus() {
         exit();
     }
 
-    // Check if the user has admin privileges
-    $gea_status = $_SESSION['gea_status']; // Assuming GEA status is stored in session
-    if (strpos($gea_status, 'Admin') === false) {
-        // Redirect if not an admin
+    // Check if the user's gea_status contains "Admin"
+    $gea_status = $_SESSION['gea_status'];
+    if (stripos($gea_status, 'Admin') === false) { // Case-insensitive check for "Admin"
+        // Redirect if "Admin" is not found in gea_status
         echo "<script>
             alert('Sorry, this page is for admins only.');
             window.location.href = 'dashboard.php';
