@@ -64,12 +64,6 @@ $percent_emails_sent = $total_ecobrickers > 0 ? round(($total_emails_sent / $tot
 $gobrik_conn->close();
 ?>
 
-<!DOCTYPE html>
-<html lang="<?php echo htmlspecialchars($lang, ENT_QUOTES, 'UTF-8'); ?>">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Panel</title>
-</head>
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
 <div class="splash-title-block"></div>
@@ -109,6 +103,7 @@ $gobrik_conn->close();
             </table>
         </div>
     </div>
+</div>
 </div>
 <?php require_once("../footer-2024.php"); ?>
 
