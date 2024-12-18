@@ -108,6 +108,7 @@ $gobrik_conn->close();
 <?php require_once("../footer-2024.php"); ?>
 
 <script>
+
 $(document).ready(function() {
     $("#newest-ecobrickers").DataTable({
         "responsive": true,
@@ -118,30 +119,25 @@ $(document).ready(function() {
             "type": "POST"
         },
         "pageLength": 100, // Show 100 rows by default
-        "order": [[7, "desc"]], // Default sorting by the Buwana ID column (now column 7)
+        "order": [[0, "desc"]],
         "columns": [
+            {
+                "data": "buwana_id",
+                "render": function (data, type, row) {
+                    // Return a clickable button to open the modal
+                    return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
+                }
+            },
             { "data": "full_name" },
             { "data": "gea_status" },
             { "data": "user_roles" },
             { "data": "ecobricks_made" },
             { "data": "login_count" },
             { "data": "test_email_status" },
-            { "data": "location_full", "responsivePriority": 2 },
-            {
-                "data": "buwana_id",
-                "orderable": true, // Allow sorting on this column
-                "render": function (data, type, row) {
-                    // Return a clickable button to open the modal
-                    return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
-                }
-            }
+            { "data": "location_full", "responsivePriority": 2 }
         ],
         "columnDefs": [
-            {
-                "targets": [6], // Target the "location_full" column
-                "visible": false, // Hide it by default
-                "responsivePriority": 2 // Ensure it shows on row expansion
-            }
+            { "targets": [7], "visible": false, "responsivePriority": 2 }
         ]
     });
 });
