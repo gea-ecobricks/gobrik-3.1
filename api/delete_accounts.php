@@ -7,28 +7,30 @@ ini_set('display_errors', 1);
 require_once '../gobrikconn_env.php'; // GoBrik database connection
 require_once '../buwanaconn_env.php'; // Buwana database connection
 
-// Check if the user is logged in and if buwana_id is set
-if (!isset($_SESSION['buwana_id'])) {
-    echo '<script>
-        alert("Please login before viewing this page.");
-        window.location.href = "login.php?redirect=profile";
-    </script>';
+header('Content-Type: application/json'); // Set response type to JSON
+
+// Check if the user is logged in and has admin privileges
+if (!isset($_SESSION['buwana_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Unauthorized access. Please login as an admin.'
+    ]);
     exit();
 }
 
 $buwana_id = $_GET['id'] ?? '';
 
-// Ensure buwana_id is valid
-if (empty($buwana_id)) {
-    echo '<script>
-        alert("Invalid account ID. Please try again.");
-        window.location.href = "profile.php";
-    </script>';
+// Validate buwana_id
+if (empty($buwana_id) || !is_numeric($buwana_id)) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Invalid account ID. Please provide a valid ID.'
+    ]);
     exit();
 }
 
 try {
-    // Start transaction to ensure all operations are successful or none are
+    // Start transaction to ensure all operations succeed or none
     $buwana_conn->begin_transaction();
     $gobrik_conn->begin_transaction();
 
@@ -66,23 +68,20 @@ try {
     $buwana_conn->commit();
     $gobrik_conn->commit();
 
-    // Terminate the session and clear session data
-    session_unset(); // Remove all session variables
-    session_destroy(); // Destroy the session
-
-    // Redirect to goodbye page with success message
-    echo '<script>
-        window.location.href = "goodbye.php?status=deleted";
-    </script>';
-
+    // Return success response
+    echo json_encode([
+        'success' => true,
+        'message' => 'User deleted successfully.'
+    ]);
 } catch (Exception $e) {
     // Rollback transactions if there was an error
     $buwana_conn->rollback();
     $gobrik_conn->rollback();
-    echo '<script>
-        alert("An error occurred while deleting your account. Please try again.");
-        window.location.href = "profile.php?status=failed";
-    </script>';
+
+    echo json_encode([
+        'success' => false,
+        'error' => 'An error occurred while deleting the account: ' . $e->getMessage()
+    ]);
 }
 
 // Close the database connections
