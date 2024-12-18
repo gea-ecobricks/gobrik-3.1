@@ -83,18 +83,19 @@ $gobrik_conn->close();
             <table id="newest-ecobrickers" class="display responsive nowrap" style="width:100%">
     <thead>
         <tr>
-            <th>Buwana</th>
-            <th>Name</th> <!-- Now uses first_name -->
-            <th>Email</th> <!-- Now uses email -->
-            <th>Status</th> <!-- Now uses account_status -->
-            <th>Briks</th>
-            <th>Logins</th>
-            <th>Notes</th> <!-- Now uses account_notes -->
-            <th>Location</th>
+            <th>Buwana</th> <!-- Uses buwana_id -->
+            <th>Name</th> <!-- Uses first_name -->
+            <th>Email</th> <!-- Uses email -->
+            <th>Status</th> <!-- Uses account_status -->
+            <th>Briks</th> <!-- Uses ecobricks_made -->
+            <th>Logins</th> <!-- Uses login_count -->
+            <th>Notes</th> <!-- Uses account_notes -->
+            <th>Location</th> <!-- Uses location_full -->
         </tr>
     </thead>
     <tbody></tbody>
 </table>
+
 
 
         </div>
@@ -104,7 +105,8 @@ $gobrik_conn->close();
 <?php require_once("../footer-2024.php"); ?>
 
 <script>
-$(document).ready(function () {
+
+    $(document).ready(function () {
     $("#newest-ecobrickers").DataTable({
         responsive: true,
         serverSide: true,
@@ -112,6 +114,13 @@ $(document).ready(function () {
         ajax: {
             url: "../api/fetch_newest_ecobrickers.php",
             type: "POST",
+            dataSrc: function (json) {
+                console.log("JSON Response:", json); // Debug: Log the full JSON response
+                if (!json.data) {
+                    console.error("Invalid JSON format or missing 'data' key:", json);
+                }
+                return json.data || []; // Return empty array if data is undefined
+            },
         },
         pageLength: 100, // Show 100 rows by default
         order: [[0, "desc"]], // Sort by Buwana ID descending
@@ -123,13 +132,13 @@ $(document).ready(function () {
                     return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
                 },
             },
-            { data: "first_name" }, // Now uses first_name for Name
-            { data: "email" }, // Now uses email for Email
-            { data: "account_status" }, // Now uses account_status for Roles/Status
-            { data: "ecobricks_made" }, // No change
-            { data: "login_count" }, // No change
-            { data: "account_notes" }, // Now uses account_notes for Notes
-            { data: "location_full", responsivePriority: 2 }, // No change
+            { data: "first_name" }, // Name column
+            { data: "email" }, // Email column
+            { data: "account_status" }, // Status column
+            { data: "ecobricks_made" }, // Briks column
+            { data: "login_count" }, // Logins column
+            { data: "account_notes" }, // Notes column
+            { data: "location_full", responsivePriority: 2 }, // Location column
         ],
         columnDefs: [
             { targets: [7], visible: false, responsivePriority: 2 }, // Hide Location initially
@@ -150,6 +159,7 @@ $(document).ready(function () {
         },
     });
 });
+
 
 
 function openEcobrickerModal(buwana_id) {

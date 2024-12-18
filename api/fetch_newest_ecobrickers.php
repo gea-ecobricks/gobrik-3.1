@@ -8,40 +8,49 @@ $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
 $searchValue = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
 
 // Base SQL query to fetch activated ecobrickers
-$sql = "SELECT buwana_id, first_name, email, account_status, ecobricks_made, login_count, account_notes, location_full
-        FROM tb_ecobrickers
-        WHERE buwana_activated = 1";
-
-// Add search filter if any
-if (!empty($searchValue)) {
-    $sql .= " AND (first_name LIKE ? OR email LIKE ? OR account_status LIKE ?)";
-    $bindTypes = "sss";
-    $bindValues = array_fill(0, 3, "%$searchValue%");
-} else {
-    $bindTypes = "";
-    $bindValues = [];
-}
-
-// Order and limit for pagination
-$sql .= " ORDER BY buwana_id DESC LIMIT ?, ?";
-$bindTypes .= "ii";
-$bindValues[] = $start;
-$bindValues[] = $length;
+$baseSql = "SELECT buwana_id, first_name, email, account_status, ecobricks_made, login_count, account_notes, location_full
+            FROM tb_ecobrickers
+            WHERE buwana_activated = 1";
 
 // Count total records before filtering
 $totalRecordsQuery = "SELECT COUNT(*) as total FROM tb_ecobrickers WHERE buwana_activated = 1";
 $totalRecordsResult = $gobrik_conn->query($totalRecordsQuery);
 $totalRecords = $totalRecordsResult->fetch_assoc()['total'] ?? 0;
 
-// Prepare the statement for the main query
-$stmt = $gobrik_conn->prepare($sql);
+// Build filtering logic
+$filterSql = $baseSql;
+$filterConditions = [];
+$bindTypes = "";
+$bindValues = [];
+
+if (!empty($searchValue)) {
+    $filterConditions[] = "(first_name LIKE ? OR email LIKE ? OR account_status LIKE ?)";
+    $bindTypes .= "sss";
+    $bindValues[] = "%$searchValue%";
+    $bindValues[] = "%$searchValue%";
+    $bindValues[] = "%$searchValue%";
+}
+
+// Append filtering conditions
+if ($filterConditions) {
+    $filterSql .= " AND " . implode(" AND ", $filterConditions);
+}
+
+// Add ordering and pagination
+$filterSql .= " ORDER BY buwana_id DESC LIMIT ?, ?";
+$bindTypes .= "ii";
+$bindValues[] = $start;
+$bindValues[] = $length;
+
+// Prepare the filtered query
+$stmt = $gobrik_conn->prepare($filterSql);
 
 // Error handling for SQL preparation
 if (!$stmt) {
     error_log("SQL Error: " . $gobrik_conn->error);
     echo json_encode([
         "draw" => $draw,
-        "recordsTotal" => 0,
+        "recordsTotal" => $totalRecords,
         "recordsFiltered" => 0,
         "data" => [],
         "error" => "Failed to prepare SQL statement: " . $gobrik_conn->error
@@ -49,21 +58,20 @@ if (!$stmt) {
     exit;
 }
 
-// Bind parameters dynamically if any
-if (!empty($searchValue)) {
+// Bind parameters dynamically
+if (!empty($bindValues)) {
     $stmt->bind_param($bindTypes, ...$bindValues);
-} else {
-    $stmt->bind_param("ii", $start, $length);
 }
 
 $stmt->execute();
 $stmt->bind_result($buwana_id, $first_name, $email, $account_status, $ecobricks_made, $login_count, $account_notes, $location_full);
 
+// Fetch filtered data
 $data = [];
 while ($stmt->fetch()) {
     $data[] = [
-        'buwana_id' => htmlspecialchars($buwana_id),
-        'first_name' => htmlspecialchars($first_name),
+        'buwana_id' => $buwana_id,
+        'first_name' => htmlspecialchars($first_name), // Escape potential HTML in strings
         'email' => htmlspecialchars($email),
         'account_status' => htmlspecialchars($account_status),
         'ecobricks_made' => intval($ecobricks_made),
@@ -73,13 +81,22 @@ while ($stmt->fetch()) {
     ];
 }
 
-// Get total filtered records
+// Count total filtered records
 $filteredSql = "SELECT COUNT(*) as total FROM tb_ecobrickers WHERE buwana_activated = 1";
-if (!empty($searchValue)) {
-    $filteredSql .= " AND (first_name LIKE '%$searchValue%' OR email LIKE '%$searchValue%' OR account_status LIKE '%$searchValue%')";
+if (!empty($filterConditions)) {
+    $filteredSql .= " AND " . implode(" AND ", $filterConditions);
 }
-$filteredResult = $gobrik_conn->query($filteredSql);
-$totalFilteredRecords = $filteredResult->fetch_assoc()['total'] ?? 0;
+
+$filteredStmt = $gobrik_conn->prepare($filteredSql);
+if ($bindTypes && $filteredStmt) {
+    $filteredStmt->bind_param(substr($bindTypes, 0, -2), ...array_slice($bindValues, 0, -2)); // Exclude pagination params
+    $filteredStmt->execute();
+    $filteredResult = $filteredStmt->get_result();
+    $totalFilteredRecords = $filteredResult->fetch_assoc()['total'] ?? 0;
+    $filteredStmt->close();
+} else {
+    $totalFilteredRecords = $totalRecords; // Default to total records if no filtering
+}
 
 // Prepare JSON response
 $response = [
