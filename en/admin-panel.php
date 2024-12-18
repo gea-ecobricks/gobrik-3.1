@@ -143,24 +143,32 @@ $(document).ready(function() {
 });
 
 
-
-
 function openEcobrickerModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
-    const modalContentBox = document.getElementById('modal-content-box');
+    const modalBox = document.getElementById('modal-content-box');
 
-    // Lock scrolling for the body
-    document.body.classList.add('modal-open');
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
 
-    // Clear previous modal content
-    modalContentBox.innerHTML = `<h4>Loading Ecobricker Details for Buwana ID: ${buwana_id}...</h4>`;
+    // Lock scrolling for the body and blur background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open'); // Locks scrolling
+
+    // Set up the modal-content-box styles
+    modalBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
+    modalBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
+
+    // Clear previous modal content and set up structure
+    modalBox.innerHTML = `<h4>Ecobricker Details (Buwana ID: ${buwana_id})</h4><div id="ecobricker-table-container"></div>`;
 
     // Fetch ecobricker details
     fetch(`../api/fetch_ecobricker_details.php?buwana_id=${buwana_id}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                modalContentBox.innerHTML = `<p>${data.error}</p>`;
+                modalBox.innerHTML = `<p>${data.error}</p>`;
                 return;
             }
 
@@ -169,29 +177,31 @@ function openEcobrickerModal(buwana_id) {
             tableHTML += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
 
             for (const [field, value] of Object.entries(data)) {
+                // Use field names as they appear in the table
                 tableHTML += `<tr><td>${field}</td><td>${value || '-'}</td></tr>`;
             }
 
             tableHTML += '</tbody></table>';
 
-            // Insert the table into the modal
-            modalContentBox.innerHTML = tableHTML;
+            // Insert the table into the ecobricker-table-container
+            document.getElementById('ecobricker-table-container').innerHTML = tableHTML;
 
             // Initialize the DataTable
             $('#ecobricker-details-table').DataTable({
-                paging: false,
-                searching: false,
-                info: false,
-                scrollX: true
+                paging: false, // Disable pagination
+                searching: false, // Disable search
+                info: false, // Disable table info
+                scrollX: true // Enable horizontal scrolling
             });
         })
         .catch(error => {
-            modalContentBox.innerHTML = `<p>Error loading ecobricker details: ${error.message}</p>`;
+            modalBox.innerHTML = `<p>Error loading ecobricker details: ${error.message}</p>`;
         });
 
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 
