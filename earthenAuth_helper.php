@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 
 
 function checkAdminStatus() {
-    session_start();
+
 
     // Check if the user is logged in
     if (!isset($_SESSION['buwana_id']) || !isset($_SESSION['gea_status'])) {
