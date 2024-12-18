@@ -142,7 +142,6 @@ $(document).ready(function() {
     });
 });
 
-
 function openEcobrickerModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -161,14 +160,18 @@ function openEcobrickerModal(buwana_id) {
     modalBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
 
     // Clear previous modal content and set up structure
-    modalBox.innerHTML = `<h4>Ecobricker Details (Buwana ID: ${buwana_id})</h4><div id="ecobricker-table-container"></div>`;
+    modalBox.innerHTML = `
+        <h4>Ecobricker Details (Buwana ID: ${buwana_id})</h4>
+        <button class="btn delete" style="margin-bottom: 15px;" onclick="confirmDeleteUser(${buwana_id})">❌ Delete User</button>
+        <div id="ecobricker-table-container"></div>
+    `;
 
     // Fetch ecobricker details
     fetch(`../api/fetch_ecobricker_details.php?buwana_id=${buwana_id}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                modalBox.innerHTML = `<p>${data.error}</p>`;
+                modalBox.innerHTML += `<p>${data.error}</p>`;
                 return;
             }
 
@@ -177,7 +180,6 @@ function openEcobrickerModal(buwana_id) {
             tableHTML += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
 
             for (const [field, value] of Object.entries(data)) {
-                // Use field names as they appear in the table
                 tableHTML += `<tr><td>${field}</td><td>${value || '-'}</td></tr>`;
             }
 
@@ -195,12 +197,40 @@ function openEcobrickerModal(buwana_id) {
             });
         })
         .catch(error => {
-            modalBox.innerHTML = `<p>Error loading ecobricker details: ${error.message}</p>`;
+            modalBox.innerHTML += `<p>Error loading ecobricker details: ${error.message}</p>`;
         });
 
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
+
+function confirmDeleteUser(buwana_id) {
+    if (confirm(`Are you sure you want to delete the user with Buwana ID: ${buwana_id}? This action cannot be undone.`)) {
+        fetch(`../api/delete-accounts.php?id=${buwana_id}`, {
+            method: 'GET', // Change to DELETE if supported by your API
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`User with Buwana ID ${buwana_id} has been successfully deleted.`);
+                closeInfoModal(); // Close the modal
+                // Reload the DataTable to reflect changes
+                $('#newest-ecobrickers').DataTable().ajax.reload();
+            } else {
+                alert(`Failed to delete user: ${data.error || 'Unknown error'}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting user:', error);
+            alert(`An error occurred while trying to delete the user: ${error.message}`);
+        });
+    }
+}
+
 
 
 
