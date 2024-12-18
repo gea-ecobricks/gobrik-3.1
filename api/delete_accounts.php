@@ -1,5 +1,8 @@
 <?php
 session_start();
+header('Content-Type: application/json'); // Ensure JSON response
+ob_start(); // Start output buffering to catch extraneous output
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -7,14 +10,15 @@ ini_set('display_errors', 1);
 require_once '../gobrikconn_env.php'; // GoBrik database connection
 require_once '../buwanaconn_env.php'; // Buwana database connection
 
-header('Content-Type: application/json'); // Set response type to JSON
+$response = []; // Initialize response array
 
 // Check if the user is logged in and has admin privileges
 if (!isset($_SESSION['buwana_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    echo json_encode([
+    $response = [
         'success' => false,
         'error' => 'Unauthorized access. Please login as an admin.'
-    ]);
+    ];
+    echo json_encode($response);
     exit();
 }
 
@@ -22,10 +26,11 @@ $buwana_id = $_GET['id'] ?? '';
 
 // Validate buwana_id
 if (empty($buwana_id) || !is_numeric($buwana_id)) {
-    echo json_encode([
+    $response = [
         'success' => false,
         'error' => 'Invalid account ID. Please provide a valid ID.'
-    ]);
+    ];
+    echo json_encode($response);
     exit();
 }
 
@@ -69,20 +74,24 @@ try {
     $gobrik_conn->commit();
 
     // Return success response
-    echo json_encode([
+    $response = [
         'success' => true,
         'message' => 'User deleted successfully.'
-    ]);
+    ];
 } catch (Exception $e) {
     // Rollback transactions if there was an error
     $buwana_conn->rollback();
     $gobrik_conn->rollback();
 
-    echo json_encode([
+    $response = [
         'success' => false,
         'error' => 'An error occurred while deleting the account: ' . $e->getMessage()
-    ]);
+    ];
 }
+
+// Clear any buffered output and return JSON
+ob_end_clean();
+echo json_encode($response);
 
 // Close the database connections
 $buwana_conn->close();
