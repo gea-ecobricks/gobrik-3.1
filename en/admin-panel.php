@@ -125,15 +125,22 @@ $(document).ready(function() {
         "pageLength": 100, // Show 100 rows by default
         "order": [[0, "desc"]],
         "columns": [
-            { "data": "buwana_id" },
-            { "data": "full_name" },
-            { "data": "gea_status" },
-            { "data": "user_roles" },
-            { "data": "ecobricks_made" },
-            { "data": "login_count" },
-            { "data": "test_email_status" },
-            { "data": "location_full", "responsivePriority": 2 }
-        ],
+    {
+        "data": "buwana_id",
+        "render": function (data, type, row) {
+            // Return a clickable button to open the modal
+            return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
+        }
+    },
+    { "data": "full_name" },
+    { "data": "gea_status" },
+    { "data": "user_roles" },
+    { "data": "ecobricks_made" },
+    { "data": "login_count" },
+    { "data": "test_email_status" },
+    { "data": "location_full", "responsivePriority": 2 }
+]
+
         "columnDefs": [
             { "targets": [7], "visible": false, "responsivePriority": 2 }
         ]
