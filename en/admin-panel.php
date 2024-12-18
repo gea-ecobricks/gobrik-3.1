@@ -84,19 +84,18 @@ $gobrik_conn->close();
                 <thead>
                     <tr>
                         <th>Buwana</th>
-                        <th>Name</th>
-                        <th>GEA Status</th>
-                        <th>Roles</th>
+                        <th>Name</th> <!-- Now uses first_name -->
+                        <th>Email</th> <!-- Now uses email -->
+                        <th>Status</th> <!-- Now uses account_status -->
                         <th>Briks</th>
                         <th>Logins</th>
-                        <th>Email</th>
+                        <th>Notes</th> <!-- Now uses account_notes -->
                         <th>Location</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- DataTables will populate this via AJAX -->
-                </tbody>
+                <tbody></tbody>
             </table>
+
         </div>
     </div>
 </div>
@@ -104,39 +103,53 @@ $gobrik_conn->close();
 <?php require_once("../footer-2024.php"); ?>
 
 <script>
-
-$(document).ready(function() {
+$(document).ready(function () {
     $("#newest-ecobrickers").DataTable({
-        "responsive": true,
-        "serverSide": true,
-        "processing": true,
-        "ajax": {
-            "url": "../api/fetch_newest_ecobrickers.php",
-            "type": "POST"
+        responsive: true,
+        serverSide: true,
+        processing: true,
+        ajax: {
+            url: "../api/fetch_newest_ecobrickers.php",
+            type: "POST",
         },
-        "pageLength": 100, // Show 100 rows by default
-        "order": [[0, "desc"]],
-        "columns": [
+        pageLength: 100, // Show 100 rows by default
+        order: [[0, "desc"]], // Sort by Buwana ID descending
+        columns: [
             {
-                "data": "buwana_id",
-                "render": function (data, type, row) {
-                    // Return a clickable button to open the modal
+                data: "buwana_id",
+                render: function (data) {
+                    // Make Buwana ID a clickable button for the modal
                     return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
-                }
+                },
             },
-            { "data": "full_name" },
-            { "data": "gea_status" },
-            { "data": "user_roles" },
-            { "data": "ecobricks_made" },
-            { "data": "login_count" },
-            { "data": "test_email_status" },
-            { "data": "location_full", "responsivePriority": 2 }
+            { data: "first_name" }, // Now uses first_name for Name
+            { data: "email" }, // Now uses email for Email
+            { data: "account_status" }, // Now uses account_status for Roles/Status
+            { data: "ecobricks_made" }, // No change
+            { data: "login_count" }, // No change
+            { data: "account_notes" }, // Now uses account_notes for Notes
+            { data: "location_full", responsivePriority: 2 }, // No change
         ],
-        "columnDefs": [
-            { "targets": [7], "visible": false, "responsivePriority": 2 }
-        ]
+        columnDefs: [
+            { targets: [7], visible: false, responsivePriority: 2 }, // Hide Location initially
+        ],
+        language: {
+            emptyTable: "It looks like no ecobrickers have activated their accounts yet!",
+            info: "Showing _START_ to _END_ of _TOTAL_ ecobrickers",
+            infoEmpty: "No ecobrickers available",
+            loadingRecords: "Loading ecobrickers...",
+            processing: "Processing...",
+            search: "",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous",
+            },
+        },
     });
 });
+
 
 function openEcobrickerModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
