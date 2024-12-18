@@ -113,6 +113,7 @@ $gobrik_conn->close();
 <?php require_once("../footer-2024.php"); ?>
 
 <script>
+
 $(document).ready(function() {
     $("#newest-ecobrickers").DataTable({
         "responsive": true,
@@ -125,22 +126,21 @@ $(document).ready(function() {
         "pageLength": 100, // Show 100 rows by default
         "order": [[0, "desc"]],
         "columns": [
-    {
-        "data": "buwana_id",
-        "render": function (data, type, row) {
-            // Return a clickable button to open the modal
-            return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
-        }
-    },
-    { "data": "full_name" },
-    { "data": "gea_status" },
-    { "data": "user_roles" },
-    { "data": "ecobricks_made" },
-    { "data": "login_count" },
-    { "data": "test_email_status" },
-    { "data": "location_full", "responsivePriority": 2 }
-]
-
+            {
+                "data": "buwana_id",
+                "render": function (data, type, row) {
+                    // Return a clickable button to open the modal
+                    return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
+                }
+            },
+            { "data": "full_name" },
+            { "data": "gea_status" },
+            { "data": "user_roles" },
+            { "data": "ecobricks_made" },
+            { "data": "login_count" },
+            { "data": "test_email_status" },
+            { "data": "location_full", "responsivePriority": 2 }
+        ],
         "columnDefs": [
             { "targets": [7], "visible": false, "responsivePriority": 2 }
         ]
@@ -152,25 +152,23 @@ $(document).ready(function() {
 
 function openEcobrickerModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
-    const modalBox = document.getElementById('modal-content-box');
+    const modalContentBox = document.getElementById('modal-content-box');
 
-    // Show the modal
-    modal.style.display = 'flex';
-
-    // Lock scrolling for the body and blur background
+    // Lock scrolling for the body
     document.body.classList.add('modal-open');
 
-    // Set up the modal-content-box styles
-    modalBox.style.maxHeight = '80vh';
-    modalBox.style.overflowY = 'auto';
-
     // Clear previous modal content
-    modalBox.innerHTML = `<h4>Ecobricker Details (Buwana ID: ${buwana_id})</h4><div id="ecobricker-table-container"></div>`;
+    modalContentBox.innerHTML = `<h4>Loading Ecobricker Details for Buwana ID: ${buwana_id}...</h4>`;
 
     // Fetch ecobricker details
     fetch(`../api/fetch_ecobricker_details.php?buwana_id=${buwana_id}`)
         .then(response => response.json())
         .then(data => {
+            if (data.error) {
+                modalContentBox.innerHTML = `<p>${data.error}</p>`;
+                return;
+            }
+
             // Build the DataTable HTML
             let tableHTML = '<table id="ecobricker-details-table" class="display" style="width:100%">';
             tableHTML += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
@@ -181,8 +179,8 @@ function openEcobrickerModal(buwana_id) {
 
             tableHTML += '</tbody></table>';
 
-            // Insert the table into the container
-            document.getElementById('ecobricker-table-container').innerHTML = tableHTML;
+            // Insert the table into the modal
+            modalContentBox.innerHTML = tableHTML;
 
             // Initialize the DataTable
             $('#ecobricker-details-table').DataTable({
@@ -193,12 +191,14 @@ function openEcobrickerModal(buwana_id) {
             });
         })
         .catch(error => {
-            modalBox.innerHTML = `<p>Error loading ecobricker details: ${error.message}</p>`;
+            modalContentBox.innerHTML = `<p>Error loading ecobricker details: ${error.message}</p>`;
         });
 
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
+
 
 
 
