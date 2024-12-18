@@ -22,11 +22,13 @@ if (isLoggedIn()) {
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
-    $buwana_conn->close(); // Close the database connection
-}
 
     // Check if the user is logged in and has admin privileges
     checkAdminStatus(); // Call the reusable function
+
+
+    $buwana_conn->close(); // Close the database connection
+}
 
 require_once '../gobrikconn_env.php';
 
