@@ -115,26 +115,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
 
             // Now create the Ecobricker account in GoBrik using the first_name and other info from Buwana
+// Insert Ecobricker record into GoBrik
 $sql_create_ecobricker = "INSERT INTO tb_ecobrickers
 (first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
 VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
 
 $stmt_create_ecobricker = $gobrik_conn->prepare($sql_create_ecobricker);
 
-if ($stmt_create_ecobricker) {
-    // Set `full_name` to the value of `first_name`, and add a note for `account_notes`
-    $full_name = $first_name; // full_name is now the same as first_name
-    $account_notes = "signup_process has run";
+if (!$stmt_create_ecobricker) {
+    handleError('db_error', $response);
+}
 
-    $stmt_create_ecobricker->bind_param("ssisi", $first_name, $full_name, $buwana_id, $credential_value, $account_notes);
+$full_name = $first_name; // full_name is set to first_name
+$account_notes = "signup_process has run";
 
-    if ($stmt_create_ecobricker->execute()) {
-        // Fix the insert_id retrieval
-        $ecobricker_id = $gobrik_conn->insert_id;
+$stmt_create_ecobricker->bind_param("ssisi", $first_name, $full_name, $buwana_id, $credential_value, $account_notes);
 
-        // Successfully updated Buwana user, credentials, and created Ecobricker account, redirect to confirm-email.php
-        $response['success'] = true;
-        $response['redirect'] = "confirm-email.php?id=$ecobricker_id";
+if (!$stmt_create_ecobricker->execute()) {
+    error_log("Ecobricker creation failed: {$stmt_create_ecobricker->error}");
+    handleError('db_error_ecobricker', $response);
+}
+
+$ecobricker_id = $gobrik_conn->insert_id;
+$stmt_create_ecobricker->close();
+
+// Redirect upon success
+$response['success'] = true;
+$response['redirect'] = "confirm-email.php?id=" . urlencode($ecobricker_id);
+
     } else {
         $response['error'] = 'db_error_ecobricker';
     }
