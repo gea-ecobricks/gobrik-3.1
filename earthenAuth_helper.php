@@ -5,9 +5,7 @@ ini_set('display_errors', 1);
 
 
 
-function checkAdminStatus() {
-
-
+function checkAdminStatus($gea_status) {
     if (stripos($gea_status, 'Admin') === false) { // Case-insensitive check for "Admin"
         // Redirect if "Admin" is not found in gea_status
         echo "<script>
@@ -20,6 +18,7 @@ function checkAdminStatus() {
     // If everything is fine, return true
     return true;
 }
+
 
 
 function startSecureSession() {
