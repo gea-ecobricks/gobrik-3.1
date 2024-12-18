@@ -81,20 +81,21 @@ $gobrik_conn->close();
             </p>
 
             <table id="newest-ecobrickers" class="display responsive nowrap" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Buwana</th>
-                        <th>Name</th> <!-- Now uses first_name -->
-                        <th>Email</th> <!-- Now uses email -->
-                        <th>Status</th> <!-- Now uses account_status -->
-                        <th>Briks</th>
-                        <th>Logins</th>
-                        <th>Notes</th> <!-- Now uses account_notes -->
-                        <th>Location</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+    <thead>
+        <tr>
+            <th>Buwana</th>
+            <th>Name</th> <!-- Now uses first_name -->
+            <th>Email</th> <!-- Now uses email -->
+            <th>Status</th> <!-- Now uses account_status -->
+            <th>Briks</th>
+            <th>Logins</th>
+            <th>Notes</th> <!-- Now uses account_notes -->
+            <th>Location</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
 
         </div>
     </div>
