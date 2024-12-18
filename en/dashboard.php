@@ -137,7 +137,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div id="gea-trainer-menu" class="dashboard-panel">
         <h4 class="panel-title">Admin Menu</h4>
         <div class="menu-buttons-row">
-            <a href="admin-review-ecobrickers.php" class="page-button">New Accounts</a>
+            <a href="admin-panel.php" class="page-button">Admin Panel</a>
             <a href="admin-review.php" class="page-button">Ecobrick Review</a>
             <a id="messenger-button" href="messenger.php" class="page-button">Messenger BETA</a>
         </div>
