@@ -115,25 +115,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
 
             // Now create the Ecobricker account in GoBrik using the first_name and other info from Buwana
-            $sql_create_ecobricker = "INSERT INTO tb_ecobrickers (first_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt) VALUES (?, ?, ?, NOW(), ?, 1, NOW())";
-            $stmt_create_ecobricker = $gobrik_conn->prepare($sql_create_ecobricker);
+$sql_create_ecobricker = "INSERT INTO tb_ecobrickers
+(first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
+VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
 
-            if ($stmt_create_ecobricker) {
-                $stmt_create_ecobricker->bind_param("sisi", $first_name, $buwana_id, $credential_value, $buwana_id);
-                if ($stmt_create_ecobricker->execute()) {
-                    // Fix the insert_id retrieval
-                    $ecobricker_id = $gobrik_conn->insert_id;
+$stmt_create_ecobricker = $gobrik_conn->prepare($sql_create_ecobricker);
 
-                    // Successfully updated Buwana user, credentials, and created Ecobricker account, redirect to confirm-email.php
-                    $response['success'] = true;
-                    $response['redirect'] = "confirm-email.php?id=$ecobricker_id";
-                } else {
-                    $response['error'] = 'db_error_ecobricker';
-                }
-                $stmt_create_ecobricker->close();
-            } else {
-                $response['error'] = 'db_error';
-            }
+if ($stmt_create_ecobricker) {
+    // Set `full_name` to the value of `first_name`, and add a note for `account_notes`
+    $full_name = $first_name; // full_name is now the same as first_name
+    $account_notes = "signup_process has run";
+
+    $stmt_create_ecobricker->bind_param("ssisi", $first_name, $full_name, $buwana_id, $credential_value, $account_notes);
+
+    if ($stmt_create_ecobricker->execute()) {
+        // Fix the insert_id retrieval
+        $ecobricker_id = $gobrik_conn->insert_id;
+
+        // Successfully updated Buwana user, credentials, and created Ecobricker account, redirect to confirm-email.php
+        $response['success'] = true;
+        $response['redirect'] = "confirm-email.php?id=$ecobricker_id";
+    } else {
+        $response['error'] = 'db_error_ecobricker';
+    }
+    $stmt_create_ecobricker->close();
+} else {
+    $response['error'] = 'db_error';
+}
+
 
             $stmt_update_user->close();
         } else {
