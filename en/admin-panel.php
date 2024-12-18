@@ -207,7 +207,7 @@ function openEcobrickerModal(buwana_id) {
 
 function confirmDeleteUser(buwana_id) {
     if (confirm(`Are you sure you want to delete the user with Buwana ID: ${buwana_id}? This action cannot be undone.`)) {
-        fetch(`../api/delete-accounts.php?id=${buwana_id}`, {
+        fetch(`../api/delete_accounts.php?id=${buwana_id}`, {
             method: 'GET', // Change to DELETE if supported by your API
             headers: {
                 'Content-Type': 'application/json'
