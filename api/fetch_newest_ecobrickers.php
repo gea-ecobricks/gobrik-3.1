@@ -8,7 +8,7 @@ $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
 $searchValue = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
 
 // Base SQL query to fetch activated ecobrickers
-$query = "SELECT
+$sql = "SELECT
             buwana_id,
             email_addr,
             account_notes,
@@ -20,9 +20,7 @@ $query = "SELECT
             login_count,
             test_email_status,
             location_full
-          FROM tb_ecobrickers
-          ORDER BY created_at DESC
-
+        FROM tb_ecobrickers
         WHERE buwana_activated = 1";
 
 // Add search filter if any
@@ -35,7 +33,7 @@ if (!empty($searchValue)) {
     $bindValues = [];
 }
 
-// Order and limit for pagination
+// Add ORDER BY and LIMIT for pagination
 $sql .= " ORDER BY buwana_activation_dt DESC LIMIT ?, ?";
 $bindTypes .= "ii";
 $bindValues[] = $start;
@@ -62,7 +60,7 @@ if (!$stmt) {
     exit;
 }
 
-// Bind parameters dynamically if any
+// Bind parameters dynamically if search is applied
 if (!empty($searchValue)) {
     $stmt->bind_param($bindTypes, ...$bindValues);
 } else {
@@ -70,21 +68,37 @@ if (!empty($searchValue)) {
 }
 
 $stmt->execute();
-$stmt->bind_result($full_name, $gea_status, $user_roles, $ecobricks_made, $login_count, $location_full, $buwana_id, $test_email_status);
+
+// Bind the results
+$stmt->bind_result(
+    $buwana_id,
+    $email_addr,
+    $account_notes,
+    $first_name,
+    $full_name,
+    $gea_status,
+    $user_roles,
+    $ecobricks_made,
+    $login_count,
+    $test_email_status,
+    $location_full
+);
 
 $data = [];
 while ($stmt->fetch()) {
     $data[] = [
-    'full_name' => htmlspecialchars($full_name ?? '', ENT_QUOTES, 'UTF-8'),
-    'gea_status' => htmlspecialchars($gea_status ?? '', ENT_QUOTES, 'UTF-8'),
-    'user_roles' => htmlspecialchars($user_roles ?? '', ENT_QUOTES, 'UTF-8'),
-    'ecobricks_made' => intval($ecobricks_made ?? 0),
-    'login_count' => intval($login_count ?? 0),
-    'location_full' => htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'),
-    'buwana_id' => htmlspecialchars($buwana_id ?? '', ENT_QUOTES, 'UTF-8'),
-    'test_email_status' => htmlspecialchars($test_email_status ?? '', ENT_QUOTES, 'UTF-8')
-];
-
+        'buwana_id' => htmlspecialchars($buwana_id ?? '', ENT_QUOTES, 'UTF-8'),
+        'email_addr' => htmlspecialchars($email_addr ?? '', ENT_QUOTES, 'UTF-8'),
+        'account_notes' => htmlspecialchars($account_notes ?? '', ENT_QUOTES, 'UTF-8'),
+        'first_name' => htmlspecialchars($first_name ?? '', ENT_QUOTES, 'UTF-8'),
+        'full_name' => htmlspecialchars($full_name ?? '', ENT_QUOTES, 'UTF-8'),
+        'gea_status' => htmlspecialchars($gea_status ?? '', ENT_QUOTES, 'UTF-8'),
+        'user_roles' => htmlspecialchars($user_roles ?? '', ENT_QUOTES, 'UTF-8'),
+        'ecobricks_made' => intval($ecobricks_made ?? 0),
+        'login_count' => intval($login_count ?? 0),
+        'test_email_status' => htmlspecialchars($test_email_status ?? '', ENT_QUOTES, 'UTF-8'),
+        'location_full' => htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8')
+    ];
 }
 
 // Get total filtered records
