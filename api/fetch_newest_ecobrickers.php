@@ -8,8 +8,21 @@ $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
 $searchValue = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
 
 // Base SQL query to fetch activated ecobrickers
-$sql = "SELECT full_name, gea_status, user_roles, ecobricks_made, login_count, location_full, buwana_id, test_email_status
-        FROM tb_ecobrickers
+$query = "SELECT
+            buwana_id,
+            email_addr,
+            account_notes,
+            first_name,
+            full_name,
+            gea_status,
+            user_roles,
+            ecobricks_made,
+            login_count,
+            test_email_status,
+            location_full
+          FROM tb_ecobrickers
+          ORDER BY created_at DESC
+
         WHERE buwana_activated = 1";
 
 // Add search filter if any

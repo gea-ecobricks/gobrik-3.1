@@ -110,15 +110,19 @@ $gobrik_conn->close();
                 <thead>
                     <tr>
                         <th>Buwana</th>
+                        <th>Email</th> <!-- New -->
+                        <th>Notes</th> <!-- New -->
+                        <th>First Name</th> <!-- New -->
                         <th>Name</th>
                         <th>GEA Status</th>
                         <th>Roles</th>
                         <th>Briks</th>
                         <th>Logins</th>
-                        <th>Email</th>
+                        <th>Email Status</th>
                         <th>Location</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     <!-- DataTables will populate this via AJAX -->
                 </tbody>
@@ -150,6 +154,9 @@ $(document).ready(function() {
                     return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
                 }
             },
+            { "data": "email_addr" }, // Add email_addr column
+            { "data": "account_notes" }, // Add account_notes column
+            { "data": "first_name" }, // Add first_name column
             { "data": "full_name" },
             { "data": "gea_status" },
             { "data": "user_roles" },
@@ -159,10 +166,11 @@ $(document).ready(function() {
             { "data": "location_full", "responsivePriority": 2 }
         ],
         "columnDefs": [
-            { "targets": [7], "visible": false, "responsivePriority": 2 }
+            { "targets": [10], "visible": false, "responsivePriority": 2 }
         ]
     });
 });
+
 
 function openEcobrickerModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
