@@ -110,7 +110,7 @@ $gobrik_conn->close();
                 <thead>
                     <tr>
                         <th>Buwana</th>
-                        <th>Email</th> <!-- New -->
+                        <th style="max-width:100px;">Email</th> <!-- New -->
                         <th style="max-width:100px;">Notes</th> <!-- New -->
                         <th>First Name</th> <!-- New -->
                         <th>Name</th>
@@ -159,7 +159,13 @@ $(document).ready(function() {
             { "data": "first_name" }, // Add first_name column
             { "data": "full_name" },
             { "data": "gea_status" },
-            { "data": "user_roles" },
+            {
+                data: "user_roles",
+                render: function (data, type, row) {
+                    return `<a href="#" onclick="openUserRolesModal(${row.buwana_id})" style="text-decoration: underline;">${data}</a>`;
+                },
+            }
+
             { "data": "ecobricks_made" },
             { "data": "login_count" },
             { "data": "test_email_status" },
@@ -170,6 +176,113 @@ $(document).ready(function() {
         ]
     });
 });
+
+function openUserRolesModal(buwana_id) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    // Lock scrolling for the body and blur background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open'); // Locks scrolling
+
+    // Set up the modal-content-box styles
+    modalBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
+    modalBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
+
+    // Clear previous modal content and set up structure
+    modalBox.innerHTML = `
+        <h4>Edit User Roles (Buwana ID: ${buwana_id})</h4>
+        <form id="user-roles-form" style="margin-top: 15px;">
+            <label for="gea-status">GEA Status:</label>
+            <select id="gea-status" name="gea_status">
+                <option value="Unknown">Unknown</option>
+                <option value="Gobriker">Gobriker</option>
+                <option value="Ecobricker">Ecobricker</option>
+                <option value="Trainer">Trainer</option>
+                <option value="Master Trainer">Master Trainer</option>
+            </select>
+
+            <label for="user-roles" style="margin-top: 10px;">User Roles:</label>
+            <select id="user-roles" name="user_roles">
+                <option value="Unknown">Unknown</option>
+                <option value="Ecobricker">Ecobricker</option>
+                <option value="Validator">Validator</option>
+                <option value="Moderator">Moderator</option>
+                <option value="Admin">Admin</option>
+            </select>
+
+            <label for="capabilities" style="margin-top: 10px;">Capabilities:</label>
+            <select id="capabilities" name="capabilities">
+                <option value="None">None</option>
+                <option value="Review users">Review users</option>
+                <option value="Review ecobricks">Review ecobricks</option>
+                <option value="Delete users">Delete users</option>
+                <option value="Delete ecobricks">Delete ecobricks</option>
+            </select>
+
+            <button type="button" style="margin-top: 20px;" class="btn save" onclick="saveUserRoles(${buwana_id})">Save</button>
+        </form>
+    `;
+
+    // Fetch current user roles and populate the fields
+    fetch(`../api/fetch_user_roles.php?buwana_id=${buwana_id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                modalBox.innerHTML += `<p>${data.error}</p>`;
+                return;
+            }
+
+            // Prepopulate dropdowns with the user's current values
+            document.getElementById('gea-status').value = data.gea_status || "Unknown";
+            document.getElementById('user-roles').value = data.user_roles || "Unknown";
+            document.getElementById('capabilities').value = data.capabilities || "None";
+        })
+        .catch(error => {
+            modalBox.innerHTML += `<p>Error loading user roles: ${error.message}</p>`;
+        });
+
+    // Display the modal
+    modal.classList.remove('modal-hidden');
+}
+
+
+function saveUserRoles(buwana_id) {
+    const geaStatus = document.getElementById('gea-status').value;
+    const userRoles = document.getElementById('user-roles').value;
+    const capabilities = document.getElementById('capabilities').value;
+
+    fetch(`../api/update_user_roles.php`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            buwana_id: buwana_id,
+            gea_status: geaStatus,
+            user_roles: userRoles,
+            capabilities: capabilities,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("User roles updated successfully!");
+                closeInfoModal(); // Close the modal
+            } else {
+                alert(`Error updating user roles: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            alert(`Error: ${error.message}`);
+        });
+}
+
 
 
 function openEcobrickerModal(buwana_id) {
