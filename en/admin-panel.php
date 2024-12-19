@@ -164,7 +164,7 @@ $(document).ready(function() {
                 render: function (data, type, row) {
                     return `<a href="#" onclick="openUserRolesModal(${row.buwana_id})" style="text-decoration: underline;">${data}</a>`;
                 },
-            }
+            },
 
             { "data": "ecobricks_made" },
             { "data": "login_count" },
