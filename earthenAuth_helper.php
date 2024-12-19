@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 
 function checkAdminStatus($buwana_id) {
     // Include database connection
-    require_once '../gobrikconn_env.php';
+    require_once 'gobrikconn_env.php';
 
     // Prepare the SQL query to fetch the user's role and capabilities
     $query = "SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE id = ?";
