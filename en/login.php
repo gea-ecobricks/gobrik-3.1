@@ -901,7 +901,7 @@ function showPasswordReset(type, lang = '<?php echo $lang; ?>', email = '') {
                     <h1>🐵</h1>
                 </div>
                 <div class="preview-title">${title}</div>
-                <form id="resetPasswordForm" action="../scripts/reset_password.php" method="POST">
+                <form id="resetPasswordForm" action="../scripts/reset_pass.php" method="POST">
                     <div class="preview-text" style="font-size:medium;">${promptText}</div>
                     <input type="email" name="email" required value="${email}">
                     <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
