@@ -230,7 +230,7 @@ function openUserRolesModal(buwana_id) {
     `;
 
     // Fetch current user roles and populate the fields
-    fetch(`../api/fetch_user_roles.php?buwana_id=${buwana_id}`)
+    fetch(`../scripts/fetch_user_roles.php?buwana_id=${buwana_id}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -257,7 +257,7 @@ function saveUserRoles(buwana_id) {
     const userRoles = document.getElementById('user-roles').value;
     const capabilities = document.getElementById('capabilities').value;
 
-    fetch(`../api/update_user_roles.php`, {
+    fetch(`../scripts/update_user_roles.php`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
