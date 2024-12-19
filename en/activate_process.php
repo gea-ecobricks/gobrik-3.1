@@ -25,7 +25,10 @@ $current_date_time = date('Y-m-d H:i:s');
 // PART 1: Update GoBrik Database for tb_ecobrickers
 require_once("../gobrikconn_env.php");
 
-$sql_update_ecobricker = "UPDATE tb_ecobrickers SET email_confirm_dt = ? WHERE ecobricker_id = ?";
+$sql_update_ecobricker = "UPDATE tb_ecobrickers
+                          SET email_confirm_dt = ?,
+                              account_notes = 'Signing up... Password set. E-mail verified.'
+                          WHERE ecobricker_id = ?";
 $stmt_update_ecobricker = $gobrik_conn->prepare($sql_update_ecobricker);
 
 if ($stmt_update_ecobricker) {
@@ -35,6 +38,7 @@ if ($stmt_update_ecobricker) {
 } else {
     die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
 }
+
 
 // Fetch the email address
 $sql_fetch_email = "SELECT email_addr FROM tb_ecobrickers WHERE ecobricker_id = ?";
@@ -131,6 +135,7 @@ if ($http_code >= 200 && $http_code < 300) {
     if ($response_data && isset($response_data['members']) && is_array($response_data['members']) && count($response_data['members']) > 0) {
         $registered = 1; // Member with the given email exists
     }
+
 
 // PART 4
 // Update GoBrik Database with registration status
