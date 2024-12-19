@@ -136,12 +136,12 @@ $gobrik_conn->close();
 <script>
 
 
-
 $(document).ready(function() {
     $("#newest-ecobrickers").DataTable({
         "responsive": true,
         "serverSide": true,
         "processing": true,
+        "scrollX": true, // Enable horizontal scrolling
         "ajax": {
             "url": "../api/fetch_newest_ecobrickers.php",
             "type": "POST"
@@ -152,21 +152,18 @@ $(document).ready(function() {
             {
                 "data": "buwana_id",
                 "render": function (data, type, row) {
-                    // Return a clickable button to open the modal
                     return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
                 }
             },
             {
                 "data": "email_addr",
                 "render": function(data, type, row) {
-                    // Truncate email if it exceeds 100px width
                     return `<div style="max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${data}">${data}</div>`;
                 }
             },
             {
                 "data": "account_notes",
                 "render": function(data, type, row) {
-                    // Break notes text into multiple lines if it exceeds 100px
                     return `<div style="max-width: 100px; word-wrap: break-word; white-space: normal;">${data}</div>`;
                 }
             },
@@ -182,23 +179,20 @@ $(document).ready(function() {
             { "data": "ecobricks_made" },
             { "data": "login_count" },
             { "data": "test_email_status" },
-            { "data": "location_full", "responsivePriority": 2 }
+            { "data": "location_full" }
         ],
         "columnDefs": [
-            {
-                "targets": 1, // Email column
-                "width": "100px"
-            },
-            {
-                "targets": 2, // Notes column
-                "width": "100px"
-            },
-            {
-                "targets": [10], "visible": false, "responsivePriority": 2
-            }
+            { "targets": 0, "width": "80px" }, // Limit width of buwana_id column
+            { "targets": 1, "width": "100px" }, // Email column
+            { "targets": 2, "width": "100px" }, // Notes column
+            { "targets": 3, "width": "80px" }, // First Name column
+            { "targets": [10], "responsivePriority": 2 }, // Reduce priority for Location column
+            { "targets": [8, 9], "visible": true }, // Ensure login count and email status are visible
+            { "targets": "_all", "defaultContent": "", "responsivePriority": 1 } // Ensure default settings for other columns
         ]
     });
 });
+
 
 
 
