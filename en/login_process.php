@@ -104,21 +104,22 @@ if ($stmt_credential) {
                         die('Error preparing statement for updating credentials_tb: ' . $buwana_conn->error);
                     }
 
-                    // PART 5: Update GoBrik Account
-                    $sql_update_ecobricker = "UPDATE tb_ecobrickers
-                        SET last_login = NOW(),
-                            login_count = login_count + 1,
-                            account_notes = CONCAT(IFNULL(account_notes, ''), ' GoBrik 3.0 account active. Logged in ', login_count + 1, ' times.')
-                        WHERE email_addr = ?";
-                    $stmt_update_ecobricker = $gobrik_conn->prepare($sql_update_ecobricker);
+                // PART 5: Update GoBrik Account
+                $sql_update_ecobricker = "UPDATE tb_ecobrickers
+                    SET last_login = NOW(),
+                        login_count = login_count + 1,
+                        account_notes = CONCAT('GoBrik 3.0 account active. Logged in ', login_count + 1, ' times.')
+                    WHERE email_addr = ?";
+                $stmt_update_ecobricker = $gobrik_conn->prepare($sql_update_ecobricker);
 
-                    if ($stmt_update_ecobricker) {
-                        $stmt_update_ecobricker->bind_param('s', $credential_key);
-                        $stmt_update_ecobricker->execute();
-                        $stmt_update_ecobricker->close();
-                    } else {
-                        die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
-                    }
+                if ($stmt_update_ecobricker) {
+                    $stmt_update_ecobricker->bind_param('s', $credential_key);
+                    $stmt_update_ecobricker->execute();
+                    $stmt_update_ecobricker->close();
+                } else {
+                    die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
+                }
+
 
 
                     // Set the session variable to indicate the user is logged in
