@@ -260,6 +260,27 @@ document.getElementById('user-signup-form').addEventListener('submit', function(
 </script>
 
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    // Get the form element
+    const form = document.getElementById("user-signup-form");
+
+    // Attach an event listener to the form
+    form.addEventListener("keypress", function(event) {
+        // Check if the pressed key is "Enter"
+        if (event.key === "Enter") {
+            // Prevent default behavior if the Enter key is pressed on a button or select
+            if (event.target.tagName === "BUTTON" || event.target.tagName === "SELECT") {
+                event.preventDefault();
+            } else {
+                // Submit the form
+                form.submit();
+            }
+        }
+    });
+});
+</script>
+
 </body>
 
 </html>
