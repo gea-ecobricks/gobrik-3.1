@@ -12,7 +12,7 @@ function checkAdminStatus($buwana_id) {
     // Prepare the SQL query to fetch the user's role and capabilities
     $query = "SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE id = ?";
 
-    if ($stmt = $conn->prepare($query)) {
+    if ($stmt = $gobrik_conn->prepare($query)) {
         // Bind the parameter and execute the query
         $stmt->bind_param("i", $buwana_id);
         $stmt->execute();
