@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.41';
+$version = '0.42';
 $page = 'signup';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -134,7 +134,7 @@ $sql_update_gobrik = "UPDATE tb_ecobrickers
     SET buwana_activated = 1,
         account_notes = CONCAT(account_notes, ' Location set.'),
         location_full_txt = ?,
-        location_country_txt = ?,
+        country_txt = ?,
         location_full = ?,
         country_id = ?,
         community_id = ?
