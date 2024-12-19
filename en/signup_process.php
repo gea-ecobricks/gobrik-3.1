@@ -98,52 +98,52 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt_update_user = $buwana_conn->prepare($sql_update_user);
 
     if ($stmt_update_user) {
-    $stmt_update_user->bind_param("ssi", $credential_value, $password_hash, $buwana_id);
+        $stmt_update_user->bind_param("ssi", $credential_value, $password_hash, $buwana_id);
 
-    if ($stmt_update_user->execute()) {
-        // Now update the credentials_tb table for the user
-        $sql_update_credentials = "UPDATE credentials_tb SET credential_key = ?, credential_type = 'e-mail' WHERE buwana_id = ?";
-        $stmt_update_credentials = $buwana_conn->prepare($sql_update_credentials);
-        if ($stmt_update_credentials) {
-            $stmt_update_credentials->bind_param("si", $credential_value, $buwana_id);
-            $stmt_update_credentials->execute();
-            $stmt_update_credentials->close();
+        if ($stmt_update_user->execute()) {
+            // Now update the credentials_tb table for the user
+            $sql_update_credentials = "UPDATE credentials_tb SET credential_key = ?, credential_type = 'e-mail' WHERE buwana_id = ?";
+            $stmt_update_credentials = $buwana_conn->prepare($sql_update_credentials);
+            if ($stmt_update_credentials) {
+                $stmt_update_credentials->bind_param("si", $credential_value, $buwana_id);
+                $stmt_update_credentials->execute();
+                $stmt_update_credentials->close();
+            } else {
+                $response['error'] = 'db_error_credentials';
+                echo json_encode($response);
+                ob_end_clean();
+                exit();
+            }
+
+            // Now create the Ecobricker account in GoBrik
+            $sql_create_ecobricker = "INSERT INTO tb_ecobrickers
+            (first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
+            VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
+            $stmt_create_ecobricker = $gobrik_conn->prepare($sql_create_ecobricker);
+
+            if (!$stmt_create_ecobricker) {
+                sendJsonError('db_error_create_ecobricker');
+            }
+
+            $full_name = $first_name;
+            $account_notes = "signup_process run. Email unverified";
+
+            $stmt_create_ecobricker->bind_param("ssisss", $first_name, $full_name, $buwana_id, $credential_value, $buwana_id, $account_notes);
+            if ($stmt_create_ecobricker->execute()) {
+                $response['success'] = true;
+                $response['redirect'] = "confirm-email.php?id=" . $gobrik_conn->insert_id;
+            } else {
+                sendJsonError('db_error_ecobricker');
+            }
+            $stmt_create_ecobricker->close(); // Closing the prepared statement
         } else {
-            $response['error'] = 'db_error_credentials';
-            echo json_encode($response);
-            ob_end_clean();
-            exit();
+            sendJsonError('db_error_user_update');
         }
-
-        // Now create the Ecobricker account in GoBrik
-        $sql_create_ecobricker = "INSERT INTO tb_ecobrickers
-        (first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
-        VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
-        $stmt_create_ecobricker = $gobrik_conn->prepare($sql_create_ecobricker);
-
-        if (!$stmt_create_ecobricker) {
-            sendJsonError('db_error_create_ecobricker');
-        }
-
-        $full_name = $first_name;
-        $account_notes = "signup_process run. Email unverified";
-
-        $stmt_create_ecobricker->bind_param("ssisss", $first_name, $full_name, $buwana_id, $credential_value, $buwana_id, $account_notes);
-        if ($stmt_create_ecobricker->execute()) {
-            $response['success'] = true;
-            $response['redirect'] = "confirm-email.php?id=" . $gobrik_conn->insert_id;
-        } else {
-            sendJsonError('db_error_ecobricker');
-        }
-        $stmt_create_ecobricker->close(); // Closing the prepared statement
+        $stmt_update_user->close(); // Closing the update statement
     } else {
-        sendJsonError('db_error_user_update');
+        sendJsonError('invalid_request');
     }
-    $stmt_update_user->close(); // Closing the update statement
-} else {
-    sendJsonError('invalid_request');
 }
-
 
 ob_end_clean(); // Clear any previous output
 
