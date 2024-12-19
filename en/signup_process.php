@@ -1,6 +1,3 @@
-
-text/x-generic signup_process.php ( PHP script, ASCII text )
-
 <?php
 session_start();
 error_reporting(E_ALL);
@@ -13,19 +10,30 @@ $response = ['success' => false];
 include '../buwanaconn_env.php'; // Buwana database connection
 include '../gobrikconn_env.php'; // GoBrik database connection
 
+function sendJsonError($error) {
+    ob_end_clean(); // Clear any previous output
+    echo json_encode(['success' => false, 'error' => $error]);
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $buwana_id = $_GET['id'] ?? null;  // Get the buwana_id from the URL
+    $buwana_id = $_GET['id'] ?? null; // Get the buwana_id from the URL
+
+    // Validate buwana_id
+    if (empty($buwana_id) || !is_numeric($buwana_id)) {
+        sendJsonError('invalid_buwana_id');
+    }
 
     // Sanitize and validate inputs
     $credential_value = filter_var($_POST['credential_value'], FILTER_SANITIZE_EMAIL);
     $password = $_POST['password_hash'];
 
-    // Validate password length
-    if (strlen($password) < 6) {
-        $response['error'] = 'invalid_password';
-        echo json_encode($response);
-        ob_end_clean(); // Clear buffer
-        exit();
+    if (empty($credential_value)) {
+        sendJsonError('invalid_email');
+    }
+
+    if (empty($password) || strlen($password) < 6) {
+        sendJsonError('invalid_password');
     }
 
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
@@ -33,63 +41,53 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Retrieve the Buwana first_name from the database
     $sql_get_first_name = "SELECT first_name FROM users_tb WHERE buwana_id = ?";
     $stmt_get_first_name = $buwana_conn->prepare($sql_get_first_name);
-    if ($stmt_get_first_name) {
-        $stmt_get_first_name->bind_param("i", $buwana_id);
-        $stmt_get_first_name->execute();
-        $stmt_get_first_name->bind_result($first_name);
-        $stmt_get_first_name->fetch();
-        $stmt_get_first_name->close();
-    } else {
-        $response['error'] = 'db_error';
-        echo json_encode($response);
-        ob_end_clean();
-        exit();
+    if (!$stmt_get_first_name) {
+        sendJsonError('db_error_first_name');
+    }
+
+    $stmt_get_first_name->bind_param("i", $buwana_id);
+    $stmt_get_first_name->execute();
+    $stmt_get_first_name->bind_result($first_name);
+    $stmt_get_first_name->fetch();
+    $stmt_get_first_name->close();
+
+    if (empty($first_name)) {
+        sendJsonError('missing_first_name');
     }
 
     // Check if the email already exists in the Buwana database
     $sql_check_email_buwana = "SELECT COUNT(*), buwana_id FROM users_tb WHERE email = ?";
     $stmt_check_email_buwana = $buwana_conn->prepare($sql_check_email_buwana);
-    if ($stmt_check_email_buwana) {
-        $stmt_check_email_buwana->bind_param("s", $credential_value);
-        $stmt_check_email_buwana->execute();
-        $stmt_check_email_buwana->bind_result($email_count_buwana, $existing_buwana_id);
-        $stmt_check_email_buwana->fetch();
-        $stmt_check_email_buwana->close();
+    if (!$stmt_check_email_buwana) {
+        sendJsonError('db_error_check_email');
+    }
 
-        if ($email_count_buwana > 0 && $existing_buwana_id != $buwana_id) {
-            // If email exists and doesn't belong to the current user, return an error
-            $response['error'] = 'duplicate_email';
-            echo json_encode($response);
-            ob_end_clean();
-            exit();
-        }
-    } else {
-        $response['error'] = 'db_error';
-        echo json_encode($response);
-        ob_end_clean();
-        exit();
+    $stmt_check_email_buwana->bind_param("s", $credential_value);
+    $stmt_check_email_buwana->execute();
+    $stmt_check_email_buwana->bind_result($email_count_buwana, $existing_buwana_id);
+    $stmt_check_email_buwana->fetch();
+    $stmt_check_email_buwana->close();
+
+    if ($email_count_buwana > 0 && $existing_buwana_id != $buwana_id) {
+        sendJsonError('duplicate_email');
     }
 
     // Check if the email already exists in the GoBrik database
     $sql_check_email_gobrik = "SELECT ecobricker_id FROM tb_ecobrickers WHERE email_addr = ?";
     $stmt_check_email_gobrik = $gobrik_conn->prepare($sql_check_email_gobrik);
-    if ($stmt_check_email_gobrik) {
-        $stmt_check_email_gobrik->bind_param("s", $credential_value);
-        $stmt_check_email_gobrik->execute();
-        $stmt_check_email_gobrik->bind_result($ecobricker_id);
-        $stmt_check_email_gobrik->fetch();
-        $stmt_check_email_gobrik->close();
+    if (!$stmt_check_email_gobrik) {
+        sendJsonError('db_error_check_email_gobrik');
+    }
 
-        if ($ecobricker_id) {
-            // If email exists in GoBrik, alert and redirect to activate.php
-            $response['error'] = 'duplicate_gobrik_email';
-            $response['redirect'] = "activate.php?id=$ecobricker_id";
-            echo json_encode($response);
-            ob_end_clean();
-            exit();
-        }
-    } else {
-        $response['error'] = 'db_error';
+    $stmt_check_email_gobrik->bind_param("s", $credential_value);
+    $stmt_check_email_gobrik->execute();
+    $stmt_check_email_gobrik->bind_result($ecobricker_id);
+    $stmt_check_email_gobrik->fetch();
+    $stmt_check_email_gobrik->close();
+
+    if ($ecobricker_id) {
+        $response['error'] = 'duplicate_gobrik_email';
+        $response['redirect'] = "activate.php?id=$ecobricker_id";
         echo json_encode($response);
         ob_end_clean();
         exit();
@@ -155,4 +153,3 @@ ob_end_clean(); // Clear any previous output
 echo json_encode($response);
 exit();
 ?>
-
