@@ -182,7 +182,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 </div><!--close page content-->
 
 <script>
-
 document.getElementById('user-signup-form').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the form from submitting until validation is complete
     var isValid = true; // Flag to determine if the form should be submitted
@@ -231,6 +230,19 @@ document.getElementById('user-signup-form').addEventListener('submit', function(
     }
 });
 
+// Add a keypress listener to submit the form on Enter
+document.getElementById('user-signup-form').addEventListener('keypress', function(event) {
+    if (event.key === "Enter") {
+        // Prevent default behavior for select or button elements
+        if (event.target.tagName === "BUTTON" || event.target.tagName === "SELECT") {
+            event.preventDefault();
+        } else {
+            // Trigger form submission
+            this.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+    }
+});
+
 
 
 
@@ -259,27 +271,6 @@ document.getElementById('user-signup-form').addEventListener('submit', function(
     }
 </script>
 
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-    // Get the form element
-    const form = document.getElementById("user-signup-form");
-
-    // Attach an event listener to the form
-    form.addEventListener("keypress", function(event) {
-        // Check if the pressed key is "Enter"
-        if (event.key === "Enter") {
-            // Prevent default behavior if the Enter key is pressed on a button or select
-            if (event.target.tagName === "BUTTON" || event.target.tagName === "SELECT") {
-                event.preventDefault();
-            } else {
-                // Submit the form
-                form.submit();
-            }
-        }
-    });
-});
-</script>
 
 </body>
 
