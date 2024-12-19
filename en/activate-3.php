@@ -134,8 +134,10 @@ $sql_update_gobrik = "UPDATE tb_ecobrickers
     SET buwana_activated = 1,
         account_notes = CONCAT(account_notes, ' Location set.'),
         location_full_txt = ?,
-        country_txt = ?,
+        country = ?,
         location_full = ?,
+        location_lat = ?,
+        location_long = ?,
         country_id = ?,
         community_id = ?
     WHERE buwana_id = ?";
@@ -145,10 +147,12 @@ $stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
 if ($stmt_update_gobrik) {
     // Bind parameters for the update
     $stmt_update_gobrik->bind_param(
-        'sssiii',
+        'sssddiii',
         $user_location_full,   // Location full text
         $selected_country,     // Country text derived from earlier
         $user_location_full,   // Full location for GoBrik
+        $user_lat,             // Latitude
+        $user_lon,             // Longitude
         $set_country_id,       // Country ID derived earlier
         $community_id,         // Community ID derived earlier
         $buwana_id             // Buwana ID to match
@@ -172,6 +176,7 @@ $gobrik_conn->close();
 // Redirect to the next step
 header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
 exit();
+
 
 }
 
