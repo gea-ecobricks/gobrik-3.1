@@ -113,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         $full_name = $first_name;
-        $account_notes = "signup_process has run";
+        $account_notes = "signup_process run. Email unverified";
 
         $stmt_create_ecobricker->bind_param("ssisss", $first_name, $full_name, $buwana_id, $credential_value, $buwana_id, $account_notes);
         if ($stmt_create_ecobricker->execute()) {
