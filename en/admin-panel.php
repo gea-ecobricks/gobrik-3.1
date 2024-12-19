@@ -9,12 +9,41 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
 
 // Check if the user is logged in
-if (isLoggedIn()) {
+if ($is_logged_in) {
     $buwana_id = $_SESSION['buwana_id'];
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch the user's location data
+    // Check admin status
+    $query = "SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE id = ?";
+    if ($stmt = $gobrik_conn->prepare($query)) {
+        $stmt->bind_param("i", $buwana_id);
+        $stmt->execute();
+        $stmt->bind_result($user_roles, $user_capabilities);
+
+        if ($stmt->fetch()) {
+            if (stripos($user_roles, 'admin') === false ||
+                stripos($user_capabilities, 'user review') === false ||
+                stripos($user_capabilities, 'user deletions') === false) {
+                // Redirect if the user is not an admin
+                echo "<script>
+                    alert('Sorry, this page is for admins only.');
+                    window.location.href = 'dashboard.php';
+                </script>";
+                exit();
+            }
+        } else {
+            // Redirect if no user record is found
+            echo "<script>
+                alert('User not found.');
+                window.location.href = 'dashboard.php';
+            </script>";
+            exit();
+        }
+        $stmt->close();
+    }
+
+    // Fetch additional user details after admin check
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
@@ -22,14 +51,10 @@ if (isLoggedIn()) {
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
-
-    // Check if the user is logged in and has admin privileges
-    checkAdminStatus($buwana_id); // Call the reusable function
-
-
     $buwana_conn->close(); // Close the database connection
 }
 
+// Fetch overall stats
 require_once '../gobrikconn_env.php';
 
 // Initialize variables
@@ -59,6 +84,7 @@ $percent_emails_sent = $total_ecobrickers > 0 ? round(($total_emails_sent / $tot
 
 $gobrik_conn->close();
 ?>
+
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 

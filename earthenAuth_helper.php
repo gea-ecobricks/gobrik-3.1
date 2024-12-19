@@ -5,39 +5,7 @@ ini_set('display_errors', 1);
 
 
 
-function checkAdminStatus($buwana_id) {
-    // Include database connection
-    require_once 'gobrikconn_env.php';
 
-    // Prepare the SQL query to fetch the user's role and capabilities
-    $query = "SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE id = ?";
-
-    if ($stmt = $gobrik_conn->prepare($query)) {
-        // Bind the parameter and execute the query
-        $stmt->bind_param("i", $buwana_id);
-        $stmt->execute();
-        $stmt->bind_result($user_roles, $user_capabilities);
-
-        if ($stmt->fetch()) {
-            // Check if the role contains "admin" (case-insensitive)
-            if (stripos($user_roles, 'admin') !== false &&
-                stripos($user_capabilities, 'user review') !== false &&
-                stripos($user_capabilities, 'user deletions') !== false) {
-                // If all conditions are met, return true
-                return true;
-            }
-        }
-        // Close the statement
-        $stmt->close();
-    }
-
-    // Redirect if the conditions are not met
-    echo "<script>
-        alert('Sorry, this page is for admins only.');
-        window.location.href = 'dashboard.php';
-    </script>";
-    exit();
-}
 
 
 
