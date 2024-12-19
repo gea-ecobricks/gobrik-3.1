@@ -127,36 +127,52 @@ if ($stmt_update_buwana) {
     $stmt_update_buwana->execute();
     $stmt_update_buwana->close();
 
-    // PART 7: Open GoBrik connection and update tb_ecobrickers to set buwana_activated to 1
-    require_once("../gobrikconn_env.php");
+    // PART 7: Open GoBrik connection and update tb_ecobrickers
+require_once("../gobrikconn_env.php");
 
-    $sql_update_gobrik = "UPDATE tb_ecobrickers SET buwana_activated = 1 WHERE buwana_id = ?";
-    $stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
+$sql_update_gobrik = "UPDATE tb_ecobrickers
+    SET buwana_activated = 1,
+        account_notes = CONCAT(account_notes, ' Location set.'),
+        location_full_txt = ?,
+        location_country_txt = ?,
+        location_full = ?,
+        country_id = ?,
+        community_id = ?
+    WHERE buwana_id = ?";
 
-    if ($stmt_update_gobrik) {
-        $stmt_update_gobrik->bind_param('i', $buwana_id); // Update based on the ecobricker's unique identifier
-        if ($stmt_update_gobrik->execute()) {
-            // Successfully updated GoBrik
-            $stmt_update_gobrik->close();
-        } else {
-            error_log('Error executing update on tb_ecobrickers: ' . $stmt_update_gobrik->error);
-            echo "Failed to update GoBrik record.";
-        }
+$stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
+
+if ($stmt_update_gobrik) {
+    // Bind parameters for the update
+    $stmt_update_gobrik->bind_param(
+        'sssiii',
+        $user_location_full,   // Location full text
+        $selected_country,     // Country text derived from earlier
+        $user_location_full,   // Full location for GoBrik
+        $set_country_id,       // Country ID derived earlier
+        $community_id,         // Community ID derived earlier
+        $buwana_id             // Buwana ID to match
+    );
+
+    // Execute the query and handle potential errors
+    if ($stmt_update_gobrik->execute()) {
+        $stmt_update_gobrik->close();
     } else {
-        error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
-        echo "Failed to prepare GoBrik update statement.";
+        error_log('Error executing update on tb_ecobrickers: ' . $stmt_update_gobrik->error);
+        echo "Failed to update GoBrik record.";
     }
-
-    // Close the GoBrik connection
-    $gobrik_conn->close();
-
-    // Redirect to the next step
-    header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
-    exit();
 } else {
-    error_log('Error preparing statement for updating Buwana user: ' . $buwana_conn->error);
-    header("Location: activate-3.php?id=" . urlencode($buwana_id) . "&error=db_update_failed");
-    exit();
+    error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
+    echo "Failed to prepare GoBrik update statement.";
+}
+
+// Close the GoBrik connection
+$gobrik_conn->close();
+
+// Redirect to the next step
+header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
+exit();
+
 }
 
 
