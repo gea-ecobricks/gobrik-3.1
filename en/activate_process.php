@@ -137,18 +137,30 @@ if ($http_code >= 200 && $http_code < 300) {
     }
 
 
-// PART 4
+/// PART 4
 // Update GoBrik Database with registration status
-$sql_update_registration = "UPDATE tb_ecobrickers SET earthen_registered = ? WHERE ecobricker_id = ?";
+$sql_update_registration = "UPDATE tb_ecobrickers
+                            SET earthen_registered = ?,
+                                account_notes = ?
+                            WHERE ecobricker_id = ?";
 $stmt_update_registration = $gobrik_conn->prepare($sql_update_registration);
 
 if ($stmt_update_registration) {
-    $stmt_update_registration->bind_param('ii', $registered, $ecobricker_id);
+    // Determine account_notes based on registration status
+    if ($registered) {
+        $account_notes = "Signing up... Password set. E-mail verified. Already registered to Earthen.";
+    } else {
+        $account_notes = "Signing up... Password set. E-mail verified. Not yet registered to Earthen.";
+    }
+
+    // Bind parameters and execute the query
+    $stmt_update_registration->bind_param('isi', $registered, $account_notes, $ecobricker_id);
     $stmt_update_registration->execute();
     $stmt_update_registration->close();
 } else {
     error_log('Error preparing statement for updating earthen_registered in tb_ecobrickers: ' . $gobrik_conn->error);
 }
+
 
 // Check if buwana_id exists
 if (empty($buwana_id)) {
