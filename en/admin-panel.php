@@ -110,8 +110,8 @@ $gobrik_conn->close();
                 <thead>
                     <tr>
                         <th>Buwana</th>
-                        <th style="max-width:100px;">Email</th> <!-- New -->
-                        <th style="max-width:100px;">Notes</th> <!-- New -->
+                        <th>Email</th> <!-- New -->
+                        <th>Notes</th> <!-- New -->
                         <th>First Name</th> <!-- New -->
                         <th>Name</th>
                         <th>GEA Status</th>
@@ -135,6 +135,8 @@ $gobrik_conn->close();
 
 <script>
 
+
+
 $(document).ready(function() {
     $("#newest-ecobrickers").DataTable({
         "responsive": true,
@@ -154,28 +156,52 @@ $(document).ready(function() {
                     return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
                 }
             },
-            { "data": "email_addr" }, // Add email_addr column
-            { "data": "account_notes" }, // Add account_notes column
-            { "data": "first_name" }, // Add first_name column
+            {
+                "data": "email_addr",
+                "render": function(data, type, row) {
+                    // Truncate email if it exceeds 100px width
+                    return `<div style="max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${data}">${data}</div>`;
+                }
+            },
+            {
+                "data": "account_notes",
+                "render": function(data, type, row) {
+                    // Break notes text into multiple lines if it exceeds 100px
+                    return `<div style="max-width: 100px; word-wrap: break-word; white-space: normal;">${data}</div>`;
+                }
+            },
+            { "data": "first_name" },
             { "data": "full_name" },
             { "data": "gea_status" },
             {
-                data: "user_roles",
-                render: function (data, type, row) {
+                "data": "user_roles",
+                "render": function (data, type, row) {
                     return `<a href="#" onclick="openUserRolesModal(${row.buwana_id})" style="text-decoration: underline;">${data}</a>`;
-                },
+                }
             },
-
             { "data": "ecobricks_made" },
             { "data": "login_count" },
             { "data": "test_email_status" },
             { "data": "location_full", "responsivePriority": 2 }
         ],
         "columnDefs": [
-            { "targets": [10], "visible": false, "responsivePriority": 2 }
+            {
+                "targets": 1, // Email column
+                "width": "100px"
+            },
+            {
+                "targets": 2, // Notes column
+                "width": "100px"
+            },
+            {
+                "targets": [10], "visible": false, "responsivePriority": 2
+            }
         ]
     });
 });
+
+
+
 
 function openUserRolesModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
