@@ -18,7 +18,6 @@ if (isLoggedIn()) {
     exit();
 }
 
-
 $response = ['success' => false];
 $buwana_id = $_GET['id'] ?? null;
 
