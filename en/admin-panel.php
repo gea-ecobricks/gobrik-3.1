@@ -111,7 +111,7 @@ $gobrik_conn->close();
                     <tr>
                         <th>Buwana</th>
                         <th>Email</th> <!-- New -->
-                        <th>Notes</th> <!-- New -->
+                        <th style="max-width:100px;">Notes</th> <!-- New -->
                         <th>First Name</th> <!-- New -->
                         <th>Name</th>
                         <th>GEA Status</th>
