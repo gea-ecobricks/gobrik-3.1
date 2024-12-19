@@ -183,8 +183,8 @@ $(document).ready(function() {
         ],
         "columnDefs": [
             { "targets": 0, "width": "80px" }, // Limit width of buwana_id column
-            { "targets": 1, "width": "100px" }, // Email column
-            { "targets": 2, "width": "100px" }, // Notes column
+            { "targets": 1, "width": "150px" }, // Email column
+            { "targets": 2, "width": "130px" }, // Notes column
             { "targets": 3, "width": "80px" }, // First Name column
             { "targets": [10], "responsivePriority": 2 }, // Reduce priority for Location column
             { "targets": [8, 9], "visible": true }, // Ensure login count and email status are visible

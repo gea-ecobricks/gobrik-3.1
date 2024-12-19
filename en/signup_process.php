@@ -115,11 +115,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
 
             // Now create the Ecobricker account in GoBrik using the first_name and other info from Buwana
-            $sql_create_ecobricker = "INSERT INTO tb_ecobrickers (first_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt) VALUES (?, ?, ?, NOW(), ?, 1, NOW())";
+            $sql_create_ecobricker = "INSERT INTO tb_ecobrickers
+            (first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
+            VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
+
             $stmt_create_ecobricker = $gobrik_conn->prepare($sql_create_ecobricker);
 
             if ($stmt_create_ecobricker) {
-                $stmt_create_ecobricker->bind_param("sisi", $first_name, $buwana_id, $credential_value, $buwana_id);
+                // Set `full_name` to the value of `first_name`, and add a note for `account_notes`
+                $full_name = $first_name;
+                $account_notes = "signup_process has run";
+
+                $stmt_create_ecobricker->bind_param("ssisi", $first_name, $full_name, $buwana_id, $credential_value, $account_notes);
+
                 if ($stmt_create_ecobricker->execute()) {
                     // Fix the insert_id retrieval
                     $ecobricker_id = $gobrik_conn->insert_id;
@@ -155,4 +163,3 @@ ob_end_clean(); // Clear any previous output
 // Return the JSON response
 echo json_encode($response);
 exit();
-?>
