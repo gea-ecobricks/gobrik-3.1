@@ -24,7 +24,7 @@ if (isLoggedIn()) {
 
 
     // Check if the user is logged in and has admin privileges
-    checkAdminStatus($gea_status); // Call the reusable function
+    checkAdminStatus($buwana_id); // Call the reusable function
 
 
     $buwana_conn->close(); // Close the database connection
