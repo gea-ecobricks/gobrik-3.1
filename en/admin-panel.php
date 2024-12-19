@@ -15,7 +15,7 @@ if ($is_logged_in) {
     require_once '../buwanaconn_env.php';
 
     // Check admin status
-    $query = "SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE id = ?";
+    $query = "SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
     if ($stmt = $gobrik_conn->prepare($query)) {
         $stmt->bind_param("i", $buwana_id);
         $stmt->execute();
