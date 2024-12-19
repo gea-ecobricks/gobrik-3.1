@@ -6,7 +6,7 @@ ini_set('display_errors', 1);
 
 
 function checkAdminStatus($gea_status) {
-    if (stripos($user_role, 'Admin') === false AND stripos($capabilities, 'User Review') === false){ // Case-insensitive check for "Admin"
+    if (stripos($user_role, 'Admin') === false { // Case-insensitive check for "Admin"
 
         // Redirect if "Admin" is not found in gea_status
         echo "<script>
