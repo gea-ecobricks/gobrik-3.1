@@ -230,8 +230,8 @@ function openUserRolesModal(buwana_id) {
             modalBox.innerHTML = `
                 <h2>Edit ${fullName}'s GoBrik Account</h2>
 
-                <h4>User Roles</h4>
-                <p style="font-size:smaller">Currently set to ${userRoles}</p>
+                <h4 style="margin-bottom: -10px;">User Roles</h4>
+                <p style="font-size:1em">Currently set to ${userRoles}</p>
                 <select id="user-roles" name="user_roles" required>
                     <option value="" disabled selected>Change to...</option>
                     <option value="Ecobricker">Ecobricker</option>
@@ -240,8 +240,8 @@ function openUserRolesModal(buwana_id) {
                     <option value="Admin">Admin</option>
                 </select>
 
-                <h4>GEA Status</h4>
-                <p style="font-size:smaller">>Currently set to ${geaStatus}</p>
+                <h4 style="margin-bottom: -10px;">GEA Status</h4>
+                <p style="font-size:1em">Currently set to ${geaStatus}</p>
                 <select id="gea-status" name="gea_status" required>
                     <option value="" disabled selected>Change to...</option>
                     <option value="Gobriker">Gobriker</option>
@@ -250,8 +250,8 @@ function openUserRolesModal(buwana_id) {
                     <option value="Master Trainer">Master Trainer</option>
                 </select>
 
-                <h4>Capabilities</h4>
-                <p style="font-size:smaller">Currently set to ${userCapabilities}</p>
+                <h4 style="margin-bottom: -10px;">Capabilities</h4>
+                <p style="font-size:1em">Currently set to ${userCapabilities}</p>
                 <select id="capabilities" name="user_capabilities" required>
                     <option value="" disabled selected>Change to...</option>
                     <option value="None">None</option>
