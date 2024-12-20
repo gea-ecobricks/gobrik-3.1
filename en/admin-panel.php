@@ -313,8 +313,7 @@ function saveUserRoles(buwana_id) {
 }
 
 
-
-function openEcobrickerModal(buwana_id) {
+function openEcobrickerModal(ecobricker_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
@@ -333,13 +332,16 @@ function openEcobrickerModal(buwana_id) {
 
     // Clear previous modal content and set up structure
     modalBox.innerHTML = `
-        <h4>Ecobricker Details (Buwana ID: ${buwana_id})</h4>
-        <button class="btn delete" style="margin-bottom: 15px;" onclick="confirmDeleteUser(${buwana_id})">❌ Delete User</button>
-        <div id="ecobricker-table-container"></div>
+        <h4 style="text-align:center;">Ecobricker Details (Ecobricker ID: ${ecobricker_id})</h4>
+        <div id="ecobricker-table-container" style="margin-bottom: 20px;"></div>
+        <a class="ecobrick-action-button deleter-button"
+           style="margin:auto; margin-top: 20px; text-align: center;"
+           data-lang-id="000-delete"
+           onclick="confirmDeleteUser(${ecobricker_id})">❌ Delete User</a>
     `;
 
     // Fetch ecobricker details
-    fetch(`../api/fetch_ecobricker_details.php?buwana_id=${buwana_id}`)
+    fetch(`../api/fetch_ecobricker_details.php?ecobricker_id=${ecobricker_id}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -375,6 +377,7 @@ function openEcobrickerModal(buwana_id) {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 function confirmDeleteUser(buwana_id) {
