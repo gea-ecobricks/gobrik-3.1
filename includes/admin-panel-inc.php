@@ -54,7 +54,7 @@
     width: 100%;           /* Ensures the button takes the full width */
     display: block;        /* Ensures the button behaves as a block element */
     text-align: center;    /* Centers the text inside the button */
-    padding: 10px;         /* Add some padding for better button appearance */
+    padding: 10px 0px 10px 0px;         /* Add some padding for better button appearance */
     margin-bottom: 10px;   /* Margin to create space between buttons */
     border: none;          /* Remove default borders */
     cursor: pointer;       /* Show pointer on hover */

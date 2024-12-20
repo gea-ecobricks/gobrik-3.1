@@ -228,7 +228,7 @@ function openUserRolesModal(buwana_id) {
 
             // Generate the modal content
             modalBox.innerHTML = `
-                <h2>Edit ${fullName}'s GoBrik Account</h2>
+                <h2 style="text-align:center;">Edit ${fullName}'s Account</h2>
 
                 <h4 style="margin-bottom: -10px;">User Roles</h4>
                 <p style="font-size:1em">Currently set to ${userRoles}</p>
@@ -265,7 +265,7 @@ function openUserRolesModal(buwana_id) {
                 <a class="ecobrick-action-button" style="margin:auto;margin-top: 30px;
   text-align: center;" data-lang-id="000-save" onclick="saveUserRoles(${buwana_id})">💾 Save</a>
 
-  <a class="ecobrick-action-button delete-button" style="margin:auto;margin-top: 10px;
+  <a class="ecobrick-action-button deleter-button" style="margin:auto;margin-top: 10px;
   text-align: center;" data-lang-id="000-save" onclick="confirmDeleteUser(${buwana_id})">❌ Delete User</a>
             `;
         })
