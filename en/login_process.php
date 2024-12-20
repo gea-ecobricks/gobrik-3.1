@@ -104,22 +104,21 @@ if ($stmt_credential) {
                         die('Error preparing statement for updating credentials_tb: ' . $buwana_conn->error);
                     }
 
-                // PART 5: Update GoBrik Account
-                        $sql_update_ecobricker = "UPDATE tb_ecobrickers
-                            SET last_login = NOW(),
-                                login_count = login_count + 1,
-                                account_notes = CONCAT('GoBrik 3.0 account active. Logged in ', login_count + 1, ' times.')
-                            WHERE email_addr = ?";
-                        $stmt_update_ecobricker = $gobrik_conn->prepare($sql_update_ecobricker);
+                // PART 5: Upon successful login: Update GoBrik Account
+                $sql_update_ecobricker = "UPDATE tb_ecobrickers
+                    SET last_login = NOW(),
+                        login_count = login_count + 1,
+                        account_notes = CONCAT('GoBrik 3.0 account active. Logged in ', login_count + 1, ' times.')
+                    WHERE email_addr = ?";
+                $stmt_update_ecobricker = $gobrik_conn->prepare($sql_update_ecobricker);
 
-                        if ($stmt_update_ecobricker) {
-                            $stmt_update_ecobricker->bind_param('s', $credential_key);
-                            $stmt_update_ecobricker->execute();
-                            $stmt_update_ecobricker->close();
-                        } else {
-                            die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
-                        }
-
+                if ($stmt_update_ecobricker) {
+                    $stmt_update_ecobricker->bind_param('s', $credential_key);
+                    $stmt_update_ecobricker->execute();
+                    $stmt_update_ecobricker->close();
+                } else {
+                    die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
+                }
 
                     // Set the session variable to indicate the user is logged in
                     $_SESSION['buwana_id'] = $buwana_id;
@@ -133,9 +132,47 @@ if ($stmt_credential) {
 
                 } else {
                     //PART 6: Bad password
-                    header("Location: ../$lang/login.php?status=invalid_password&key=" . urlencode($credential_key));
-                    exit();
-                }
+                    // PART 6: Handle failed login attempts
+                    $sql_check_failed = "SELECT failed_last_tm, failed_password_count FROM credentials_tb WHERE credential_key = ?";
+                    $stmt_check_failed = $buwana_conn->prepare($sql_check_failed);
+
+                    if ($stmt_check_failed) {
+                        $stmt_check_failed->bind_param('s', $credential_key);
+                        $stmt_check_failed->execute();
+                        $stmt_check_failed->bind_result($failed_last_tm, $failed_password_count);
+                        $stmt_check_failed->fetch();
+                        $stmt_check_failed->close();
+
+                        // Check if failed_last_tm exists and if it's within the last 10 minutes
+                        $current_time = new DateTime();
+                        $last_failed_time = $failed_last_tm ? new DateTime($failed_last_tm) : null;
+
+                        if (is_null($last_failed_time) || $current_time->getTimestamp() - $last_failed_time->getTimestamp() > 600) {
+                            // Reset failed_password_count if no entry or if the last failure was more than 10 minutes ago
+                            $failed_password_count = 0;
+                        }
+
+                        // Increment failed_password_count and update failed_last_tm
+                        $failed_password_count += 1;
+
+                        $sql_update_failed = "UPDATE credentials_tb
+                                              SET failed_last_tm = NOW(),
+                                                  failed_password_count = ?
+                                              WHERE credential_key = ?";
+                        $stmt_update_failed = $buwana_conn->prepare($sql_update_failed);
+
+                        if ($stmt_update_failed) {
+                            $stmt_update_failed->bind_param('is', $failed_password_count, $credential_key);
+                            $stmt_update_failed->execute();
+                            $stmt_update_failed->close();
+                        } else {
+                            error_log('Error preparing statement for updating failed login attempts: ' . $buwana_conn->error);
+                        }
+                    } else {
+                        error_log('Error preparing statement for checking failed login attempts: ' . $buwana_conn->error);
+                    }
+
+
             } else {
                 header("Location: ../$lang/login.php?status=invalid_user&key=" . urlencode($credential_key));
                 exit();
