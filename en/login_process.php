@@ -172,7 +172,7 @@ if ($stmt_credential) {
                         error_log('Error preparing statement for checking failed login attempts: ' . $buwana_conn->error);
                     }
 
-
+                }
             } else {
                 header("Location: ../$lang/login.php?status=invalid_user&key=" . urlencode($credential_key));
                 exit();
