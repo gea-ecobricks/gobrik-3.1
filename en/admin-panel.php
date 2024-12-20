@@ -262,7 +262,11 @@ function openUserRolesModal(buwana_id) {
                 </select>
             <br><br>
 
-                <a class="ecobrick-action-button" data-lang-id="000-save" onclick="saveUserRoles(${buwana_id})">💾 Save</a>
+                <a class="ecobrick-action-button" style="margin:auto;margin-top: 30px;
+  text-align: center;" data-lang-id="000-save" onclick="saveUserRoles(${buwana_id})">💾 Save</a>
+
+  <a class="ecobrick-action-button delete-button" style="margin:auto;margin-top: 10px;
+  text-align: center;" data-lang-id="000-save" onclick="confirmDeleteUser(${buwana_id})">❌ Delete User</a>
             `;
         })
         .catch(error => {

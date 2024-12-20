@@ -59,7 +59,7 @@
     border: none;          /* Remove default borders */
     cursor: pointer;       /* Show pointer on hover */
     font-size: 1em;        /* Consistent font size */
-    padding: 10px 20px;
+
   border: none;
   border-radius: 10px;
   cursor: pointer;
