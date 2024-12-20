@@ -9,6 +9,7 @@ $searchValue = isset($_POST['search']['value']) ? $_POST['search']['value'] : ''
 
 // Base SQL query to fetch activated ecobrickers
 $sql = "SELECT
+            ecobricker_id,
             buwana_id,
             email_addr,
             account_notes,
@@ -71,6 +72,7 @@ $stmt->execute();
 
 // Bind the results
 $stmt->bind_result(
+    $ecobricker_id,
     $buwana_id,
     $email_addr,
     $account_notes,
@@ -87,6 +89,7 @@ $stmt->bind_result(
 $data = [];
 while ($stmt->fetch()) {
     $data[] = [
+        'ecobricker_id' => htmlspecialchars($ecobricker_id ?? '', ENT_QUOTES, 'UTF-8'),
         'buwana_id' => htmlspecialchars($buwana_id ?? '', ENT_QUOTES, 'UTF-8'),
         'email_addr' => htmlspecialchars($email_addr ?? '', ENT_QUOTES, 'UTF-8'),
         'account_notes' => htmlspecialchars($account_notes ?? '', ENT_QUOTES, 'UTF-8'),

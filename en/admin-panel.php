@@ -109,16 +109,17 @@ $gobrik_conn->close();
             <table id="newest-ecobrickers" class="display responsive nowrap" style="width:100%">
                 <thead>
                     <tr>
-                        <th>Buwana</th>
-                        <th>Email</th> <!-- New -->
-                        <th>Notes</th> <!-- New -->
-                        <th>First Name</th> <!-- New -->
+                        <th>Ecobricker ID</th>
+                        <th>Email</th>
+                        <th>Notes</th>
                         <th>Name</th>
-                        <th>GEA Status</th>
                         <th>Roles</th>
                         <th>Briks</th>
                         <th>Logins</th>
                         <th>Email Status</th>
+                         <th>First Name</th>
+                        <th>Buwana ID</th>
+                        <th>GEA Status</th>
                         <th>Location</th>
                     </tr>
                 </thead>
@@ -135,7 +136,6 @@ $gobrik_conn->close();
 
 <script>
 
-
 $(document).ready(function() {
     $("#newest-ecobrickers").DataTable({
         "responsive": true,
@@ -150,8 +150,8 @@ $(document).ready(function() {
         "order": [[0, "desc"]],
         "columns": [
             {
-                "data": "buwana_id",
-                "render": function (data, type, row) {
+                "data": "ecobricker_id",
+                "render": function(data, type, row) {
                     return `<button class="btn btn-primary" onclick="openEcobrickerModal(${data})">${data}</button>`;
                 }
             },
@@ -169,29 +169,31 @@ $(document).ready(function() {
             },
             { "data": "first_name" },
             { "data": "full_name" },
-            { "data": "gea_status" },
             {
                 "data": "user_roles",
-                "render": function (data, type, row) {
-                    return `<a href="#" onclick="openUserRolesModal(${row.buwana_id})" style="text-decoration: underline;">${data}</a>`;
+                "render": function(data, type, row) {
+                    return `<a href="#" onclick="openUserRolesModal(${row.ecobricker_id})" style="text-decoration: underline;">${data}</a>`;
                 }
             },
             { "data": "ecobricks_made" },
             { "data": "login_count" },
             { "data": "test_email_status" },
+            { "data": "buwana_id" },
+            { "data": "gea_status" },
             { "data": "location_full" }
         ],
         "columnDefs": [
-            { "targets": 0, "width": "80px" }, // Limit width of buwana_id column
+            { "targets": 0, "width": "80px" }, // Ecobricker ID column
             { "targets": 1, "width": "150px" }, // Email column
             { "targets": 2, "width": "130px" }, // Notes column
-            { "targets": 3, "width": "80px" }, // First Name column
-            { "targets": [10], "responsivePriority": 2 }, // Reduce priority for Location column
+            { "targets": 9, "width": "80px" }, // Buwana ID column
+            { "targets": [11], "responsivePriority": 2 }, // Reduce priority for Location column
             { "targets": [8, 9], "visible": true }, // Ensure login count and email status are visible
             { "targets": "_all", "defaultContent": "", "responsivePriority": 1 } // Ensure default settings for other columns
         ]
     });
 });
+
 
 
 function openUserRolesModal(buwana_id) {
