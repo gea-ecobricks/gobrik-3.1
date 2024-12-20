@@ -131,7 +131,6 @@ if ($stmt_credential) {
                     exit();
 
                 } else {
-                    //PART 6: Bad password
                     // PART 6: Handle failed login attempts
                     $sql_check_failed = "SELECT failed_last_tm, failed_password_count FROM credentials_tb WHERE credential_key = ?";
                     $stmt_check_failed = $buwana_conn->prepare($sql_check_failed);
@@ -171,6 +170,10 @@ if ($stmt_credential) {
                     } else {
                         error_log('Error preparing statement for checking failed login attempts: ' . $buwana_conn->error);
                     }
+
+                    // Redirect the user to the login page with an error status
+                    header("Location: ../$lang/login.php?status=invalid_password&key=" . urlencode($credential_key));
+                    exit();
 
                 }
             } else {
