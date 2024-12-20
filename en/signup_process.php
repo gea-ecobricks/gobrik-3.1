@@ -16,6 +16,7 @@ function sendJsonError($error) {
     exit();
 }
 
+//PART 1: PROCESS SPECIFIC USER
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $buwana_id = $_GET['id'] ?? null; // Get the buwana_id from the URL
 
@@ -38,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
-    // Retrieve the Buwana first_name from the database
+    // PART 2: Retrieve the Buwana first_name from the database
     $sql_get_first_name = "SELECT first_name FROM users_tb WHERE buwana_id = ?";
     $stmt_get_first_name = $buwana_conn->prepare($sql_get_first_name);
     if (!$stmt_get_first_name) {
@@ -93,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Update the Buwana user (only update email and password, not first_name)
+    // PART 3: Update the Buwana user (only update email and password, not first_name)
     $sql_update_user = "UPDATE users_tb SET email = ?, password_hash = ?, account_status = 'registered no login', last_login = NOW() WHERE buwana_id = ?";
     $stmt_update_user = $buwana_conn->prepare($sql_update_user);
 

@@ -33,7 +33,7 @@ if ($stmt_check_email) {
     if ($stmt_check_email->num_rows === 1) {
         $stmt_check_email->bind_result($ecobricker_id, $buwana_activated);
         $stmt_check_email->fetch();
-
+//If Account is unactivated send them to activate
         if ($buwana_activated == '0') {
             header("Location: ../$lang/activate.php?id=$ecobricker_id");
             exit();
@@ -48,7 +48,7 @@ if ($stmt_check_email) {
     die('Database query failed.');
 }
 
-// PART 3: Check Buwana Database
+// PART 3: Check Buwana Database for specific Buwana_id to login
 require_once("../buwanaconn_env.php");
 
 // SQL query to get buwana_id from credentials_tb using credential_key
@@ -81,7 +81,7 @@ if ($stmt_credential) {
                 // Verify the password entered by the user
                 if (password_verify($password, $password_hash)) {
 
-                    // PART 4: Update Buwana Account
+                    // PART 4: If login successfull Update Buwana Account
                     $sql_update_user = "UPDATE users_tb SET last_login = NOW(), login_count = login_count + 1 WHERE buwana_id = ?";
                     $stmt_update_user = $buwana_conn->prepare($sql_update_user);
 
@@ -105,21 +105,20 @@ if ($stmt_credential) {
                     }
 
                 // PART 5: Update GoBrik Account
-                $sql_update_ecobricker = "UPDATE tb_ecobrickers
-                    SET last_login = NOW(),
-                        login_count = login_count + 1,
-                        account_notes = CONCAT('GoBrik 3.0 account active. Logged in ', login_count + 1, ' times.')
-                    WHERE email_addr = ?";
-                $stmt_update_ecobricker = $gobrik_conn->prepare($sql_update_ecobricker);
+                        $sql_update_ecobricker = "UPDATE tb_ecobrickers
+                            SET last_login = NOW(),
+                                login_count = login_count + 1,
+                                account_notes = CONCAT('GoBrik 3.0 account active. Logged in ', login_count + 1, ' times.')
+                            WHERE email_addr = ?";
+                        $stmt_update_ecobricker = $gobrik_conn->prepare($sql_update_ecobricker);
 
-                if ($stmt_update_ecobricker) {
-                    $stmt_update_ecobricker->bind_param('s', $credential_key);
-                    $stmt_update_ecobricker->execute();
-                    $stmt_update_ecobricker->close();
-                } else {
-                    die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
-                }
-
+                        if ($stmt_update_ecobricker) {
+                            $stmt_update_ecobricker->bind_param('s', $credential_key);
+                            $stmt_update_ecobricker->execute();
+                            $stmt_update_ecobricker->close();
+                        } else {
+                            die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
+                        }
 
 
                     // Set the session variable to indicate the user is logged in
@@ -133,6 +132,7 @@ if ($stmt_credential) {
                     exit();
 
                 } else {
+                    //PART 6: Bad password
                     header("Location: ../$lang/login.php?status=invalid_password&key=" . urlencode($credential_key));
                     exit();
                 }
