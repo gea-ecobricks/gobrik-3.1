@@ -1,3 +1,4 @@
+<?php
 require_once '../gobrikconn_env.php'; // Include database connection
 
 $buwana_id = $_GET['buwana_id'] ?? null;
@@ -29,3 +30,6 @@ echo json_encode([
 
 $stmt->close();
 $gobrik_conn->close();
+
+
+?>
