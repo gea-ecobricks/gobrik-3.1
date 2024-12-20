@@ -195,7 +195,6 @@ $(document).ready(function() {
 
 
 
-
 function openUserRolesModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -226,7 +225,7 @@ function openUserRolesModal(buwana_id) {
             const fullName = data.full_name || "Unknown";
             const geaStatus = data.gea_status || "No GEA status set";
             const userRoles = data.user_roles || "No role set";
-            const capabilities = data.capabilities || "No capabilities set";
+            const userCapabilities = data.user_capabilities || "No capabilities set";
 
             // Generate the modal content
             modalBox.innerHTML = `
@@ -253,8 +252,8 @@ function openUserRolesModal(buwana_id) {
                 </select>
 
                 <h4>Capabilities</h4>
-                <p>Currently set to ${capabilities}</p>
-                <select id="capabilities" name="capabilities">
+                <p>Currently set to ${userCapabilities}</p>
+                <select id="capabilities" name="user_capabilities">
                     <option value="None">None</option>
                     <option value="Review users">Review users</option>
                     <option value="Review ecobricks">Review ecobricks</option>
