@@ -228,10 +228,10 @@ function openUserRolesModal(buwana_id) {
 
             // Generate the modal content
             modalBox.innerHTML = `
-                <p><b>Edit ${fullName}'s GoBrik Account</b></p>
+                <h2>Edit ${fullName}'s GoBrik Account</h2>
 
-                <p><b>User Roles</b></p>
-                <p>Currently set to ${userRoles}</p>
+                <h4>User Roles</h4>
+                <p style="font-size:smaller">Currently set to ${userRoles}</p>
                 <select id="user-roles" name="user_roles" required>
                     <option value="" disabled selected>Change to...</option>
                     <option value="Ecobricker">Ecobricker</option>
@@ -240,8 +240,8 @@ function openUserRolesModal(buwana_id) {
                     <option value="Admin">Admin</option>
                 </select>
 
-                <p><b>GEA Status</b></p>
-                <p>Currently set to ${geaStatus}</p>
+                <h4>GEA Status</h4>
+                <p style="font-size:smaller">>Currently set to ${geaStatus}</p>
                 <select id="gea-status" name="gea_status" required>
                     <option value="" disabled selected>Change to...</option>
                     <option value="Gobriker">Gobriker</option>
@@ -250,8 +250,8 @@ function openUserRolesModal(buwana_id) {
                     <option value="Master Trainer">Master Trainer</option>
                 </select>
 
-                <p><b>Capabilities</b></p>
-                <p>Currently set to ${userCapabilities}</p>
+                <h4>Capabilities</h4>
+                <p style="font-size:smaller">Currently set to ${userCapabilities}</p>
                 <select id="capabilities" name="user_capabilities" required>
                     <option value="" disabled selected>Change to...</option>
                     <option value="None">None</option>
@@ -260,6 +260,7 @@ function openUserRolesModal(buwana_id) {
                     <option value="Delete users">Delete users</option>
                     <option value="Delete ecobricks">Delete ecobricks</option>
                 </select>
+            <br><br>
 
                 <a class="ecobrick-action-button" data-lang-id="000-save" onclick="saveUserRoles(${buwana_id})">💾 Save</a>
             `;
