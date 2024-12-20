@@ -8,7 +8,7 @@ if (!$buwana_id || !is_numeric($buwana_id)) {
     exit();
 }
 
-$sql = "SELECT full_name, gea_status, user_roles, capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
+$sql = "SELECT full_name, gea_status, user_roles, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
 
 if (!$stmt) {
@@ -25,7 +25,7 @@ echo json_encode([
     'full_name' => $full_name,
     'gea_status' => $gea_status,
     'user_roles' => $user_roles,
-    'capabilities' => $capabilities,
+    'capabilities' => $user_capabilities,
 ]);
 
 $stmt->close();
