@@ -135,7 +135,8 @@ $gobrik_conn->close();
 <?php require_once("../footer-2024.php"); ?>
 
 <script>
-$(document).ready(function() {
+
+    $(document).ready(function() {
     $("#newest-ecobrickers").DataTable({
         "responsive": true,
         "serverSide": true,
@@ -192,6 +193,7 @@ $(document).ready(function() {
         ]
     });
 });
+
 
 
 
