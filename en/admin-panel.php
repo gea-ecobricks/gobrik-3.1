@@ -112,12 +112,12 @@ $gobrik_conn->close();
                         <th>Ecobricker ID</th>
                         <th>Email</th>
                         <th>Notes</th>
-                        <th>Name</th>
+                        <th>First Name</th>
                         <th>Roles</th>
                         <th>Briks</th>
                         <th>Logins</th>
                         <th>Email Status</th>
-                         <th>First Name</th>
+                         <th>Full Name</th>
                         <th>Buwana ID</th>
                         <th>GEA Status</th>
                         <th>Location</th>
@@ -135,7 +135,6 @@ $gobrik_conn->close();
 <?php require_once("../footer-2024.php"); ?>
 
 <script>
-
 $(document).ready(function() {
     $("#newest-ecobrickers").DataTable({
         "responsive": true,
@@ -168,7 +167,6 @@ $(document).ready(function() {
                 }
             },
             { "data": "first_name" },
-            { "data": "full_name" },
             {
                 "data": "user_roles",
                 "render": function(data, type, row) {
@@ -178,6 +176,7 @@ $(document).ready(function() {
             { "data": "ecobricks_made" },
             { "data": "login_count" },
             { "data": "test_email_status" },
+            { "data": "full_name" },
             { "data": "buwana_id" },
             { "data": "gea_status" },
             { "data": "location_full" }
