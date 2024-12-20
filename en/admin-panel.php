@@ -196,7 +196,6 @@ $(document).ready(function() {
 
 
 
-
 function openUserRolesModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -214,57 +213,60 @@ function openUserRolesModal(buwana_id) {
     modalBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
     modalBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
 
-    // Clear previous modal content and set up structure
-    modalBox.innerHTML = `
-        <h4>Edit User Roles (Buwana ID: ${buwana_id})</h4>
-        <form id="user-roles-form" style="margin-top: 15px;">
-            <label for="gea-status">GEA Status:</label>
-            <select id="gea-status" name="gea_status">
-                <option value="Unknown">Unknown</option>
-                <option value="Gobriker">Gobriker</option>
-                <option value="Ecobricker">Ecobricker</option>
-                <option value="Trainer">Trainer</option>
-                <option value="Master Trainer">Master Trainer</option>
-            </select>
-
-            <label for="user-roles" style="margin-top: 10px;">User Roles:</label>
-            <select id="user-roles" name="user_roles">
-                <option value="Unknown">Unknown</option>
-                <option value="Ecobricker">Ecobricker</option>
-                <option value="Validator">Validator</option>
-                <option value="Moderator">Moderator</option>
-                <option value="Admin">Admin</option>
-            </select>
-
-            <label for="capabilities" style="margin-top: 10px;">Capabilities:</label>
-            <select id="capabilities" name="capabilities">
-                <option value="None">None</option>
-                <option value="Review users">Review users</option>
-                <option value="Review ecobricks">Review ecobricks</option>
-                <option value="Delete users">Delete users</option>
-                <option value="Delete ecobricks">Delete ecobricks</option>
-            </select>
-
-            <button type="button" style="margin-top: 20px;" class="btn save" onclick="saveUserRoles(${buwana_id})">Save</button>
-        </form>
-    `;
-
     // Fetch current user roles and populate the fields
     fetch(`../scripts/fetch_user_roles.php?buwana_id=${buwana_id}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                modalBox.innerHTML += `<p>${data.error}</p>`;
+                modalBox.innerHTML = `<p>${data.error}</p>`;
                 return;
             }
 
-            // Prepopulate dropdowns with the user's current values
-            document.getElementById('gea-status').value = data.gea_status || "Unknown";
-            document.getElementById('user-roles').value = data.user_roles || "Unknown";
-            document.getElementById('capabilities').value = data.capabilities || "None";
+            // Extract the data
+            const fullName = data.full_name || "Unknown";
+            const geaStatus = data.gea_status || "No GEA status set";
+            const userRoles = data.user_roles || "No role set";
+            const capabilities = data.capabilities || "No capabilities set";
+
+            // Generate the modal content
+            modalBox.innerHTML = `
+                <h3>Edit ${fullName}'s GoBrik Account</h3>
+
+                <h4>User Roles</h4>
+                <p>Currently set to ${userRoles}</p>
+                <select id="user-roles" name="user_roles">
+                    <option value="Unknown">Unknown</option>
+                    <option value="Ecobricker">Ecobricker</option>
+                    <option value="Validator">Validator</option>
+                    <option value="Moderator">Moderator</option>
+                    <option value="Admin">Admin</option>
+                </select>
+
+                <h4>GEA Status</h4>
+                <p>Currently set to ${geaStatus}</p>
+                <select id="gea-status" name="gea_status">
+                    <option value="Unknown">Unknown</option>
+                    <option value="Gobriker">Gobriker</option>
+                    <option value="Ecobricker">Ecobricker</option>
+                    <option value="Trainer">Trainer</option>
+                    <option value="Master Trainer">Master Trainer</option>
+                </select>
+
+                <h4>Capabilities</h4>
+                <p>Currently set to ${capabilities}</p>
+                <select id="capabilities" name="capabilities">
+                    <option value="None">None</option>
+                    <option value="Review users">Review users</option>
+                    <option value="Review ecobricks">Review ecobricks</option>
+                    <option value="Delete users">Delete users</option>
+                    <option value="Delete ecobricks">Delete ecobricks</option>
+                </select>
+
+                <a class="ecobrick-action-button" data-lang-id="000-save" onclick="saveUserRoles(${buwana_id})">💾 Save</a>
+            `;
         })
         .catch(error => {
-            modalBox.innerHTML += `<p>Error loading user roles: ${error.message}</p>`;
+            modalBox.innerHTML = `<p>Error loading user roles: ${error.message}</p>`;
         });
 
     // Display the modal
