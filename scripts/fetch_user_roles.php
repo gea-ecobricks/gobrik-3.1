@@ -1,14 +1,14 @@
 <?php
 require_once '../gobrikconn_env.php'; // Include database connection
 
-$buwana_id = $_GET['buwana_id'] ?? null;
+$ecobricker_id = $_GET['ecobricker_id'] ?? null;
 
-if (!$buwana_id || !is_numeric($buwana_id)) {
-    echo json_encode(['error' => 'Invalid Buwana ID']);
+if (!$ecobricker_id || !is_numeric($ecobricker_id)) {
+    echo json_encode(['error' => 'Invalid Ecobricker ID']);
     exit();
 }
 
-$sql = "SELECT full_name, gea_status, user_roles, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
+$sql = "SELECT full_name, gea_status, user_roles, user_capabilities FROM tb_ecobrickers WHERE ecobricker_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
 
 if (!$stmt) {
@@ -16,7 +16,7 @@ if (!$stmt) {
     exit();
 }
 
-$stmt->bind_param("i", $buwana_id);
+$stmt->bind_param("i", $ecobricker_id);
 $stmt->execute();
 $stmt->bind_result($full_name, $gea_status, $user_roles, $user_capabilities);
 $stmt->fetch();
@@ -30,6 +30,4 @@ echo json_encode([
 
 $stmt->close();
 $gobrik_conn->close();
-
-
 ?>

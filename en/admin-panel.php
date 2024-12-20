@@ -196,8 +196,7 @@ $gobrik_conn->close();
 
 
 
-
-function openUserRolesModal(buwana_id) {
+function openUserRolesModal(ecobricker_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
@@ -215,7 +214,7 @@ function openUserRolesModal(buwana_id) {
     modalBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
 
     // Fetch current user roles and populate the fields
-    fetch(`../scripts/fetch_user_roles.php?buwana_id=${buwana_id}`)
+    fetch(`../scripts/fetch_user_roles.php?ecobricker_id=${ecobricker_id}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -233,7 +232,7 @@ function openUserRolesModal(buwana_id) {
             modalBox.innerHTML = `
                 <h2 style="text-align:center;">Edit ${fullName}'s Account</h2>
 
-                <h4 style="margin-bottom: -10px;">User Roles</h4>
+                <p><b>User Roles</b></p>
                 <p style="font-size:1em">Currently set to ${userRoles}</p>
                 <select id="user-roles" name="user_roles" required>
                     <option value="" disabled selected>Change to...</option>
@@ -243,7 +242,7 @@ function openUserRolesModal(buwana_id) {
                     <option value="Admin">Admin</option>
                 </select>
 
-                <h4 style="margin-bottom: -10px;">GEA Status</h4>
+                <p><b>GEA Status</b></p>
                 <p style="font-size:1em">Currently set to ${geaStatus}</p>
                 <select id="gea-status" name="gea_status" required>
                     <option value="" disabled selected>Change to...</option>
@@ -253,7 +252,7 @@ function openUserRolesModal(buwana_id) {
                     <option value="Master Trainer">Master Trainer</option>
                 </select>
 
-                <h4 style="margin-bottom: -10px;">Capabilities</h4>
+                <p><b>Capabilities</b></p>
                 <p style="font-size:1em">Currently set to ${userCapabilities}</p>
                 <select id="capabilities" name="user_capabilities" required>
                     <option value="" disabled selected>Change to...</option>
@@ -266,14 +265,14 @@ function openUserRolesModal(buwana_id) {
             <br><br>
 
                 <a class="ecobrick-action-button" style="margin:auto;margin-top: 30px;
-  text-align: center;" data-lang-id="000-save" onclick="saveUserRoles(${buwana_id})">💾 Save</a>
+  text-align: center;" data-lang-id="000-save" onclick="saveUserRoles(${ecobricker_id})">💾 Save</a>
 
   <a class="ecobrick-action-button deleter-button" style="margin:auto;margin-top: 10px;
-  text-align: center;" data-lang-id="000-save" onclick="confirmDeleteUser(${buwana_id})">❌ Delete User</a>
+  text-align: center;" data-lang-id="000-save" onclick="confirmDeleteUser(${ecobricker_id})">❌ Delete User</a>
             `;
         })
         .catch(error => {
-            modalBox.innerHTML = `<p>Error loading user roles: ${error.message}</p>`;
+            modalBox.innerHTML += `<p>Error loading user roles: ${error.message}</p>`;
         });
 
     // Display the modal
