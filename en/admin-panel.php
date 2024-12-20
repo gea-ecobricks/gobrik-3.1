@@ -194,7 +194,6 @@ $(document).ready(function() {
 });
 
 
-
 function openUserRolesModal(buwana_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -229,31 +228,32 @@ function openUserRolesModal(buwana_id) {
 
             // Generate the modal content
             modalBox.innerHTML = `
-                <h3>Edit ${fullName}'s GoBrik Account</h3>
+                <p><b>Edit ${fullName}'s GoBrik Account</b></p>
 
-                <h4>User Roles</h4>
+                <p><b>User Roles</b></p>
                 <p>Currently set to ${userRoles}</p>
-                <select id="user-roles" name="user_roles">
-                    <option value="Unknown">Unknown</option>
+                <select id="user-roles" name="user_roles" required>
+                    <option value="" disabled selected>Change to...</option>
                     <option value="Ecobricker">Ecobricker</option>
                     <option value="Validator">Validator</option>
                     <option value="Moderator">Moderator</option>
                     <option value="Admin">Admin</option>
                 </select>
 
-                <h4>GEA Status</h4>
+                <p><b>GEA Status</b></p>
                 <p>Currently set to ${geaStatus}</p>
-                <select id="gea-status" name="gea_status">
-                    <option value="Unknown">Unknown</option>
+                <select id="gea-status" name="gea_status" required>
+                    <option value="" disabled selected>Change to...</option>
                     <option value="Gobriker">Gobriker</option>
                     <option value="Ecobricker">Ecobricker</option>
                     <option value="Trainer">Trainer</option>
                     <option value="Master Trainer">Master Trainer</option>
                 </select>
 
-                <h4>Capabilities</h4>
+                <p><b>Capabilities</b></p>
                 <p>Currently set to ${userCapabilities}</p>
-                <select id="capabilities" name="user_capabilities">
+                <select id="capabilities" name="user_capabilities" required>
+                    <option value="" disabled selected>Change to...</option>
                     <option value="None">None</option>
                     <option value="Review users">Review users</option>
                     <option value="Review ecobricks">Review ecobricks</option>
@@ -271,6 +271,7 @@ function openUserRolesModal(buwana_id) {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 function saveUserRoles(buwana_id) {
