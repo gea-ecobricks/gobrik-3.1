@@ -230,7 +230,7 @@ function openUserRolesModal(ecobricker_id) {
 
             // Define available capabilities
             const capabilitiesOptions = [
-                "None",
+
                 "Review users",
                 "Review ecobricks",
                 "Delete users",

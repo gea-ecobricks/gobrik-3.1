@@ -3,17 +3,17 @@ require_once '../gobrikconn_env.php'; // Include database connection
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-$buwana_id = $data['buwana_id'] ?? null;
+$ecobricker_id = $data['ecobricker_id'] ?? null;
 $gea_status = $data['gea_status'] ?? null;
 $user_roles = $data['user_roles'] ?? null;
 $capabilities = $data['capabilities'] ?? null;
 
-if (!$buwana_id || !is_numeric($buwana_id)) {
-    echo json_encode(['success' => false, 'error' => 'Invalid Buwana ID']);
+if (!$ecobricker_id || !is_numeric($ecobricker_id)) {
+    echo json_encode(['success' => false, 'error' => 'Invalid Ecobricker ID']);
     exit();
 }
 
-$sql = "UPDATE tb_ecobrickers SET gea_status = ?, user_roles = ?, capabilities = ? WHERE buwana_id = ?";
+$sql = "UPDATE tb_ecobrickers SET gea_status = ?, user_roles = ?, user_capabilities = ? WHERE ecobricker_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
 
 if (!$stmt) {
@@ -21,7 +21,7 @@ if (!$stmt) {
     exit();
 }
 
-$stmt->bind_param("sssi", $gea_status, $user_roles, $capabilities, $buwana_id);
+$stmt->bind_param("sssi", $gea_status, $user_roles, $capabilities, $ecobricker_id);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true]);
