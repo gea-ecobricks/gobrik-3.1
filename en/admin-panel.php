@@ -195,7 +195,6 @@ $gobrik_conn->close();
 });
 
 
-
 function openUserRolesModal(ecobricker_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -230,7 +229,6 @@ function openUserRolesModal(ecobricker_id) {
 
             // Define available capabilities
             const capabilitiesOptions = [
-
                 "Review users",
                 "Review ecobricks",
                 "Delete users",
@@ -245,20 +243,20 @@ function openUserRolesModal(ecobricker_id) {
                 <p style="font-size:1em; margin-bottom: 10px;">Currently set to ${userRoles}</p>
                 <select id="user-roles" name="user_roles" required style="width: 100%; padding: 10px; margin-bottom: 20px;">
                     <option value="" disabled selected>Change to...</option>
-                    <option value="Ecobricker">Ecobricker</option>
-                    <option value="Validator">Validator</option>
-                    <option value="Moderator">Moderator</option>
-                    <option value="Admin">Admin</option>
+                    <option value="Ecobricker" ${userRoles === "Ecobricker" ? "selected" : ""}>Ecobricker</option>
+                    <option value="Validator" ${userRoles === "Validator" ? "selected" : ""}>Validator</option>
+                    <option value="Moderator" ${userRoles === "Moderator" ? "selected" : ""}>Moderator</option>
+                    <option value="Admin" ${userRoles === "Admin" ? "selected" : ""}>Admin</option>
                 </select>
 
                 <p style="margin-top: 20px; font-weight: bold;">GEA Status</p>
                 <p style="font-size:1em; margin-bottom: 10px;">Currently set to ${geaStatus}</p>
                 <select id="gea-status" name="gea_status" required style="width: 100%; padding: 10px; margin-bottom: 20px;">
                     <option value="" disabled selected>Change to...</option>
-                    <option value="Gobriker">Gobriker</option>
-                    <option value="Ecobricker">Ecobricker</option>
-                    <option value="Trainer">Trainer</option>
-                    <option value="Master Trainer">Master Trainer</option>
+                    <option value="Gobriker" ${geaStatus === "Gobriker" ? "selected" : ""}>Gobriker</option>
+                    <option value="Ecobricker" ${geaStatus === "Ecobricker" ? "selected" : ""}>Ecobricker</option>
+                    <option value="Trainer" ${geaStatus === "Trainer" ? "selected" : ""}>Trainer</option>
+                    <option value="Master Trainer" ${geaStatus === "Master Trainer" ? "selected" : ""}>Master Trainer</option>
                 </select>
 
                 <p style="margin-top: 20px; font-weight: bold;">Capabilities</p>
@@ -289,6 +287,7 @@ function openUserRolesModal(ecobricker_id) {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 
