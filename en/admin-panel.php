@@ -237,9 +237,9 @@ function openUserRolesModal(ecobricker_id) {
 
             // Generate the modal content
             modalBox.innerHTML = `
-                <h2 style="text-align:center; font-size: 1.5em; margin-bottom: 20px;">Edit ${fullName}'s Account</h2>
+                <h3 style="text-align:center; font-size: 1.5em; margin-bottom: 20px;">Edit ${fullName}'s Account</h3>
 
-                <p style="margin-top: 20px; font-weight: bold;">User Roles</p>
+                <p style="margin-top: 20px; font-weight: bold;margin-bottom: -10px;">User Roles</p>
                 <p style="font-size:1em; margin-bottom: 10px;">Currently set to ${userRoles}</p>
                 <select id="user-roles" name="user_roles" required style="width: 100%; padding: 10px; margin-bottom: 20px;">
                     <option value="" disabled selected>Change to...</option>
@@ -249,7 +249,7 @@ function openUserRolesModal(ecobricker_id) {
                     <option value="Admin" ${userRoles === "Admin" ? "selected" : ""}>Admin</option>
                 </select>
 
-                <p style="margin-top: 20px; font-weight: bold;">GEA Status</p>
+                <p style="margin-top: 20px; font-weight: bold;margin-bottom: -10px;">GEA Status</p>
                 <p style="font-size:1em; margin-bottom: 10px;">Currently set to ${geaStatus}</p>
                 <select id="gea-status" name="gea_status" required style="width: 100%; padding: 10px; margin-bottom: 20px;">
                     <option value="" disabled selected>Change to...</option>
@@ -259,7 +259,7 @@ function openUserRolesModal(ecobricker_id) {
                     <option value="Master Trainer" ${geaStatus === "Master Trainer" ? "selected" : ""}>Master Trainer</option>
                 </select>
 
-                <p style="margin-top: 20px; font-weight: bold;">Capabilities</p>
+                <p style="margin-top: 20px; font-weight: bold;margin-bottom: -10px;">Capabilities</p>
                 <p style="font-size:1em; margin-bottom: 10px;">Currently set to: ${userCapabilities.join(', ') || "No capabilities set"}</p>
                 <div id="capabilities-options" style="margin-bottom: 20px;">
                     ${capabilitiesOptions
@@ -300,17 +300,28 @@ function saveUserRoles(ecobricker_id) {
         document.querySelectorAll('#capabilities-options input[type="checkbox"]:checked')
     ).map(checkbox => checkbox.value).join(','); // Combine values into a comma-separated string
 
+    // Prepare the data payload
+    const payload = {
+        ecobricker_id: ecobricker_id,
+        capabilities: selectedCapabilities, // Always send capabilities
+    };
+
+    // Only include `gea_status` if it's not set to "Change to..."
+    if (geaStatus !== "Change to...") {
+        payload.gea_status = geaStatus;
+    }
+
+    // Only include `user_roles` if it's not set to "Change to..."
+    if (userRoles !== "Change to...") {
+        payload.user_roles = userRoles;
+    }
+
     fetch(`../scripts/update_user_roles.php`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            ecobricker_id: ecobricker_id,
-            gea_status: geaStatus,
-            user_roles: userRoles,
-            capabilities: selectedCapabilities, // Send the selected capabilities as a string
-        }),
+        body: JSON.stringify(payload), // Send the payload with conditional fields
     })
         .then(response => response.json())
         .then(data => {
