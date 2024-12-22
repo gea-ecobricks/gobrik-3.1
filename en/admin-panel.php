@@ -292,12 +292,14 @@ function openUserRolesModal(ecobricker_id) {
 
 
 
-
-
-function saveUserRoles(buwana_id) {
+function saveUserRoles(ecobricker_id) {
     const geaStatus = document.getElementById('gea-status').value;
     const userRoles = document.getElementById('user-roles').value;
-    const capabilities = document.getElementById('capabilities').value;
+
+    // Collect selected capabilities from the checkboxes
+    const selectedCapabilities = Array.from(
+        document.querySelectorAll('#capabilities-options input[type="checkbox"]:checked')
+    ).map(checkbox => checkbox.value).join(','); // Combine values into a comma-separated string
 
     fetch(`../scripts/update_user_roles.php`, {
         method: 'POST',
@@ -305,10 +307,10 @@ function saveUserRoles(buwana_id) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            buwana_id: buwana_id,
+            ecobricker_id: ecobricker_id,
             gea_status: geaStatus,
             user_roles: userRoles,
-            capabilities: capabilities,
+            capabilities: selectedCapabilities, // Send the selected capabilities as a string
         }),
     })
         .then(response => response.json())
@@ -324,6 +326,7 @@ function saveUserRoles(buwana_id) {
             alert(`Error: ${error.message}`);
         });
 }
+
 
 
 function openEcobrickerModal(ecobricker_id) {
