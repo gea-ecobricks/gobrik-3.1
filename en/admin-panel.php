@@ -196,7 +196,6 @@ $gobrik_conn->close();
 
 
 
-
 function openUserRolesModal(ecobricker_id) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -227,7 +226,16 @@ function openUserRolesModal(ecobricker_id) {
             const fullName = data.full_name || "Unknown";
             const geaStatus = data.gea_status || "No GEA status set";
             const userRoles = data.user_roles || "No role set";
-            const userCapabilities = data.user_capabilities || "No capabilities set";
+            const userCapabilities = data.user_capabilities ? data.user_capabilities.split(',') : []; // Convert to array
+
+            // Define available capabilities
+            const capabilitiesOptions = [
+                "None",
+                "Review users",
+                "Review ecobricks",
+                "Delete users",
+                "Delete ecobricks"
+            ];
 
             // Generate the modal content
             modalBox.innerHTML = `
@@ -254,15 +262,20 @@ function openUserRolesModal(ecobricker_id) {
                 </select>
 
                 <p style="margin-top: 20px; font-weight: bold;">Capabilities</p>
-                <p style="font-size:1em; margin-bottom: 10px;">Currently set to ${userCapabilities}</p>
-                <select id="capabilities" name="user_capabilities" required style="width: 100%; padding: 10px; margin-bottom: 20px;">
-                    <option value="" disabled selected>Change to...</option>
-                    <option value="None">None</option>
-                    <option value="Review users">Review users</option>
-                    <option value="Review ecobricks">Review ecobricks</option>
-                    <option value="Delete users">Delete users</option>
-                    <option value="Delete ecobricks">Delete ecobricks</option>
-                </select>
+                <p style="font-size:1em; margin-bottom: 10px;">Currently set to: ${userCapabilities.join(', ') || "No capabilities set"}</p>
+                <div id="capabilities-options" style="margin-bottom: 20px;">
+                    ${capabilitiesOptions
+                        .map(
+                            (capability) =>
+                                `<label style="display: block; margin-bottom: 5px;">
+                                    <input type="checkbox" value="${capability}"
+                                    ${userCapabilities.includes(capability) ? "checked" : ""}
+                                    style="margin-right: 10px;">
+                                    ${capability}
+                                </label>`
+                        )
+                        .join('')}
+                </div>
 
                 <a class="ecobrick-action-button" style="margin:auto;margin-top: 30px; text-align: center;" data-lang-id="000-save" onclick="saveUserRoles(${ecobricker_id})">💾 Save</a>
 
@@ -276,6 +289,7 @@ function openUserRolesModal(ecobricker_id) {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 
