@@ -215,7 +215,7 @@ function openUserRolesModal(ecobricker_id) {
     modalBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
 
     // Fetch current user roles and populate the fields
-    fetch(`../scripts/fetch_user_roles.php?buwana_id=${buwana_id}`)
+    fetch(`../scripts/fetch_user_roles.php?ecobricker_id=${ecobricker_id}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -231,11 +231,11 @@ function openUserRolesModal(ecobricker_id) {
 
             // Generate the modal content
             modalBox.innerHTML = `
-                <h2 style="text-align:center;">Edit ${fullName}'s Account</h2>
+                <h2 style="text-align:center; font-size: 1.5em; margin-bottom: 20px;">Edit ${fullName}'s Account</h2>
 
-                <h4 style="margin-bottom: -10px;">User Roles</h4>
-                <p style="font-size:1em">Currently set to ${userRoles}</p>
-                <select id="user-roles" name="user_roles" required>
+                <p style="margin-top: 20px; font-weight: bold;">User Roles</p>
+                <p style="font-size:1em; margin-bottom: 10px;">Currently set to ${userRoles}</p>
+                <select id="user-roles" name="user_roles" required style="width: 100%; padding: 10px; margin-bottom: 20px;">
                     <option value="" disabled selected>Change to...</option>
                     <option value="Ecobricker">Ecobricker</option>
                     <option value="Validator">Validator</option>
@@ -243,9 +243,9 @@ function openUserRolesModal(ecobricker_id) {
                     <option value="Admin">Admin</option>
                 </select>
 
-                <h4 style="margin-bottom: -10px;">GEA Status</h4>
-                <p style="font-size:1em">Currently set to ${geaStatus}</p>
-                <select id="gea-status" name="gea_status" required>
+                <p style="margin-top: 20px; font-weight: bold;">GEA Status</p>
+                <p style="font-size:1em; margin-bottom: 10px;">Currently set to ${geaStatus}</p>
+                <select id="gea-status" name="gea_status" required style="width: 100%; padding: 10px; margin-bottom: 20px;">
                     <option value="" disabled selected>Change to...</option>
                     <option value="Gobriker">Gobriker</option>
                     <option value="Ecobricker">Ecobricker</option>
@@ -253,9 +253,9 @@ function openUserRolesModal(ecobricker_id) {
                     <option value="Master Trainer">Master Trainer</option>
                 </select>
 
-                <h4 style="margin-bottom: -10px;">Capabilities</h4>
-                <p style="font-size:1em">Currently set to ${userCapabilities}</p>
-                <select id="capabilities" name="user_capabilities" required>
+                <p style="margin-top: 20px; font-weight: bold;">Capabilities</p>
+                <p style="font-size:1em; margin-bottom: 10px;">Currently set to ${userCapabilities}</p>
+                <select id="capabilities" name="user_capabilities" required style="width: 100%; padding: 10px; margin-bottom: 20px;">
                     <option value="" disabled selected>Change to...</option>
                     <option value="None">None</option>
                     <option value="Review users">Review users</option>
@@ -263,22 +263,20 @@ function openUserRolesModal(ecobricker_id) {
                     <option value="Delete users">Delete users</option>
                     <option value="Delete ecobricks">Delete ecobricks</option>
                 </select>
-            <br><br>
 
-                <a class="ecobrick-action-button" style="margin:auto;margin-top: 30px;
-  text-align: center;" data-lang-id="000-save" onclick="saveUserRoles(${buwana_id})">💾 Save</a>
+                <a class="ecobrick-action-button" style="margin:auto;margin-top: 30px; text-align: center;" data-lang-id="000-save" onclick="saveUserRoles(${ecobricker_id})">💾 Save</a>
 
-  <a class="ecobrick-action-button deleter-button" style="margin:auto;margin-top: 10px;
-  text-align: center;" data-lang-id="000-save" onclick="confirmDeleteUser(${buwana_id})">❌ Delete User</a>
+                <a class="ecobrick-action-button deleter-button" style="margin:auto;margin-top: 10px; text-align: center;" data-lang-id="000-save" onclick="confirmDeleteUser(${ecobricker_id})">❌ Delete User</a>
             `;
         })
         .catch(error => {
-            modalBox.innerHTML = `<p>Error loading user roles: ${error.message}</p>`;
+            modalBox.innerHTML += `<p>Error loading user roles: ${error.message}</p>`;
         });
 
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 
