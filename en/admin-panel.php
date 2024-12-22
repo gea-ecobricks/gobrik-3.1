@@ -290,7 +290,6 @@ function openUserRolesModal(ecobricker_id) {
 
 
 
-
 function saveUserRoles(ecobricker_id) {
     const geaStatus = document.getElementById('gea-status').value;
     const userRoles = document.getElementById('user-roles').value;
@@ -327,7 +326,12 @@ function saveUserRoles(ecobricker_id) {
         .then(data => {
             if (data.success) {
                 alert("User roles updated successfully!");
-                closeInfoModal(); // Close the modal
+
+                // Close the modal
+                closeInfoModal();
+
+                // Reload the DataTable with the latest values
+                $('#newest-ecobrickers').DataTable().ajax.reload(null, false); // Keep the current page
             } else {
                 alert(`Error updating user roles: ${data.error}`);
             }
@@ -336,6 +340,7 @@ function saveUserRoles(ecobricker_id) {
             alert(`Error: ${error.message}`);
         });
 }
+
 
 
 
