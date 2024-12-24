@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $buwana_id = $buwana_conn->insert_id;
 
             // Prepare the SQL statement for inserting credential data into credentials_tb
-            $sql_credential = "INSERT INTO credentials_tb (buwana_id, credential_type, times_used, times_failed, last_login) VALUES (?, ?, 0, 0, ?)";
+            $sql_credential = "INSERT INTO credentials_tb (buwana_id, credential_type, times_used, failed_password_count, last_login) VALUES (?, ?, 0, 0, ?)";
             $stmt_credential = $buwana_conn->prepare($sql_credential);
 
             if ($stmt_credential) {
