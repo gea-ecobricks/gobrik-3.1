@@ -94,29 +94,49 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // PART 3: Update the Buwana user (only update email and password, not first_name)
-    $sql_update_user = "UPDATE users_tb SET email = ?, password_hash = ?, account_status = 'registered no login', last_login = NOW() WHERE buwana_id = ?";
-    $stmt_update_user = $buwana_conn->prepare($sql_update_user);
+    // PART 3: Update the Buwana user record. Add their credentials and add the connected app id (in this case GoBrik: 1)
+$sql_update_user = "UPDATE users_tb SET email = ?, password_hash = ?, account_status = 'signup_process run. Email unverified', last_login = NOW() WHERE buwana_id = ?";
+$stmt_update_user = $buwana_conn->prepare($sql_update_user);
 
-    if ($stmt_update_user) {
-        $stmt_update_user->bind_param("ssi", $credential_value, $password_hash, $buwana_id);
+if ($stmt_update_user) {
+    $stmt_update_user->bind_param("ssi", $credential_value, $password_hash, $buwana_id);
 
-        if ($stmt_update_user->execute()) {
-            // Now update the credentials_tb table for the user
-            $sql_update_credentials = "UPDATE credentials_tb SET credential_key = ?, credential_type = 'e-mail' WHERE buwana_id = ?";
-            $stmt_update_credentials = $buwana_conn->prepare($sql_update_credentials);
-            if ($stmt_update_credentials) {
-                $stmt_update_credentials->bind_param("si", $credential_value, $buwana_id);
-                $stmt_update_credentials->execute();
-                $stmt_update_credentials->close();
-            } else {
-                $response['error'] = 'db_error_credentials';
-                echo json_encode($response);
-                ob_end_clean();
-                exit();
-            }
+    if ($stmt_update_user->execute()) {
+        // Update connected_app_ids to include GoBrik (app_id: 1)
+        $sql_update_connected_apps = "UPDATE users_tb
+                                      SET connected_app_ids =
+                                      CASE
+                                        WHEN connected_app_ids IS NULL OR connected_app_ids = ''
+                                        THEN '1'
+                                        ELSE CONCAT(connected_app_ids, ',1')
+                                      END
+                                      WHERE buwana_id = ?";
+        $stmt_update_connected_apps = $buwana_conn->prepare($sql_update_connected_apps);
 
-            // Now create the Ecobricker account in GoBrik
+        if ($stmt_update_connected_apps) {
+            $stmt_update_connected_apps->bind_param("i", $buwana_id);
+            $stmt_update_connected_apps->execute();
+            $stmt_update_connected_apps->close();
+        } else {
+            sendJsonError('db_error_connected_apps_update');
+        }
+
+        // Now update the credentials_tb table for the user
+        $sql_update_credentials = "UPDATE credentials_tb SET credential_key = ?, credential_type = 'e-mail' WHERE buwana_id = ?";
+        $stmt_update_credentials = $buwana_conn->prepare($sql_update_credentials);
+        if ($stmt_update_credentials) {
+            $stmt_update_credentials->bind_param("si", $credential_value, $buwana_id);
+            $stmt_update_credentials->execute();
+            $stmt_update_credentials->close();
+        } else {
+            $response['error'] = 'db_error_credentials';
+            echo json_encode($response);
+            ob_end_clean();
+            exit();
+        }
+
+
+            // PART 4.  Now create the Ecobricker account in GoBrik
             $sql_create_ecobricker = "INSERT INTO tb_ecobrickers
             (first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
             VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
