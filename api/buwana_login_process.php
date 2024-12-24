@@ -10,7 +10,7 @@ $allowed_origins = [
     'http://0.0.0.0:8000'      // Local test server
 ];
 
-// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
+// PArt 0: Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
 // Check if the origin is in the allowed list
@@ -68,57 +68,59 @@ try {
         $stmt_credential->fetch();
         $stmt_credential->close();
 
-        // Retrieve user details: first_name, continent_code, location_full
-        $sql_user = "SELECT password_hash, first_name, continent_code, location_full FROM users_tb WHERE buwana_id = ?";
-        $stmt_user = $buwana_conn->prepare($sql_user);
+        // Part 3: Retrieve user details: first_name, continent_code, location_full, and connected_apps
+$sql_user = "SELECT password_hash, first_name, continent_code, location_full, connected_app_ids FROM users_tb WHERE buwana_id = ?";
+$stmt_user = $buwana_conn->prepare($sql_user);
 
-        if (!$stmt_user) {
-            throw new Exception('Error preparing statement for users_tb: ' . $buwana_conn->error);
+if (!$stmt_user) {
+    throw new Exception('Error preparing statement for users_tb: ' . $buwana_conn->error);
+}
+
+$stmt_user->bind_param('i', $buwana_id);
+$stmt_user->execute();
+$stmt_user->store_result();
+
+if ($stmt_user->num_rows === 1) {
+    $stmt_user->bind_result($password_hash, $first_name, $continent_code, $location_full, $connected_app_ids);
+    $stmt_user->fetch();
+
+    // Verify the password entered by the user
+    if (password_verify($password, $password_hash)) {
+        // PART 4: Update last_login and login_count
+        $sql_update_user = "UPDATE users_tb SET last_login = NOW(), login_count = login_count + 1 WHERE buwana_id = ?";
+        $stmt_update_user = $buwana_conn->prepare($sql_update_user);
+        if ($stmt_update_user) {
+            $stmt_update_user->bind_param('i', $buwana_id);
+            $stmt_update_user->execute();
+            $stmt_update_user->close();
         }
 
-        $stmt_user->bind_param('i', $buwana_id);
-        $stmt_user->execute();
-        $stmt_user->store_result();
+        // PART 4: Respond with success and user details, including connected_apps
+        echo json_encode([
+            'success' => true,
+            'message' => 'Login successful',
+            'buwana_id' => $buwana_id,
+            'first_name' => $first_name,
+            'continent_code' => $continent_code,
+            'location_full' => $location_full,
+            'connected_apps' => $connected_app_ids // Include connected_apps in the response
+        ]);
+        exit();
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid password'
+        ]);
+        exit();
+    }
+} else {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Invalid user'
+    ]);
+    exit();
+}
 
-        if ($stmt_user->num_rows === 1) {
-            $stmt_user->bind_result($password_hash, $first_name, $continent_code, $location_full);
-            $stmt_user->fetch();
-
-            // Verify the password entered by the user
-            if (password_verify($password, $password_hash)) {
-                // PART 4: Update last_login and login_count
-                $sql_update_user = "UPDATE users_tb SET last_login = NOW(), login_count = login_count + 1 WHERE buwana_id = ?";
-                $stmt_update_user = $buwana_conn->prepare($sql_update_user);
-                if ($stmt_update_user) {
-                    $stmt_update_user->bind_param('i', $buwana_id);
-                    $stmt_update_user->execute();
-                    $stmt_update_user->close();
-                }
-
-                // Respond with success and user details
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Login successful',
-                    'buwana_id' => $buwana_id,
-                    'first_name' => $first_name,
-                    'continent_code' => $continent_code,
-                    'location_full' => $location_full
-                ]);
-                exit();
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Invalid password'
-                ]);
-                exit();
-            }
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Invalid user'
-            ]);
-            exit();
-        }
     } else {
         echo json_encode([
             'success' => false,
@@ -135,3 +137,4 @@ try {
 } finally {
     $buwana_conn->close();
 }
+?>
