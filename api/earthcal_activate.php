@@ -87,7 +87,7 @@ try {
     }
 
   $stmt_insert_earthcal->bind_param(
-    "isssssiiiiissddii",
+    "isssssisiisssddisiisisi",
     $user_data['buwana_id'],                 // INT
     $user_data['first_name'],               // VARCHAR
     $user_data['last_name'],                // VARCHAR
@@ -103,7 +103,14 @@ try {
     $user_data['location_watershed'],       // VARCHAR
     $user_data['location_lat'],             // DECIMAL
     $user_data['location_long'],            // DECIMAL
-    $user_data['community_id']              // INT (nullable)
+    $user_data['community_id'],              // INT (nullable)
+    $user_data['account_status'],          // var
+    $user_data['created_at'],              // date
+    $user_data['last_login'],              // date
+    $user_data['role'],              // varchar
+    $user_data['terms_of_service'],  //inter
+    $user_data['notes'],              // varchar
+    $user_data['login_count'],              // int
 );
 
 
