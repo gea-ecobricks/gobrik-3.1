@@ -6,8 +6,6 @@ $allowed_origins = [
     'https://cycles.earthen.io',
     'https://ecobricks.org',
     'https://gobrik.com',
-    'http://localhost:8000',   // Localhost
-    'http://0.0.0.0:8000'      // Local test server
 ];
 
 // PArt 0: Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
