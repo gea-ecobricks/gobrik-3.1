@@ -73,21 +73,25 @@ try {
     $user_data = $result->fetch_assoc();
     $stmt_get_user->close();
 
-    // Step 2: Insert user data into EarthCal database
-    $sql_insert_earthcal = "INSERT INTO users_tb (buwana_id, first_name, last_name, full_name, email,
-        profile_pic, country_id, language_id, earthen_newsletter_join, birth_date, continent_code,
-        location_full, location_watershed, location_lat, location_long, community_id, account_status,
-        created_at, last_login, role, terms_of_service, notes, login_count)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW(), 'user', 1,
-        'account activate, no sync', 1)";
-    $stmt_insert_earthcal = $cal_conn->prepare($sql_insert_earthcal);
+   // Step 2: Insert user data into EarthCal database
+$sql_insert_earthcal = "INSERT INTO users_tb (
+    buwana_id, first_name, last_name, full_name, email, profile_pic, country_id, language_id,
+    earthen_newsletter_join, birth_date, continent_code, location_full, location_watershed,
+    location_lat, location_long, community_id, account_status, created_at, last_login, role,
+    terms_of_service, notes, login_count
+) VALUES (
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW(), 'user', 1,
+    'account activate, no sync', 1
+)";
+$stmt_insert_earthcal = $cal_conn->prepare($sql_insert_earthcal);
 
-    if (!$stmt_insert_earthcal) {
-        throw new Exception("Error preparing EarthCal insert statement: " . $cal_conn->error);
-    }
+if (!$stmt_insert_earthcal) {
+    throw new Exception("Error preparing EarthCal insert statement: " . $cal_conn->error);
+}
 
-  $stmt_insert_earthcal->bind_param(
-    "isssssisiisssddisiisisi",
+// Bind the parameters for the fields that need to be passed
+$stmt_insert_earthcal->bind_param(
+    "isssssisiisssddii",
     $user_data['buwana_id'],                 // INT
     $user_data['first_name'],               // VARCHAR
     $user_data['last_name'],                // VARCHAR
@@ -103,15 +107,9 @@ try {
     $user_data['location_watershed'],       // VARCHAR
     $user_data['location_lat'],             // DECIMAL
     $user_data['location_long'],            // DECIMAL
-    $user_data['community_id'],              // INT (nullable)
-    $user_data['account_status'],          // var
-    $user_data['created_at'],              // date
-    $user_data['last_login'],              // date
-    $user_data['role'],              // varchar
-    $user_data['terms_of_service'],  //inter
-    $user_data['notes'],              // varchar
-    $user_data['login_count'],              // int
+    $user_data['community_id']              // INT (nullable)
 );
+
 
 
     if (!$stmt_insert_earthcal->execute()) {
