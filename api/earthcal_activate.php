@@ -91,7 +91,7 @@ if (!$stmt_insert_earthcal) {
 
 // Bind the parameters for the fields that need to be passed
 $stmt_insert_earthcal->bind_param(
-    "isssssisiisssddii",
+    "isssssisiisssddi",
     $user_data['buwana_id'],                 // INT
     $user_data['first_name'],               // VARCHAR
     $user_data['last_name'],                // VARCHAR
