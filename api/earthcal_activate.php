@@ -86,25 +86,26 @@ try {
         throw new Exception("Error preparing EarthCal insert statement: " . $cal_conn->error);
     }
 
-    $stmt_insert_earthcal->bind_param(
-        "isssssisisdssddii",
-        $user_data['buwana_id'],
-        $user_data['first_name'],
-        $user_data['last_name'],
-        $user_data['full_name'],
-        $user_data['email'],
-        $user_data['profile_pic'],
-        $user_data['country_id'],
-        $user_data['language_id'],
-        $user_data['earthen_newsletter_join'],
-        $user_data['birth_date'],
-        $user_data['continent_code'],
-        $user_data['location_full'],
-        $user_data['location_watershed'],
-        $user_data['location_lat'],
-        $user_data['location_long'],
-        $user_data['community_id']
-    );
+  $stmt_insert_earthcal->bind_param(
+    "isssssiiiiissddii",
+    $user_data['buwana_id'],                 // INT
+    $user_data['first_name'],               // VARCHAR
+    $user_data['last_name'],                // VARCHAR
+    $user_data['full_name'],                // VARCHAR
+    $user_data['email'],                    // VARCHAR
+    $user_data['profile_pic'],              // VARCHAR
+    $user_data['country_id'],               // INT (nullable)
+    $user_data['language_id'],              // VARCHAR
+    $user_data['earthen_newsletter_join'],  // TINYINT
+    $user_data['birth_date'],               // DATE
+    $user_data['continent_code'],           // VARCHAR
+    $user_data['location_full'],            // VARCHAR
+    $user_data['location_watershed'],       // VARCHAR
+    $user_data['location_lat'],             // DECIMAL
+    $user_data['location_long'],            // DECIMAL
+    $user_data['community_id']              // INT (nullable)
+);
+
 
     if (!$stmt_insert_earthcal->execute()) {
         throw new Exception("Error inserting user into EarthCal database: " . $stmt_insert_earthcal->error);
