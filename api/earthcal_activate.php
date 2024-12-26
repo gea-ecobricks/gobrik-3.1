@@ -5,17 +5,15 @@ header('Content-Type: application/json');
 require_once '../buwanaconn_env.php'; // Buwana database connection
 require_once '../calconn_env.php';   // EarthCal database connection
 
-
 $allowed_origins = [
     'https://cycles.earthen.io',
     'https://ecobricks.org',
     'https://gobrik.com',
 ];
 
-// PArt 0: Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
+// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
-// Check if the origin is in the allowed list
 if ($origin && in_array($origin, $allowed_origins)) {
     header('Access-Control-Allow-Origin: ' . $origin);
     header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -23,7 +21,6 @@ if ($origin && in_array($origin, $allowed_origins)) {
     header('Access-Control-Allow-Credentials: true');
 } else {
     error_log('CORS error: Invalid or missing HTTP_ORIGIN - ' . $origin);
-    // Do not send the headers for invalid origins
     header('HTTP/1.1 403 Forbidden');
     echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
     exit();
@@ -34,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
-    exit(0); // Stop execution for preflight
+    exit(0);
 }
 
 $response = ['success' => false];
@@ -45,7 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit();
 }
 
-// Get the Buwana ID from the request
 $input = json_decode(file_get_contents('php://input'), true);
 $buwana_id = $input['buwana_id'] ?? null;
 
@@ -73,44 +69,31 @@ try {
     $user_data = $result->fetch_assoc();
     $stmt_get_user->close();
 
-   // Step 2: Insert user data into EarthCal database
-$sql_insert_earthcal = "INSERT INTO users_tb (
-    buwana_id, first_name, last_name, full_name, email, profile_pic, country_id, language_id,
-    earthen_newsletter_join, birth_date, continent_code, location_full, location_watershed,
-    location_lat, location_long, community_id, account_status, created_at, last_login, role,
-    terms_of_service, notes, login_count
-) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW(), 'user', 1,
-    'account activate, no sync', 1
-)";
-$stmt_insert_earthcal = $cal_conn->prepare($sql_insert_earthcal);
+    // Step 2: Insert user data into EarthCal database
+    $sql_insert_earthcal = "INSERT INTO users_tb (
+        buwana_id, first_name, last_name, full_name, email, profile_pic, country_id, language_id,
+        earthen_newsletter_join, birth_date, continent_code, location_full, location_watershed,
+        location_lat, location_long, community_id, account_status, created_at, last_login, role,
+        terms_of_service, notes, login_count
+    ) VALUES (
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW(), 'user', 1,
+        'account activate, no sync', 1
+    )";
+    $stmt_insert_earthcal = $cal_conn->prepare($sql_insert_earthcal);
 
-if (!$stmt_insert_earthcal) {
-    throw new Exception("Error preparing EarthCal insert statement: " . $cal_conn->error);
-}
+    if (!$stmt_insert_earthcal) {
+        throw new Exception("Error preparing EarthCal insert statement: " . $cal_conn->error);
+    }
 
-// Bind the parameters for the fields that need to be passed
-$stmt_insert_earthcal->bind_param(
-    "isssssisiisssddi",
-    $user_data['buwana_id'],                 // INT
-    $user_data['first_name'],               // VARCHAR
-    $user_data['last_name'],                // VARCHAR
-    $user_data['full_name'],                // VARCHAR
-    $user_data['email'],                    // VARCHAR
-    $user_data['profile_pic'],              // VARCHAR
-    $user_data['country_id'],               // INT (nullable)
-    $user_data['language_id'],              // VARCHAR
-    $user_data['earthen_newsletter_join'],  // TINYINT
-    $user_data['birth_date'],               // DATE
-    $user_data['continent_code'],           // VARCHAR
-    $user_data['location_full'],            // VARCHAR
-    $user_data['location_watershed'],       // VARCHAR
-    $user_data['location_lat'],             // DECIMAL
-    $user_data['location_long'],            // DECIMAL
-    $user_data['community_id']              // INT (nullable)
-);
-
-
+    $stmt_insert_earthcal->bind_param(
+        "isssssisiisssddi",
+        $user_data['buwana_id'], $user_data['first_name'], $user_data['last_name'],
+        $user_data['full_name'], $user_data['email'], $user_data['profile_pic'],
+        $user_data['country_id'], $user_data['language_id'], $user_data['earthen_newsletter_join'],
+        $user_data['birth_date'], $user_data['continent_code'], $user_data['location_full'],
+        $user_data['location_watershed'], $user_data['location_lat'], $user_data['location_long'],
+        $user_data['community_id']
+    );
 
     if (!$stmt_insert_earthcal->execute()) {
         throw new Exception("Error inserting user into EarthCal database: " . $stmt_insert_earthcal->error);
@@ -132,9 +115,14 @@ $stmt_insert_earthcal->bind_param(
     }
     $stmt_update_buwana->close();
 
-    // Success response
+    // Part 4: Success response with user data
     $response['success'] = true;
     $response['message'] = 'EarthCal account activated successfully.';
+    $response['user_data'] = [
+        'first_name' => $user_data['first_name'],
+        'continent_code' => $user_data['continent_code'],
+        'location_full' => $user_data['location_full']
+    ];
 } catch (Exception $e) {
     $response['message'] = $e->getMessage();
 } finally {
