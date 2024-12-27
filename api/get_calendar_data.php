@@ -56,35 +56,36 @@ if (empty($buwana_id) || !is_numeric($buwana_id)) {
 
 try {
     if (!empty($calendar_name)) {
-        // Fetch data for the specific calendar "My Calendar"
-        $sql = "SELECT events_json_blob, last_updated
-                FROM calendars_tb
-                WHERE buwana_id = ? AND calendar_name = ?";
-        $stmt = $cal_conn->prepare($sql);
+    // Fetch data for the specific calendar "My Calendar"
+    $sql = "SELECT events_json_blob, last_updated
+            FROM calendars_tb
+            WHERE buwana_id = ? AND calendar_name = ?";
+    $stmt = $cal_conn->prepare($sql);
 
-        if (!$stmt) {
-            throw new Exception("Database error: " . $cal_conn->error);
-        }
+    if (!$stmt) {
+        throw new Exception("Database error: " . $cal_conn->error);
+    }
 
-        $stmt->bind_param("is", $buwana_id, $calendar_name);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    $stmt->bind_param("is", $buwana_id, $calendar_name);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        if ($result->num_rows === 0) {
-            throw new Exception("No calendar found for the specified user and calendar name.");
-        }
+    if ($result->num_rows === 0) {
+        throw new Exception("No calendar found for the specified user and calendar name.");
+    }
 
-        $calendar_data = $result->fetch_assoc();
-        $stmt->close();
+    $calendar_data = $result->fetch_assoc();
+    $stmt->close();
 
-        // Prepare response for single calendar
-        $response['success'] = true;
-        $response['message'] = 'Calendar data retrieved successfully.';
-        $response['data'] = [
-            'events_json_blob' => json_decode($calendar_data['events_json_blob'], true), // Decode JSON blob
-            'last_updated' => $calendar_data['last_updated']
-        ];
-    } else {
+    // Prepare response for single calendar
+    $response['success'] = true;
+    $response['message'] = 'Calendar data retrieved successfully.';
+    $response['data'] = [
+        'events_json_blob' => $calendar_data['events_json_blob'] ? json_decode($calendar_data['events_json_blob'], true) : [], // Handle NULL case
+        'last_updated' => $calendar_data['last_updated']
+    ];
+}
+ else {
         // Fetch all calendars for the user (currently redundant but preserved for flexibility)
         $sql = "SELECT calendar_name, last_updated, calendar_color, calendar_public
                 FROM calendars_tb
