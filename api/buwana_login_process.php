@@ -1,6 +1,7 @@
 <?php
 require_once '../earthenAuth_helper.php';
 require_once '../buwanaconn_env.php';
+require_once '../calconn_env.php'; // EarthCal database connection for calendar data
 
 $allowed_origins = [
     'https://cycles.earthen.io',
@@ -8,10 +9,9 @@ $allowed_origins = [
     'https://gobrik.com',
 ];
 
-// PArt 0: Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
+// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
-// Check if the origin is in the allowed list
 if ($origin && in_array($origin, $allowed_origins)) {
     header('Access-Control-Allow-Origin: ' . $origin);
     header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -19,7 +19,6 @@ if ($origin && in_array($origin, $allowed_origins)) {
     header('Access-Control-Allow-Credentials: true');
 } else {
     error_log('CORS error: Invalid or missing HTTP_ORIGIN - ' . $origin);
-    // Do not send the headers for invalid origins
     header('HTTP/1.1 403 Forbidden');
     echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
     exit();
@@ -30,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
-    exit(0); // Stop execution for preflight
+    exit(0);
 }
 
 startSecureSession();
@@ -66,59 +65,79 @@ try {
         $stmt_credential->fetch();
         $stmt_credential->close();
 
-        // Part 3: Retrieve user details: first_name, continent_code, location_full, and connected_apps
-$sql_user = "SELECT password_hash, first_name, continent_code, location_full, connected_app_ids FROM users_tb WHERE buwana_id = ?";
-$stmt_user = $buwana_conn->prepare($sql_user);
+        // PART 3: Retrieve user details: first_name, continent_code, location_full, connected_apps, and last_sync_ts
+        $sql_user = "SELECT password_hash, first_name, continent_code, location_full, connected_app_ids, last_sync_ts FROM users_tb WHERE buwana_id = ?";
+        $stmt_user = $buwana_conn->prepare($sql_user);
 
-if (!$stmt_user) {
-    throw new Exception('Error preparing statement for users_tb: ' . $buwana_conn->error);
-}
-
-$stmt_user->bind_param('i', $buwana_id);
-$stmt_user->execute();
-$stmt_user->store_result();
-
-if ($stmt_user->num_rows === 1) {
-    $stmt_user->bind_result($password_hash, $first_name, $continent_code, $location_full, $connected_app_ids);
-    $stmt_user->fetch();
-
-    // Verify the password entered by the user
-    if (password_verify($password, $password_hash)) {
-        // PART 4: Update last_login and login_count
-        $sql_update_user = "UPDATE users_tb SET last_login = NOW(), login_count = login_count + 1 WHERE buwana_id = ?";
-        $stmt_update_user = $buwana_conn->prepare($sql_update_user);
-        if ($stmt_update_user) {
-            $stmt_update_user->bind_param('i', $buwana_id);
-            $stmt_update_user->execute();
-            $stmt_update_user->close();
+        if (!$stmt_user) {
+            throw new Exception('Error preparing statement for users_tb: ' . $buwana_conn->error);
         }
 
-        // PART 4: Respond with success and user details, including connected_apps
-        echo json_encode([
-            'success' => true,
-            'message' => 'Login successful',
-            'buwana_id' => $buwana_id,
-            'first_name' => $first_name,
-            'continent_code' => $continent_code,
-            'location_full' => $location_full,
-            'connected_apps' => $connected_app_ids // Include connected_apps in the response
-        ]);
-        exit();
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Invalid password'
-        ]);
-        exit();
-    }
-} else {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Invalid user'
-    ]);
-    exit();
-}
+        $stmt_user->bind_param('i', $buwana_id);
+        $stmt_user->execute();
+        $stmt_user->store_result();
 
+        if ($stmt_user->num_rows === 1) {
+            $stmt_user->bind_result($password_hash, $first_name, $continent_code, $location_full, $connected_app_ids, $last_sync_ts);
+            $stmt_user->fetch();
+
+            // Verify the password entered by the user
+            if (password_verify($password, $password_hash)) {
+                // PART 4: Fetch user's calendar names from EarthCal database
+                $sql_calendars = "SELECT calendar_name FROM calendars_tb WHERE buwana_id = ?";
+                $stmt_calendars = $cal_conn->prepare($sql_calendars);
+
+                if (!$stmt_calendars) {
+                    throw new Exception('Error preparing statement for calendars_tb: ' . $cal_conn->error);
+                }
+
+                $stmt_calendars->bind_param('i', $buwana_id);
+                $stmt_calendars->execute();
+                $result_calendars = $stmt_calendars->get_result();
+
+                $calendar_names = [];
+                while ($row = $result_calendars->fetch_assoc()) {
+                    $calendar_names[] = $row['calendar_name'];
+                }
+
+                $stmt_calendars->close();
+
+                // PART 5: Update last_login and login_count
+                $sql_update_user = "UPDATE users_tb SET last_login = NOW(), login_count = login_count + 1 WHERE buwana_id = ?";
+                $stmt_update_user = $buwana_conn->prepare($sql_update_user);
+                if ($stmt_update_user) {
+                    $stmt_update_user->bind_param('i', $buwana_id);
+                    $stmt_update_user->execute();
+                    $stmt_update_user->close();
+                }
+
+                // PART 6: Respond with success and user details, including connected_apps and calendar names
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Login successful',
+                    'buwana_id' => $buwana_id,
+                    'first_name' => $first_name,
+                    'continent_code' => $continent_code,
+                    'location_full' => $location_full,
+                    'connected_apps' => $connected_app_ids,
+                    'last_sync_ts' => $last_sync_ts,
+                    'calendars' => $calendar_names
+                ]);
+                exit();
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid password'
+                ]);
+                exit();
+            }
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid user'
+            ]);
+            exit();
+        }
     } else {
         echo json_encode([
             'success' => false,
@@ -134,5 +153,6 @@ if ($stmt_user->num_rows === 1) {
     exit();
 } finally {
     $buwana_conn->close();
+    $cal_conn->close();
 }
 ?>
