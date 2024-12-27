@@ -4,6 +4,36 @@ header('Content-Type: application/json');
 // Include the database connection for the EarthCal database
 require_once '../calconn_env.php';
 
+
+$allowed_origins = [
+    'https://cycles.earthen.io',
+    'https://ecobricks.org',
+    'https://gobrik.com',
+];
+
+// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
+
+if ($origin && in_array($origin, $allowed_origins)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+} else {
+    error_log('CORS error: Invalid or missing HTTP_ORIGIN - ' . $origin);
+    header('HTTP/1.1 403 Forbidden');
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
+    exit();
+}
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+    exit(0);
+}
+
 $response = ['success' => false];
 
 // Check the request method
