@@ -56,7 +56,7 @@ if (empty($buwana_id) || !is_numeric($buwana_id)) {
 
 try {
     if (!empty($calendar_name)) {
-        // Fetch data for a specific calendar
+        // Fetch data for the specific calendar "My Calendar"
         $sql = "SELECT events_json_blob, last_updated
                 FROM calendars_tb
                 WHERE buwana_id = ? AND calendar_name = ?";
@@ -85,7 +85,7 @@ try {
             'last_updated' => $calendar_data['last_updated']
         ];
     } else {
-        // Fetch all calendars for the user
+        // Fetch all calendars for the user (currently redundant but preserved for flexibility)
         $sql = "SELECT calendar_name, last_updated, calendar_color, calendar_public
                 FROM calendars_tb
                 WHERE buwana_id = ?";
