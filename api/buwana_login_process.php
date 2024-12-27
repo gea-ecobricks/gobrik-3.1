@@ -7,6 +7,10 @@ $allowed_origins = [
     'https://cycles.earthen.io',
     'https://ecobricks.org',
     'https://gobrik.com',
+    'http://localhost', // Allow localhost
+    'http://127.0.0.1', // Allow loopback address
+    'http://localhost:8000', // Allow specific localhost ports (adjust as needed)
+    'http://127.0.0.1:8000'
 ];
 
 // Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)

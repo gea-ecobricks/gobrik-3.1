@@ -1,22 +1,31 @@
 <?php
+require_once '../earthenAuth_helper.php';
+require_once '../buwanaconn_env.php';
+require_once '../calconn_env.php'; // Include EarthCal database connection
 
 $allowed_origins = [
     'https://cycles.earthen.io',
     'https://ecobricks.org',
-    'http://localhost:8000',  // Localhost
-    'http://0.0.0.0:8000'     // Local test server
+    'https://gobrik.com',
+    'http://localhost', // Allow localhost
+    'http://127.0.0.1', // Allow loopback address
+    'http://localhost:8000', // Allow specific localhost ports (adjust as needed)
+    'http://127.0.0.1:8000'
 ];
 
-// CORS headers
-if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
-    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
+
+if ($origin && in_array($origin, $allowed_origins)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
 } else {
-    // Fallback for debugging in local environments
-    header('Access-Control-Allow-Origin: *'); // DEBUG ONLY, REMOVE IN PRODUCTION
-    error_log('CORS error: Missing or invalid HTTP_ORIGIN');
+    error_log('CORS error: Invalid or missing HTTP_ORIGIN - ' . $origin);
+    header('HTTP/1.1 403 Forbidden');
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
+    exit();
 }
 
 // Handle preflight requests
