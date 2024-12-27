@@ -100,11 +100,30 @@ try {
     }
     $stmt_insert_earthcal->close();
 
-    // Step 3: Update connected_app_ids in Buwana database
+    // Step 3: Create default calendar for the user
+    $sql_create_calendar = "INSERT INTO calendars_tb (
+        buwana_id, calendar_name, calendar_created, last_updated, calendar_color, calendar_public
+    ) VALUES (
+        ?, 'My Calendar', NOW(), NOW(), 'blue', 0
+    )";
+    $stmt_create_calendar = $cal_conn->prepare($sql_create_calendar);
+
+    if (!$stmt_create_calendar) {
+        throw new Exception("Error preparing calendar creation statement: " . $cal_conn->error);
+    }
+
+    $stmt_create_calendar->bind_param("i", $buwana_id);
+
+    if (!$stmt_create_calendar->execute()) {
+        throw new Exception("Error creating default calendar for user: " . $stmt_create_calendar->error);
+    }
+    $stmt_create_calendar->close();
+
+    // Step 4: Update connected_app_ids in Buwana database
     $sql_update_buwana = "UPDATE users_tb SET connected_app_ids =
         CASE
-            WHEN connected_app_ids IS NULL OR connected_app_ids = '' THEN '0002'
-            ELSE CONCAT(connected_app_ids, ',0002')
+            WHEN connected_app_ids IS NULL OR connected_app_ids = '' THEN '00002'
+            ELSE CONCAT(connected_app_ids, ',00002')
         END
         WHERE buwana_id = ?";
     $stmt_update_buwana = $buwana_conn->prepare($sql_update_buwana);
@@ -115,7 +134,7 @@ try {
     }
     $stmt_update_buwana->close();
 
-    // Part 4: Success response with user data
+    // Part 5: Success response with user data
     $response['success'] = true;
     $response['message'] = 'EarthCal account activated successfully.';
     $response['user_data'] = [
