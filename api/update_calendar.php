@@ -46,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
+
 $response = ['success' => false];
 
 // Check the request method
@@ -107,9 +108,28 @@ try {
 
     $stmt->close();
 
-    // Step 3: Return success response
+    // Step 3: Update the user's last_sync_ts in the users_tb table
+    $sql_update_user = "UPDATE users_tb
+                        SET last_sync_ts = NOW()
+                        WHERE buwana_id = ?";
+    $stmt_user = $cal_conn->prepare($sql_update_user);
+
+    if (!$stmt_user) {
+        throw new Exception("Database error: " . $cal_conn->error);
+    }
+
+    $stmt_user->bind_param("i", $buwana_id);
+    $stmt_user->execute();
+
+    if ($stmt_user->affected_rows === 0) {
+        throw new Exception("Failed to update the user's last_sync_ts.");
+    }
+
+    $stmt_user->close();
+
+    // Step 4: Return success response
     $response['success'] = true;
-    $response['message'] = 'Calendar updated successfully.';
+    $response['message'] = 'Calendar and last sync timestamp updated successfully.';
     $response['last_updated'] = date('Y-m-d H:i:s');
 } catch (Exception $e) {
     $response['message'] = $e->getMessage();
@@ -121,4 +141,5 @@ try {
 // Output the JSON response
 echo json_encode($response);
 exit();
+
 ?>
