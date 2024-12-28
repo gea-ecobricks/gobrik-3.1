@@ -1,10 +1,50 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-session_start();
-require_once '../buwanaconn_env.php'; // Ensure this path is correct and the file exists
-require_once '../gobrikconn_env.php'; // Include GoBrik connection
+require_once '../earthenAuth_helper.php';
+require_once '../buwanaconn_env.php';
+require_once '../calconn_env.php'; // Include EarthCal database connection
 
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING); // Suppress warnings and notices
+ini_set('display_errors', '0'); // Disable error display for production
+
+$allowed_origins = [
+    'https://cycles.earthen.io',
+    'https://ecobricks.org',
+    'https://gobrik.com',
+    'http://localhost',
+    'file://' // Allow local Snap apps or filesystem-based origins
+];
+
+// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
+
+// Log the detected origin
+error_log('Incoming HTTP_ORIGIN: ' . $origin);
+
+if (empty($origin)) {
+    // Allow requests with no origin for local development
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+} elseif (in_array($origin, $allowed_origins)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+} else {
+    error_log('CORS error: Invalid or missing HTTP_ORIGIN - ' . $origin);
+    header('HTTP/1.1 403 Forbidden');
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
+    exit();
+}
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+    exit(0);
+}
 // PART 1: Initialize
 $response = array('status' => 'error', 'message' => 'Something went wrong');
 
