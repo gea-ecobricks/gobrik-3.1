@@ -2,22 +2,31 @@
 require_once '../earthenAuth_helper.php';
 require_once '../buwanaconn_env.php';
 require_once '../calconn_env.php'; // Include EarthCal database connection
-error_log('Incoming HTTP_ORIGIN: ' . $origin);
+
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING); // Suppress warnings and notices
+ini_set('display_errors', '0'); // Disable error display for production
 
 $allowed_origins = [
     'https://cycles.earthen.io',
     'https://ecobricks.org',
     'https://gobrik.com',
-    'http://localhost', // Allow localhost
-    'http://127.0.0.1', // Allow loopback address
-    'http://localhost:8000', // Allow specific localhost ports (adjust as needed)
-    'http://127.0.0.1:8000'
+    'http://localhost',
+    'file://' // Allow local Snap apps or filesystem-based origins
 ];
 
 // Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
-if ($origin && in_array($origin, $allowed_origins)) {
+// Log the detected origin
+error_log('Incoming HTTP_ORIGIN: ' . $origin);
+
+if (empty($origin)) {
+    // Allow requests with no origin for local development
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Credentials: true');
+} elseif (in_array($origin, $allowed_origins)) {
     header('Access-Control-Allow-Origin: ' . $origin);
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
