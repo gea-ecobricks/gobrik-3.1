@@ -104,7 +104,10 @@ $gobrik_conn->close();
                 <?php echo $percent_with_buwana; ?>% have a buwana account and <?php echo $percent_emails_sent; ?>% have received the test email.
             </p>
 
-        <div id="test-email-controls">
+        <div id="test-email-controls" style="background: #80808030;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 20px;">
     <h4>Test Emailing Script</h4>
     <p>The next test email will be sent to <span id="next-email-to-send">loading...</span></p>
     <button id="send-test-email">Send</button>
