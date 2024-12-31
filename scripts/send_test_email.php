@@ -1,7 +1,7 @@
 <?php
 require_once '../earthenAuth_helper.php';
 require_once '../gobrikconn_env.php';
-require_once 'smtp_mailer.php'; // Assuming this is your SMTP setup file
+require_once 'smtp_mailer.php'; // SMTP setup file
 
 header('Content-Type: application/json');
 $response = [];
@@ -45,9 +45,9 @@ try {
     $from = "no-reply@gobrik.com";
 
     // Send the email
-    $mail_sent = smtp_mail($email_addr, $subject, $body, $from);
-    if (!$mail_sent) {
-        throw new Exception('Failed to send the email.');
+    $mail_result = smtp_mail($email_addr, $subject, $body, $from);
+    if (!$mail_result['success']) {
+        throw new Exception("Failed to send the email. Debug info:\n" . $mail_result['debug_info']);
     }
 
     // Update test_email_status in the database
@@ -63,6 +63,7 @@ try {
     $response = [
         'success' => true,
         'message' => "Email sent successfully to $email_addr.",
+        'debug_info' => $mail_result['debug_info'],
     ];
 } catch (Exception $e) {
     $response = [

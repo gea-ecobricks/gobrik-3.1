@@ -146,23 +146,25 @@ $gobrik_conn->close();
 <?php require_once("../footer-2024.php"); ?>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+   document.addEventListener('DOMContentLoaded', function () {
     const nextEmailElement = document.getElementById('next-email-to-send');
     const emailStatusElement = document.getElementById('email-status');
     const sendButton = document.getElementById('send-test-email');
 
     async function fetchNextEmail() {
         try {
-            const response = await fetch('../scripts/get_next_email.php'); // Create a simple endpoint to fetch next ecobricker details
+            const response = await fetch('../scripts/get_next_email.php'); // Fetch next ecobricker details
             const data = await response.json();
             if (data.success) {
                 nextEmailElement.textContent = data.email_addr || 'No email pending';
+                sendButton.disabled = false; // Enable the button if there's an email to send
             } else {
                 nextEmailElement.textContent = 'No email pending';
-                sendButton.disabled = true;
+                sendButton.disabled = true; // Disable the button if no email is pending
             }
         } catch (error) {
             console.error('Error fetching next email:', error);
+            nextEmailElement.textContent = 'Error fetching email';
         }
     }
 
@@ -178,6 +180,10 @@ $gobrik_conn->close();
                 fetchNextEmail(); // Fetch the next email details
             } else {
                 emailStatusElement.textContent = `Error: ${data.error}`;
+                console.error('Debug Info:', data.debug_info); // Log debug info to console
+                const debugDetails = document.createElement('pre');
+                debugDetails.textContent = data.debug_info || 'No additional debug information.';
+                emailStatusElement.appendChild(debugDetails); // Display debug info
             }
         } catch (error) {
             emailStatusElement.textContent = 'Error sending email.';
@@ -191,6 +197,7 @@ $gobrik_conn->close();
     // Attach the event listener to the button
     sendButton.addEventListener('click', sendEmail);
 });
+
 
 
 </script>
