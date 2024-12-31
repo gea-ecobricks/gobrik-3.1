@@ -135,6 +135,8 @@ $gobrik_conn->close();
 
 <script>
 
+
+
     $(document).ready(function() {
     $("#newest-ecobrickers").DataTable({
         "responsive": true,
@@ -191,6 +193,24 @@ $gobrik_conn->close();
             { "targets": "_all", "defaultContent": "", "responsivePriority": 1 } // Ensure default settings for other columns
         ]
     });
+});
+
+$(document).ready(function () {
+    var table = $('#newest-ecobrickers').DataTable({
+        responsive: true,
+        pageLength: 10,
+    });
+
+    table.on('draw', function () {
+        adjustMainHeight();
+    });
+
+    function adjustMainHeight() {
+        const tableHeight = $('#table-container').outerHeight();
+        $('#main').css('height', tableHeight + 'px');
+    }
+
+    adjustMainHeight(); // Initial adjustment
 });
 
 
@@ -421,7 +441,7 @@ function confirmDeleteUser(ecobricker_id) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(`User with Buwana ID ${ecobricker_id} has been successfully deleted.`);
+                alert(`User with ecobricker ID ${ecobricker_id} has been successfully deleted.`);
                 closeInfoModal(); // Close the modal
                 // Reload the DataTable to reflect changes
                 $('#newest-ecobrickers').DataTable().ajax.reload();
