@@ -411,8 +411,8 @@ function openEcobrickerModal(ecobricker_id) {
 
 
 function confirmDeleteUser(ecobricker_id) {
-    if (confirm(`Are you sure you want to delete the user with Buwana ID: ${ecobricker_id}? This action cannot be undone.`)) {
-        fetch(`../api/delete_accounts.php?id=${buwana_id}`, {
+    if (confirm(`Are you sure you want to delete the user with ecobricker ID: ${ecobricker_id}? This action cannot be undone.`)) {
+        fetch(`../api/delete_accounts.php?id=${ecobricker_id}`, {
             method: 'GET', // Change to DELETE if supported by your API
             headers: {
                 'Content-Type': 'application/json'
@@ -421,7 +421,7 @@ function confirmDeleteUser(ecobricker_id) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(`User with Buwana ID ${buwana_id} has been successfully deleted.`);
+                alert(`User with Buwana ID ${ecobricker_id} has been successfully deleted.`);
                 closeInfoModal(); // Close the modal
                 // Reload the DataTable to reflect changes
                 $('#newest-ecobrickers').DataTable().ajax.reload();
