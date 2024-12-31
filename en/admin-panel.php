@@ -136,9 +136,9 @@ $gobrik_conn->close();
 <script>
 
 
-
-    $(document).ready(function() {
-    $("#newest-ecobrickers").DataTable({
+$(document).ready(function() {
+    // Initialize DataTable
+    var table = $("#newest-ecobrickers").DataTable({
         "responsive": true,
         "serverSide": true,
         "processing": true,
@@ -193,25 +193,22 @@ $gobrik_conn->close();
             { "targets": "_all", "defaultContent": "", "responsivePriority": 1 } // Ensure default settings for other columns
         ]
     });
-});
 
-$(document).ready(function () {
-    var table = $('#newest-ecobrickers').DataTable({
-        responsive: true,
-        pageLength: 10,
-    });
-
+    // Adjust #main height dynamically when the table is redrawn
     table.on('draw', function () {
         adjustMainHeight();
     });
 
+    // Function to adjust the #main height
     function adjustMainHeight() {
         const tableHeight = $('#table-container').outerHeight();
         $('#main').css('height', tableHeight + 'px');
     }
 
-    adjustMainHeight(); // Initial adjustment
+    // Initial height adjustment
+    adjustMainHeight();
 });
+
 
 
 function openUserRolesModal(ecobricker_id) {
