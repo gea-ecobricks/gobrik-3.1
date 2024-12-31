@@ -1,7 +1,7 @@
 <?php
 require_once '../earthenAuth_helper.php';
 require_once '../gobrikconn_env.php';
-require_once '../smtp_mailer.php'; // Assuming this is your SMTP setup file
+require_once 'smtp_mailer.php'; // Assuming this is your SMTP setup file
 
 header('Content-Type: application/json');
 $response = [];
