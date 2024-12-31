@@ -13,25 +13,25 @@ ini_set('display_errors', 1);
 $response = [];
 
 try {
-    $target_buwana_id = $_GET['id'] ?? '';
-    if (empty($target_buwana_id) || !is_numeric($target_buwana_id)) {
-        throw new Exception('Invalid account ID. Please provide a valid ID.');
+    $target_ecobricker_id = $_GET['id'] ?? '';
+    if (empty($target_ecobricker_id) || !is_numeric($target_ecobricker_id)) {
+        throw new Exception('Invalid ecobricker ID. Please provide a valid ID.');
     }
 
-    // Fetch email_addr from tb_ecobrickers
-    $sql_fetch_email = "SELECT email_addr FROM tb_ecobrickers WHERE buwana_id = ?";
-    $stmt_fetch_email = $gobrik_conn->prepare($sql_fetch_email);
-    if (!$stmt_fetch_email) {
-        throw new Exception('Error preparing statement for fetching email: ' . $gobrik_conn->error);
+    // Fetch email_addr and buwana_id from tb_ecobrickers
+    $sql_fetch_details = "SELECT email_addr, buwana_id FROM tb_ecobrickers WHERE ecobricker_id = ?";
+    $stmt_fetch_details = $gobrik_conn->prepare($sql_fetch_details);
+    if (!$stmt_fetch_details) {
+        throw new Exception('Error preparing statement for fetching details: ' . $gobrik_conn->error);
     }
-    $stmt_fetch_email->bind_param('i', $target_buwana_id);
-    $stmt_fetch_email->execute();
-    $stmt_fetch_email->bind_result($email_addr);
-    $stmt_fetch_email->fetch();
-    $stmt_fetch_email->close();
+    $stmt_fetch_details->bind_param('i', $target_ecobricker_id);
+    $stmt_fetch_details->execute();
+    $stmt_fetch_details->bind_result($email_addr, $buwana_id);
+    $stmt_fetch_details->fetch();
+    $stmt_fetch_details->close();
 
-    if (empty($email_addr)) {
-        throw new Exception('Email address not found for the given buwana_id.');
+    if (empty($email_addr) || empty($buwana_id)) {
+        throw new Exception('User details not found for the given ecobricker ID.');
     }
 
     // Begin transactions
@@ -39,12 +39,12 @@ try {
     $gobrik_conn->begin_transaction();
 
     // Delete from tb_ecobrickers
-    $sql_delete_ecobricker = "DELETE FROM tb_ecobrickers WHERE buwana_id = ?";
+    $sql_delete_ecobricker = "DELETE FROM tb_ecobrickers WHERE ecobricker_id = ?";
     $stmt_delete_ecobricker = $gobrik_conn->prepare($sql_delete_ecobricker);
     if (!$stmt_delete_ecobricker) {
         throw new Exception('Error preparing statement for deleting ecobricker: ' . $gobrik_conn->error);
     }
-    $stmt_delete_ecobricker->bind_param('i', $target_buwana_id);
+    $stmt_delete_ecobricker->bind_param('i', $target_ecobricker_id);
     $stmt_delete_ecobricker->execute();
     $stmt_delete_ecobricker->close();
 
@@ -54,7 +54,7 @@ try {
     if (!$stmt_delete_user) {
         throw new Exception('Error preparing statement for deleting user: ' . $buwana_conn->error);
     }
-    $stmt_delete_user->bind_param('i', $target_buwana_id);
+    $stmt_delete_user->bind_param('i', $buwana_id);
     $stmt_delete_user->execute();
     $stmt_delete_user->close();
 
@@ -64,7 +64,7 @@ try {
     if (!$stmt_delete_credentials) {
         throw new Exception('Error preparing statement for deleting credentials: ' . $buwana_conn->error);
     }
-    $stmt_delete_credentials->bind_param('i', $target_buwana_id);
+    $stmt_delete_credentials->bind_param('i', $buwana_id);
     $stmt_delete_credentials->execute();
     $stmt_delete_credentials->close();
 

@@ -98,14 +98,12 @@ $gobrik_conn->close();
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
             <h2 data-lang-id="001-main-title">Admin Panel</h2>
-            <p>
-                Review ecobrickers and the status of the test welcome email.
-            </p>
+
             <p>
                 So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik and <?php echo number_format($total_emails_sent); ?> test emails have been sent.
                 <?php echo $percent_with_buwana; ?>% have a buwana account and <?php echo $percent_emails_sent; ?>% have received the test email.
             </p>
-
+            <div id="table-container" style="overflow-x: auto; width: 100%;">
             <table id="newest-ecobrickers" class="display responsive nowrap" style="width:100%">
                 <thead>
                     <tr>
@@ -128,6 +126,7 @@ $gobrik_conn->close();
                     <!-- DataTables will populate this via AJAX -->
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>
@@ -411,8 +410,8 @@ function openEcobrickerModal(ecobricker_id) {
 
 
 
-function confirmDeleteUser(buwana_id) {
-    if (confirm(`Are you sure you want to delete the user with Buwana ID: ${buwana_id}? This action cannot be undone.`)) {
+function confirmDeleteUser(ecobricker_id) {
+    if (confirm(`Are you sure you want to delete the user with Buwana ID: ${ecobricker_id}? This action cannot be undone.`)) {
         fetch(`../api/delete_accounts.php?id=${buwana_id}`, {
             method: 'GET', // Change to DELETE if supported by your API
             headers: {
