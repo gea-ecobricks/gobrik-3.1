@@ -21,9 +21,13 @@
 
 
 <STYLE>
+#main {
+    height: auto;
+    overflow: visible;
+    padding-bottom: 100px; /* Keep this for footer spacing */
+    display: flex;
+    flex-direction: column;
 
-        #main {
-        height: fit-content !important;
         padding-bottom: 100px;
     }
 
