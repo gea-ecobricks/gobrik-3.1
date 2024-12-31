@@ -98,9 +98,7 @@ $gobrik_conn->close();
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
             <h2 data-lang-id="001-main-title">Admin Panel</h2>
-            <p>
-                Review ecobrickers and the status of the test welcome email.
-            </p>
+
             <p>
                 So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik and <?php echo number_format($total_emails_sent); ?> test emails have been sent.
                 <?php echo $percent_with_buwana; ?>% have a buwana account and <?php echo $percent_emails_sent; ?>% have received the test email.
