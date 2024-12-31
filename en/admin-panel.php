@@ -103,6 +103,15 @@ $gobrik_conn->close();
                 So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik and <?php echo number_format($total_emails_sent); ?> test emails have been sent.
                 <?php echo $percent_with_buwana; ?>% have a buwana account and <?php echo $percent_emails_sent; ?>% have received the test email.
             </p>
+
+        <div id="test-email-controls">
+    <h4>Test Emailing Script</h4>
+    <p>The next test email will be sent to <span id="next-email-to-send">loading...</span></p>
+    <button id="send-test-email">Send</button>
+    <p>Status: <span id="email-status">Ready to send</span></p>
+</div>
+
+
             <div id="table-container" style="overflow-x: auto; width: 100%;">
             <table id="newest-ecobrickers" class="display responsive nowrap" style="width:100%">
                 <thead>
@@ -132,6 +141,56 @@ $gobrik_conn->close();
 </div>
 </div>
 <?php require_once("../footer-2024.php"); ?>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const nextEmailElement = document.getElementById('next-email-to-send');
+    const emailStatusElement = document.getElementById('email-status');
+    const sendButton = document.getElementById('send-test-email');
+
+    async function fetchNextEmail() {
+        try {
+            const response = await fetch('../scripts/get_next_email.php'); // Create a simple endpoint to fetch next ecobricker details
+            const data = await response.json();
+            if (data.success) {
+                nextEmailElement.textContent = data.email_addr || 'No email pending';
+            } else {
+                nextEmailElement.textContent = 'No email pending';
+                sendButton.disabled = true;
+            }
+        } catch (error) {
+            console.error('Error fetching next email:', error);
+        }
+    }
+
+    async function sendEmail() {
+        try {
+            emailStatusElement.textContent = 'Sending...';
+            const response = await fetch('../scripts/send_test_email.php', {
+                method: 'POST',
+            });
+            const data = await response.json();
+            if (data.success) {
+                emailStatusElement.textContent = 'Email sent successfully!';
+                fetchNextEmail(); // Fetch the next email details
+            } else {
+                emailStatusElement.textContent = `Error: ${data.error}`;
+            }
+        } catch (error) {
+            emailStatusElement.textContent = 'Error sending email.';
+            console.error('Error sending email:', error);
+        }
+    }
+
+    // Fetch the first email on page load
+    fetchNextEmail();
+
+    // Attach the event listener to the button
+    sendButton.addEventListener('click', sendEmail);
+});
+
+
+</script>
 
 <script>
 
@@ -438,7 +497,7 @@ function confirmDeleteUser(ecobricker_id) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(`User with ecobricker ID ${ecobricker_id} has been successfully deleted.`);
+                alert(`User with ecobricker ID ${ecobricker_id} has been successfully deleted from GoBrik, Buwana and Earthen.`);
                 closeInfoModal(); // Close the modal
                 // Reload the DataTable to reflect changes
                 $('#newest-ecobrickers').DataTable().ajax.reload();
