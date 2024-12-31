@@ -132,6 +132,7 @@ $gobrik_conn->close();
     </div>
 </div>
 </div>
+</div>
 <?php require_once("../footer-2024.php"); ?>
 
 <script>
@@ -277,7 +278,7 @@ function openUserRolesModal(ecobricker_id) {
 
                 <a class="ecobrick-action-button" style="margin:auto;margin-top: 30px; text-align: center;" data-lang-id="000-save" onclick="saveUserRoles(${ecobricker_id})">💾 Save</a>
 
-                <a class="ecobrick-action-button deleter-button" style="margin:auto;margin-top: 10px; text-align: center;" data-lang-id="000-save" onclick="confirmDeleteUser(${ecobricker_id})">❌ Delete User</a>
+                <a class="ecobrick-action-button deleter-button" style="margin:auto;margin-top: 10px; text-align: center;" data-lang-id="000-save" onclick="confirmDeleteUser(${buwana_id})">❌ Delete User</a>
             `;
         })
         .catch(error => {
@@ -368,7 +369,7 @@ function openEcobrickerModal(ecobricker_id) {
         <a class="ecobrick-action-button deleter-button"
            style="margin:auto; margin-top: 20px; text-align: center;"
            data-lang-id="000-delete"
-           onclick="confirmDeleteUser(${ecobricker_id})">❌ Delete User</a>
+           onclick="confirmDeleteUser(${buwana_id})">❌ Delete User</a>
     `;
 
     // Fetch ecobricker details
