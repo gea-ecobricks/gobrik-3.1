@@ -110,7 +110,7 @@ $gobrik_conn->close();
   margin: 20px;">
     <h4>Test Emailing Script</h4>
     <p>The next test email will be sent to <span id="next-email-to-send">loading...</span></p>
-    <button id="send-test-email">Send</button>
+    <button id="send-test-email" class="page-button">Send</button>
     <p>Status: <span id="email-status">Ready to send</span></p>
 </div>
 
