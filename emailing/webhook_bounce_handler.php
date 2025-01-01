@@ -5,9 +5,32 @@ header('Content-Type: application/json');
 require_once '../gobrikconn_env.php';
 
 try {
+    // Log when the file is accessed
+    error_log("webhook_bounce_handler.php accessed at " . date('Y-m-d H:i:s'));
+
     // Read the POST data sent by Mailgun
     $input = file_get_contents('php://input');
+
+    // Log the raw POST input for debugging
+    if (!empty($input)) {
+        error_log("Raw JSON payload received: $input");
+    } else {
+        error_log("No JSON payload received.");
+        http_response_code(400); // Respond with HTTP 400 for bad request
+        exit();
+    }
+
+    // Decode the JSON input
     $data = json_decode($input, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("Failed to decode JSON payload: " . json_last_error_msg());
+        http_response_code(400); // Respond with HTTP 400 for bad request
+        exit();
+    }
+
+    // Log the decoded JSON for further debugging
+    error_log("Decoded JSON payload: " . print_r($data, true));
 
     // Check if the event is a bounce
     if (isset($data['event-data']['event']) && $data['event-data']['event'] === 'bounced') {
@@ -15,7 +38,7 @@ try {
         $error_message = $data['event-data']['delivery-status']['message']; // Bounce reason
         $timestamp = $data['event-data']['timestamp']; // Event timestamp
 
-        // Log the bounce for debugging purposes
+        // Log the bounce details
         error_log("Bounce detected for $email at $timestamp: $error_message");
 
         // Prepare SQL to update the test_email_status field for the corresponding record
@@ -41,6 +64,8 @@ try {
         }
 
         $stmt_update_bounce->close();
+    } else {
+        error_log("Event data is not a bounce or is missing. Event type: " . ($data['event-data']['event'] ?? 'Unknown'));
     }
 
     // Respond with HTTP 200 to acknowledge the webhook
