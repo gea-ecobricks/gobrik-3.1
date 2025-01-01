@@ -1,7 +1,10 @@
 <?php
 require_once '../earthenAuth_helper.php';
 require_once '../gobrikconn_env.php';
-require_once 'smtp_mailer.php'; // SMTP setup file
+
+require '../vendor/autoload.php'; // Path to Composer's autoloader
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 header('Content-Type: application/json');
 $response = [];
@@ -28,43 +31,68 @@ try {
         throw new Exception('No more emails to send. All eligible ecobrickers have been notified.');
     }
 
-    // Compose the email
+    // Set up the Mailgun API client
+    $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU-based endpoint
+    $mailgunApiKey = 'your-mailgun-api-key'; // Replace with your Mailgun API key
+    $mailgunDomain = 'mail.gobrik.com'; // Your Mailgun domain
+
+    // Email subject and body content
     $subject = "New Year... new GoBrik! Fully regenerated to be corporate code-free.";
-    $body = "
+    $html_body = "
+        <p>Happy New Year $first_name!</p>
+        <p>In celebration of 2025, we're excited to launch the new GoBrik 3.0.</p>
+        <p>While on $date_registered, you signed up for GoBrik, today 1/1/2025 we invite you to regenerate your account on our fully revamped system to preserve ownership of all your logged ecobricks, brikcoin, and validation credit balances.</p>
+        <p><a href='https://gobrik.com'>Please login to activate your account</a></p>
+        <p>Together we can keep plastic out of industry and out of the biosphere.</p>
+        <p>Russell and the GoBrik, GEA team.</p>";
+    $text_body = "
         Happy New Year $first_name!
 
         In celebration of 2025, we're excited to launch the new GoBrik 3.0.
+
         While on $date_registered, you signed up for GoBrik, today 1/1/2025 we invite you to regenerate your account on our fully revamped system to preserve ownership of all your logged ecobricks, brikcoin, and validation credit balances.
 
         Please login to activate your account: https://gobrik.com
 
         Together we can keep plastic out of industry and out of the biosphere.
 
-        Russell and the GoBrik, GEA team.
-    ";
-    $from = "no-reply@gobrik.com";
+        Russell and the GoBrik, GEA team.";
 
-    // Send the email
-    $mail_result = smtp_mail($email_addr, $subject, $body, $from);
-    if (!$mail_result['success']) {
-        throw new Exception("Failed to send the email. Debug info:\n" . $mail_result['debug_info']);
+    try {
+        // Send the email using Mailgun's API
+        $response = $client->post("$mailgunDomain/messages", [
+            'auth' => ['api', $mailgunApiKey],
+            'form_params' => [
+                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>', // Verified domain email
+                'to' => $email_addr,
+                'subject' => $subject,
+                'html' => $html_body,
+                'text' => $text_body, // Plain text fallback
+            ]
+        ]);
+
+        // Check response status
+        if ($response->getStatusCode() !== 200) {
+            throw new Exception("Mailgun: Failed to send email. Status: " . $response->getStatusCode());
+        }
+
+        // Update test_email_status in the database
+        $sql_update_status = "UPDATE tb_ecobrickers SET test_email_status = 'sent' WHERE ecobricker_id = ?";
+        $stmt_update_status = $gobrik_conn->prepare($sql_update_status);
+        if (!$stmt_update_status) {
+            throw new Exception('Error preparing update statement: ' . $gobrik_conn->error);
+        }
+        $stmt_update_status->bind_param('i', $ecobricker_id);
+        $stmt_update_status->execute();
+        $stmt_update_status->close();
+
+        $response = [
+            'success' => true,
+            'message' => "Email sent successfully to $email_addr."
+        ];
+    } catch (RequestException $e) {
+        throw new Exception("Mailgun API Exception: " . $e->getMessage());
     }
-
-    // Update test_email_status in the database
-    $sql_update_status = "UPDATE tb_ecobrickers SET test_email_status = 'sent' WHERE ecobricker_id = ?";
-    $stmt_update_status = $gobrik_conn->prepare($sql_update_status);
-    if (!$stmt_update_status) {
-        throw new Exception('Error preparing update statement: ' . $gobrik_conn->error);
-    }
-    $stmt_update_status->bind_param('i', $ecobricker_id);
-    $stmt_update_status->execute();
-    $stmt_update_status->close();
-
-    $response = [
-        'success' => true,
-        'message' => "Email sent successfully to $email_addr.",
-        'debug_info' => $mail_result['debug_info'],
-    ];
 } catch (Exception $e) {
     $response = [
         'success' => false,
@@ -74,4 +102,5 @@ try {
 
 echo json_encode($response);
 exit();
+
 ?>
