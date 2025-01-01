@@ -33,7 +33,7 @@ try {
 
     // Set up the Mailgun API client
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU-based endpoint
-    $mailgunApiKey = 'your-mailgun-api-key'; // Replace with your Mailgun API key
+    $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Retrieve Mailgun API key from environment
     $mailgunDomain = 'mail.gobrik.com'; // Your Mailgun domain
 
     // Email subject and body content
