@@ -4,6 +4,15 @@ header('Content-Type: application/json');
 // Include your database connection setup
 require_once '../gobrikconn_env.php';
 
+// Retrieve Mailgun webhook signing key from the environment
+$mailgun_signing_key = getenv('MAILGUN_WEBHOOK');
+
+if (!$mailgun_signing_key) {
+    error_log("Mailgun webhook signing key not set in the environment.");
+    http_response_code(500); // Internal Server Error
+    exit();
+}
+
 try {
     // Log when the file is accessed
     error_log("webhook_handler.php accessed at " . date('Y-m-d H:i:s'));
@@ -18,9 +27,32 @@ try {
         exit();
     }
 
+    // Validate the webhook signature
+    $signature = $data['signature'] ?? null;
+    if (!isset($signature['timestamp'], $signature['token'], $signature['signature'])) {
+        error_log("Webhook signature is missing or incomplete.");
+        http_response_code(400); // Bad Request
+        exit();
+    }
+
+    // Verify the signature
+    $expected_signature = hash_hmac(
+        'sha256',
+        $signature['timestamp'] . $signature['token'],
+        $mailgun_signing_key
+    );
+
+    if (!hash_equals($expected_signature, $signature['signature'])) {
+        error_log("Invalid Mailgun webhook signature.");
+        http_response_code(403); // Forbidden
+        exit();
+    }
+
     // Extract relevant data
     $email_addr = $data['event-data']['recipient'] ?? 'Unknown';
-    $timestamp = date('Y-m-d H:i:s', $data['event-data']['timestamp'] ?? time());
+    $timestamp = isset($data['event-data']['timestamp'])
+        ? date('Y-m-d H:i:s', (int) $data['event-data']['timestamp'])
+        : 'Unknown';
     $basic_mailgun_status = $data['event-data']['event'] ?? 'unknown';
     $email_subject = $data['event-data']['message']['headers']['subject'] ?? 'No Subject';
     $response_message = $data['event-data']['delivery-status']['message'] ?? 'No response message';
