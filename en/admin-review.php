@@ -209,7 +209,7 @@ function viewEcobrickActions(serial_no, status, lang) {
 
     // Properly encode serial number for URL safety
     let encodedSerialNo = encodeURIComponent(serial_no);
-    let ecobrickURL = `https://beta.gobrik.com/en/brik.php?serial_no=${encodedSerialNo}`;
+    let ecobrickURL = `https://gobrik.com/en/brik.php?serial_no=${encodedSerialNo}`;
 
    // Construct the content (stack of buttons) using string concatenation to avoid issues
 let content = '';
