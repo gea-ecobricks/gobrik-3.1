@@ -20,7 +20,7 @@ if ($result->num_rows > 0) {
 
         echo '<meta name="keywords" content="ecobrick, número de serie '. $array["owner"] .', '. $array["owner"] .', brikchain, brikcoin, registro brik, secuestro de plástico, reciclaje, alternativa, secuestro de plástico, compensación de plástico, plástico AES, secuestro de carbono. '. $array["location_full"] .'">';
 
-        echo '<meta property="og:url"           content="https://gobrik.com/es/details-ecobrick-page.php?serial_no='. $array["serial_no"] .'"/>' ;
+        echo '<meta property="og:url"           content="https://gobrik.com/es/brik.php?serial_no='. $array["serial_no"] .'"/>' ;
         echo '<meta property="og:title"         content="Ecobrick '. $array["serial_no"] .' | '. $array["weight_g"] .'g de plástico secuestrado por '. $array["owner"] .' en '. $array["location_full"] .'.">';
         echo '<meta property="og:description"   content="Un ecobrick autenticado que fue publicado y archivado en la blockchain manual de brikcoin el ' . $array["date_logged_ts"] .'"/>';
         echo '<meta property="og:image"         content="'. $array["ecobrick_full_photo_url"] .'"/>';
