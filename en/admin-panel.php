@@ -66,7 +66,7 @@ $total_emails_sent = 0;
 $sql = "SELECT
             COUNT(*) as total_ecobrickers,
             SUM(CASE WHEN buwana_id IS NOT NULL AND buwana_id != '' THEN 1 ELSE 0 END) as total_with_buwana_id,
-            SUM(CASE WHEN test_email_status = 'received' THEN 1 ELSE 0 END) as total_emails_sent
+            SUM(CASE WHEN emailing_status = 'received' THEN 1 ELSE 0 END) as total_emails_sent
         FROM tb_ecobrickers";
 
 $result = $gobrik_conn->query($sql);
@@ -246,7 +246,7 @@ $(document).ready(function() {
             },
             { "data": "ecobricks_made" },
             { "data": "login_count" },
-            { "data": "test_email_status" },
+            { "data": "emailing_status" },
             { "data": "full_name" },
             { "data": "buwana_id" },
             { "data": "gea_status" },
