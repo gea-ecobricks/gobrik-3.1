@@ -478,6 +478,8 @@ function confirmDeleteUser(ecobricker_id) {
 
 
     //FAILED Fetch
+
+
 function pruneFailedAccounts() {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -616,6 +618,7 @@ function pruneFailedAccounts() {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 
