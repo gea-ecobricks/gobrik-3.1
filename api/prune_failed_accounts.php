@@ -8,7 +8,7 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$response = [];
+$response = []; // Response array to store details for each email processed
 
 try {
     // Start transactions
@@ -23,16 +23,19 @@ try {
         $accounts_to_delete = $fetch_result->fetch_all(MYSQLI_ASSOC);
 
         foreach ($accounts_to_delete as $account) {
-            $ecobricker_id = $account['ecobricker_id'];
             $email_addr = $account['email_addr'];
+            $ecobricker_id = $account['ecobricker_id'];
             $buwana_id = $account['buwana_id'];
+            $log = ["email" => $email_addr];
 
             // Delete the ecobricker record
             $delete_ecobricker_query = "DELETE FROM tb_ecobrickers WHERE ecobricker_id = ?";
             $stmt_ecobricker = $gobrik_conn->prepare($delete_ecobricker_query);
             $stmt_ecobricker->bind_param("i", $ecobricker_id);
-            if (!$stmt_ecobricker->execute()) {
-                throw new Exception('Error deleting ecobricker: ' . $stmt_ecobricker->error);
+            if ($stmt_ecobricker->execute()) {
+                $log["ecobricker_status"] = "User successfully deleted from GoBrik database.";
+            } else {
+                $log["ecobricker_status"] = "Error deleting user from GoBrik: " . $stmt_ecobricker->error;
             }
             $stmt_ecobricker->close();
 
@@ -41,34 +44,45 @@ try {
                 $delete_user_query = "DELETE FROM users_tb WHERE buwana_id = ?";
                 $stmt_user = $buwana_conn->prepare($delete_user_query);
                 $stmt_user->bind_param("i", $buwana_id);
-                if (!$stmt_user->execute()) {
-                    throw new Exception('Error deleting Buwana user: ' . $stmt_user->error);
+                if ($stmt_user->execute()) {
+                    $log["buwana_status"] = "User successfully deleted from Buwana database.";
+                } else {
+                    $log["buwana_status"] = "Error deleting user from Buwana: " . $stmt_user->error;
                 }
                 $stmt_user->close();
 
                 $delete_credentials_query = "DELETE FROM credentials_tb WHERE buwana_id = ?";
                 $stmt_credentials = $buwana_conn->prepare($delete_credentials_query);
                 $stmt_credentials->bind_param("i", $buwana_id);
-                if (!$stmt_credentials->execute()) {
-                    throw new Exception('Error deleting Buwana credentials: ' . $stmt_credentials->error);
+                if ($stmt_credentials->execute()) {
+                    $log["credentials_status"] = "User credentials successfully deleted from Buwana.";
+                } else {
+                    $log["credentials_status"] = "Error deleting credentials from Buwana: " . $stmt_credentials->error;
                 }
                 $stmt_credentials->close();
+            } else {
+                $log["buwana_status"] = "No Buwana account associated with this user.";
             }
 
             // Call Earthen unsubscribe
             if (!empty($email_addr)) {
-                earthenUnsubscribe($email_addr);
+                $unsubscribe_result = earthenUnsubscribe($email_addr);
+                if (strpos($unsubscribe_result, "success") !== false) {
+                    $log["earthen_status"] = "User successfully unsubscribed from Earthen.";
+                } else {
+                    $log["earthen_status"] = "Error unsubscribing user from Earthen: " . $unsubscribe_result;
+                }
+            } else {
+                $log["earthen_status"] = "No email provided for Earthen unsubscribe.";
             }
+
+            $response[] = $log;
         }
 
         // Commit transactions
         $buwana_conn->commit();
         $gobrik_conn->commit();
 
-        $response = [
-            'success' => true,
-            'message' => 'Accounts pruned successfully.',
-        ];
     } else {
         throw new Exception('No accounts found with status "failed".');
     }
@@ -82,7 +96,6 @@ try {
     }
 
     $response = [
-        'success' => false,
         'error' => $e->getMessage(),
     ];
 }
