@@ -1,13 +1,17 @@
 <?php
-ob_start();
+ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php';
 require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
 require_once '../scripts/earthen_subscribe_functions.php';
 
 header('Content-Type: application/json');
+
+// Suppress direct error output and log errors instead
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', '/path/to/error.log');
 
 $response = []; // Response array to store details for each email processed
 
@@ -68,10 +72,10 @@ try {
             // Call Earthen unsubscribe
             if (!empty($email_addr)) {
                 $unsubscribe_result = earthenUnsubscribe($email_addr);
-                if (strpos($unsubscribe_result, "success") !== false) {
+                if (!empty($unsubscribe_result) && strpos((string)$unsubscribe_result, "success") !== false) {
                     $log["earthen_status"] = "User successfully unsubscribed from Earthen.";
                 } else {
-                    $log["earthen_status"] = "Error unsubscribing user from Earthen: " . $unsubscribe_result;
+                    $log["earthen_status"] = "Error unsubscribing user from Earthen: " . ($unsubscribe_result ?? 'No response received.');
                 }
             } else {
                 $log["earthen_status"] = "No email provided for Earthen unsubscribe.";
@@ -87,6 +91,13 @@ try {
     } else {
         throw new Exception('No accounts found with status "failed".');
     }
+
+    // Success response
+    $final_response = [
+        'status' => 'success',
+        'details' => $response,
+    ];
+
 } catch (Exception $e) {
     // Rollback transactions on error
     if ($buwana_conn->in_transaction) {
@@ -96,11 +107,15 @@ try {
         $gobrik_conn->rollback();
     }
 
-    $response = [
-        'error' => $e->getMessage(),
+    // Error response
+    $final_response = [
+        'status' => 'error',
+        'message' => $e->getMessage(),
     ];
 }
 
-echo json_encode($response);
+// Clear any unintended output before sending JSON
+ob_end_clean();
+echo json_encode($final_response);
 exit();
 ?>

@@ -478,8 +478,7 @@ function confirmDeleteUser(ecobricker_id) {
 
 
     //FAILED Fetch
-
-    function pruneFailedAccounts() {
+function pruneFailedAccounts() {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
@@ -566,15 +565,51 @@ function confirmDeleteUser(ecobricker_id) {
         fetch('../api/prune_failed_accounts.php', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    alert('Successfully pruned the accounts.');
-                    modal.style.display = 'none'; // Close the modal
+                if (data.status === 'success') {
+                    // Build a detailed result table
+                    let resultHTML = '<h4>Prune Results:</h4>';
+                    resultHTML += '<table class="display" style="width:100%">';
+                    resultHTML += `
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>GoBrik Status</th>
+                                <th>Buwana Status</th>
+                                <th>Earthen Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+
+                    data.details.forEach(result => {
+                        resultHTML += `
+                            <tr>
+                                <td>${result.email}</td>
+                                <td>${result.ecobricker_status}</td>
+                                <td>${result.buwana_status}</td>
+                                <td>${result.earthen_status}</td>
+                            </tr>
+                        `;
+                    });
+
+                    resultHTML += '</tbody></table>';
+
+                    // Display results in the modal
+                    modalBox.innerHTML = resultHTML;
+
+                    // Reinitialize the DataTable for results
+                    $('table.display').DataTable({
+                        paging: false,
+                        searching: false,
+                        info: false,
+                        scrollX: true
+                    });
                 } else {
-                    alert('Error pruning accounts: ' + data.error);
+                    modalBox.innerHTML = `<p>Error pruning accounts: ${data.message}</p>`;
                 }
             })
             .catch(error => {
-                alert('Error: ' + error.message);
+                modalBox.innerHTML = `<p>Error: ${error.message}</p>`;
             });
     });
 
