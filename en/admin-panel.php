@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.5';
+$version = '0.51';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -108,10 +108,10 @@ $gobrik_conn->close();
     <?php echo $percent_with_buwana; ?>% have an active Buwana account.
     Of these, <?php echo number_format($unsent); ?> have not received the test email,
     <?php echo number_format($delivered); ?> have received it, and
-    <?php echo number_format($failed); ?> account emails failed to receive it.
+    <?php echo number_format($failed); ?> account emails failed to receive it.<br><br>
     Would you like to prune the first 5 failed accounts from the database?
 </p>
-<button onclick="pruneFailedAccounts()">Prune Accounts</button>
+<button class="confirm-button enabled" onclick="pruneFailedAccounts()" data-land-id="002-prune-button">Prune Accounts</button>
 
 
 
@@ -477,7 +477,8 @@ function confirmDeleteUser(ecobricker_id) {
 
 
 
-//FAILED Fetch
+    //FAILED Fetch
+
 
 function pruneFailedAccounts() {
     const modal = document.getElementById('form-modal-message');
@@ -535,7 +536,7 @@ function pruneFailedAccounts() {
                         <td>${account.emailing_status || '-'}</td>
                         <td>${account.ecobricks_made || '0'}</td>
                         <td>
-                            <button onclick="grantException('${account.id}')" class="exception-button">
+                            <button onclick="grantException('${account.email_addr}')" class="exception-button">
                                 Grant Exception
                             </button>
                         </td>
@@ -581,10 +582,8 @@ function pruneFailedAccounts() {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
-
-// Grant exception function
-function grantException(userId) {
-    fetch(`../api/grant_exception.php?user_id=${userId}`, { method: 'POST' })
+function grantException(emailAddr) {
+    fetch(`../api/grant_exception.php?email_addr=${encodeURIComponent(emailAddr)}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
