@@ -507,7 +507,7 @@ function pruneFailedAccounts() {
     const resultsContainer = document.getElementById('prune-results-container');
 
     // Fetch the first 5 failed accounts and prune them
-    fetch('../api/prune_failed_accounts.php', { method: 'POST' })
+    fetch('../api/fetch_failed_accounts.php', { method: 'POST' })
         .then(response => response.json())
         .then(data => {
             if (Array.isArray(data)) {
