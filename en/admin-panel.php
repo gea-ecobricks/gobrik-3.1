@@ -478,7 +478,8 @@ function confirmDeleteUser(ecobricker_id) {
 
 
     //FAILED Fetch
-function pruneFailedAccounts() {
+
+    function pruneFailedAccounts() {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
@@ -498,68 +499,89 @@ function pruneFailedAccounts() {
     // Clear previous modal content and set up structure
     modalBox.innerHTML = `
         <h4 style="text-align:center;">Prune Failed Accounts</h4>
-        <div id="prune-results-container" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 5px;">
-            <p>Processing accounts...</p>
-        </div>
-        <button id="close-prune-modal-btn" style="margin-top: 10px; display: none;">OK</button>
+        <div id="prune-table-container" style="margin-bottom: 20px;"></div>
+        <button id="confirm-prune-btn" style="margin-top: 10px;">Confirm Prune</button>
     `;
 
-    const resultsContainer = document.getElementById('prune-results-container');
-
-    // Fetch the first 5 failed accounts and prune them
-    fetch('../api/fetch_failed_accounts.php', { method: 'POST' })
+    // Fetch the first 5 failed accounts
+    fetch('../api/fetch_failed_accounts.php?limit=5')
         .then(response => response.json())
         .then(data => {
-            if (Array.isArray(data)) {
-                // Display detailed results for each email
-                resultsContainer.innerHTML = '<ul style="list-style: none; padding: 0;">';
-                data.forEach(log => {
-                    resultsContainer.innerHTML += `
-                        <li style="margin-bottom: 15px;">
-                            <strong>Email:</strong> ${log.email || 'N/A'}<br>
-                            <span style="color: ${log.ecobricker_status.includes('success') ? 'green' : 'red'};">
-                                ${log.ecobricker_status || 'N/A'}
-                            </span><br>
-                            <span style="color: ${log.buwana_status.includes('success') ? 'green' : 'red'};">
-                                ${log.buwana_status || 'N/A'}
-                            </span><br>
-                            <span style="color: ${log.credentials_status.includes('success') ? 'green' : 'red'};">
-                                ${log.credentials_status || 'N/A'}
-                            </span><br>
-                            <span style="color: ${log.earthen_status.includes('success') ? 'green' : 'red'};">
-                                ${log.earthen_status || 'N/A'}
-                            </span>
-                        </li>
-                    `;
-                });
-                resultsContainer.innerHTML += '</ul>';
-            } else if (data.error) {
-                // Display error message
-                resultsContainer.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
-            } else {
-                // Handle unknown response
-                resultsContainer.innerHTML = '<p>An unknown error occurred.</p>';
+            if (data.error) {
+                modalBox.innerHTML += `<p>${data.error}</p>`;
+                return;
             }
 
-            // Show the OK button to close the modal
-            const closeButton = document.getElementById('close-prune-modal-btn');
-            closeButton.style.display = 'block';
-            closeButton.addEventListener('click', () => {
-                closeModal(); // Use the existing close modal function
+            // Build the DataTable HTML
+            let tableHTML = '<table id="failed-accounts-table" class="display" style="width:100%">';
+            tableHTML += `
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Emailing Status</th>
+                        <th>Ecobricks Made</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            data.forEach(account => {
+                tableHTML += `
+                    <tr>
+                        <td>${account.full_name || '-'}</td>
+                        <td>${account.email_addr || '-'}</td>
+                        <td>${account.emailing_status || '-'}</td>
+                        <td>${account.ecobricks_made || '0'}</td>
+                        <td>
+                            <button onclick="grantException('${account.email_addr}')" class="exception-button">
+                                Grant Exception
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+
+            // Insert the table into the prune-table-container
+            document.getElementById('prune-table-container').innerHTML = tableHTML;
+
+            // Initialize the DataTable
+            $('#failed-accounts-table').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                scrollX: true
             });
         })
         .catch(error => {
-            resultsContainer.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
-            const closeButton = document.getElementById('close-prune-modal-btn');
-            closeButton.style.display = 'block';
-            closeButton.addEventListener('click', () => {
-                closeModal(); // Use the existing close modal function
-            });
+            modalBox.innerHTML += `<p>Error loading failed accounts: ${error.message}</p>`;
         });
+
+    // Attach event listener to the Confirm Prune button
+    document.getElementById('confirm-prune-btn').addEventListener('click', () => {
+        // Send a request to prune the accounts
+        fetch('../api/prune_failed_accounts.php', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Successfully pruned the accounts.');
+                    modal.style.display = 'none'; // Close the modal
+                } else {
+                    alert('Error pruning accounts: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+    });
 
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 
