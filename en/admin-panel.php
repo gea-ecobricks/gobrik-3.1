@@ -60,13 +60,17 @@ require_once '../gobrikconn_env.php';
 // Initialize variables
 $total_ecobrickers = 0;
 $total_with_buwana_id = 0;
-$total_emails_sent = 0;
+$unsent = 0;
+$delivered = 0;
+$failed = 0;
 
 // Fetch counts
 $sql = "SELECT
             COUNT(*) as total_ecobrickers,
             SUM(CASE WHEN buwana_id IS NOT NULL AND buwana_id != '' THEN 1 ELSE 0 END) as total_with_buwana_id,
-            SUM(CASE WHEN emailing_status = 'received' THEN 1 ELSE 0 END) as total_emails_sent
+            SUM(CASE WHEN emailing_status = 'unsent' THEN 1 ELSE 0 END) as unsent,
+            SUM(CASE WHEN emailing_status = 'delivered' THEN 1 ELSE 0 END) as delivered,
+            SUM(CASE WHEN emailing_status = 'failed' THEN 1 ELSE 0 END) as failed
         FROM tb_ecobrickers";
 
 $result = $gobrik_conn->query($sql);
@@ -75,16 +79,16 @@ if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $total_ecobrickers = intval($row['total_ecobrickers'] ?? 0);
     $total_with_buwana_id = intval($row['total_with_buwana_id'] ?? 0);
-    $total_emails_sent = intval($row['total_emails_sent'] ?? 0);
+    $unsent = intval($row['unsent'] ?? 0);
+    $delivered = intval($row['delivered'] ?? 0);
+    $failed = intval($row['failed'] ?? 0);
 }
 
-// Calculate percentages
+// Calculate percentage of users with Buwana accounts
 $percent_with_buwana = $total_ecobrickers > 0 ? round(($total_with_buwana_id / $total_ecobrickers) * 100, 2) : 0;
-$percent_emails_sent = $total_ecobrickers > 0 ? round(($total_emails_sent / $total_ecobrickers) * 100, 2) : 0;
 
 $gobrik_conn->close();
 ?>
-
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
@@ -99,20 +103,17 @@ $gobrik_conn->close();
         <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
             <h2 data-lang-id="001-main-title">Admin Panel</h2>
 
-            <p>
-                So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik and <?php echo number_format($total_emails_sent); ?> test emails have been sent.
-                <?php echo $percent_with_buwana; ?>% have a buwana account and <?php echo $percent_emails_sent; ?>% have received the test email.
+            <p id="admin-welcome-stats">
+                So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik.
+                <?php echo $percent_with_buwana; ?>% have an active Buwana account.
+                Of these, <?php echo number_format($unsent); ?> have not received the test email,
+                <?php echo number_format($delivered); ?> have received it, and
+                <?php echo number_format($failed); ?> account emails failed to receive it.
             </p>
 
-        <div id="test-email-controls" style="background: #80808030;
-  padding: 10px;
-  border-radius: 10px;
-  margin: 20px;">
-    <h4>Test Emailing Script</h4>
-    <p>The next test email will be sent to <span id="next-email-to-send">loading...</span></p>
-    <button id="send-test-email" class="page-button">Send</button>
-    <p>Status: <span id="email-status">Ready to send</span></p>
-</div>
+
+
+
 
 
             <div id="table-container" style="overflow-x: auto; width: 100%;">

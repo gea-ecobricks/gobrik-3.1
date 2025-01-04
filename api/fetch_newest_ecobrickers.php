@@ -19,14 +19,14 @@ $sql = "SELECT
             user_roles,
             ecobricks_made,
             login_count,
-            test_email_status,
+            emailing_status,
             location_full
         FROM tb_ecobrickers
         WHERE buwana_activated = 1";
 
 // Add search filter if any
 if (!empty($searchValue)) {
-    $sql .= " AND (full_name LIKE ? OR gea_status LIKE ? OR user_roles LIKE ? OR test_email_status LIKE ?)";
+    $sql .= " AND (full_name LIKE ? OR gea_status LIKE ? OR user_roles LIKE ? OR emailing_status LIKE ?)";
     $bindTypes = "ssss";
     $bindValues = array_fill(0, 4, "%$searchValue%");
 } else {
@@ -82,7 +82,7 @@ $stmt->bind_result(
     $user_roles,
     $ecobricks_made,
     $login_count,
-    $test_email_status,
+    $emailing_status,
     $location_full
 );
 
@@ -99,7 +99,7 @@ while ($stmt->fetch()) {
         'user_roles' => htmlspecialchars($user_roles ?? '', ENT_QUOTES, 'UTF-8'),
         'ecobricks_made' => intval($ecobricks_made ?? 0),
         'login_count' => intval($login_count ?? 0),
-        'test_email_status' => htmlspecialchars($test_email_status ?? '', ENT_QUOTES, 'UTF-8'),
+        'emailing_status' => htmlspecialchars($emailing_status ?? '', ENT_QUOTES, 'UTF-8'),
         'location_full' => htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8')
     ];
 }
@@ -107,7 +107,7 @@ while ($stmt->fetch()) {
 // Get total filtered records
 $filteredSql = "SELECT COUNT(*) as total FROM tb_ecobrickers WHERE buwana_activated = 1";
 if (!empty($searchValue)) {
-    $filteredSql .= " AND (full_name LIKE '%$searchValue%' OR gea_status LIKE '%$searchValue%' OR user_roles LIKE '%$searchValue%' OR test_email_status LIKE '%$searchValue%')";
+    $filteredSql .= " AND (full_name LIKE '%$searchValue%' OR gea_status LIKE '%$searchValue%' OR user_roles LIKE '%$searchValue%' OR emailing_status LIKE '%$searchValue%')";
 }
 $filteredResult = $gobrik_conn->query($filteredSql);
 $totalFilteredRecords = $filteredResult->fetch_assoc()['total'] ?? 0;

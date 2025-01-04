@@ -41,10 +41,10 @@ try {
         // Log the bounce details
         error_log("Bounce detected for $email at $timestamp: $error_message");
 
-        // Prepare SQL to update the test_email_status field for the corresponding record
+        // Prepare SQL to update the emailing_status field for the corresponding record
         $sql_update_bounce = "
             UPDATE tb_ecobrickers
-            SET test_email_status = 'Bounced'
+            SET emailing_status = 'Bounced'
             WHERE email_addr = ?
         ";
 
@@ -58,7 +58,7 @@ try {
         $stmt_update_bounce->execute();
 
         if ($stmt_update_bounce->affected_rows > 0) {
-            error_log("Successfully updated test_email_status to 'Bounced' for $email.");
+            error_log("Successfully updated emailing_status to 'Bounced' for $email.");
         } else {
             error_log("No record found for $email. No update was made.");
         }
