@@ -487,7 +487,6 @@ function confirmDeleteUser(ecobricker_id) {
 
     //FAILED Fetch
 
-
 function pruneFailedAccounts() {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -557,6 +556,11 @@ function pruneFailedAccounts() {
             // Insert the table into the prune-table-container
             document.getElementById('prune-table-container').innerHTML = tableHTML;
 
+            // Check if DataTable is already initialized and destroy it if necessary
+            if ($.fn.DataTable.isDataTable('#failed-accounts-table')) {
+                $('#failed-accounts-table').DataTable().destroy();
+            }
+
             // Initialize the DataTable
             $('#failed-accounts-table').DataTable({
                 paging: false,
@@ -578,7 +582,7 @@ function pruneFailedAccounts() {
                 if (data.status === 'success') {
                     // Build a detailed result table
                     let resultHTML = '<h4>Prune Results:</h4>';
-                    resultHTML += '<table class="display" style="width:100%">';
+                    resultHTML += '<table id="prune-results-table" class="display" style="width:100%">';
                     resultHTML += `
                         <thead>
                             <tr>
@@ -607,8 +611,13 @@ function pruneFailedAccounts() {
                     // Display results in the modal
                     modalBox.innerHTML = resultHTML;
 
-                    // Reinitialize the DataTable for results
-                    $('table.display').DataTable({
+                    // Check if DataTable is already initialized and destroy it if necessary
+                    if ($.fn.DataTable.isDataTable('#prune-results-table')) {
+                        $('#prune-results-table').DataTable().destroy();
+                    }
+
+                    // Initialize the DataTable for results
+                    $('#prune-results-table').DataTable({
                         paging: false,
                         searching: false,
                         info: false,
@@ -626,6 +635,7 @@ function pruneFailedAccounts() {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 
