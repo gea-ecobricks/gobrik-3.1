@@ -26,7 +26,7 @@ if (isset($_GET['serial_no']) && !empty($_GET['serial_no'])) {
 
                 echo '<meta name="keywords" content="ecobrick, serial '. htmlspecialchars($array["owner"]) .', '. htmlspecialchars($array["owner"]) .', brikchain, brikcoin, brik record, plastic sequestration, recycling, alternative, sequestration of plastic, plastic offsetting, aes plastic, carbon sequestration. '. htmlspecialchars($array["location_full"]) .'">';
 
-                echo '<meta property="og:url"           content="https://gobrik.com/en/briks.php?serial_no='. htmlspecialchars($array["serial_no"]) .'"/>' ;
+                echo '<meta property="og:url"           content="https://gobrik.com/en/brik.php?serial_no='. htmlspecialchars($array["serial_no"]) .'"/>' ;
                 echo '<meta property="og:title"         content="Ecobrick '. htmlspecialchars($array["serial_no"]) .' | '. htmlspecialchars($array["weight_g"]) .'g of plastic sequestered by '. htmlspecialchars($array["owner"]) .' in '. htmlspecialchars($array["location_full"]) .'.">';
                 echo '<meta property="og:description"   content="An authenticated ecobrick that was published and archived on the brikcoin manual blockchain on ' . htmlspecialchars($array["date_logged_ts"]) .'"/>';
                 echo '<meta property="og:image"         content="'. htmlspecialchars($array["ecobrick_full_photo_url"]) .'"/>';
