@@ -514,15 +514,33 @@ function pruneFailedAccounts() {
 
             // Build the DataTable HTML
             let tableHTML = '<table id="failed-accounts-table" class="display" style="width:100%">';
-            tableHTML += '<thead><tr><th>Full Name</th><th>Email Address</th><th>Emailing Status</th><th>Ecobricks Made</th></tr></thead><tbody>';
+            tableHTML += `
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Emailing Status</th>
+                        <th>Ecobricks Made</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
 
             data.forEach(account => {
-                tableHTML += `<tr>
-                    <td>${account.full_name || '-'}</td>
-                    <td>${account.email_addr || '-'}</td>
-                    <td>${account.emailing_status || '-'}</td>
-                    <td>${account.ecobricks_made || '0'}</td>
-                </tr>`;
+                tableHTML += `
+                    <tr>
+                        <td>${account.full_name || '-'}</td>
+                        <td>${account.email_addr || '-'}</td>
+                        <td>${account.emailing_status || '-'}</td>
+                        <td>${account.ecobricks_made || '0'}</td>
+                        <td>
+                            <button onclick="grantException('${account.id}')" class="exception-button">
+                                Grant Exception
+                            </button>
+                        </td>
+                    </tr>
+                `;
             });
 
             tableHTML += '</tbody></table>';
@@ -563,6 +581,24 @@ function pruneFailedAccounts() {
     // Display the modal
     modal.classList.remove('modal-hidden');
 }
+
+// Grant exception function
+function grantException(userId) {
+    fetch(`../api/grant_exception.php?user_id=${userId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Exception granted successfully!');
+                pruneFailedAccounts(); // Refresh the list
+            } else {
+                alert('Error granting exception: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+}
+
 
 
 </script>
