@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php';
 require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
@@ -8,14 +9,16 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$response = []; // Response array to store details for each email processed
+$response = [];
 
 try {
-    // Start transactions
+    // Start transactions and track status
     $buwana_conn->begin_transaction();
     $gobrik_conn->begin_transaction();
+    $in_buwana_transaction = true;
+    $in_gobrik_transaction = true;
 
-    // Fetch the first 5 accounts with status 'failed'
+    // Fetch first 5 accounts with 'failed' status
     $fetch_query = "SELECT ecobricker_id, email_addr, buwana_id FROM tb_ecobrickers WHERE emailing_status = 'failed' LIMIT 5";
     $fetch_result = $gobrik_conn->query($fetch_query);
 
@@ -23,10 +26,17 @@ try {
         $accounts_to_delete = $fetch_result->fetch_all(MYSQLI_ASSOC);
 
         foreach ($accounts_to_delete as $account) {
-            $email_addr = $account['email_addr'];
             $ecobricker_id = $account['ecobricker_id'];
+            $email_addr = $account['email_addr'];
             $buwana_id = $account['buwana_id'];
             $log = ["email" => $email_addr];
+
+            // Delete related rows in other tables referencing ecobricker_id
+            $delete_related_query = "DELETE FROM related_table WHERE maker_id = ?";
+            $stmt_related = $gobrik_conn->prepare($delete_related_query);
+            $stmt_related->bind_param("i", $ecobricker_id);
+            $stmt_related->execute();
+            $stmt_related->close();
 
             // Delete the ecobricker record
             $delete_ecobricker_query = "DELETE FROM tb_ecobrickers WHERE ecobricker_id = ?";
@@ -67,11 +77,9 @@ try {
             // Call Earthen unsubscribe
             if (!empty($email_addr)) {
                 $unsubscribe_result = earthenUnsubscribe($email_addr);
-                if (strpos($unsubscribe_result, "success") !== false) {
-                    $log["earthen_status"] = "User successfully unsubscribed from Earthen.";
-                } else {
-                    $log["earthen_status"] = "Error unsubscribing user from Earthen: " . $unsubscribe_result;
-                }
+                $log["earthen_status"] = strpos($unsubscribe_result, "success") !== false
+                    ? "User successfully unsubscribed from Earthen."
+                    : "Error unsubscribing user from Earthen: " . $unsubscribe_result;
             } else {
                 $log["earthen_status"] = "No email provided for Earthen unsubscribe.";
             }
@@ -87,11 +95,11 @@ try {
         throw new Exception('No accounts found with status "failed".');
     }
 } catch (Exception $e) {
-    // Rollback transactions on error
-    if ($buwana_conn->in_transaction) {
+    // Rollback transactions
+    if (isset($in_buwana_transaction)) {
         $buwana_conn->rollback();
     }
-    if ($gobrik_conn->in_transaction) {
+    if (isset($in_gobrik_transaction)) {
         $gobrik_conn->rollback();
     }
 
@@ -100,6 +108,7 @@ try {
     ];
 }
 
+ob_end_clean();
 echo json_encode($response);
 exit();
 ?>
