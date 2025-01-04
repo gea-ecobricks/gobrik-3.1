@@ -508,7 +508,7 @@ function pruneFailedAccounts() {
     modalBox.innerHTML = `
         <h4 style="text-align:center;">Prune Failed Accounts</h4>
         <div id="prune-table-container" style="margin-bottom: 20px;"></div>
-        <button id="confirm-prune-btn" class="confirm-button delete">Confirm Prune</button>
+        <button id="confirm-prune-btn" class="confirm-button delete">❌ Confirm Prune</button>
     `;
 
     // Fetch the first 5 failed accounts
