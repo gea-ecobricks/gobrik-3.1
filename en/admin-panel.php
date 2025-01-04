@@ -104,12 +104,15 @@ $gobrik_conn->close();
             <h2 data-lang-id="001-main-title">Admin Panel</h2>
 
             <p id="admin-welcome-stats">
-                So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik.
-                <?php echo $percent_with_buwana; ?>% have an active Buwana account.
-                Of these, <?php echo number_format($unsent); ?> have not received the test email,
-                <?php echo number_format($delivered); ?> have received it, and
-                <?php echo number_format($failed); ?> account emails failed to receive it.
-            </p>
+    So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik.
+    <?php echo $percent_with_buwana; ?>% have an active Buwana account.
+    Of these, <?php echo number_format($unsent); ?> have not received the test email,
+    <?php echo number_format($delivered); ?> have received it, and
+    <?php echo number_format($failed); ?> account emails failed to receive it.
+    Would you like to prune the first 5 failed accounts from the database?
+</p>
+<button onclick="pruneFailedAccounts()">Prune Accounts</button>
+
 
 
 
@@ -146,62 +149,9 @@ $gobrik_conn->close();
 </div>
 <?php require_once("../footer-2024.php"); ?>
 
-<script>
-   document.addEventListener('DOMContentLoaded', function () {
-    const nextEmailElement = document.getElementById('next-email-to-send');
-    const emailStatusElement = document.getElementById('email-status');
-    const sendButton = document.getElementById('send-test-email');
-
-    async function fetchNextEmail() {
-        try {
-            const response = await fetch('../scripts/get_next_email.php'); // Fetch next ecobricker details
-            const data = await response.json();
-            if (data.success) {
-                nextEmailElement.textContent = data.email_addr || 'No email pending';
-                sendButton.disabled = false; // Enable the button if there's an email to send
-            } else {
-                nextEmailElement.textContent = 'No email pending';
-                sendButton.disabled = true; // Disable the button if no email is pending
-            }
-        } catch (error) {
-            console.error('Error fetching next email:', error);
-            nextEmailElement.textContent = 'Error fetching email';
-        }
-    }
-
-    async function sendEmail() {
-        try {
-            emailStatusElement.textContent = 'Sending...';
-            const response = await fetch('../scripts/send_test_email.php', {
-                method: 'POST',
-            });
-            const data = await response.json();
-            if (data.success) {
-                emailStatusElement.textContent = 'Email sent successfully!';
-                fetchNextEmail(); // Fetch the next email details
-            } else {
-                emailStatusElement.textContent = `Error: ${data.error}`;
-                console.error('Debug Info:', data.debug_info); // Log debug info to console
-                const debugDetails = document.createElement('pre');
-                debugDetails.textContent = data.debug_info || 'No additional debug information.';
-                emailStatusElement.appendChild(debugDetails); // Display debug info
-            }
-        } catch (error) {
-            emailStatusElement.textContent = 'Error sending email.';
-            console.error('Error sending email:', error);
-        }
-    }
-
-    // Fetch the first email on page load
-    fetchNextEmail();
-
-    // Attach the event listener to the button
-    sendButton.addEventListener('click', sendEmail);
-});
 
 
 
-</script>
 
 <script>
 
@@ -527,6 +477,92 @@ function confirmDeleteUser(ecobricker_id) {
 
 
 
+//FAILED Fetch
+
+function pruneFailedAccounts() {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    // Lock scrolling for the body and blur background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    // Set up the modal-content-box styles
+    modalBox.style.maxHeight = '80vh';
+    modalBox.style.overflowY = 'auto';
+
+    // Clear previous modal content and set up structure
+    modalBox.innerHTML = `
+        <h4 style="text-align:center;">Prune Failed Accounts</h4>
+        <div id="prune-table-container" style="margin-bottom: 20px;"></div>
+        <button id="confirm-prune-btn" style="margin-top: 10px;">Confirm Prune</button>
+    `;
+
+    // Fetch the first 5 failed accounts
+    fetch('../api/fetch_failed_accounts.php?limit=5')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                modalBox.innerHTML += `<p>${data.error}</p>`;
+                return;
+            }
+
+            // Build the DataTable HTML
+            let tableHTML = '<table id="failed-accounts-table" class="display" style="width:100%">';
+            tableHTML += '<thead><tr><th>Full Name</th><th>Email Address</th><th>Emailing Status</th><th>Ecobricks Made</th></tr></thead><tbody>';
+
+            data.forEach(account => {
+                tableHTML += `<tr>
+                    <td>${account.full_name || '-'}</td>
+                    <td>${account.email_addr || '-'}</td>
+                    <td>${account.emailing_status || '-'}</td>
+                    <td>${account.ecobricks_made || '0'}</td>
+                </tr>`;
+            });
+
+            tableHTML += '</tbody></table>';
+
+            // Insert the table into the prune-table-container
+            document.getElementById('prune-table-container').innerHTML = tableHTML;
+
+            // Initialize the DataTable
+            $('#failed-accounts-table').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                scrollX: true
+            });
+        })
+        .catch(error => {
+            modalBox.innerHTML += `<p>Error loading failed accounts: ${error.message}</p>`;
+        });
+
+    // Attach event listener to the Confirm Prune button
+    document.getElementById('confirm-prune-btn').addEventListener('click', () => {
+        // Send a request to prune the accounts
+        fetch('../api/prune_failed_accounts.php', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Successfully pruned the accounts.');
+                    modal.style.display = 'none'; // Close the modal
+                } else {
+                    alert('Error pruning accounts: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+    });
+
+    // Display the modal
+    modal.classList.remove('modal-hidden');
+}
 
 
 </script>
