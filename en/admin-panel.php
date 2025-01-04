@@ -6,53 +6,60 @@ $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.51';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
-$is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
 
 // Check if the user is logged in
-if ($is_logged_in) {
-    $buwana_id = $_SESSION['buwana_id'];
-    require_once '../gobrikconn_env.php';
-    require_once '../buwanaconn_env.php';
+if (!isLoggedIn()) {
+    header("Location: login.php");
+    exit();
+}
 
-    // Check admin status
-    $query = "SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
-    if ($stmt = $gobrik_conn->prepare($query)) {
-        $stmt->bind_param("i", $buwana_id);
-        $stmt->execute();
-        $stmt->bind_result($user_roles, $user_capabilities);
+// User is logged in, proceed to check admin status
+$buwana_id = $_SESSION['buwana_id'];
+require_once '../gobrikconn_env.php';
 
-        if ($stmt->fetch()) {
-            if (stripos($user_roles, 'admin') === false ||
-                stripos($user_capabilities, 'user review') === false ||
-                stripos($user_capabilities, 'user deletions') === false) {
-                // Redirect if the user is not an admin
-                echo "<script>
-                    alert('Sorry, this page is for admins only.');
-                    window.location.href = 'dashboard.php';
-                </script>";
-                exit();
-            }
-        } else {
-            // Redirect if no user record is found
+$query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
+if ($stmt = $gobrik_conn->prepare($query)) {
+    $stmt->bind_param("i", $buwana_id);
+    $stmt->execute();
+    $stmt->bind_result($user_roles);
+
+    if ($stmt->fetch()) {
+        // Check if the user has an admin role
+        if (stripos($user_roles, 'admin') === false) {
             echo "<script>
-                alert('User not found.');
+                alert('Sorry, only admins can see this page.');
                 window.location.href = 'dashboard.php';
             </script>";
             exit();
         }
-        $stmt->close();
+    } else {
+        // Redirect if no user record is found
+        echo "<script>
+            alert('User record not found.');
+            window.location.href = 'dashboard.php';
+        </script>";
+        exit();
     }
-
-    // Fetch additional user details after admin check
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
-    $first_name = getFirstName($buwana_conn, $buwana_id);
-
-    $buwana_conn->close(); // Close the database connection
+    $stmt->close();
+} else {
+    // Handle database error
+    echo "<script>
+        alert('Error checking user role. Please try again later.');
+        window.location.href = 'dashboard.php';
+    </script>";
+    exit();
 }
+
+// Fetch additional user details after admin check
+require_once '../buwanaconn_env.php';
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+$first_name = getFirstName($buwana_conn, $buwana_id);
+
+$buwana_conn->close(); // Close the database connection
 
 // Fetch overall stats
 require_once '../gobrikconn_env.php';
@@ -89,6 +96,7 @@ $percent_with_buwana = $total_ecobrickers > 0 ? round(($total_with_buwana_id / $
 
 $gobrik_conn->close();
 ?>
+
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
