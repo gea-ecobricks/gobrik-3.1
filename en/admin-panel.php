@@ -116,11 +116,12 @@ $gobrik_conn->close();
     <?php echo $percent_with_buwana; ?>% have an active Buwana account.
     Of these, <?php echo number_format($unsent); ?> have not received the test email,
     <?php echo number_format($delivered); ?> have received it, and
-    <?php echo number_format($failed); ?> account emails failed to receive it.<br><br>
-    Would you like to prune the first 5 failed accounts from the database?
-</p>
-<button class="confirm-button enabled" onclick="pruneFailedAccounts()" data-land-id="002-prune-button">Prune Accounts</button>
+    <?php echo number_format($failed); ?> account emails failed to receive it.</p>
 
+    <div id="prune-time" style="background:grey";>
+        <p>Would you like to prune the failed accounts from the database?</p>
+<button class="confirm-button enabled" onclick="pruneFailedAccounts()" data-land-id="002-prune-button">Prune Accounts</button>
+</div>
 
 
 
@@ -512,7 +513,7 @@ function pruneFailedAccounts() {
     `;
 
     // Fetch the first 5 failed accounts
-    fetch('../api/fetch_failed_accounts.php?limit=5')
+    fetch('../api/fetch_failed_accounts.php?limit=25')
         .then(response => response.json())
         .then(data => {
             if (data.error) {
