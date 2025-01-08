@@ -369,7 +369,7 @@ function getUser_Role($buwana_id) {
     global $gobrik_conn;
 
     // Prepare your query to select the user_role
-    $sql = "SELECT user_role FROM tb_ecobrickers WHERE buwana_id = ?";
+    $sql = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
     $stmt = $gobrik_conn->prepare($sql);
 
     // Check if the statement was prepared successfully
@@ -378,12 +378,12 @@ function getUser_Role($buwana_id) {
         $stmt->execute();
 
         // Bind the result to a variable
-        $stmt->bind_result($user_role);
+        $stmt->bind_result($user_roles);
         $stmt->fetch();
         $stmt->close();
 
         // Return the fetched user_role
-        return $user_role;
+        return $user_roles;
     } else {
         // Log error or handle it appropriately
         error_log("Database error: " . $gobrik_conn->error);
