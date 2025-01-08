@@ -133,8 +133,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php endif; ?>
 
 
-<?php if (strpos(strtolower($user_roles), 'Admin') !== false): ?>
-    <div id="gea-trainer-menu" class="dashboard-panel">
+<?php if (strpos(strtolower($user_roles), 'admin') !== false): ?>
+    <div id="admin-menu" class="dashboard-panel">
         <h4 class="panel-title">Admin Menu</h4>
         <div class="menu-buttons-row">
             <a href="admin-panel.php" class="page-button">Admin Panel</a>
@@ -143,6 +143,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
     </div>
 <?php endif; ?>
+
 
 
 <!-- populated by fetch_newest_briks.php -->
