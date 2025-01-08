@@ -118,7 +118,10 @@ $gobrik_conn->close();
     <?php echo number_format($delivered); ?> have received it, and
     <?php echo number_format($failed); ?> account emails failed to receive it.</p>
 
-    <div id="prune-time" style="background:grey";>
+    <div id="prune-time" style="background: #7d7d7d24;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 30px;">
         <p>Would you like to prune the failed accounts from the database?</p>
 <button class="confirm-button enabled" onclick="pruneFailedAccounts()" data-land-id="002-prune-button">Prune Accounts</button>
 </div>
