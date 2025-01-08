@@ -133,7 +133,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php endif; ?>
 
 
-<?php if (strpos(strtolower($gea_status), 'admin') !== false): ?>
+<?php if (strpos(strtolower($user_roles), 'admin') !== false): ?>
     <div id="gea-trainer-menu" class="dashboard-panel">
         <h4 class="panel-title">Admin Menu</h4>
         <div class="menu-buttons-row">
