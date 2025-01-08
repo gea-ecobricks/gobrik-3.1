@@ -364,6 +364,35 @@ function getGEA_status($buwana_id) {
     }
 }
 
+function getUser_Role($buwana_id) {
+    // Use the existing connection variable
+    global $gobrik_conn;
+
+    // Prepare your query to select the user_role
+    $sql = "SELECT user_role FROM tb_ecobrickers WHERE buwana_id = ?";
+    $stmt = $gobrik_conn->prepare($sql);
+
+    // Check if the statement was prepared successfully
+    if ($stmt) {
+        $stmt->bind_param("i", $buwana_id);
+        $stmt->execute();
+
+        // Bind the result to a variable
+        $stmt->bind_result($user_role);
+        $stmt->fetch();
+        $stmt->close();
+
+        // Return the fetched user_role
+        return $user_role;
+    } else {
+        // Log error or handle it appropriately
+        error_log("Database error: " . $gobrik_conn->error);
+        return null;
+    }
+}
+
+
+
 
 function getEcobrickerID($buwana_id) {
     // Include the database connection if not already included
