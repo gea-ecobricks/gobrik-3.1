@@ -520,8 +520,8 @@ function pruneFailedAccounts() {
         <button id="confirm-prune-btn" class="confirm-button delete">❌ Confirm Prune</button>
     `;
 
-    // Fetch the first 5 failed accounts
-    fetch('../api/fetch_failed_accounts.php?limit=25')
+    // Fetch the first 50 failed accounts
+    fetch('../api/fetch_failed_accounts.php?limit=50')
         .then(response => response.json())
         .then(data => {
             if (data.error) {

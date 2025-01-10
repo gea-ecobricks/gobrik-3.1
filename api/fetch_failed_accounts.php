@@ -1,7 +1,7 @@
 <?php
 require_once '../gobrikconn_env.php';
 
-$limit = intval($_GET['limit'] ?? 25); // Default limit to 5 if not provided
+$limit = intval($_GET['limit'] ?? 50); // Default limit to 50 if not provided
 
 $query = "SELECT full_name, email_addr, emailing_status, ecobricks_made
           FROM tb_ecobrickers

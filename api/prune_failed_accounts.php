@@ -20,8 +20,8 @@ try {
     $buwana_conn->begin_transaction();
     $gobrik_conn->begin_transaction();
 
-    // Fetch the first 5 accounts with status 'failed'
-    $fetch_query = "SELECT ecobricker_id, email_addr, buwana_id FROM tb_ecobrickers WHERE emailing_status = 'failed' LIMIT 25";
+    // Fetch the first 50 accounts with status 'failed'
+    $fetch_query = "SELECT ecobricker_id, email_addr, buwana_id FROM tb_ecobrickers WHERE emailing_status = 'failed' LIMIT 50";
     $fetch_result = $gobrik_conn->query($fetch_query);
 
     if ($fetch_result && $fetch_result->num_rows > 0) {
