@@ -7,7 +7,9 @@ $version = '0.51';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// Check if the user is logged in
+
+// LOGIN AND ROLE CHECK:
+//Check if the user is logged in, if not send them to login.
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
@@ -49,6 +51,9 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     </script>";
     exit();
 }
+//END LOGIN AND ROLE CHECK
+
+
 
 // Fetch additional user details after admin check
 require_once '../buwanaconn_env.php';

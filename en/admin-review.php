@@ -7,30 +7,52 @@ $version = '0.446';
 $page = 'admin-review';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// Check if the user is logged in
+
+// LOGIN AND ROLE CHECK:
+//Check if the user is logged in, if not send them to login.
 if (!isLoggedIn()) {
-    header('Location: login.php');
+    header("Location: login.php");
     exit();
 }
 
-// If logged in, get session data
+// User is logged in, proceed to check admin status
 $buwana_id = $_SESSION['buwana_id'];
-
-// Include database connections
 require_once '../gobrikconn_env.php';
-require_once '../buwanaconn_env.php';
 
-// Fetch the user's GEA status
-$gea_status = getGEA_status($buwana_id);
+$query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
+if ($stmt = $gobrik_conn->prepare($query)) {
+    $stmt->bind_param("i", $buwana_id);
+    $stmt->execute();
+    $stmt->bind_result($user_roles);
 
-// Check if the user is an admin
-if (strpos($gea_status, 'Admin') === false) {
+    if ($stmt->fetch()) {
+        // Check if the user has an admin role
+        if (stripos($user_roles, 'admin') === false) {
+            echo "<script>
+                alert('Sorry, only admins can see this page.');
+                window.location.href = 'dashboard.php';
+            </script>";
+            exit();
+        }
+    } else {
+        // Redirect if no user record is found
+        echo "<script>
+            alert('User record not found.');
+            window.location.href = 'dashboard.php';
+        </script>";
+        exit();
+    }
+    $stmt->close();
+} else {
+    // Handle database error
     echo "<script>
-        alert('Sorry, this page is for admins only.');
+        alert('Error checking user role. Please try again later.');
         window.location.href = 'dashboard.php';
     </script>";
     exit();
 }
+//END LOGIN AND ROLE CHECK
+
 
 // Fetch additional user data
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
@@ -38,7 +60,7 @@ $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
 $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 $first_name = getFirstName($buwana_conn, $buwana_id);
-
+$gea_status = getGEA_status($buwana_id);
 // Close Buwana connection
 $buwana_conn->close();
 
