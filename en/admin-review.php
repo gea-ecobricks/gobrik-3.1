@@ -54,15 +54,17 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 //END LOGIN AND ROLE CHECK
 
 
-// Fetch additional user data
+
+// Fetch additional user details after admin check
+require_once '../buwanaconn_env.php';
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
 $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
 $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 $first_name = getFirstName($buwana_conn, $buwana_id);
-$gea_status = getGEA_status($buwana_id);
-// Close Buwana connection
-$buwana_conn->close();
+
+$buwana_conn->close(); // Close the database connection
 
 // Fetch the count of ecobricks and the total weight in kg
 $sql = "SELECT COUNT(*) as ecobrick_count, SUM(weight_g) / 1000 as total_weight FROM tb_ecobricks WHERE status != 'not ready'";
