@@ -1,17 +1,57 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
-// Ensure the user is logged in (handled by $is_logged_in from helper)
-if (!$is_logged_in) {
-    header('Location: login.php?redirect=admin-review.php');
-    exit();
-}
-
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
 $version = '0.448';
 $page = 'validate-1';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
+
+
+// LOGIN AND ROLE CHECK:
+//Check if the user is logged in, if not send them to login.
+if (!isLoggedIn()) {
+    header("Location: login.php");
+    exit();
+}
+
+// User is logged in, proceed to check admin status
+$buwana_id = $_SESSION['buwana_id'];
+require_once '../gobrikconn_env.php';
+
+$query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
+if ($stmt = $gobrik_conn->prepare($query)) {
+    $stmt->bind_param("i", $buwana_id);
+    $stmt->execute();
+    $stmt->bind_result($user_roles);
+
+    if ($stmt->fetch()) {
+        // Check if the user has an admin role
+        if (stripos($user_roles, 'admin') === false) {
+            echo "<script>
+                alert('Sorry, only admins can see this page.');
+                window.location.href = 'dashboard.php';
+            </script>";
+            exit();
+        }
+    } else {
+        // Redirect if no user record is found
+        echo "<script>
+            alert('User record not found.');
+            window.location.href = 'dashboard.php';
+        </script>";
+        exit();
+    }
+    $stmt->close();
+} else {
+    // Handle database error
+    echo "<script>
+        alert('Error checking user role. Please try again later.');
+        window.location.href = 'dashboard.php';
+    </script>";
+    exit();
+}
+//END LOGIN AND ROLE CHECK
 
 // Include database connections
 require_once '../gobrikconn_env.php';
