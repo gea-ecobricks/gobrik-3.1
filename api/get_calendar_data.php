@@ -61,45 +61,69 @@ $buwana_id = $input['buwana_id'] ?? null;
 $calendar_name = $input['calendar_name'] ?? null;
 
 // Validate inputs
-if (empty($buwana_id) || !is_numeric($buwana_id)) {
-    $response['message'] = 'Invalid or missing Buwana ID.';
+if (empty($calendar_name) && (empty($buwana_id) || !is_numeric($buwana_id))) {
+    $response['message'] = 'Invalid or missing input. Either buwana_id or calendar_name must be provided.';
     echo json_encode($response);
     exit();
 }
 
 try {
-    if (!empty($calendar_name)) {
-    // Fetch data for the specific calendar "My Calendar"
-    $sql = "SELECT events_json_blob, last_updated
-            FROM calendars_tb
-            WHERE buwana_id = ? AND calendar_name = ?";
-    $stmt = $cal_conn->prepare($sql);
+    if (!empty($calendar_name) && !empty($buwana_id)) {
+        // Fetch personal calendar data for a specific calendar
+        $sql = "SELECT events_json_blob, last_updated
+                FROM calendars_tb
+                WHERE buwana_id = ? AND calendar_name = ?";
+        $stmt = $cal_conn->prepare($sql);
 
-    if (!$stmt) {
-        throw new Exception("Database error: " . $cal_conn->error);
-    }
+        if (!$stmt) {
+            throw new Exception("Database error: " . $cal_conn->error);
+        }
 
-    $stmt->bind_param("is", $buwana_id, $calendar_name);
-    $stmt->execute();
-    $result = $stmt->get_result();
+        $stmt->bind_param("is", $buwana_id, $calendar_name);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    if ($result->num_rows === 0) {
-        throw new Exception("No calendar found for the specified user and calendar name.");
-    }
+        if ($result->num_rows === 0) {
+            throw new Exception("No personal calendar found for the specified user and calendar name.");
+        }
 
-    $calendar_data = $result->fetch_assoc();
-    $stmt->close();
+        $calendar_data = $result->fetch_assoc();
+        $stmt->close();
 
-    // Prepare response for single calendar
-    $response['success'] = true;
-    $response['message'] = 'Calendar data retrieved successfully.';
-    $response['data'] = [
-        'events_json_blob' => $calendar_data['events_json_blob'] ? json_decode($calendar_data['events_json_blob'], true) : [], // Handle NULL case
-        'last_updated' => $calendar_data['last_updated']
-    ];
-}
- else {
-        // Fetch all calendars for the user (currently redundant but preserved for flexibility)
+        $response['success'] = true;
+        $response['data'] = [
+            'events_json_blob' => $calendar_data['events_json_blob'] ? json_decode($calendar_data['events_json_blob'], true) : [],
+            'last_updated' => $calendar_data['last_updated']
+        ];
+    } elseif (!empty($calendar_name)) {
+        // Fetch public calendar data
+        $sql = "SELECT events_json_blob, last_updated
+                FROM calendars_tb
+                WHERE calendar_name = ? AND calendar_public = 1";
+        $stmt = $cal_conn->prepare($sql);
+
+        if (!$stmt) {
+            throw new Exception("Database error: " . $cal_conn->error);
+        }
+
+        $stmt->bind_param("s", $calendar_name);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            throw new Exception("No public calendar found with the specified name.");
+        }
+
+        $calendar_data = $result->fetch_assoc();
+        $stmt->close();
+
+        $response['success'] = true;
+        $response['data'] = [
+            'events_json_blob' => $calendar_data['events_json_blob'] ? json_decode($calendar_data['events_json_blob'], true) : [],
+            'last_updated' => $calendar_data['last_updated']
+        ];
+    } elseif (!empty($buwana_id)) {
+        // Fetch all personal calendars for the user
         $sql = "SELECT calendar_name, last_updated, calendar_color, calendar_public
                 FROM calendars_tb
                 WHERE buwana_id = ?";
@@ -114,7 +138,7 @@ try {
         $result = $stmt->get_result();
 
         if ($result->num_rows === 0) {
-            throw new Exception("No calendars found for the specified user.");
+            throw new Exception("No personal calendars found for the specified user.");
         }
 
         $calendars = [];
@@ -123,10 +147,10 @@ try {
         }
         $stmt->close();
 
-        // Prepare response for all calendars
         $response['success'] = true;
-        $response['message'] = 'Calendars retrieved successfully.';
         $response['data'] = $calendars;
+    } else {
+        throw new Exception("Insufficient data to process the request.");
     }
 } catch (Exception $e) {
     $response['message'] = $e->getMessage();
