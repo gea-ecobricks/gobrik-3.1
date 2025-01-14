@@ -69,7 +69,7 @@ if (empty($buwana_id) || !is_numeric($buwana_id)) {
 
 try {
     // Fetch user data from users_tb
-    $sqlUser = "SELECT first_name, last_synk_ts, continent_code, location_full FROM users_tb WHERE buwana_id = ?";
+    $sqlUser = "SELECT first_name, last_sync_ts, continent_code, location_full FROM users_tb WHERE buwana_id = ?";
     $stmtUser = $cal_conn->prepare($sqlUser);
     $stmtUser->bind_param("i", $buwana_id);
     $stmtUser->execute();
