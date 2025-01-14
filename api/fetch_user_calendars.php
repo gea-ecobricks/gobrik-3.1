@@ -70,7 +70,7 @@ if (empty($buwana_id) || !is_numeric($buwana_id)) {
 try {
     // Fetch user data from users_tb
     $sqlUser = "SELECT first_name, last_synk_ts, continent_code, location_full FROM users_tb WHERE buwana_id = ?";
-    $stmtUser = $conn->prepare($sqlUser);
+    $stmtUser = $cal_conn->prepare($sqlUser);
     $stmtUser->bind_param("i", $buwana_id);
     $stmtUser->execute();
     $userData = $stmtUser->get_result()->fetch_assoc();
@@ -82,7 +82,7 @@ try {
 
     // Fetch personal calendars
     $sqlPersonalCalendars = "SELECT calendar_id, calendar_name FROM calendars_tb WHERE buwana_id = ?";
-    $stmtPersonal = $conn->prepare($sqlPersonalCalendars);
+    $stmtPersonal = $cal_conn->prepare($sqlPersonalCalendars);
     $stmtPersonal->bind_param("i", $buwana_id);
     $stmtPersonal->execute();
     $personalCalendars = $stmtPersonal->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -92,7 +92,7 @@ try {
     $sqlSubscribedCalendars = "SELECT c.calendar_id, c.calendar_name FROM cal_subscriptions_tb s
                                JOIN calendars_tb c ON s.calendar_id = c.calendar_id
                                WHERE s.buwana_id = ?";
-    $stmtSubscribed = $conn->prepare($sqlSubscribedCalendars);
+    $stmtSubscribed = $cal_conn->prepare($sqlSubscribedCalendars);
     $stmtSubscribed->bind_param("i", $buwana_id);
     $stmtSubscribed->execute();
     $subscribedCalendars = $stmtSubscribed->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -106,7 +106,7 @@ try {
 } catch (Exception $e) {
     $response['message'] = $e->getMessage();
 } finally {
-    $conn->close();
+    $cal_conn->close();
 }
 
 echo json_encode($response);
