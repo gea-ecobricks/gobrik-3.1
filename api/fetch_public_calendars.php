@@ -49,6 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $response = ['success' => false];
 
+// Check the request method
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    $response['message'] = 'Invalid request method. Use POST.';
+    echo json_encode($response);
+    exit();
 }
 
 try {
@@ -73,9 +78,10 @@ try {
         $publicCalendars[] = $row;
     }
 
-    echo json_encode(['success' => true, 'data' => $publicCalendars]);
+    echo json_encode(['success' => true, 'public_calendars' => $publicCalendars]);
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 } finally {
     $cal_conn->close();
 }
+?>
