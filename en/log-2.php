@@ -257,7 +257,7 @@ echo '<!DOCTYPE html>
                    <div class="photo-upload-container">
                         <label for="ecobrick_photo_main" class="custom-file-upload" data-lang-id="025-basic-photo-labelx">
                             📷 Add Basic Photo
-                            <input type="file" id="ecobrick_photo_main" name="ecobrick_photo_main" onchange="displayFileName('ecobrick_photo_main', 'file-name-basic')">
+                            <input type="file" id="ecobrick_photo_main" name="ecobrick_photo_main" onchange="displayFileName('ecobrick_photo_main', 'file-name-basic')" required>
                         </label>
                         <span id="file-name-basic" class="file-name" data-lang-id="035b-no-file-chosen">No file chosen</span>
                         <p class="form-caption" data-lang-id="026-basic-feature-desc">Take or select a photo of your serialized ecobrick.</p>
