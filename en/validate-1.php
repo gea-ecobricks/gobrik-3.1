@@ -29,7 +29,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
         // Check if the user has an admin role
         if (stripos($user_roles, 'admin') === false) {
             echo "<script>
-                alert('Sorry, only admins can see this page.');
+                alert('Sorry! Only admins can see this page.');
                 window.location.href = 'dashboard.php';
             </script>";
             exit();
