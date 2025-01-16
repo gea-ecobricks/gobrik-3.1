@@ -260,29 +260,7 @@ document.querySelector('form').addEventListener('submit', function (e) {
     }
 });
 
-document.querySelector('form').addEventListener('submit', function (e) {
-    e.preventDefault(); // Prevent the form from reloading the page
 
-    const formData = new FormData(this);
-
-    fetch('admin-emailer.php', {
-        method: 'POST',
-        body: formData,
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message); // Success message
-                location.reload(); // Reload the page to fetch the next ecobricker
-            } else {
-                alert(`Error: ${data.message}`);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("An unexpected error occurred. Check the console for details.");
-        });
-});
 
 
 </script>
