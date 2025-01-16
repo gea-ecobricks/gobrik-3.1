@@ -118,21 +118,20 @@ See you on the app!<br><br>
 GEA Dev Team
 ";
 
-function sendAccountActivationEmail($first_name, $to, $subject, $body_html, $body_text = null) {
+
+
+function sendAccountActivationEmail($to, $subject, $body_html, $body_text) {
     // Set up the Mailgun API client
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU endpoint for Mailgun
     $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Get Mailgun API key from environment variables
     $mailgunDomain = 'mail.gobrik.com'; // Verified Mailgun domain
-
-    // Set plain text fallback if not provided
-    $body_text = $body_text ?? strip_tags($body_html);
 
     try {
         // Log the email sending attempt
         error_log("Attempting to send email to $to with subject: $subject");
 
         // Send the email using Mailgun's API
-        $response = $client->post("{$mailgunDomain}/messages", [
+        $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
                 'from' => 'GoBrik Team <no-reply@mail.gobrik.com>', // Verified sender email
@@ -169,6 +168,8 @@ function sendAccountActivationEmail($first_name, $to, $subject, $body_html, $bod
         return false;
     }
 }
+
+
 
 
 // PART 4: Handle form submission
@@ -260,7 +261,29 @@ document.querySelector('form').addEventListener('submit', function (e) {
     }
 });
 
+/* document.querySelector('form').addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevent the form from reloading the page
 
+    const formData = new FormData(this);
+
+    fetch('admin-emailer.php', {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message); // Success message
+                location.reload(); // Reload the page to fetch the next ecobricker
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An unexpected error occurred. Check the console for details.");
+        });
+}); */
 
 
 </script>
