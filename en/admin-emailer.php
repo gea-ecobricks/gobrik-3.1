@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     }
 
     $gobrik_conn->close();
-    exit();
+
 }
 ?>
 
