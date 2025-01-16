@@ -1,6 +1,7 @@
 <?php
-require '../vendor/autoload.php'; // Path to Composer's autoloader
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require '../vendor/autoload.php'; // Path to Composer's autoloader
+
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -30,47 +31,33 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
     if ($stmt->fetch()) {
         if (stripos($user_roles, 'admin') === false) {
-            echo json_encode(['success' => false, 'message' => 'You do not have admin privileges.']);
+            echo "<script>
+                alert('Sorry, only admins can see this page.');
+                window.location.href = 'dashboard.php';
+            </script>";
             exit();
         }
     } else {
-        echo json_encode(['success' => false, 'message' => 'User record not found.']);
+        echo "<script>
+            alert('User record not found.');
+            window.location.href = 'dashboard.php';
+        </script>";
         exit();
     }
     $stmt->close();
 } else {
-    echo json_encode(['success' => false, 'message' => 'Error checking user role.']);
+    echo "<script>
+        alert('Error checking user role. Please try again later.');
+        window.location.href = 'dashboard.php';
+    </script>";
     exit();
 }
-// END LOGIN AND ROLE CHECK
-
-//Set up user variables
-
- $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
-
-    // Include database connection
-    require_once '../gobrikconn_env.php';
-    require_once '../buwanaconn_env.php';
-
-    // Fetch the user's location data
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
-    $ecobrick_unique_id = '';
-    $first_name = getFirstName($buwana_conn, $buwana_id);
-
-    $error_message = '';
-    $full_urls = [];
-    $thumbnail_paths = [];
-    $main_file_sizes = [];
-    $thumbnail_file_sizes = [];
+//END LOGIN AND ROLE CHECK
 
 // PART 2: Function to grab the next ecobricker record
 function getNextEcobricker($conn) {
     $query = "
-        SELECT ecobricker_id, email_addr, first_name, date_registered, brk_balance, ecobricks_made, city_txt, region_txt, country_txt
+        SELECT ecobricker_id, email_addr, first_name, date_registered, brk_balance, ecobrick_density_avg, ecobricks_made, city_txt, region_txt, country_txt
         FROM tb_ecobrickers
         WHERE ecobricker_id > 3
           AND (buwana_id IS NULL OR buwana_id = 150)
@@ -88,6 +75,46 @@ function getNextEcobricker($conn) {
     return null; // Return null if no matching record found
 }
 
+// Fetch the next ecobricker candidate on page load
+$nextEcobricker = getNextEcobricker($gobrik_conn);
+
+
+    require_once '../buwanaconn_env.php';
+
+ // Fetch the user's location data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $ecobrick_unique_id = '';
+    $first_name = getFirstName($buwana_conn, $buwana_id);
+
+// Initialize variables for the email form
+$email_addr = $nextEcobricker['email_addr'] ?? '';
+$first_name = $nextEcobricker['first_name'] ?? '';
+$date_registered = $nextEcobricker['date_registered'] ?? '';
+$brk_balance = $nextEcobricker['brk_balance'] ?? 0;
+$ecobricks_made = $nextEcobricker['ecobricks_made'] ?? 0;
+$city_txt = $nextEcobricker['city_txt'] ?? '';
+$region_txt = $nextEcobricker['region_txt'] ?? '';
+$country_txt = $nextEcobricker['country_txt'] ?? '';
+$subject = "Please activate your 2025 GoBrik account";
+
+// Compose the email body with dynamic user data
+$body = "
+Hi there $first_name,<br><br>
+GoBrik has been totally revamped for 2025! <br><br>
+We've removed our reliance on Google, Facebook and Amazon services and need you to re-activate your new account with our new Buwana authentication protocol.<br><br>
+You've been with us since you registered on $date_registered.<br><br>
+In your old account, we have your $ecobricks_made ecobricks and $brk_balance Brikcoins.<br><br>
+Your work there was a great service to your local $city_txt ecology and your $region_txt bioregion of $country_txt Earth.<br><br>
+We'd like to encourage you to activate your account and try logging your latest ecobricks.<br><br>
+Please do so by logging in with your email ($email_addr) at <a href='https://gobrik.com'>https://gobrik.com</a><br><br>
+See you on the app!<br><br>
+GEA Dev Team
+";
+
 // PART 3: Function to send the email
 function sendAccountActivationEmail($to, $subject, $body) {
     $client = new Client(['base_uri' => 'https://api.mailgun.net/v3/']); // Mailgun API
@@ -99,7 +126,11 @@ function sendAccountActivationEmail($to, $subject, $body) {
 
     try {
         // Log the email request parameters
-        error_log("Sending email to $to with subject: $subject");
+        $logMessage = "Sending email with the following details:\n" .
+                      "To: $to\n" .
+                      "Subject: $subject\n" .
+                      "Body (HTML): $body\n";
+        error_log($logMessage);
 
         // Send the email using Mailgun's API
         $response = $client->post("https://api.mailgun.net/v3/{$mailgunDomain}/messages", [
@@ -129,44 +160,23 @@ function sendAccountActivationEmail($to, $subject, $body) {
             return false;
         }
     } catch (RequestException $e) {
+        // Log the exception message
         error_log("Mailgun API Request Exception: " . $e->getMessage());
+
+        // Log the request and response for debugging
         if ($e->hasResponse()) {
             error_log("Mailgun API Error Response: " . (string) $e->getResponse()->getBody());
         }
         return false;
     } catch (Exception $e) {
+        // Log any other exceptions
         error_log("Unexpected Exception: " . $e->getMessage());
         return false;
     }
 }
 
-// PART 4: Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
-    $to = $_POST['email_to'];
-    $subject = $_POST['email_subject'];
-    $body = $_POST['email_body'];
-
-    // Send the email
-    if (sendAccountActivationEmail($to, $subject, $body)) {
-        // Update the emailing_status to 'delivered'
-        $updateQuery = "UPDATE tb_ecobrickers SET emailing_status = 'delivered' WHERE email_addr = ?";
-        $stmt = $gobrik_conn->prepare($updateQuery);
-        $stmt->bind_param("s", $to);
-        $stmt->execute();
-        $stmt->close();
-
-        // Return success response
-        echo json_encode(['success' => true, 'message' => 'Email sent successfully.']);
-    } else {
-        // Return error response
-        echo json_encode(['success' => false, 'message' => 'Failed to send the email.']);
-    }
-
-    $gobrik_conn->close();
-
-}
+$gobrik_conn->close();
 ?>
-
 
 
 
@@ -230,8 +240,6 @@ document.querySelector('form').addEventListener('submit', function (e) {
         alert("Please fill out all fields before sending the email.");
     }
 });
-
-
 
 document.querySelector('form').addEventListener('submit', function (e) {
     e.preventDefault(); // Prevent the form from reloading the page
