@@ -77,10 +77,7 @@ function getNextEcobricker($conn) {
 // Fetch the next ecobricker candidate on page load
 $nextEcobricker = getNextEcobricker($gobrik_conn);
 
-$gobrik_conn->close();
 
-    // Include database connection
-    require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
  // Fetch the user's location data
@@ -163,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
         echo "<script>alert('Failed to send the email to $to.');</script>";
     }
 }
+$gobrik_conn->close();
 ?>
 
 
