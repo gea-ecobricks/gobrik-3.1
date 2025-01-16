@@ -174,28 +174,37 @@ function sendAccountActivationEmail($to, $subject, $body_html, $body_text) {
 
 // PART 4: Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
+    // Get the form data
     $to = $_POST['email_to'];
     $subject = $_POST['email_subject'];
-    $body = $_POST['email_body'];
+    $body_html = $_POST['email_body'];
+    $body_text = strip_tags($body_html); // Generate plain text fallback
 
-    // Send the email
-    if (sendAccountActivationEmail($to, $subject, $body)) {
-        // Update the emailing_status to 'delivered'
-        $updateQuery = "UPDATE tb_ecobrickers SET emailing_status = 'delivered' WHERE email_addr = ?";
-        $stmt = $gobrik_conn->prepare($updateQuery);
-        $stmt->bind_param("s", $to);
-        $stmt->execute();
-        $stmt->close();
-
-        // Return success response
-        echo json_encode(['success' => true, 'message' => 'Email sent successfully.']);
+    // Validate required fields
+    if (empty($to) || empty($subject) || empty($body_html)) {
+        echo "<script>alert('Please fill in all the required fields.');</script>";
     } else {
-        // Return error response
-        echo json_encode(['success' => false, 'message' => 'Failed to send the email.']);
-    }
+        // Call the email sending function
+        $success = sendAccountActivationEmail($to, $subject, $body_html, $body_text);
 
-    $gobrik_conn->close();
+        if ($success) {
+            echo "<script>alert('Email sent successfully to $to');</script>";
+
+            // Update the emailing_status to 'delivered'
+            $updateQuery = "UPDATE tb_ecobrickers SET emailing_status = 'delivered' WHERE email_addr = ?";
+            $stmt = $gobrik_conn->prepare($updateQuery);
+            $stmt->bind_param("s", $to);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            echo "<script>alert('Failed to send the email to $to. Check the logs for details.');</script>";
+        }
     }
+}
+
+
+
+
 ?>
 
 
