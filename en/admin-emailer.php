@@ -118,58 +118,58 @@ See you on the app!<br><br>
 GEA Dev Team
 ";
 
-
-// PART 3: Function to send the email
-function sendAccountActivationEmail($to, $subject, $body) {
-    $client = new Client(['base_uri' => 'https://api.mailgun.net/v3/']); // Mailgun API
-    $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Mailgun API key
+function sendAccountActivationEmail($first_name, $to, $subject, $body_html, $body_text = null) {
+    // Set up the Mailgun API client
+    $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU endpoint for Mailgun
+    $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Get Mailgun API key from environment variables
     $mailgunDomain = 'mail.gobrik.com'; // Verified Mailgun domain
 
-    // Log the sending process start
-    error_log("Starting email sending process to: $to");
+    // Set plain text fallback if not provided
+    $body_text = $body_text ?? strip_tags($body_html);
 
     try {
-        // Log the email request parameters
-        error_log("Sending email to $to with subject: $subject");
+        // Log the email sending attempt
+        error_log("Attempting to send email to $to with subject: $subject");
 
         // Send the email using Mailgun's API
-        $response = $client->post("https://api.mailgun.net/v3/{$mailgunDomain}/messages", [
+        $response = $client->post("{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
-                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
+                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>', // Verified sender email
                 'to' => $to,
                 'subject' => $subject,
-                'html' => $body,
-                'text' => strip_tags($body), // Plain text fallback
+                'html' => $body_html,
+                'text' => $body_text, // Plain text fallback
             ]
         ]);
 
-        // Log the response status code and body
-        $statusCode = $response->getStatusCode();
-        $responseBody = (string) $response->getBody();
-
-        error_log("Mailgun Response Code: $statusCode");
-        error_log("Mailgun Response Body: $responseBody");
-
-        // Check if the response indicates success
-        if ($statusCode == 200) {
-            error_log("Email sent successfully to $to");
+        // Check response status
+        if ($response->getStatusCode() == 200) {
+            error_log("Mailgun: Email sent successfully to $to");
             return true;
         } else {
-            error_log("Failed to send email to $to. Status Code: $statusCode. Response Body: $responseBody");
+            error_log("Mailgun: Failed to send email to $to. Status Code: " . $response->getStatusCode());
+            error_log("Mailgun Response: " . (string)$response->getBody());
             return false;
         }
+
     } catch (RequestException $e) {
+        // Log exception message
         error_log("Mailgun API Request Exception: " . $e->getMessage());
+
+        // Log response body if available
         if ($e->hasResponse()) {
             error_log("Mailgun API Error Response: " . (string) $e->getResponse()->getBody());
         }
+
         return false;
     } catch (Exception $e) {
+        // Log any other exceptions
         error_log("Unexpected Exception: " . $e->getMessage());
         return false;
     }
 }
+
 
 // PART 4: Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
