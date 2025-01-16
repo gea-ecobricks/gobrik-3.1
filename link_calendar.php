@@ -11,7 +11,9 @@ $allowed_origins = [
     'https://ecobricks.org',
     'https://gobrik.com',
     'http://localhost',
-    'file://' // Allow local Snap apps or filesystem-based origins
+    'file://',
+    'file:///home/russs/PycharmProjects/earthcalendar/',
+    'https://cal.earthen.io',// Allow local Snap apps or filesystem-based origins
 ];
 
 // Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
