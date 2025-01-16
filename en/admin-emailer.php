@@ -119,9 +119,19 @@ function sendAccountActivationEmail($to, $subject, $body) {
     $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Mailgun API key
     $mailgunDomain = 'mail.gobrik.com'; // Verified Mailgun domain
 
+    // Log the sending process start
+    error_log("Starting email sending process to: $to");
+
     try {
+        // Log the email request parameters
+        $logMessage = "Sending email with the following details:\n" .
+                      "To: $to\n" .
+                      "Subject: $subject\n" .
+                      "Body (HTML): $body\n";
+        error_log($logMessage);
+
         // Send the email using Mailgun's API
-        $response = $client->post("{$mailgunDomain}/messages", [
+        $response = $client->post("https://api.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
                 'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
@@ -132,34 +142,37 @@ function sendAccountActivationEmail($to, $subject, $body) {
             ]
         ]);
 
-        return $response->getStatusCode() == 200;
+        // Log the response status code and body
+        $statusCode = $response->getStatusCode();
+        $responseBody = (string) $response->getBody();
+
+        error_log("Mailgun Response Code: $statusCode");
+        error_log("Mailgun Response Body: $responseBody");
+
+        // Check if the response indicates success
+        if ($statusCode == 200) {
+            error_log("Email sent successfully to $to");
+            return true;
+        } else {
+            error_log("Failed to send email to $to. Status Code: $statusCode. Response Body: $responseBody");
+            return false;
+        }
+    } catch (RequestException $e) {
+        // Log the exception message
+        error_log("Mailgun API Request Exception: " . $e->getMessage());
+
+        // Log the request and response for debugging
+        if ($e->hasResponse()) {
+            error_log("Mailgun API Error Response: " . (string) $e->getResponse()->getBody());
+        }
+        return false;
     } catch (Exception $e) {
-        error_log("Mailgun API Exception: " . $e->getMessage());
+        // Log any other exceptions
+        error_log("Unexpected Exception: " . $e->getMessage());
         return false;
     }
 }
 
-// PART 4: Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
-    $to = $_POST['email_to'];
-    $subject = $_POST['email_subject'];
-    $body = $_POST['email_body'];
-
-    if (sendAccountActivationEmail($to, $subject, $body)) {
-        echo "<script>alert('Email sent successfully to $to');</script>";
-
-        // Update the emailing_status to 'delivered'
-        require_once '../gobrikconn_env.php';
-        $updateQuery = "UPDATE tb_ecobrickers SET emailing_status = 'delivered' WHERE email_addr = ?";
-        $stmt = $gobrik_conn->prepare($updateQuery);
-        $stmt->bind_param("s", $to);
-        $stmt->execute();
-        $stmt->close();
-        $gobrik_conn->close();
-    } else {
-        echo "<script>alert('Failed to send the email to $to.');</script>";
-    }
-}
 $gobrik_conn->close();
 ?>
 
