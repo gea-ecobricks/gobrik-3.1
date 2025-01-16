@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\RequestException;
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.51';
+$version = '0.52';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -103,7 +103,8 @@ $subject = "Please activate your 2025 GoBrik account";
 // Compose the email body with dynamic user data
 $body = "
 Hi there $first_name,<br><br>
-GoBrik has been totally revamped for 2025! We've removed our reliance on Google, Facebook and Amazon services and need you to re-activate your new account with our new Buwana authentication protocol.<br><br>
+GoBrik has been totally revamped for 2025! <br><br>
+We've removed our reliance on Google, Facebook and Amazon services and need you to re-activate your new account with our new Buwana authentication protocol.<br><br>
 You've been with us since you registered on $date_registered.<br><br>
 In your old account, we have your $ecobricks_made ecobricks and $brk_balance Brikcoins.<br><br>
 Your work there was a great service to your local $city_txt ecology and your $region_txt bioregion of $country_txt Earth.<br><br>
@@ -204,7 +205,7 @@ $gobrik_conn->close();
     <p>Use this form to send an email to remind users to activate their account.</p>
 
     <form method="post" style="text-align:left;">
-        <label for="email_to">To:</label><br>
+        <label for="email_to">Sending to:</label><br>
         <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
 
         <label for="email_subject">Subject:</label><br>
@@ -243,26 +244,28 @@ document.querySelector('form').addEventListener('submit', function (e) {
         alert("Please fill out all fields before sending the email.");
     }
 });
-document.querySelector('form').addEventListener('submit', function (e) {
-    e.preventDefault();
 
-    const formData = new FormData(this);
-
-    fetch('admin-emailer.php', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.text())
-    .then(data => {
-        alert("Email sent successfully!");
-        // Optionally update the form with the next ecobricker
-        console.log(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("Failed to send the email.");
-    });
-});
+//
+// document.querySelector('form').addEventListener('submit', function (e) {
+//     e.preventDefault();
+//
+//     const formData = new FormData(this);
+//
+//     fetch('admin-emailer.php', {
+//         method: 'POST',
+//         body: formData,
+//     })
+//     .then(response => response.text())
+//     .then(data => {
+//         alert("Email sent successfully!");
+//         // Optionally update the form with the next ecobricker
+//         console.log(data);
+//     })
+//     .catch(error => {
+//         console.error('Error:', error);
+//         alert("Failed to send the email.");
+//     });
+// });
 
 </script>
 
