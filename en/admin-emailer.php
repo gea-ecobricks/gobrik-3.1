@@ -1,4 +1,5 @@
 <?php
+require '../vendor/autoload.php'; // Path to Composer's autoloader
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
 use GuzzleHttp\Client;
@@ -42,6 +43,29 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     exit();
 }
 // END LOGIN AND ROLE CHECK
+
+//Set up user variables
+
+ $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
+
+    // Include database connection
+    require_once '../gobrikconn_env.php';
+    require_once '../buwanaconn_env.php';
+
+    // Fetch the user's location data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $ecobrick_unique_id = '';
+    $first_name = getFirstName($buwana_conn, $buwana_id);
+
+    $error_message = '';
+    $full_urls = [];
+    $thumbnail_paths = [];
+    $main_file_sizes = [];
+    $thumbnail_file_sizes = [];
 
 // PART 2: Function to grab the next ecobricker record
 function getNextEcobricker($conn) {
