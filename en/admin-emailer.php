@@ -79,6 +79,19 @@ $nextEcobricker = getNextEcobricker($gobrik_conn);
 
 $gobrik_conn->close();
 
+    // Include database connection
+    require_once '../gobrikconn_env.php';
+    require_once '../buwanaconn_env.php';
+
+ // Fetch the user's location data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $ecobrick_unique_id = '';
+    $first_name = getFirstName($buwana_conn, $buwana_id);
+
 // Initialize variables for the email form
 $email_addr = $nextEcobricker['email_addr'] ?? '';
 $first_name = $nextEcobricker['first_name'] ?? '';
@@ -179,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     <h2>Send Email Check</h2>
     <p>Use this form to send an email to remind users to activate their account.</p>
 
-    <form method="post">
+    <form method="post" style="text-align:left;">
         <label for="email_to">To:</label><br>
         <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
 
@@ -189,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
         <label for="email_body">Body:</label><br>
         <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
 
-        <button type="submit" name="send_email" class="submit-button" class="submit-button activate">📨 Send Email</button>
+        <button type="submit" name="send_email" class="submit-button" class="submit-button confirm">📨 Send Email</button>
     </form>
 </div>
 
