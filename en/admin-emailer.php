@@ -101,6 +101,9 @@ $region_txt = $nextEcobricker['region_txt'] ?? '';
 $country_txt = $nextEcobricker['country_txt'] ?? '';
 $subject = "Please activate your 2025 GoBrik account";
 
+
+
+
 // Compose the email body with dynamic user data
 $body = "
 Hi there $first_name,<br><br>
@@ -115,6 +118,7 @@ See you on the app!<br><br>
 GEA Dev Team
 ";
 
+
 // PART 3: Function to send the email
 function sendAccountActivationEmail($to, $subject, $body) {
     $client = new Client(['base_uri' => 'https://api.mailgun.net/v3/']); // Mailgun API
@@ -126,11 +130,7 @@ function sendAccountActivationEmail($to, $subject, $body) {
 
     try {
         // Log the email request parameters
-        $logMessage = "Sending email with the following details:\n" .
-                      "To: $to\n" .
-                      "Subject: $subject\n" .
-                      "Body (HTML): $body\n";
-        error_log($logMessage);
+        error_log("Sending email to $to with subject: $subject");
 
         // Send the email using Mailgun's API
         $response = $client->post("https://api.mailgun.net/v3/{$mailgunDomain}/messages", [
@@ -160,22 +160,40 @@ function sendAccountActivationEmail($to, $subject, $body) {
             return false;
         }
     } catch (RequestException $e) {
-        // Log the exception message
         error_log("Mailgun API Request Exception: " . $e->getMessage());
-
-        // Log the request and response for debugging
         if ($e->hasResponse()) {
             error_log("Mailgun API Error Response: " . (string) $e->getResponse()->getBody());
         }
         return false;
     } catch (Exception $e) {
-        // Log any other exceptions
         error_log("Unexpected Exception: " . $e->getMessage());
         return false;
     }
 }
 
-$gobrik_conn->close();
+// PART 4: Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
+    $to = $_POST['email_to'];
+    $subject = $_POST['email_subject'];
+    $body = $_POST['email_body'];
+
+    // Send the email
+    if (sendAccountActivationEmail($to, $subject, $body)) {
+        // Update the emailing_status to 'delivered'
+        $updateQuery = "UPDATE tb_ecobrickers SET emailing_status = 'delivered' WHERE email_addr = ?";
+        $stmt = $gobrik_conn->prepare($updateQuery);
+        $stmt->bind_param("s", $to);
+        $stmt->execute();
+        $stmt->close();
+
+        // Return success response
+        echo json_encode(['success' => true, 'message' => 'Email sent successfully.']);
+    } else {
+        // Return error response
+        echo json_encode(['success' => false, 'message' => 'Failed to send the email.']);
+    }
+
+    $gobrik_conn->close();
 ?>
 
 
