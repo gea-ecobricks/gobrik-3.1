@@ -234,7 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
         <label for="email_body">Body:</label><br>
         <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
 
-        <button type="submit" name="send_email" class="submit-button" class="confirm-button enabled">📨 Send Email</button>
+        <button type="submit" name="send_email" class="confirm-button enabled">📨 Send Email</button>
     </form>
 </div>
 
