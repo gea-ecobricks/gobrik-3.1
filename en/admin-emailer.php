@@ -1,6 +1,10 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.51';
@@ -204,7 +208,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 
 <!--FOOTER STARTS HERE-->
 <?php require_once ("../footer-2024.php"); ?>
+<script>
+document.querySelector('form').addEventListener('submit', function (e) {
+    const emailTo = document.getElementById('email_to').value.trim();
+    const emailSubject = document.getElementById('email_subject').value.trim();
+    const emailBody = document.getElementById('email_body').value.trim();
 
+    if (!emailTo || !emailSubject || !emailBody) {
+        e.preventDefault();
+        alert("Please fill out all fields before sending the email.");
+    }
+});
+document.querySelector('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch('admin-emailer.php', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert("Email sent successfully!");
+        // Optionally update the form with the next ecobricker
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Failed to send the email.");
+    });
+});
+
+</script>
 
 
 </body>
