@@ -201,7 +201,7 @@ $gobrik_conn->close();
        <!-- Email confirmation form -->
 
 <div style="text-align:center;">
-    <h2>Send Email Check</h2>
+    <h2>Send Activation Email</h2>
     <p>Use this form to send an email to remind users to activate their account.</p>
 
     <form method="post" style="text-align:left;">
@@ -214,7 +214,7 @@ $gobrik_conn->close();
         <label for="email_body">Body:</label><br>
         <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
 
-        <button type="submit" name="send_email" class="submit-button" class="submit-button confirm">📨 Send Email</button>
+        <button type="submit" name="send_email" class="submit-button" class="confirm-button enabled">📨 Send Email</button>
     </form>
 </div>
 
@@ -222,11 +222,6 @@ $gobrik_conn->close();
 
 </div>
 
-
-</div>
-
-</div>
-</div>
 
 </div> <!--Closes main-->
 
@@ -245,27 +240,27 @@ document.querySelector('form').addEventListener('submit', function (e) {
     }
 });
 
-//
-// document.querySelector('form').addEventListener('submit', function (e) {
-//     e.preventDefault();
-//
-//     const formData = new FormData(this);
-//
-//     fetch('admin-emailer.php', {
-//         method: 'POST',
-//         body: formData,
-//     })
-//     .then(response => response.text())
-//     .then(data => {
-//         alert("Email sent successfully!");
-//         // Optionally update the form with the next ecobricker
-//         console.log(data);
-//     })
-//     .catch(error => {
-//         console.error('Error:', error);
-//         alert("Failed to send the email.");
-//     });
-// });
+
+document.querySelector('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch('admin-emailer.php', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert("Email sent successfully!");
+        // Optionally update the form with the next ecobricker
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Failed to send the email.");
+    });
+});
 
 </script>
 
