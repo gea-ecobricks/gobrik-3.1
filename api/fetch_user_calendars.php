@@ -111,6 +111,8 @@ try {
     $response['subscribed_calendars'] = $subscribedCalendars;
     $response['public_calendars'] = $publicCalendars;
 
+error_log("User Data: " . print_r($userData, true));
+
 } catch (Exception $e) {
     $response['message'] = $e->getMessage();
 } finally {
