@@ -58,7 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 // Get the JSON input from the request
 $input = json_decode(file_get_contents('php://input'), true);
 $buwana_id = $input['buwana_id'] ?? null;
-$calendar_name = $input['calendar_name'] ?? null;
 
 // Validate inputs
 if (empty($buwana_id) || !is_numeric($buwana_id)) {
@@ -98,11 +97,20 @@ try {
     $subscribedCalendars = $stmtSubscribed->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmtSubscribed->close();
 
+    // Fetch public calendars
+    $sqlPublicCalendars = "SELECT calendar_id, calendar_name FROM calendars_tb WHERE calendar_public = 1";
+    $stmtPublic = $cal_conn->prepare($sqlPublicCalendars);
+    $stmtPublic->execute();
+    $publicCalendars = $stmtPublic->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmtPublic->close();
+
     // Prepare response
     $response['success'] = true;
     $response['user'] = $userData;
     $response['personal_calendars'] = $personalCalendars;
     $response['subscribed_calendars'] = $subscribedCalendars;
+    $response['public_calendars'] = $publicCalendars;
+
 } catch (Exception $e) {
     $response['message'] = $e->getMessage();
 } finally {
