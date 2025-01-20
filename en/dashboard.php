@@ -119,6 +119,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         </div>
 
+
+<!--TRAINER MENU-->
 <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
     <div id="gea-trainer-menu" class="dashboard-panel">
         <h4 class="panel-title">GEA Trainer Menu</h4>
@@ -133,6 +135,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </div>
 <?php endif; ?>
 
+<!--ADMIN-->
 
 <?php if (strpos(strtolower($user_roles), 'admin') !== false): ?>
     <div id="admin-menu" class="dashboard-panel">
@@ -144,6 +147,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
     </div>
 <?php endif; ?>
+
+<?php if (strpos(strtolower($gea_status), 'master trainer') !== false): ?>
+    <div id="admin-menu" class="dashboard-panel">
+        <h4 class="panel-title">Master Trainer Menu</h4>
+        <div class="menu-buttons-row">
+            <!-- Add Revenue button with onclick and aria property -->
+            <button class="page-button" id="add-revenue" onclick="addRevenueTrans()" aria-label="Click to add a revenue transaction">➕ Record GEA Revenue</button>
+        </div>
+    </div>
+<?php endif; ?>
+
 
 
 
