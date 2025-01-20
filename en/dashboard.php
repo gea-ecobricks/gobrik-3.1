@@ -148,6 +148,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </div>
 <?php endif; ?>
 
+
 <?php if (strpos(strtolower($gea_status), 'master trainer') !== false): ?>
     <div id="admin-menu" class="dashboard-panel">
         <h4 class="panel-title">Master Trainer Menu</h4>
