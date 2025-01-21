@@ -155,6 +155,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <div class="menu-buttons-row">
             <!-- Add Revenue button with onclick and aria property -->
             <button class="page-button" id="add-revenue" onclick="addRevenueTrans()" aria-label="Click to add a revenue transaction">➕ Record GEA Revenue</button>
+            <button class="page-button" id="open-books" href="https://ecobricks.org/en/open-books.php" aria-label="Click to add a revenue transaction">Open Books</button>
+            <button class="page-button" id="add-expense" onclick="addExpenseTrans()" aria-label="Click to add an expense transaction">➕ Record GEA Expenses</button>
         </div>
     </div>
 <?php endif; ?>
@@ -224,7 +226,7 @@ function addRevenueTrans() {
 
     // Create the form HTML
     const formHTML = `
-        <h4 style="text-align:center">Add Revenue Transaction</h4>
+        <h2 style="text-align:center">Add Revenue Transaction</h2>
         <form id="add-revenue-form" onsubmit="submitRevenueTrans(event)">
             <div class="form-item" style="margin-top: 25px;">
                 <label for="amount-idr">Amount (IDR):</label>
@@ -241,10 +243,10 @@ function addRevenueTrans() {
             <div class="form-item">
                 <label for="description">Transaction Description:</label>
                 <br>
-                <textarea id="description" name="description" rows="4" required></textarea>
+                <textarea id="description" name="description" rows="4" required style="width:90%"></textarea>
             </div>
             <div data-lang-id="016-submit-button" style="margin:auto;text-align: center;margin-top:30px;">
-                <button type="submit" class="submit-button enabled" aria-label="Submit Form">Submit</button>
+                <button type="submit" class="submit-button enabled" aria-label="Submit Form">➕ Add Revenue Transaction</button>
             </div>
         </form>
     `;
