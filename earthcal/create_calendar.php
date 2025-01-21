@@ -3,7 +3,6 @@ require_once '../earthenAuth_helper.php';
 require_once '../buwanaconn_env.php';
 require_once '../calconn_env.php'; // Include EarthCal database connection
 
-// Set headers for JSON response
 header('Content-Type: application/json');
 
 // CORS configuration
@@ -27,14 +26,12 @@ if (empty($origin)) {
     exit();
 }
 
-// Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     exit(0);
 }
 
-// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405); // Method Not Allowed
     echo json_encode(['success' => false, 'message' => 'Invalid request method. Use POST.']);
@@ -42,15 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    // Parse input
     $inputData = json_decode(file_get_contents('php://input'), true);
 
     // Validate input
     $requiredFields = ['local_id', 'name', 'color', 'public'];
     foreach ($requiredFields as $field) {
-        if (empty($inputData[$field])) {
+        if (!isset($inputData[$field]) || ($field === 'public' && !in_array($inputData[$field], [0, 1], true))) {
             http_response_code(400); // Bad Request
-            echo json_encode(['success' => false, 'message' => "Missing required field: $field"]);
+            echo json_encode(['success' => false, 'message' => "Invalid or missing field: $field"]);
             exit();
         }
     }
@@ -59,7 +55,7 @@ try {
     $localId = htmlspecialchars($inputData['local_id']);
     $name = htmlspecialchars($inputData['name']);
     $color = htmlspecialchars($inputData['color']);
-    $public = intval($inputData['public']);
+    $public = intval($inputData['public']); // Map "public" from request to "calendar_public" in the database
     $buwanaId = isset($inputData['buwana_id']) && is_numeric($inputData['buwana_id']) ? intval($inputData['buwana_id']) : null;
 
     // Prepare SQL to insert the calendar
