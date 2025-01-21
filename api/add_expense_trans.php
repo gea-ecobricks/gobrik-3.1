@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once '../gobrikconn_env.php';
 
 // Check if required POST fields are set
-if (!isset($_POST['amount_idr'], $_POST['sender'], $_POST['transaction_date'], $_POST['description'], $_POST['revenue_type'], $_POST['receiving_gea_acct'])) {
+if (!isset($_POST['amount_idr'], $_POST['receiver'], $_POST['transaction_date'], $_POST['description'], $_POST['expense_type'], $_POST['expense_vendor'])) {
     http_response_code(400); // Bad Request
     echo json_encode(['error' => 'All fields are required.']);
     exit;
@@ -16,25 +16,26 @@ if (!isset($_POST['amount_idr'], $_POST['sender'], $_POST['transaction_date'], $
 
 // Sanitize input data
 $amount_idr = intval($_POST['amount_idr']); // Convert to integer
-$sender = $gobrik_conn->real_escape_string($_POST['sender']);
+$receiver = $gobrik_conn->real_escape_string($_POST['receiver']);
 $transaction_date = $gobrik_conn->real_escape_string($_POST['transaction_date']);
 $description = $gobrik_conn->real_escape_string($_POST['description']);
-$revenue_type = $gobrik_conn->real_escape_string($_POST['revenue_type']);
-$receiving_gea_acct = $gobrik_conn->real_escape_string($_POST['receiving_gea_acct']);
+$expense_type = $gobrik_conn->real_escape_string($_POST['expense_type']);
+$expense_vendor = $gobrik_conn->real_escape_string($_POST['expense_vendor']);
 
 // Additional fields
 $currency_code = 'IDR';
-$type_of_transaction = 'Revenue';
-$receiver_for_display = 'Global Ecobrick Alliance'; // Set receiver_for_display field
+$type_of_transaction = 'Expense'; // Fixed value
+$sender_for_display = 'Global Ecobrick Alliance'; // Fixed value
+$sender_ecobricker = 'Global Ecobrick Alliance'; // Fixed value
 $datetime_sent_ts = date('Y-m-d H:i:s', strtotime($transaction_date));
 
 // Insert transaction into the database
 $sql = "INSERT INTO tb_cash_transaction (
-            native_ccy_amt, idr_amount, sender_for_display,
+            native_ccy_amt, idr_amount, receiver_for_display,
             datetime_sent_ts, tran_name_desc, currency_code,
-            receiving_gea_acct, type_of_transaction,
-            revenue_accounting_type, receiver_for_display
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            expense_accounting_type, type_of_transaction,
+            expense_vendor, sender_for_display, sender_ecobricker
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $gobrik_conn->prepare($sql);
 if (!$stmt) {
@@ -44,11 +45,11 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    'iissssssss',
-    $amount_idr, $amount_idr, $sender,
+    'iisssssssss',
+    $amount_idr, $amount_idr, $receiver,
     $datetime_sent_ts, $description, $currency_code,
-    $receiving_gea_acct, $type_of_transaction,
-    $revenue_type, $receiver_for_display
+    $expense_type, $type_of_transaction,
+    $expense_vendor, $sender_for_display, $sender_ecobricker
 );
 
 if ($stmt->execute()) {

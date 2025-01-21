@@ -446,6 +446,162 @@ function submitRevenueTrans(event) {
     });
 }
 
+// ADD Expense
+function addExpenseTrans() {
+    // Select modal elements
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    // Lock scrolling for the body and blur the background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open'); // Locks scrolling
+
+    // Set up the modal-content-box styles
+    const modalContentBox = document.getElementById('modal-content-box');
+    modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
+    modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
+
+    // List of expense_accounting_type values
+    const expenseTypes = [
+        'Work Space',
+        'Visas',
+        'Transportation',
+        'Translation Services',
+        'Trainers Fees',
+        'Team Communications',
+        'Team Communication Platform',
+        'Site Servers & Domains',
+        'Services',
+        'Rent & Co-working',
+        'Reimbursement',
+        'Internet Access',
+        'GEA team meeting expense',
+        'EarthWand Expense',
+        'Domain name fees',
+        'Database & App',
+        'Center Circle Salary (unpaid)',
+        'Center Circle Salary',
+        'App services',
+        'Accomodations'
+    ];
+
+    // List of expense_vendor options
+    const expenseVendors = [
+        'Zoom Video Conferencing',
+        'Vultr.com',
+        'Visas for Trainings',
+        'VectorStock',
+        'Travel Service Provider',
+        'Tony Rakka Cafe',
+        'Misc. Vendor',
+        'Make.com',
+        'Localize',
+        'Knack.com',
+        'Integromat',
+        'IndiHome Internet Provider',
+        'I. Bagus Swastika',
+        'Gumi Bamboo',
+        'Eledo.online',
+        'DropBox',
+        'Cloudflare',
+        '1&1 IONOS Inc.'
+    ];
+
+    // Generate options for the dropdowns
+    const expenseTypeOptions = expenseTypes
+        .map(type => `<option value="${type}">${type}</option>`)
+        .join('');
+    const expenseVendorOptions = expenseVendors
+        .map(vendor => `<option value="${vendor}">${vendor}</option>`)
+        .join('');
+
+    // Create the form HTML
+    const formHTML = `
+        <h2 style="text-align:center">Add Expense Transaction</h2>
+        <form id="add-expense-form" onsubmit="submitExpenseTrans(event)">
+            <div class="form-item" style="margin-top: 25px;">
+                <label for="amount-idr">Amount (IDR):</label>
+                <input type="number" id="amount-idr" name="amount_idr" required />
+            </div>
+            <div class="form-item">
+                <label for="receiver">To (Receiver):</label>
+                <input type="text" id="receiver" name="receiver" required />
+            </div>
+            <div class="form-item">
+                <label for="transaction-date">Transaction Date:</label>
+                <input type="date" id="transaction-date" name="transaction_date" value="${new Date().toISOString().split('T')[0]}" required />
+            </div>
+            <div class="form-item">
+                <label for="description">Transaction Description:</label>
+                <textarea id="description" name="description" rows="4" required style="width:90%"></textarea>
+            </div>
+            <div class="form-item">
+                <label for="expense-type">Expense Accounting Type:</label>
+                <select id="expense-type" name="expense_type" required>
+                    <option value="">Select an expense type</option>
+                    ${expenseTypeOptions}
+                </select>
+            </div>
+            <div class="form-item">
+                <label for="expense-vendor">Expense Vendor:</label>
+                <select id="expense-vendor" name="expense_vendor" required>
+                    <option value="">Select a vendor</option>
+                    ${expenseVendorOptions}
+                </select>
+            </div>
+            <div data-lang-id="016-submit-button" style="margin:auto;text-align: center;margin-top:30px;">
+                <button type="submit" class="submit-button enabled" aria-label="Submit Form">➕ Add Expense Transaction</button>
+            </div>
+        </form>
+    `;
+
+    // Populate the modal content
+    modalContentBox.innerHTML = formHTML;
+
+    // Show the modal
+    modal.classList.remove('modal-hidden');
+}
+
+
+function submitExpenseTrans(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Get form data
+    const formData = {
+        amount_idr: document.getElementById('amount-idr').value,
+        receiver: document.getElementById('receiver').value,
+        transaction_date: document.getElementById('transaction-date').value,
+        description: document.getElementById('description').value,
+        expense_type: document.getElementById('expense-type').value,
+        expense_vendor: document.getElementById('expense-vendor').value
+    };
+
+    // Send the data to the backend
+    $.ajax({
+        url: '../api/add_expense_trans.php',
+        type: 'POST',
+        data: formData,
+        success: function (response) {
+            const data = JSON.parse(response);
+            if (data.success) {
+                alert('Expense transaction added successfully!');
+                closeInfoModal(); // Close the modal
+                location.reload(); // Reload the page to refresh data
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        },
+        error: function (xhr, status, error) {
+            alert('Failed to add expense transaction. Please try again later.');
+            console.error('AJAX Error:', status, error);
+        }
+    });
+}
 
 
 
