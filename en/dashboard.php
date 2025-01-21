@@ -201,6 +201,93 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <script>
 
+
+//ADD Revenue
+function addRevenueTrans() {
+    // Select modal elements
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    // Lock scrolling for the body and blur the background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open'); // Locks scrolling
+
+    // Set up the modal-content-box styles
+    const modalContentBox = document.getElementById('modal-content-box');
+    modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
+    modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
+
+    // Create the form HTML
+    const formHTML = `
+        <h4>Add Revenue Transaction</h4>
+        <form id="add-revenue-form" onsubmit="submitRevenueTrans(event)">
+            <label for="amount-idr">Amount (IDR):</label>
+            <input type="number" id="amount-idr" name="amount_idr" required />
+
+            <label for="sender">Sender:</label>
+            <input type="text" id="sender" name="sender" required />
+
+            <label for="transaction-date">Transaction Date:</label>
+            <input type="date" id="transaction-date" name="transaction_date" value="${new Date().toISOString().split('T')[0]}" required />
+
+            <label for="description">Transaction Description:</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+
+            <button type="submit" class="page-button">Submit</button>
+        </form>
+    `;
+
+    // Populate the modal content
+    modalContentBox.innerHTML = formHTML;
+
+    // Show the modal
+    modal.classList.remove('modal-hidden');
+}
+
+// Function to handle form submission
+function submitRevenueTrans(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Get form data
+    const amountIDR = document.getElementById('amount-idr').value;
+    const sender = document.getElementById('sender').value;
+    const transactionDate = document.getElementById('transaction-date').value;
+    const description = document.getElementById('description').value;
+
+    // Send the data to the backend
+    $.ajax({
+        url: '../api/add_revenue_trans.php',
+        type: 'POST',
+        data: {
+            amount_idr: amountIDR,
+            sender: sender,
+            transaction_date: transactionDate,
+            description: description
+        },
+        success: function (response) {
+            const data = JSON.parse(response);
+            if (data.success) {
+                alert('Revenue transaction added successfully!');
+                closeInfoModal(); // Close the modal
+                location.reload(); // Reload the page to refresh data
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        },
+        error: function (xhr, status, error) {
+            alert('Failed to add revenue transaction. Please try again later.');
+            console.error('AJAX Error:', status, error);
+        }
+    });
+}
+
+
+
     //GET ECOBRICKER'S ECOBRICKS
 
 
