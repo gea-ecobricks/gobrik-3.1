@@ -224,21 +224,28 @@ function addRevenueTrans() {
 
     // Create the form HTML
     const formHTML = `
-        <h4>Add Revenue Transaction</h4>
+        <h4 style="text-align:center">Add Revenue Transaction</h4>
         <form id="add-revenue-form" onsubmit="submitRevenueTrans(event)">
-            <label for="amount-idr">Amount (IDR):</label>
-            <input type="number" id="amount-idr" name="amount_idr" required />
-
-            <label for="sender">Sender:</label>
-            <input type="text" id="sender" name="sender" required />
-
-            <label for="transaction-date">Transaction Date:</label>
-            <input type="date" id="transaction-date" name="transaction_date" value="${new Date().toISOString().split('T')[0]}" required />
-
-            <label for="description">Transaction Description:</label>
-            <textarea id="description" name="description" rows="4" required></textarea>
-
-            <button type="submit" class="page-button">Submit</button>
+            <div class="form-item" style="margin-top: 25px;">
+                <label for="amount-idr">Amount (IDR):</label>
+                <input type="number" id="amount-idr" name="amount_idr" required />
+            </div>
+            <div class="form-item">
+                <label for="sender">From:</label>
+                <input type="text" id="sender" name="sender" required />
+            </div>
+            <div class="form-item">
+                <label for="transaction-date">Transaction Date:</label>
+                <input type="date" id="transaction-date" name="transaction_date" value="${new Date().toISOString().split('T')[0]}" required />
+            </div>
+            <div class="form-item">
+                <label for="description">Transaction Description:</label>
+                <br>
+                <textarea id="description" name="description" rows="4" required></textarea>
+            </div>
+            <div data-lang-id="016-submit-button" style="margin:auto;text-align: center;margin-top:30px;">
+                <button type="submit" class="submit-button enabled" aria-label="Submit Form">Submit</button>
+            </div>
         </form>
     `;
 
