@@ -57,22 +57,22 @@ if (empty($buwana_id) || !is_numeric($buwana_id)) {
 }
 
 try {
-    // Fetch personal calendars
-    $sqlPersonalCalendars = "SELECT calendar_id AS id, calendar_name AS name, calendar_color AS color
-                             FROM calendars_tb
-                             WHERE buwana_id = ?";
-    $stmtPersonal = $cal_conn->prepare($sqlPersonalCalendars);
-    $stmtPersonal->bind_param("i", $buwana_id);
-    $stmtPersonal->execute();
-    $personalCalendars = $stmtPersonal->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmtPersonal->close();
+    // Fetch all calendars associated with the user
+    $sqlAllCalendars = "SELECT calendar_id AS id, calendar_name AS name, calendar_color AS color
+                        FROM calendars_tb
+                        WHERE buwana_id = ?";
+    $stmtAll = $cal_conn->prepare($sqlAllCalendars);
+    $stmtAll->bind_param("i", $buwana_id);
+    $stmtAll->execute();
+    $allCalendars = $stmtAll->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmtAll->close();
 
     // Prepare response
     $response['success'] = true;
-    $response['calendars'] = $personalCalendars;
+    $response['calendars'] = $allCalendars;
 
     // Handle no calendars found
-    if (empty($personalCalendars)) {
+    if (empty($allCalendars)) {
         $response['message'] = 'No calendars found for this user.';
     }
 } catch (Exception $e) {
@@ -83,4 +83,5 @@ try {
 
 echo json_encode($response);
 exit();
+
 ?>
