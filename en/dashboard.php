@@ -325,9 +325,20 @@ function addRevenueTrans() {
         'AES Plastic Offset Purchase'
     ];
 
-    // Generate options for the dropdown
+    // List of receiving_gea_acct options
+    const receivingAccounts = [
+        'CAN Bank Account',
+        'ID Bank Account',
+        'PayPal Account',
+        'Yayasan Bank Account'
+    ];
+
+    // Generate options for the dropdowns
     const revenueTypeOptions = revenueTypes
         .map(type => `<option value="${type}">${type}</option>`)
+        .join('');
+    const receivingAcctOptions = receivingAccounts
+        .map(account => `<option value="${account}">${account}</option>`)
         .join('');
 
     // Create the form HTML
@@ -341,6 +352,14 @@ function addRevenueTrans() {
             <div class="form-item">
                 <label for="sender">From:</label>
                 <input type="text" id="sender" name="sender" required />
+            </div>
+            <div class="form-item">
+                <label for="sender-ecobricker">Was this revenue sent by a GoBrik user?</label>
+                <select id="sender-ecobricker" name="sender_ecobricker" required>
+                    <option value="">Select an option</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
             </div>
             <div class="form-item">
                 <label for="transaction-date">Transaction Date:</label>
@@ -357,6 +376,17 @@ function addRevenueTrans() {
                     ${revenueTypeOptions}
                 </select>
             </div>
+            <div class="form-item">
+                <label for="receiving-gea-acct">Receiving GEA Account:</label>
+                <select id="receiving-gea-acct" name="receiving_gea_acct" required>
+                    <option value="">Select an account</option>
+                    ${receivingAcctOptions}
+                </select>
+            </div>
+            <div class="form-item">
+                <label for="transaction-image">Image of Transaction Record:</label>
+                <input type="file" id="transaction-image" name="transaction_image" accept="image/*" />
+            </div>
             <div data-lang-id="016-submit-button" style="margin:auto;text-align: center;margin-top:30px;">
                 <button type="submit" class="submit-button enabled" aria-label="Submit Form">➕ Add Revenue Transaction</button>
             </div>
@@ -370,33 +400,28 @@ function addRevenueTrans() {
     modal.classList.remove('modal-hidden');
 }
 
+
 function submitRevenueTrans(event) {
     event.preventDefault(); // Prevent default form submission
 
     // Get form data
-    const amountIDR = document.getElementById('amount-idr').value;
-    const sender = document.getElementById('sender').value;
-    const transactionDate = document.getElementById('transaction-date').value;
-    const description = document.getElementById('description').value;
-    const revenueType = document.getElementById('revenue-type').value;
-
-    // Validate that a revenue type is selected
-    if (!revenueType) {
-        alert('Please select a revenue accounting type.');
-        return;
-    }
+    const formData = new FormData();
+    formData.append('amount_idr', document.getElementById('amount-idr').value);
+    formData.append('sender', document.getElementById('sender').value);
+    formData.append('sender_ecobricker', document.getElementById('sender-ecobricker').value);
+    formData.append('transaction_date', document.getElementById('transaction-date').value);
+    formData.append('description', document.getElementById('description').value);
+    formData.append('revenue_type', document.getElementById('revenue-type').value);
+    formData.append('receiving_gea_acct', document.getElementById('receiving-gea-acct').value);
+    formData.append('transaction_image', document.getElementById('transaction-image').files[0]);
 
     // Send the data to the backend
     $.ajax({
         url: '../api/add_revenue_trans.php',
         type: 'POST',
-        data: {
-            amount_idr: amountIDR,
-            sender: sender,
-            transaction_date: transactionDate,
-            description: description,
-            revenue_type: revenueType
-        },
+        data: formData,
+        contentType: false, // Necessary for file uploads
+        processData: false, // Prevent jQuery from processing the data
         success: function (response) {
             const data = JSON.parse(response);
             if (data.success) {
@@ -413,6 +438,7 @@ function submitRevenueTrans(event) {
         }
     });
 }
+
 
 
 
