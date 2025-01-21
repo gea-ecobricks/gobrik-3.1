@@ -354,14 +354,6 @@ function addRevenueTrans() {
                 <input type="text" id="sender" name="sender" required />
             </div>
             <div class="form-item">
-                <label for="sender-ecobricker">Was this revenue sent by a GoBrik user?</label>
-                <select id="sender-ecobricker" name="sender_ecobricker" required>
-                    <option value="">Select an option</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
-            </div>
-            <div class="form-item">
                 <label for="transaction-date">Transaction Date:</label>
                 <input type="date" id="transaction-date" name="transaction_date" value="${new Date().toISOString().split('T')[0]}" required />
             </div>
@@ -383,10 +375,24 @@ function addRevenueTrans() {
                     ${receivingAcctOptions}
                 </select>
             </div>
+            <!-- Uncomment the following section to include the "Was this transaction sent by a GoBrik user?" field -->
+            <!--
+            <div class="form-item">
+                <label for="sender-ecobricker">Was this revenue sent by a GoBrik user?</label>
+                <select id="sender-ecobricker" name="sender_ecobricker">
+                    <option value="">Select an option</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+            -->
+            <!-- Uncomment the following section to include the file upload for transaction record -->
+            <!--
             <div class="form-item">
                 <label for="transaction-image">Image of Transaction Record:</label>
                 <input type="file" id="transaction-image" name="transaction_image" accept="image/*" />
             </div>
+            -->
             <div data-lang-id="016-submit-button" style="margin:auto;text-align: center;margin-top:30px;">
                 <button type="submit" class="submit-button enabled" aria-label="Submit Form">➕ Add Revenue Transaction</button>
             </div>
@@ -399,6 +405,7 @@ function addRevenueTrans() {
     // Show the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 function submitRevenueTrans(event) {
