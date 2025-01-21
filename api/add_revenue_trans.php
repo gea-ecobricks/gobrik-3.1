@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once '../gobrikconn_env.php';
 
 // Check if required POST fields are set
-if (!isset($_POST['amount_idr'], $_POST['sender'], $_POST['transaction_date'], $_POST['description'])) {
+if (!isset($_POST['amount_idr'], $_POST['sender'], $_POST['transaction_date'], $_POST['description'], $_POST['revenue_type'])) {
     http_response_code(400); // Bad Request
     echo json_encode(['error' => 'All fields are required.']);
     exit;
@@ -19,6 +19,7 @@ $amount_idr = intval($_POST['amount_idr']); // Convert to integer
 $sender = $gobrik_conn->real_escape_string($_POST['sender']);
 $transaction_date = $gobrik_conn->real_escape_string($_POST['transaction_date']);
 $description = $gobrik_conn->real_escape_string($_POST['description']);
+$revenue_type = $gobrik_conn->real_escape_string($_POST['revenue_type']);
 
 // Additional fields
 $currency_code = 'IDR';
@@ -30,8 +31,8 @@ $datetime_sent_ts = date('Y-m-d H:i:s', strtotime($transaction_date));
 $sql = "INSERT INTO tb_cash_transaction (
             native_ccy_amt, idr_amount, sender_for_display,
             datetime_sent_ts, tran_name_desc, currency_code,
-            receiving_gea_acct, type_of_transaction
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            receiving_gea_acct, type_of_transaction, revenue_accounting_type
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $gobrik_conn->prepare($sql);
 if (!$stmt) {
@@ -41,10 +42,10 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    'iissssss',
+    'iisssssss',
     $amount_idr, $amount_idr, $sender,
     $datetime_sent_ts, $description, $currency_code,
-    $receiving_gea_acct, $type_of_transaction
+    $receiving_gea_acct, $type_of_transaction, $revenue_type
 );
 
 if ($stmt->execute()) {

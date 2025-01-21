@@ -203,8 +203,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <script>
 
-
-//ADD Revenue
+// ADD Revenue
 function addRevenueTrans() {
     // Select modal elements
     const modal = document.getElementById('form-modal-message');
@@ -224,6 +223,29 @@ function addRevenueTrans() {
     modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
     modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
 
+    // List of revenue_accounting_type values
+    const revenueTypes = [
+        'Trainer EarthWands Remittance',
+        'Trainer Course 20% Remittance',
+        'Other',
+        'Open donation',
+        'O2E Contribution',
+        'GEA Trainer Monthly Contribution',
+        'GEA product purchase',
+        'GEA Course Registration',
+        'GEA Catalyst Program Fee',
+        'Founder contribution',
+        'Encouragement',
+        'Brikcoin purchase',
+        'Arc.io CDN',
+        'AES Plastic Offset Purchase'
+    ];
+
+    // Generate options for the dropdown
+    const revenueTypeOptions = revenueTypes
+        .map(type => `<option value="${type}">${type}</option>`)
+        .join('');
+
     // Create the form HTML
     const formHTML = `
         <h2 style="text-align:center">Add Revenue Transaction</h2>
@@ -242,8 +264,14 @@ function addRevenueTrans() {
             </div>
             <div class="form-item">
                 <label for="description">Transaction Description:</label>
-                <br>
                 <textarea id="description" name="description" rows="4" required style="width:90%"></textarea>
+            </div>
+            <div class="form-item">
+                <label for="revenue-type">Revenue Accounting Type:</label>
+                <select id="revenue-type" name="revenue_type" required>
+                    <option value="">Select a revenue type</option>
+                    ${revenueTypeOptions}
+                </select>
             </div>
             <div data-lang-id="016-submit-button" style="margin:auto;text-align: center;margin-top:30px;">
                 <button type="submit" class="submit-button enabled" aria-label="Submit Form">➕ Add Revenue Transaction</button>
@@ -258,7 +286,90 @@ function addRevenueTrans() {
     modal.classList.remove('modal-hidden');
 }
 
-// Function to handle form submission
+
+// ADD Revenue
+function addRevenueTrans() {
+    // Select modal elements
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    // Lock scrolling for the body and blur the background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open'); // Locks scrolling
+
+    // Set up the modal-content-box styles
+    const modalContentBox = document.getElementById('modal-content-box');
+    modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
+    modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
+
+    // List of revenue_accounting_type values
+    const revenueTypes = [
+        'Trainer EarthWands Remittance',
+        'Trainer Course 20% Remittance',
+        'Other',
+        'Open donation',
+        'O2E Contribution',
+        'GEA Trainer Monthly Contribution',
+        'GEA product purchase',
+        'GEA Course Registration',
+        'GEA Catalyst Program Fee',
+        'Founder contribution',
+        'Encouragement',
+        'Brikcoin purchase',
+        'Arc.io CDN',
+        'AES Plastic Offset Purchase'
+    ];
+
+    // Generate options for the dropdown
+    const revenueTypeOptions = revenueTypes
+        .map(type => `<option value="${type}">${type}</option>`)
+        .join('');
+
+    // Create the form HTML
+    const formHTML = `
+        <h2 style="text-align:center">Add Revenue Transaction</h2>
+        <form id="add-revenue-form" onsubmit="submitRevenueTrans(event)">
+            <div class="form-item" style="margin-top: 25px;">
+                <label for="amount-idr">Amount (IDR):</label>
+                <input type="number" id="amount-idr" name="amount_idr" required />
+            </div>
+            <div class="form-item">
+                <label for="sender">From:</label>
+                <input type="text" id="sender" name="sender" required />
+            </div>
+            <div class="form-item">
+                <label for="transaction-date">Transaction Date:</label>
+                <input type="date" id="transaction-date" name="transaction_date" value="${new Date().toISOString().split('T')[0]}" required />
+            </div>
+            <div class="form-item">
+                <label for="description">Transaction Description:</label>
+                <textarea id="description" name="description" rows="4" required style="width:90%"></textarea>
+            </div>
+            <div class="form-item">
+                <label for="revenue-type">Revenue Accounting Type:</label>
+                <select id="revenue-type" name="revenue_type" required>
+                    <option value="">Select a revenue type</option>
+                    ${revenueTypeOptions}
+                </select>
+            </div>
+            <div data-lang-id="016-submit-button" style="margin:auto;text-align: center;margin-top:30px;">
+                <button type="submit" class="submit-button enabled" aria-label="Submit Form">➕ Add Revenue Transaction</button>
+            </div>
+        </form>
+    `;
+
+    // Populate the modal content
+    modalContentBox.innerHTML = formHTML;
+
+    // Show the modal
+    modal.classList.remove('modal-hidden');
+}
+
 function submitRevenueTrans(event) {
     event.preventDefault(); // Prevent default form submission
 
@@ -267,6 +378,13 @@ function submitRevenueTrans(event) {
     const sender = document.getElementById('sender').value;
     const transactionDate = document.getElementById('transaction-date').value;
     const description = document.getElementById('description').value;
+    const revenueType = document.getElementById('revenue-type').value;
+
+    // Validate that a revenue type is selected
+    if (!revenueType) {
+        alert('Please select a revenue accounting type.');
+        return;
+    }
 
     // Send the data to the backend
     $.ajax({
@@ -276,7 +394,8 @@ function submitRevenueTrans(event) {
             amount_idr: amountIDR,
             sender: sender,
             transaction_date: transactionDate,
-            description: description
+            description: description,
+            revenue_type: revenueType
         },
         success: function (response) {
             const data = JSON.parse(response);
@@ -294,6 +413,7 @@ function submitRevenueTrans(event) {
         }
     });
 }
+
 
 
 
