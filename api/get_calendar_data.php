@@ -7,6 +7,7 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING); // Suppress warnings and notice
 ini_set('display_errors', '0'); // Disable error display for production
 
 $allowed_origins = [
+    'https://cal.earthen.io',
     'https://cycles.earthen.io',
     'https://ecobricks.org',
     'https://gobrik.com',
