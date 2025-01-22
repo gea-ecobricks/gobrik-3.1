@@ -138,7 +138,6 @@ echo '<!DOCTYPE html>
     <!-- FOOTER -->
     <?php require_once("../footer-2024.php"); ?>
 
-
 <script>
     $(document).ready(function() {
         var userLang = "<?php echo htmlspecialchars($lang); ?>"; // Get the user's language
@@ -174,7 +173,17 @@ echo '<!DOCTYPE html>
                 { "data": "volume_ml" }, // Volume
                 { "data": "density" }, // Density
 
-                { "data": "location_brik" }, // Location
+                {
+                    "data": "location_brik", // Location
+                    "render": function(data, type, row) {
+                        if (type === 'display' && data) {
+                            const maxLength = 100; // Set max character length
+                            return data.length > maxLength ? data.substr(0, maxLength) + '...' : data;
+                        }
+                        return data;
+                    },
+                    "className": "location-column" // Apply CSS class for width restriction
+                },
                 {
                     "data": "serial_no",
                     "render": function(data, type, row) {
@@ -205,6 +214,7 @@ echo '<!DOCTYPE html>
         });
     });
 </script>
+
 
 
 <script>

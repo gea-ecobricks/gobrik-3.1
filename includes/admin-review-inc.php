@@ -19,8 +19,14 @@
 <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
 
 
+<style>
+    .location-column {
+        max-width: 200px; /* Set max width */
+        white-space: nowrap; /* Prevent wrapping */
+        overflow: hidden; /* Hide overflow content */
+        text-overflow: ellipsis; /* Add ellipsis for overflow text */
+    }
 
-<STYLE>
 
         #main {
         height: fit-content !important;
