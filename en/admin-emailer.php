@@ -299,7 +299,6 @@ document.querySelector('form').addEventListener('submit', function (e) {
 });
 
 
-
 $(document).ready(function () {
     $('#next-ecobrickers').DataTable({
         "processing": true,
@@ -322,27 +321,21 @@ $(document).ready(function () {
         ]
     });
 
-    // Populate email form with the first record
+    // Update only the email field if necessary
     $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
         if (json.data.length > 0) {
             const firstRecord = json.data[0];
-            $('#email_to').val(firstRecord.email_addr);
-            $('#email_subject').val("Please activate your 2025 GoBrik account");
-            $('#email_body').val(`
-Hi there ${firstRecord.first_name},
-
-GoBrik has been totally revamped for 2025!
-
-We've removed our reliance on Google, Facebook, and Amazon services and need you to re-activate your new account with our new Buwana authentication protocol.
-
-Please do so by logging in with your email (${firstRecord.email_addr}) at https://gobrik.com
-
-Best regards,
-GEA Dev Team
-            `);
+            // Update email address only if empty or needs changing
+            const currentEmail = $('#email_to').val();
+            if (!currentEmail || currentEmail !== firstRecord.email_addr) {
+                $('#email_to').val(firstRecord.email_addr);
+            }
+            // Do not overwrite subject or body
         }
     });
 });
+
+
 </script>
 
 
