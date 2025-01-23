@@ -217,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 <title>Admin Send Email Check</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<?php require_once ("../includes/admin-panel.php");?>
+<?php require_once ("../includes/admin-panel-inc.php");?>
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
