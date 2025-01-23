@@ -8,7 +8,7 @@ use GuzzleHttp\Exception\RequestException;
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.52';
+$version = '0.53';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -296,10 +296,6 @@ document.querySelector('form').addEventListener('submit', function (e) {
 
 
 
-</script>
-
-
-<script>
 $(document).ready(function () {
     $('#next-ecobrickers').DataTable({
         "processing": true,
