@@ -217,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 <title>Admin Send Email Check</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<?php require_once ("../includes/activate-inc.php");?>
+<?php require_once ("../includes/admin-panel.php");?>
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
@@ -287,16 +287,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 
 
 <script>
-// document.querySelector('form').addEventListener('submit', function (e) {
-//     const emailTo = document.getElementById('email_to').value.trim();
-//     const emailSubject = document.getElementById('email_subject').value.trim();
-//     const emailBody = document.getElementById('email_body').value.trim();
-//
-//     if (!emailTo || !emailSubject || !emailBody) {
-//         e.preventDefault();
-//         alert("Please fill out all fields before sending the email.");
-//     }
-// });
+document.querySelector('form').addEventListener('submit', function (e) {
+    const emailTo = document.getElementById('email_to').value.trim();
+    const emailSubject = document.getElementById('email_subject').value.trim();
+    const emailBody = document.getElementById('email_body').value.trim();
+
+    if (!emailTo || !emailSubject || !emailBody) {
+        e.preventDefault();
+        alert("Please fill out all fields before sending the email.");
+    }
+});
 
 
 
