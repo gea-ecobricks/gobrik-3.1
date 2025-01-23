@@ -231,7 +231,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
        <!-- Email confirmation form -->
 
 <div style="text-align:center;">
-    <h2>Send Activation Email</h2>
+    <h2>Send Activation Emails to Unactivated Users</h2>
+    <p>Here are the user's that haven't yet activated their buwana account</p>
+
+      <div id="table-container" style="overflow-x: auto; width: 100%;">
+            <table id="next-ecobrickers" class="display responsive nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Ecobricker ID</th>
+                        <th>Email</th>
+                        <th>Notes</th>
+                        <th>First Name</th>
+                        <th>Roles</th>
+                        <th>Briks</th>
+                        <th>Logins</th>
+                        <th>Email Status</th>
+                        <th>Full Name</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+            </table>
+
+            </div>
+
+
+
     <p>Use this form to send an email to remind users to activate their account.</p>
 
     <form method="post" style="text-align:left;">
@@ -270,31 +294,55 @@ document.querySelector('form').addEventListener('submit', function (e) {
     }
 });
 
-/* document.querySelector('form').addEventListener('submit', function (e) {
-    e.preventDefault(); // Prevent the form from reloading the page
-
-    const formData = new FormData(this);
-
-    fetch('admin-emailer.php', {
-        method: 'POST',
-        body: formData,
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message); // Success message
-                location.reload(); // Reload the page to fetch the next ecobricker
-            } else {
-                alert(`Error: ${data.message}`);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("An unexpected error occurred. Check the console for details.");
-        });
-}); */
 
 
+</script>
+
+
+<script>
+$(document).ready(function () {
+    $('#next-ecobrickers').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "../api/fetch_next_ecobrickers.php",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "ecobricker_id" },
+            { "data": "email_addr" },
+            { "data": "account_notes" },
+            { "data": "first_name" },
+            { "data": "user_roles" },
+            { "data": "ecobricks_made" },
+            { "data": "login_count" },
+            { "data": "emailing_status" },
+            { "data": "full_name" },
+            { "data": "location_full" }
+        ]
+    });
+
+    // Populate email form with the first record
+    $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
+        if (json.data.length > 0) {
+            const firstRecord = json.data[0];
+            $('#email_to').val(firstRecord.email_addr);
+            $('#email_subject').val("Please activate your 2025 GoBrik account");
+            $('#email_body').val(`
+Hi there ${firstRecord.first_name},
+
+GoBrik has been totally revamped for 2025!
+
+We've removed our reliance on Google, Facebook, and Amazon services and need you to re-activate your new account with our new Buwana authentication protocol.
+
+Please do so by logging in with your email (${firstRecord.email_addr}) at https://gobrik.com
+
+Best regards,
+GEA Dev Team
+            `);
+        }
+    });
+});
 </script>
 
 
