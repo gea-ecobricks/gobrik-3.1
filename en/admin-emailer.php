@@ -235,22 +235,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     <p>Here are the user's that haven't yet activated their buwana account</p>
 
       <div id="table-container" style="overflow-x: auto; width: 100%;">
-            <table id="next-ecobrickers" class="display responsive nowrap" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Ecobricker ID</th>
-                        <th>Email</th>
-                        <th>Notes</th>
-                        <th>First Name</th>
-                        <th>Roles</th>
-                        <th>Briks</th>
-                        <th>Logins</th>
-                        <th>Email Status</th>
-                        <th>Full Name</th>
-                        <th>Location</th>
-                    </tr>
-                </thead>
-            </table>
+           <table id="next-ecobrickers" class="display responsive nowrap" style="width:100%">
+    <thead>
+        <tr>
+            <th>Ecobricker ID</th>
+            <th>Email</th>
+            <th>Notes</th>
+            <th>First Name</th>
+            <th>Roles</th>
+            <th>Briks</th>
+            <th>Logins</th>
+            <th>Email Status</th>
+            <th>Full Name</th>
+            <th>Location</th>
+        </tr>
+    </thead>
+</table>
+
 
             </div>
 
@@ -282,17 +283,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 
 <!--FOOTER STARTS HERE-->
 <?php require_once ("../footer-2024.php"); ?>
-<script>
-document.querySelector('form').addEventListener('submit', function (e) {
-    const emailTo = document.getElementById('email_to').value.trim();
-    const emailSubject = document.getElementById('email_subject').value.trim();
-    const emailBody = document.getElementById('email_body').value.trim();
 
-    if (!emailTo || !emailSubject || !emailBody) {
-        e.preventDefault();
-        alert("Please fill out all fields before sending the email.");
-    }
-});
+
+
+<script>
+// document.querySelector('form').addEventListener('submit', function (e) {
+//     const emailTo = document.getElementById('email_to').value.trim();
+//     const emailSubject = document.getElementById('email_subject').value.trim();
+//     const emailBody = document.getElementById('email_body').value.trim();
+//
+//     if (!emailTo || !emailSubject || !emailBody) {
+//         e.preventDefault();
+//         alert("Please fill out all fields before sending the email.");
+//     }
+// });
 
 
 
