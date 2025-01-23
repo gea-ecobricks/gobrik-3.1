@@ -22,7 +22,7 @@ $sql = "SELECT
             emailing_status,
             location_full
         FROM tb_ecobrickers
-        WHERE buwana_activated = 1";
+        ";
 
 // Add search filter if any
 if (!empty($searchValue)) {
