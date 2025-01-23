@@ -42,7 +42,7 @@ try {
     $inputData = json_decode(file_get_contents('php://input'), true);
 
     // Validate input
-    $requiredFields = ['local_id', 'name', 'color', 'public'];
+    $requiredFields = ['name', 'color', 'public'];
     foreach ($requiredFields as $field) {
         if (!isset($inputData[$field]) || ($field === 'public' && !in_array($inputData[$field], [0, 1], true))) {
             http_response_code(400); // Bad Request
@@ -52,11 +52,16 @@ try {
     }
 
     // Extract input data
-    $localId = htmlspecialchars($inputData['local_id']);
     $name = htmlspecialchars($inputData['name']);
     $color = htmlspecialchars($inputData['color']);
     $public = intval($inputData['public']); // Map "public" from request to "calendar_public" in the database
     $buwanaId = isset($inputData['buwana_id']) && is_numeric($inputData['buwana_id']) ? intval($inputData['buwana_id']) : null;
+
+    if (!$buwanaId) {
+        http_response_code(400); // Bad Request
+        echo json_encode(['success' => false, 'message' => 'Missing or invalid buwana_id.']);
+        exit();
+    }
 
     // Prepare SQL to insert the calendar
     $sql = "INSERT INTO calendars_tb (
