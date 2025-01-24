@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
             $stmt->close();
 
             // Reload the page after successful email sending
-            echo "<script>window.location.href = 'admin-sender.php';</script>";
+            echo "<script>window.location.href = 'admin-emailer.php';</script>";
             exit();
         } else {
             echo "<script>alert('Failed to send the email to $to. Check the logs for details.');</script>";
