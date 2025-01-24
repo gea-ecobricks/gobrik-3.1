@@ -102,20 +102,32 @@ $country_txt = $nextEcobricker['country_txt'] ?? '';
 $subject = "Please activate your 2025 GoBrik account";
 
 
+// Format the date to exclude the time
+if (!empty($date_registered)) {
+    $date_registered = date('Y-m-d', strtotime($date_registered));
+}
 
-
-// Compose the email body with dynamic user data
+// Initialize the email body
 $body = "
 Hi there $first_name,<br><br>
 GoBrik has been totally revamped for 2025! <br><br>
 We've removed our reliance on Google, Facebook and Amazon services and need you to re-activate your new account with our new Buwana authentication protocol.<br><br>
-You've been with us since you registered on $date_registered.<br><br>
-In your old account, we have your $ecobricks_made ecobricks and $brk_balance Brikcoins.<br><br>
-Your work there was a great service to your local $city_txt ecology and your $region_txt bioregion of $country_txt Earth.<br><br>
+You've been with us since you registered on $date_registered.<br><br>";
+
+// Add ecobricks and Brikcoins sentence only if ecobricks were made
+if ($ecobricks_made > 0) {
+    $body .= "In your old account, we have your $ecobricks_made ecobricks and $brk_balance Brikcoins.<br><br>";
+}
+
+// Continue building the email body
+$body .= "
+Your ecobricking work was a great service to your local $city_txt ecology and your $region_txt bioregion of $country_txt, Earth.<br><br>
 We'd like to encourage you to activate your account and try logging your latest ecobricks.<br><br>
 Please do so by logging in with your email ($email_addr) at <a href='https://gobrik.com'>https://gobrik.com</a><br><br>
 See you on the app!<br><br>
 GEA Dev Team
+
+P.S.  If you'd like to delete your account with us, you can do that too during the activation process.
 ";
 
 
