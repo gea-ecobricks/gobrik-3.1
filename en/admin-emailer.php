@@ -148,32 +148,41 @@ function sendAccountActivationEmail($to, $subject, $body_html, $body_text) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
+    // Get the form data
     $to = $_POST['email_to'];
     $subject = $_POST['email_subject'];
     $body_html = $_POST['email_body'];
-    $body_text = strip_tags($body_html);
+    $body_text = strip_tags($body_html); // Generate plain text fallback
 
+    // Validate required fields
     if (empty($to) || empty($subject) || empty($body_html)) {
         echo "<script>alert('Please fill in all the required fields.');</script>";
     } else {
+        // Call the email-sending function
         $success = sendAccountActivationEmail($to, $subject, $body_html, $body_text);
 
         if ($success) {
             echo "<script>alert('Email sent successfully to $to');</script>";
 
+            // Update the emailing_status to 'delivered'
             $updateQuery = "
                 UPDATE tb_ecobrickers
-                SET emailing_status = 'delivered', email_body = ?
+                SET emailing_status = 'delivered'
                 WHERE email_addr = ?";
             $stmt = $gobrik_conn->prepare($updateQuery);
-            $stmt->bind_param("ss", $body_html, $to);
+            $stmt->bind_param("s", $to);
             $stmt->execute();
             $stmt->close();
+
+            // Reload the page after successful email sending
+            echo "<script>window.location.href = 'admin-sender.php';</script>";
+            exit();
         } else {
             echo "<script>alert('Failed to send the email to $to. Check the logs for details.');</script>";
         }
     }
 }
+
 ?>
 
 
