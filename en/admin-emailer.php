@@ -2,7 +2,6 @@
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 require '../vendor/autoload.php'; // Path to Composer's autoloader
 
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -13,13 +12,11 @@ $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 // LOGIN AND ROLE CHECK:
-// Check if the user is logged in, if not send them to login.
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
 }
 
-// User is logged in, proceed to check admin status
 $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
 
@@ -52,7 +49,6 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     </script>";
     exit();
 }
-//END LOGIN AND ROLE CHECK
 
 // PART 2: Function to grab the next ecobricker record
 function getNextEcobricker($conn) {
@@ -69,26 +65,24 @@ function getNextEcobricker($conn) {
     if ($stmt->execute()) {
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
-            return $result->fetch_assoc(); // Return the first record
+            return $result->fetch_assoc();
         }
     }
-    return null; // Return null if no matching record found
+    return null;
 }
 
-// Fetch the next ecobricker candidate on page load
 $nextEcobricker = getNextEcobricker($gobrik_conn);
 
+require_once '../buwanaconn_env.php';
 
-    require_once '../buwanaconn_env.php';
-
- // Fetch the user's location data
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
-    $ecobrick_unique_id = '';
-    $first_name = getFirstName($buwana_conn, $buwana_id);
+// Fetch the user's location data
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+$ecobrick_unique_id = '';
+$first_name = getFirstName($buwana_conn, $buwana_id);
 
 // Initialize variables for the email form
 $email_addr = $nextEcobricker['email_addr'] ?? '';
@@ -100,7 +94,6 @@ $city_txt = $nextEcobricker['city_txt'] ?? '';
 $region_txt = $nextEcobricker['region_txt'] ?? '';
 $country_txt = $nextEcobricker['country_txt'] ?? '';
 $subject = "Please activate your 2025 GoBrik account";
-
 
 // Format the date to exclude the time
 if (!empty($date_registered)) {
@@ -114,12 +107,10 @@ GoBrik has been totally revamped for 2025! <br><br>
 We've removed our reliance on Google, Facebook and Amazon services and need you to re-activate your new account with our new Buwana authentication protocol.<br><br>
 You've been with us since you registered on $date_registered.<br><br>";
 
-// Add ecobricks and Brikcoins sentence only if ecobricks were made
 if ($ecobricks_made > 0) {
     $body .= "In your old account, we have your $ecobricks_made ecobricks and $brk_balance Brikcoins.<br><br>";
 }
 
-// Continue building the email body
 $body .= "
 Your ecobricking work was a great service to your local $city_txt ecology and your $region_txt bioregion of $country_txt, Earth.<br><br>
 We'd like to encourage you to activate your account and try logging your latest ecobricks.<br><br>
@@ -130,124 +121,51 @@ GEA Dev Team
 P.S.  If you'd like to delete your account with us, you can do that too during the activation process.
 ";
 
-
-
+// Send email function
 function sendAccountActivationEmail($to, $subject, $body_html, $body_text) {
-    // Set up the Mailgun API client
-    $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU endpoint for Mailgun
-    $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Get Mailgun API key from environment variables
-    $mailgunDomain = 'mail.gobrik.com'; // Verified Mailgun domain
+    $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
+    $mailgunApiKey = getenv('MAILGUN_API_KEY');
+    $mailgunDomain = 'mail.gobrik.com';
 
     try {
-        // Log the email sending attempt
-        error_log("Attempting to send email to $to with subject: $subject");
-
-        // Send the email using Mailgun's API
         $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
-                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>', // Verified sender email
+                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
                 'to' => $to,
                 'subject' => $subject,
                 'html' => $body_html,
-                'text' => $body_text, // Plain text fallback
+                'text' => $body_text,
             ]
         ]);
 
-        // Check response status
-        if ($response->getStatusCode() == 200) {
-            error_log("Mailgun: Email sent successfully to $to");
-            return true;
-        } else {
-            error_log("Mailgun: Failed to send email to $to. Status Code: " . $response->getStatusCode());
-            error_log("Mailgun Response: " . (string)$response->getBody());
-            return false;
-        }
-
-    } catch (RequestException $e) {
-        // Log exception message
-        error_log("Mailgun API Request Exception: " . $e->getMessage());
-
-        // Log response body if available
-        if ($e->hasResponse()) {
-            error_log("Mailgun API Error Response: " . (string) $e->getResponse()->getBody());
-        }
-
-        return false;
+        return $response->getStatusCode() == 200;
     } catch (Exception $e) {
-        // Log any other exceptions
-        error_log("Unexpected Exception: " . $e->getMessage());
+        error_log("Error sending email: " . $e->getMessage());
         return false;
     }
 }
 
-
-
-
-// PART 4: Handle form submission
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
-    // Get the form data
     $to = $_POST['email_to'];
     $subject = $_POST['email_subject'];
     $body_html = $_POST['email_body'];
-    $body_text = strip_tags($body_html); // Generate plain text fallbackif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
-    // Get the form data
-    $to = $_POST['email_to'];
-    $subject = $_POST['email_subject'];
-    $body_html = $_POST['email_body'];
-    $body_text = strip_tags($body_html); // Generate plain text fallback
+    $body_text = strip_tags($body_html);
 
-    // Validate required fields
     if (empty($to) || empty($subject) || empty($body_html)) {
         echo "<script>alert('Please fill in all the required fields.');</script>";
     } else {
-        // Call the email-sending function
         $success = sendAccountActivationEmail($to, $subject, $body_html, $body_text);
 
         if ($success) {
             echo "<script>alert('Email sent successfully to $to');</script>";
 
-            // Update the emailing_status to 'delivered' and save the email body
             $updateQuery = "
                 UPDATE tb_ecobrickers
                 SET emailing_status = 'delivered', email_body = ?
                 WHERE email_addr = ?";
             $stmt = $gobrik_conn->prepare($updateQuery);
-
-            // Bind parameters and execute
-            $stmt->bind_param("ss", $body_html, $to);
-            $stmt->execute();
-            $stmt->close();
-        } else {
-            echo "<script>alert('Failed to send the email to $to. Check the logs for details.');</script>";
-        }
-    }
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
-    // Get the form data
-    $to = $_POST['email_to'];
-    $subject = $_POST['email_subject'];
-    $body_html = $_POST['email_body'];
-    $body_text = strip_tags($body_html); // Generate plain text fallback
-
-    // Validate required fields
-    if (empty($to) || empty($subject) || empty($body_html)) {
-        echo "<script>alert('Please fill in all the required fields.');</script>";
-    } else {
-        // Call the email-sending function
-        $success = sendAccountActivationEmail($to, $subject, $body_html, $body_text);
-
-        if ($success) {
-            echo "<script>alert('Email sent successfully to $to');</script>";
-
-            // Update the emailing_status to 'delivered' and save the email body
-            $updateQuery = "
-                UPDATE tb_ecobrickers
-                SET emailing_status = 'delivered', email_body = ?
-                WHERE email_addr = ?";
-            $stmt = $gobrik_conn->prepare($updateQuery);
-
-            // Bind parameters and execute
             $stmt->bind_param("ss", $body_html, $to);
             $stmt->execute();
             $stmt->close();
@@ -256,13 +174,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
         }
     }
 }
-
-
-
-
-
-
 ?>
+
 
 
 
