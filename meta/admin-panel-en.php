@@ -1,23 +1,23 @@
 <!-- Meta tags for page display and search engine listing-->
 
-<title>Admin Panel | GoBrik</title>
-<meta name="keywords" content="Review, validate, authenticate, Ecobricks, Log, Record, submit, ecobrick, Gobrik">
-<meta name="description" content="Review ecobricks for authentication on the brikchain.">
+<title>OpenBooks Accounting Backend | GoBrik</title>
+<meta name="keywords" content="openbooks, accounting, gea, global ecobrick alliance">
+<meta name="description" content="For our admin team to log and maintain our openbooks accounting.">
 <meta name="author" content="GoBrik.com">
 <meta name="last-modified" content="' . $lastModified . '">
 <meta name="revised" content="' . $lastModified . '">
 
 	<!-- Facebook Open Graph Tags for social sharing-->
 
-<meta property="og:url"           content="https://gobrik.com/en/newest.php">
+<meta property="og:url"           content="https://gobrik.com/en/accounting.php">
 <meta property="og:locale" content="en_GB" >
 <meta property="og:type"          content="website">
-<meta property="og:title"         content="Admin Review">
-<meta property="og:description"   content="Review ecobricks for authentication on the brikchain.">
-<meta property="og:image"         content="https://gobrik.com/pngs/what-page-ecobrick-banner-1024px.png">
+<meta property="og:title"         content="Accounting">
+<meta property="og:description"   content="For our admin team to log and maintain our openbooks accounting.">
+<meta property="og:image"         content="https://gobrik.com/pngs/openbooks.png">
 <meta property="og:image:width" content="1024">
-<meta property="og:image:height" content="1017">
-<meta property="og:image:alt"     content="An ecobrick being packed with plastic using a wooden stick.">
+<meta property="og:image:height" content="1024">
+<meta property="og:image:alt"     content="open books accounting logo.">
 <meta property="og:locale" content="en_GB">
 
 	<meta property="og:type" content="form" >
