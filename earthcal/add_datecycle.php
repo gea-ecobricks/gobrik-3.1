@@ -8,6 +8,7 @@ ini_set('display_errors', '0');
 ini_set('log_errors', '1');
 ini_set('error_log', '/path/to/secure/error.log'); // Adjust this path
 
+// Check if $cal_conn is initialized
 if (!$cal_conn || $cal_conn->connect_error) {
     error_log('Database connection error: ' . $cal_conn->connect_error);
     die(json_encode(['success' => false, 'message' => 'Database connection error.']));
@@ -43,28 +44,34 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
-if (!isset($data['buwana_id'], $data['calendar_id'], $data['event_name'], $data['day'], $data['month'], $data['year'])) {
-    echo json_encode(['success' => false, 'message' => 'Missing required fields.']);
+// Validate required fields
+if (!isset($data['user_id'], $data['calendar_id'], $data['event_name'], $data['date'], $data['cal_color'])) {
+    echo json_encode(['success' => false, 'message' => 'Missing required fields: user_id, calendar_id, event_name, date, or cal_color.']);
     exit();
 }
 
-$buwana_id = $data['buwana_id'];
-$calendar_id = $data['calendar_id'];
-$event_name = $data['event_name'];
-$day = $data['day'];
-$month = $data['month'];
-$year = $data['year'];
-$frequency = $data['frequency'] ?? 'One-time';
-$comment = $data['comment'] ?? '';
-$comments = $data['comments'] ?? '';
-$pinned = $data['pinned'] ?? 'no';
+// Extract and sanitize inputs
+$user_id = (int) $data['user_id'];
+$calendar_id = (int) $data['calendar_id'];
+$event_name = $cal_conn->real_escape_string($data['event_name']);
+$date = $cal_conn->real_escape_string($data['date']);
+$frequency = $cal_conn->real_escape_string($data['frequency'] ?? 'One-time');
+$completed = $cal_conn->real_escape_string($data['completed'] ?? 'No');
+$pinned = $cal_conn->real_escape_string($data['pinned'] ?? 'No');
+$public = $cal_conn->real_escape_string($data['public'] ?? 'No');
+$comment = $cal_conn->real_escape_string($data['comment'] ?? '');
+$color = $cal_conn->real_escape_string($data['color'] ?? null);
+$cal_color = $cal_conn->real_escape_string($data['cal_color']);
+$raw_json = $cal_conn->real_escape_string(json_encode($data)); // Optional raw JSON for debugging
+$synced = $cal_conn->real_escape_string($data['synced'] ?? 'No');
 $last_edited = date('Y-m-d H:i:s');
-$datecycle_color = $data['datecycle_color'] ?? '#FFFFFF';
 
 try {
+    // Insert query
     $query = "
-        INSERT INTO events (calendar_id, event_name, frequency, day, month, year, comment, comments, pinned, last_edited, datecycle_color)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO datecycles_tb
+        (user_id, calendar_id, event_name, date, frequency, completed, pinned, public, comment, color, cal_color, raw_json, synced, last_edited)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ";
 
     $stmt = $cal_conn->prepare($query);
@@ -72,12 +79,31 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    $stmt->bind_param('sssssssssss', $calendar_id, $event_name, $frequency, $day, $month, $year, $comment, $comments, $pinned, $last_edited, $datecycle_color);
+    // Bind parameters
+    $stmt->bind_param(
+        'iissssssssssss',
+        $user_id,
+        $calendar_id,
+        $event_name,
+        $date,
+        $frequency,
+        $completed,
+        $pinned,
+        $public,
+        $comment,
+        $color,
+        $cal_color,
+        $raw_json,
+        $synced,
+        $last_edited
+    );
 
+    // Execute the query
     $stmt->execute();
     $new_id = $stmt->insert_id;
     $stmt->close();
 
+    // Return success response with the new ID
     echo json_encode(['success' => true, 'id' => $new_id]);
 } catch (Exception $e) {
     error_log('Error: ' . $e->getMessage());
