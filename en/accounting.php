@@ -218,6 +218,8 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     });
 }
 
+
+
 /* ALL TRANSACTIONS */
 $(document).ready(function () {
     $('#all-transactions').DataTable({
@@ -238,10 +240,10 @@ $(document).ready(function () {
                     return `${data} IDR`; // Add "IDR" after the Amount IDR
                 }
             },
-            { data: 'Date' },
+            { data: 'Date' }, // Sortable column
             { data: 'Sender' },
             { data: 'Type' }, // type_of_transaction
-            { data: 'Category' }, // Will be hidden by default for overflow
+            { data: 'Category' }, // Hidden by default for overflow
             { data: 'Transaction' },
             {
                 data: 'AmountUSD',
@@ -250,7 +252,7 @@ $(document).ready(function () {
                 }
             },
             {
-                data: 'AccountNote', // "Account Note" column (was previously 'Type')
+                data: 'AccountNote',
                 render: function (data) {
                     return data || 'N/A'; // Show 'N/A' if no account note exists
                 }
@@ -278,7 +280,7 @@ $(document).ready(function () {
                 { name: 'mobile', width: 700 }
             ]
         },
-        order: [[2, 'desc']] // Sort by Date descending
+        order: [[2, 'desc']] // Sort by the "Date" column (index 2), descending
     });
 });
 

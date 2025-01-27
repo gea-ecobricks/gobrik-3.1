@@ -37,11 +37,13 @@
     background: var(--darker);
     color: var(--text-color);
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 10px;
     padding: 10px 20px;
     text-align: center;
     flex: 1 1 90%; /* Make each button take 90% of the width of the container */
     max-width: 200px; /* Prevent buttons from becoming too wide */
+    cursor: pointer;
+    font-size:1.3em;
 }
 
 .page-button:hover {

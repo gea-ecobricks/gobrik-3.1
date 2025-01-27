@@ -11,7 +11,8 @@ $sql = "SELECT cash_tran_id,
                usd_amount,
                idr_amount,
                revenue_accounting_type AS account_note -- Rename revenue_accounting_type as account_note
-        FROM tb_cash_transaction";
+        FROM tb_cash_transaction
+        ORDER BY transaction_date_dt DESC"; // Sort by date descending (newest first)
 
 $result = $gobrik_conn->query($sql);
 
