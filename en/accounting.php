@@ -70,7 +70,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 <div id="splash-bar"></div>
 
 <!-- PAGE CONTENT -->
-<div id="top-page-image" class="message-birded top-page-image"></div>
+<div id="top-page-image" class="message-birded top-page-image-xxx"></div>
 
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container">
