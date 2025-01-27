@@ -78,13 +78,13 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     <h2>GEA OpenBooks</h2>
     <p>Our backend accounting for adminstrative use.</p>
 
-    <div id="admin-menu" class="dashboard-panel">
-        <h4 class="panel-title">Master Trainer Menu</h4>
+    <div id="admin-menu" class="dashboard-panel" style="margin-bottom: 30px;">
         <div class="menu-buttons-row">
             <!-- Add Revenue button with onclick and aria property -->
             <button class="page-button" id="add-revenue" onclick="addRevenueTrans()" aria-label="Click to add a revenue transaction">➕ Add Revenue</button>
-            <button class="page-button" id="open-books" href="https://ecobricks.org/en/open-books.php" aria-label="Click to add a revenue transaction">Open Books</button>
             <button class="page-button" id="add-expense" onclick="addExpenseTrans()" aria-label="Click to add an expense transaction">➕ Add Expenses</button>
+           <button class="page-button" id="open-books" href="https://ecobricks.org/en/open-books.php" aria-label="go to ecobricks.org">↗️ Ecobricks.org/openbooks</button>
+
         </div>
     </div>
 
@@ -168,13 +168,13 @@ if ($stmt = $gobrik_conn->prepare($query)) {
             // Construct the HTML for the transaction details
             let transactionDetailsHTML = `
                 <div id="main-details">
-                    <div class="date"><b>Transaction ID:</b> ${data.cash_tran_id}</div>
                     ${data.paymt_record_url && data.paymt_record_url !== 'N/A' ? `
                         <div id="photo">
                             <img src="${data.paymt_record_url}" width="90%" />
                         </div>
                     ` : ''}
-                    <div class="serial"><b>Amount:</b> <var>${data.native_ccy_amt} ${data.currency_code}</var></div>
+                    <div class="serial"><b>Amount:</b> <br>
+                    <h2><var>${data.native_ccy_amt} ${data.currency_code}</var></h2></div>
                     <div class="general-field"><b>Transaction Name:</b> ${data.tran_name_desc}</div>
                     <div class="main"><b>Sender:</b> <var>${data.sender_for_display}</var></div>
                     <div class="main"><b>Sent:</b> <var>${data.datetime_sent_ts}</var></div>
