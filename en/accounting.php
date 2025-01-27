@@ -2,12 +2,9 @@
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 require '../vendor/autoload.php'; // Path to Composer's autoloader
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.53';
+$version = '0.55';
 $page = 'accounting';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -61,7 +58,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 <html lang="<?php echo $lang; ?>">
 <head>
 <meta charset="UTF-8">
-<title>Admin Send Email Check</title>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <?php require_once ("../includes/accounting-inc.php");?>
