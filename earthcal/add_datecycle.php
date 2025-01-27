@@ -3,17 +3,10 @@ require_once '../earthenAuth_helper.php';
 require_once '../buwanaconn_env.php';
 require_once '../calconn_env.php'; // Include EarthCal database connection
 
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
-ini_set('display_errors', '0');
-ini_set('log_errors', '1');
-ini_set('error_log', '/path/to/secure/error.log'); // Adjust this path
+// Set headers for JSON response
+header('Content-Type: application/json');
 
-// Check if $cal_conn is initialized
-if (!$cal_conn || $cal_conn->connect_error) {
-    error_log('Database connection error: ' . $cal_conn->connect_error);
-    die(json_encode(['success' => false, 'message' => 'Database connection error.']));
-}
-
+// CORS configuration
 $allowed_origins = [
     'https://cal.earthen.io',
     'https://cycles.earthen.io',
@@ -23,10 +16,16 @@ $allowed_origins = [
     'file://'
 ];
 
-$origin = isset($_SERVER['HTTP_ORIGIN']) ? strtolower(rtrim($_SERVER['HTTP_ORIGIN'], '/')) : '';
-if (!in_array($origin, $allowed_origins)) {
+// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
+
+if (empty($origin)) {
+    header('Access-Control-Allow-Origin: *');
+} elseif (in_array($origin, $allowed_origins)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+} else {
     header('HTTP/1.1 403 Forbidden');
-    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin v2']);
     exit();
 }
 
