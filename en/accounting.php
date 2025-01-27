@@ -64,7 +64,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 <title>Admin Send Email Check</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<?php require_once ("../includes/admin-panel-inc.php");?>
+<?php require_once ("../includes/accounting-inc.php");?>
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
@@ -121,8 +121,9 @@ if ($stmt = $gobrik_conn->prepare($query)) {
                 </tfoot>
             </table>
 
-    </div>
+        </div>
 
+    </div>
 </div>
 
 
@@ -132,7 +133,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 <!--FOOTER STARTS HERE-->
 <?php require_once ("../footer-2024.php"); ?>
 
-<script>
+
 
     <script>
 
@@ -234,6 +235,8 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 
 /* REVENUES */
+
+
 $(document).ready(function () {
     $('#revenues').DataTable({
         ajax: '../api/fetch_revenues_trans.php', // URL of the PHP file

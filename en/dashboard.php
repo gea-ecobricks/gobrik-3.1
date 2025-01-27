@@ -144,6 +144,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <a href="admin-panel.php" class="page-button">Admin Panel</a>
             <a href="admin-review.php" class="page-button">Ecobrick Review</a>
             <a id="messenger-button" href="messenger.php" class="page-button">Messenger BETA</a>
+            <a href="admin-emailer.php" class="page-button">Admin Emailer</a>
         </div>
     </div>
 <?php endif; ?>
