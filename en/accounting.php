@@ -618,8 +618,8 @@ function addExpenseTrans() {
                 <input type="number" id="amount-idr" name="amount_idr" required />
             </div>
             <div class="form-item">
-                <label for="receiver">To (Receiver):</label>
-                <input type="text" id="receiver" name="receiver" required />
+                <label for="receiver">To (only use this field for a GoBrik account user):</label>
+                <input type="text" id="receiver" name="receiver" />
             </div>
             <div class="form-item">
                 <label for="transaction-date">Transaction Date:</label>

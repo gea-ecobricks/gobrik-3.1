@@ -27,15 +27,15 @@ $currency_code = 'IDR';
 $type_of_transaction = 'Expense'; // Fixed value
 $sender_for_display = 'Global Ecobrick Alliance'; // Fixed value
 $sender_ecobricker = 'Global Ecobrick Alliance'; // Fixed value
-$datetime_sent_ts = date('Y-m-d H:i:s', strtotime($transaction_date));
+$current_datetime = date('Y-m-d H:i:s'); // Current datetime for datetime_sent_ts
 
 // Insert transaction into the database
 $sql = "INSERT INTO tb_cash_transaction (
             native_ccy_amt, idr_amount, receiver_for_display,
-            datetime_sent_ts, tran_name_desc, currency_code,
+            transaction_date, datetime_sent_ts, tran_name_desc, currency_code,
             expense_accounting_type, type_of_transaction,
             expense_vendor, sender_for_display, sender_ecobricker
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $gobrik_conn->prepare($sql);
 if (!$stmt) {
@@ -45,9 +45,9 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    'iisssssssss',
+    'iissssssssss',
     $amount_idr, $amount_idr, $receiver,
-    $datetime_sent_ts, $description, $currency_code,
+    $transaction_date, $current_datetime, $description, $currency_code,
     $expense_type, $type_of_transaction,
     $expense_vendor, $sender_for_display, $sender_ecobricker
 );
