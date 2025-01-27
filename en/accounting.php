@@ -93,24 +93,23 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 
       <div class="overflow">
-            <table id="all-transactions" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th data-lang-id="012-id-column">ID</th>
-                        <th data-lang-id="013-date-column">Date</th>
-                        <th data-lang-id="014-sender-column">Sender</th>
-                        <th data-lang-id="014-sender-column">Type</th>
-                        <th data-lang-id="015-category-column">Category</th>
-                        <th data-lang-id="016-tran-name-column">Transaction</th>
-                        <th data-lang-id="017-amount-usd-column">Amount USD</th>
-                        <th data-lang-id="018-amount-idr-column">Amount IDR</th>
-                        <th data-lang-id="019-type-column">Type</th>
-                    </tr>
-                </thead>
+    <table id="all-transactions" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th data-lang-id="012-id-column">ID</th>
+                <th data-lang-id="018-amount-idr-column">Amount</th> <!-- Use IDR amount -->
+                <th data-lang-id="013-date-column">Date</th>
+                <th data-lang-id="014-sender-column">Sender</th>
+                <th data-lang-id="014-sender-column">Type</th> <!-- type_of_transaction -->
+                <th data-lang-id="015-category-column">Category</th> <!-- Hide and show only on overflow -->
+                <th data-lang-id="016-tran-name-column">Transaction</th>
+                <th data-lang-id="017-amount-usd-column">Amount USD</th> <!-- Hide and show only on overflow -->
+                <th data-lang-id="019-type-column">Account Note</th> <!-- Renamed column title -->
+            </tr>
+        </thead>
+    </table>
+</div>
 
-            </table>
-
-        </div>
 
     </div>
 </div>
@@ -236,10 +235,16 @@ $(document).ready(function () {
                 },
                 className: 'dt-center' // Center-align the ID column
             },
+            {
+                data: 'AmountIDR',
+                render: function (data) {
+                    return `${data} IDR`; // Add "IDR" after the Amount IDR
+                }
+            },
             { data: 'Date' },
             { data: 'Sender' },
-            { data: 'Type' }, // NEW COLUMN for "Type"
-            { data: 'Category' },
+            { data: 'Type' }, // type_of_transaction
+            { data: 'Category' }, // Will be hidden by default for overflow
             { data: 'Transaction' },
             {
                 data: 'AmountUSD',
@@ -248,21 +253,20 @@ $(document).ready(function () {
                 }
             },
             {
-                data: 'AmountIDR',
+                data: 'AccountNote', // "Account Note" column (was previously 'Type')
                 render: function (data) {
-                    return `${data} IDR`; // Add "IDR" after the Amount IDR
+                    return data || 'N/A'; // Show 'N/A' if no account note exists
                 }
-            },
-            { data: 'Type' } // Includes the field showing whether it's revenue or expense
+            }
         ],
         columnDefs: [
             {
-                targets: [4, 5, 7], // Columns to hide by default
+                targets: [5, 7], // Hide "Category" and "Amount USD" by default
                 visible: false,
-                responsivePriority: 4
+                responsivePriority: 4 // Lower priority for responsive view
             },
             {
-                targets: [3], // Ensure "Type" is visible on most devices
+                targets: [4, 8], // Ensure "Type" and "Account Note" are visible on most devices
                 responsivePriority: 1
             }
         ],
@@ -277,9 +281,11 @@ $(document).ready(function () {
                 { name: 'mobile', width: 700 }
             ]
         },
-        order: [[1, 'desc']] // Sort by Date descending
+        order: [[2, 'desc']] // Sort by Date descending
     });
 });
+
+
 
 
 </script>
