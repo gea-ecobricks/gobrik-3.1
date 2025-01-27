@@ -691,6 +691,7 @@ function submitExpenseTrans(event) {
     });
 }
 
+</script>
 
 
 
