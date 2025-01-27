@@ -70,7 +70,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 <div id="splash-bar"></div>
 
 <!-- PAGE CONTENT -->
-<div id="top-page-image" class="message-birded top-page-image-xxx"></div>
+<div id="top-page-image" class="open-books-top top-page-image"></div>
 
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container">
@@ -78,9 +78,8 @@ if ($stmt = $gobrik_conn->prepare($query)) {
        <!-- Email confirmation form -->
 
 <div style="text-align:center;">
-    <img src="../pngs/openbooks.png" width="250px" height="250px">
     <h2>GEA OpenBooks</h2>
-    <p>Our backend accounting.</p>
+    <p>Our backend accounting for adminstrative use.</p>
 
     <div id="admin-menu" class="dashboard-panel">
         <h4 class="panel-title">Master Trainer Menu</h4>
@@ -94,12 +93,13 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 
       <div class="overflow">
-            <table id="revenues" class="display" style="width:100%">
+            <table id="all-transactions" class="display" style="width:100%">
                 <thead>
                     <tr>
                         <th data-lang-id="012-id-column">ID</th>
                         <th data-lang-id="013-date-column">Date</th>
                         <th data-lang-id="014-sender-column">Sender</th>
+                        <th data-lang-id="014-sender-column">Type</th>
                         <th data-lang-id="015-category-column">Category</th>
                         <th data-lang-id="016-tran-name-column">Transaction</th>
                         <th data-lang-id="017-amount-usd-column">Amount USD</th>
@@ -107,18 +107,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
                         <th data-lang-id="019-type-column">Type</th>
                     </tr>
                 </thead>
-                <tfoot>
-                    <tr>
-                        <th data-lang-id="012-id-column">ID</th>
-                        <th data-lang-id="013-date-column">Date</th>
-                        <th data-lang-id="014-sender-column">Sender</th>
-                        <th data-lang-id="015-category-column">Category</th>
-                        <th data-lang-id="016-tran-name-column">Transaction</th>
-                        <th data-lang-id="017-amount-usd-column">Amount USD</th>
-                        <th data-lang-id="018-amount-idr-column">Amount IDR</th>
-                        <th data-lang-id="019-type-column">Type</th>
-                    </tr>
-                </tfoot>
+
             </table>
 
         </div>
@@ -233,28 +222,23 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     });
 }
 
-
-/* REVENUES */
-
-
+/* ALL TRANSACTIONS */
 $(document).ready(function () {
-    $('#revenues').DataTable({
-        ajax: '../api/fetch_revenues_trans.php', // URL of the PHP file
+    $('#all-transactions').DataTable({
+        ajax: '../api/fetch_all_transactions.php', // URL of the new PHP file
         columns: [
             {
                 data: 'ID',
                 orderable: false,
                 render: function (data, type, row) {
-                    // Properly escape and handle special characters for the transaction ID
                     const escapedData = String(data).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-
-                    // Add onclick call to openTransactionModal with the transaction ID
                     return `<a href="#" onclick="openTransactionModal('${escapedData}')">${data}</a>`;
                 },
                 className: 'dt-center' // Center-align the ID column
             },
             { data: 'Date' },
             { data: 'Sender' },
+            { data: 'Type' }, // NEW COLUMN for "Type"
             { data: 'Category' },
             { data: 'Transaction' },
             {
@@ -269,23 +253,22 @@ $(document).ready(function () {
                     return `${data} IDR`; // Add "IDR" after the Amount IDR
                 }
             },
-            { data: 'Type' }
+            { data: 'Type' } // Includes the field showing whether it's revenue or expense
         ],
         columnDefs: [
-            // Columns to hide by default for responsive design
             {
-                targets: [3, 5, 7], // Move 'Category', 'Amount USD', and 'Type' to the overflow
-                visible: false, // Hide these columns by default
-                responsivePriority: 4 // Lower priority for responsive view
+                targets: [4, 5, 7], // Columns to hide by default
+                visible: false,
+                responsivePriority: 4
             },
             {
-                targets: [4], // Ensure "Transaction" is visible on tablet and desktop
-                responsivePriority: 2
+                targets: [3], // Ensure "Type" is visible on most devices
+                responsivePriority: 1
             }
         ],
         responsive: {
             details: {
-                display: $.fn.dataTable.Responsive.display.childRowImmediate, // Use child row for overflow
+                display: $.fn.dataTable.Responsive.display.childRowImmediate,
                 type: ''
             },
             breakpoints: [
@@ -294,7 +277,6 @@ $(document).ready(function () {
                 { name: 'mobile', width: 700 }
             ]
         },
-
         order: [[1, 'desc']] // Sort by Date descending
     });
 });

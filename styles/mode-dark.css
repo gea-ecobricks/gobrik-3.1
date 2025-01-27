@@ -673,6 +673,11 @@ background-size: contain;
       background-size: contain;
       }
 
+  .open-books-top {
+      background: url(../pngs/openbooks.png) no-repeat center;
+      background-size: contain;
+      }
+
  .bug-reported {
       background: url(../svgs/bug-report-night.svg) no-repeat center;
       background-size: contain;
