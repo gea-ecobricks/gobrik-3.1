@@ -130,6 +130,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
             <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
             <a href="bug-report.php" class="page-button">Report a Bug</a>
+            <a href="accounting.php" class="page-button">GEA Accounting</a>
 
         </div>
     </div>
@@ -193,7 +194,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
 
-
+<script>
     //GET ECOBRICKER'S ECOBRICKS
 
 
