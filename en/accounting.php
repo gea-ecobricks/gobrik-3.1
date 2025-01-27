@@ -82,8 +82,6 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     <h2>GEA OpenBooks</h2>
     <p>Our backend accounting.</p>
 
-
-<?php if (strpos(strtolower($gea_status), 'master trainer') !== false): ?>
     <div id="admin-menu" class="dashboard-panel">
         <h4 class="panel-title">Master Trainer Menu</h4>
         <div class="menu-buttons-row">
@@ -93,7 +91,6 @@ if ($stmt = $gobrik_conn->prepare($query)) {
             <button class="page-button" id="add-expense" onclick="addExpenseTrans()" aria-label="Click to add an expense transaction">➕ Record GEA Expenses</button>
         </div>
     </div>
-<?php endif; ?>
 
 
       <div class="overflow">
