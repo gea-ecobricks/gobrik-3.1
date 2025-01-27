@@ -656,18 +656,22 @@ function addExpenseTrans() {
     modal.classList.remove('modal-hidden');
 }
 
+
 function submitExpenseTrans(event) {
     event.preventDefault(); // Prevent default form submission
 
     // Get form data and handle optional fields
     const formData = {
         amount_idr: document.getElementById('amount-idr').value,
-        receiver: document.getElementById('receiver').value || '', // Default to empty string if blank
-        transaction_date: document.getElementById('transaction-date').value,
+        receiver: document.getElementById('receiver').value || '',
+        transaction_date_dt: document.getElementById('transaction-date').value, // Corrected key
         description: document.getElementById('description').value,
         expense_type: document.getElementById('expense-type').value,
-        expense_vendor: document.getElementById('expense-vendor').value || '' // Default to empty string if blank
+        expense_vendor: document.getElementById('expense-vendor').value || '' // Allow empty value
     };
+
+    // Log formData for debugging
+    console.log('Submitting formData:', formData);
 
     // Send the data to the backend
     $.ajax({
@@ -690,6 +694,7 @@ function submitExpenseTrans(event) {
         }
     });
 }
+
 
 </script>
 
