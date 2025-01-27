@@ -638,8 +638,8 @@ function addExpenseTrans() {
             </div>
             <div class="form-item">
                 <label for="expense-vendor">Expense Vendor:</label>
-                <select id="expense-vendor" name="expense_vendor" required>
-                    <option value="">Select a vendor</option>
+                <select id="expense-vendor" name="expense_vendor">
+                    <option value="">Select a vendor (optional)</option>
                     ${expenseVendorOptions}
                 </select>
             </div>
@@ -656,18 +656,17 @@ function addExpenseTrans() {
     modal.classList.remove('modal-hidden');
 }
 
-
 function submitExpenseTrans(event) {
     event.preventDefault(); // Prevent default form submission
 
-    // Get form data
+    // Get form data and handle optional fields
     const formData = {
         amount_idr: document.getElementById('amount-idr').value,
-        receiver: document.getElementById('receiver').value,
+        receiver: document.getElementById('receiver').value || '', // Default to empty string if blank
         transaction_date: document.getElementById('transaction-date').value,
         description: document.getElementById('description').value,
         expense_type: document.getElementById('expense-type').value,
-        expense_vendor: document.getElementById('expense-vendor').value
+        expense_vendor: document.getElementById('expense-vendor').value || '' // Default to empty string if blank
     };
 
     // Send the data to the backend
@@ -691,7 +690,7 @@ function submitExpenseTrans(event) {
         }
     });
 }
-</script>
+
 
 
 
