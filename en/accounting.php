@@ -638,7 +638,7 @@ function addExpenseTrans() {
             </div>
             <div class="form-item">
                 <label for="expense-vendor">Expense Vendor:</label>
-                <select id="expense-vendor" name="expense_vendor" required>
+                <select id="expense-vendor" name="expense_vendor">
                     <option value="">Select a vendor</option>
                     ${expenseVendorOptions}
                 </select>
