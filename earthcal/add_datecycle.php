@@ -79,14 +79,13 @@ $delete = $cal_conn->real_escape_string($data['delete'] ?? 'No');
 $synced = $cal_conn->real_escape_string($data['synced'] ?? 'No');
 $conflict = $cal_conn->real_escape_string($data['conflict'] ?? 'No');
 $last_edited = date('Y-m-d H:i:s');
-$raw_json = $cal_conn->real_escape_string(json_encode($data)); // Store raw JSON for debugging
 
 try {
-    // Insert query with proper escaping for `delete`
+    // Insert query without `raw_json`
     $query = "
         INSERT INTO datecycles_tb
-        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, comment, comments, datecycle_color, cal_name, cal_color, frequency, pinned, completed, public, `delete`, synced, conflict, last_edited, raw_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, comment, comments, datecycle_color, cal_name, cal_color, frequency, pinned, completed, public, `delete`, synced, conflict, last_edited)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ";
 
     $stmt = $cal_conn->prepare($query);
@@ -94,35 +93,9 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // Log all parameters before binding
-    error_log("Binding parameters:");
-    error_log("buwana_id: $buwana_id");
-    error_log("cal_id: $cal_id");
-    error_log("title: $title");
-    error_log("date: $date");
-    error_log("time: $time");
-    error_log("time_zone: $time_zone");
-    error_log("day: $day");
-    error_log("month: $month");
-    error_log("year: $year");
-    error_log("comment: $comment");
-    error_log("comments: $comments");
-    error_log("datecycle_color: $datecycle_color");
-    error_log("cal_name: $cal_name");
-    error_log("cal_color: $cal_color");
-    error_log("frequency: $frequency");
-    error_log("pinned: $pinned");
-    error_log("completed: $completed");
-    error_log("public: $public");
-    error_log("delete: $delete");
-    error_log("synced: $synced");
-    error_log("conflict: $conflict");
-    error_log("last_edited: $last_edited");
-    error_log("raw_json: $raw_json");
-
     // Bind parameters
     $stmt->bind_param(
-        'iissssiissssssssssssss',
+        'iissssiisssssssssssss',
         $buwana_id,
         $cal_id,
         $title,
@@ -144,8 +117,7 @@ try {
         $delete,
         $synced,
         $conflict,
-        $last_edited,
-        $raw_json
+        $last_edited
     );
 
     // Execute the query
@@ -159,5 +131,3 @@ try {
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
-
-?>
