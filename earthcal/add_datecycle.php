@@ -75,17 +75,18 @@ $frequency = $cal_conn->real_escape_string($data['frequency'] ?? 'One-time');
 $pinned = $cal_conn->real_escape_string($data['pinned'] ?? 'No');
 $completed = $cal_conn->real_escape_string($data['completed'] ?? 'No');
 $public = $cal_conn->real_escape_string($data['public'] ?? 'No');
-$delete = $cal_conn->real_escape_string($data['delete'] ?? 'No');
+$delete_it = $cal_conn->real_escape_string($data['delete'] ?? 'No'); // Renamed field
 $synced = $cal_conn->real_escape_string($data['synced'] ?? 'No');
 $conflict = $cal_conn->real_escape_string($data['conflict'] ?? 'No');
 $last_edited = date('Y-m-d H:i:s');
+$raw_json = $cal_conn->real_escape_string(json_encode($data)); // Store raw JSON for debugging
 
 try {
-    // Insert query without `raw_json`
+    // Insert query with `raw_json` and renamed `delete_it`
     $query = "
         INSERT INTO datecycles_tb
-        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, comment, comments, datecycle_color, cal_name, cal_color, frequency, pinned, completed, public, `delete`, synced, conflict, last_edited)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, comment, comments, datecycle_color, cal_name, cal_color, frequency, pinned, completed, public, delete_it, synced, conflict, last_edited, raw_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ";
 
     $stmt = $cal_conn->prepare($query);
@@ -114,10 +115,11 @@ try {
         $pinned,
         $completed,
         $public,
-        $delete,
+        $delete_it, // Updated parameter
         $synced,
         $conflict,
-        $last_edited
+        $last_edited,
+        $raw_json
     );
 
     // Execute the query
@@ -131,3 +133,4 @@ try {
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
+?>
