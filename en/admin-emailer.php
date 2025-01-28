@@ -324,6 +324,73 @@ $(document).ready(function () {
         $(this).hide(); // Hide the stop button
     });
 });
+
+
+$(document).ready(function () {
+    // Initialize the DataTable
+    $('#next-ecobrickers').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "../api/fetch_next_ecobrickers.php",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "ecobricker_id" },
+            { "data": "email_addr" },
+            { "data": "account_notes" },
+            { "data": "first_name" },
+            { "data": "user_roles" },
+            { "data": "ecobricks_made" },
+            { "data": "login_count" },
+            { "data": "emailing_status" },
+            { "data": "full_name" },
+            { "data": "location_full" }
+        ]
+    });
+
+    let countdownTimer; // Reference for the timer
+    let countdown = 10; // Countdown starting value
+
+    // Handle the email submission
+    $('#send-email-btn').on('click', function () {
+        const emailTo = $('#email_to').val().trim();
+        const emailSubject = $('#email_subject').val().trim();
+        const emailBody = $('#email_body').val().trim();
+
+        if (!emailTo || !emailSubject || !emailBody) {
+            alert("Please fill out all fields before sending the email.");
+            return;
+        }
+
+        $.ajax({
+            url: 'admin-emailer.php',
+            type: 'POST',
+            data: {
+                send_email: true,
+                email_to: emailTo,
+                email_subject: emailSubject,
+                email_body: emailBody
+            },
+            success: function () {
+                // Update the button text to indicate success
+                $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
+
+                // Wait 1 second, then reload the page
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+
+                // Start the countdown after reloading
+                startCountdown();
+            },
+            error: function () {
+                alert("Failed to send the email. Please try again.");
+            }
+        });
+    });
+
+
 </script>
 
 
@@ -331,6 +398,8 @@ $(document).ready(function () {
 
 
 
+
+</div>
 
 
 </div> <!--Closes main-->
