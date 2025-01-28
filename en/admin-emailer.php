@@ -254,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 <script>
 $(document).ready(function () {
     // Initialize the DataTable
-    $('#next-ecobrickers').DataTable({
+    const dataTable = $('#next-ecobrickers').DataTable({
         "processing": true,
         "serverSide": true,
         "ajax": {
@@ -273,6 +273,17 @@ $(document).ready(function () {
             { "data": "full_name" },
             { "data": "location_full" }
         ]
+    });
+
+    // Automatically update the email field based on the first record in the DataTable
+    $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
+        if (json.data.length > 0) {
+            const firstRecord = json.data[0];
+            const currentEmail = $('#email_to').val();
+            if (!currentEmail || currentEmail !== firstRecord.email_addr) {
+                $('#email_to').val(firstRecord.email_addr);
+            }
+        }
     });
 
     // Handle the email submission with AJAX
@@ -320,13 +331,14 @@ $(document).ready(function () {
 
             if (countdown <= 0) {
                 clearInterval(timer);
-                // Automatically submit the form via AJAX after countdown
+                // Automatically trigger the send email button
                 $('#send-email-btn').trigger('click');
             }
         }, 1000);
     }
 });
 </script>
+
 
 
 
@@ -343,53 +355,7 @@ $(document).ready(function () {
 
 
 <script>
-document.querySelector('form').addEventListener('submit', function (e) {
-    const emailTo = document.getElementById('email_to').value.trim();
-    const emailSubject = document.getElementById('email_subject').value.trim();
-    const emailBody = document.getElementById('email_body').value.trim();
 
-    if (!emailTo || !emailSubject || !emailBody) {
-        e.preventDefault();
-        alert("Please fill out all fields before sending the email.");
-    }
-});
-
-
-$(document).ready(function () {
-    $('#next-ecobrickers').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-            "url": "../api/fetch_next_ecobrickers.php",
-            "type": "POST"
-        },
-        "columns": [
-            { "data": "ecobricker_id" },
-            { "data": "email_addr" },
-            { "data": "account_notes" },
-            { "data": "first_name" },
-            { "data": "user_roles" },
-            { "data": "ecobricks_made" },
-            { "data": "login_count" },
-            { "data": "emailing_status" },
-            { "data": "full_name" },
-            { "data": "location_full" }
-        ]
-    });
-
-    // Update only the email field if necessary
-    $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
-        if (json.data.length > 0) {
-            const firstRecord = json.data[0];
-            // Update email address only if empty or needs changing
-            const currentEmail = $('#email_to').val();
-            if (!currentEmail || currentEmail !== firstRecord.email_addr) {
-                $('#email_to').val(firstRecord.email_addr);
-            }
-            // Do not overwrite subject or body
-        }
-    });
-});
 
 
 </script>
