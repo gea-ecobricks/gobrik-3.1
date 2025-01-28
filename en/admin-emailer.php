@@ -198,61 +198,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 
 <?php require_once ("../includes/admin-panel-inc.php");?>
 
-<div class="splash-title-block"></div>
-<div id="splash-bar"></div>
+    <div class="splash-title-block"></div>
+    <div id="splash-bar"></div>
 
-<!-- PAGE CONTENT -->
-<div id="top-page-image" class="message-birded top-page-image"></div>
+    <!-- PAGE CONTENT -->
+    <div id="top-page-image" class="message-birded top-page-image"></div>
 
-<div id="form-submission-box" class="landing-page-form">
-    <div class="form-container">
+    <div id="form-submission-box" class="landing-page-form">
+        <div class="form-container">
 
-       <!-- Email confirmation form -->
+           <!-- Email confirmation form -->
 
-<div style="text-align:center;">
-    <h2>Send Activation Emails to Unactivated Users</h2>
-    <p>Here are the user's that haven't yet activated their buwana account</p>
-
-      <div id="table-container" style="overflow-x: auto; width: 100%;">
+    <div id="content-to-refresh" style="text-align:center;">
+        <h2>Send Activation Emails to Unactivated Users</h2>
+        <p>Here are the user's that haven't yet activated their buwana account</p>
+         <div id="table-container" style="overflow-x: auto; width: 100%;">
            <table id="next-ecobrickers" class="display responsive nowrap" style="width:100%">
-    <thead>
-        <tr>
-            <th>Ecobricker ID</th>
-            <th>Email</th>
-            <th>Notes</th>
-            <th>First Name</th>
-            <th>Roles</th>
-            <th>Briks</th>
-            <th>Logins</th>
-            <th>Email Status</th>
-            <th>Full Name</th>
-            <th>Location</th>
-        </tr>
-    </thead>
-</table>
+                <thead>
+                    <tr>
+                        <th>Ecobricker ID</th>
+                        <th>Email</th>
+                        <th>Notes</th>
+                        <th>First Name</th>
+                        <th>Roles</th>
+                        <th>Briks</th>
+                        <th>Logins</th>
+                        <th>Email Status</th>
+                        <th>Full Name</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <p>Use this form to send an email to remind users to activate their account.</p>
+        <form method="post" style="text-align:left;">
+            <label for="email_to">Sending to:</label><br>
+            <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
+
+            <label for="email_subject">Subject:</label><br>
+            <input type="text" id="email_subject" name="email_subject" value="<?php echo htmlspecialchars($subject); ?>" style="width: 80%;"><br><br>
+
+            <label for="email_body">Body:</label><br>
+            <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
+
+            <button type="submit" name="send_email" class="confirm-button enabled">📨 Send Email</button>
+        </form>
+    </div>
 
 
-            </div>
-
-
-
-    <p>Use this form to send an email to remind users to activate their account.</p>
-
-    <form method="post" style="text-align:left;">
-        <label for="email_to">Sending to:</label><br>
-        <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
-
-        <label for="email_subject">Subject:</label><br>
-        <input type="text" id="email_subject" name="email_subject" value="<?php echo htmlspecialchars($subject); ?>" style="width: 80%;"><br><br>
-
-        <label for="email_body">Body:</label><br>
-        <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
-
-        <button type="submit" name="send_email" class="confirm-button enabled">📨 Send Email</button>
-    </form>
-</div>
-
-</div>
 
 </div>
 
