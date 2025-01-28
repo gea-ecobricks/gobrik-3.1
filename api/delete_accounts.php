@@ -30,8 +30,8 @@ try {
     $stmt_fetch_details->fetch();
     $stmt_fetch_details->close();
 
-    if (empty($email_addr) || empty($buwana_id)) {
-        throw new Exception('User details not found for the given ecobricker ID.');
+    if (empty($email_addr)) {
+        throw new Exception('No email found for the given ecobricker ID.');
     }
 
     // Begin transactions
