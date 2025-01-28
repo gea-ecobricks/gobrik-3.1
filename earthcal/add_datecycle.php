@@ -76,7 +76,7 @@ $pinned = $cal_conn->real_escape_string($data['pinned'] ?? 'No');
 $completed = $cal_conn->real_escape_string($data['completed'] ?? 'No');
 $public = $cal_conn->real_escape_string($data['public'] ?? 'No');
 $delete_it = $cal_conn->real_escape_string($data['delete'] ?? 'No'); // Renamed field
-$synced = $cal_conn->real_escape_string($data['synced'] ?? 'No');
+$synced = 1; // Always set to "1" (tinyint equivalent of "Yes")
 $conflict = $cal_conn->real_escape_string($data['conflict'] ?? 'No');
 $last_edited = date('Y-m-d H:i:s');
 $raw_json = $cal_conn->real_escape_string(json_encode($data)); // Store raw JSON for debugging
@@ -116,7 +116,7 @@ try {
         $completed,
         $public,
         $delete_it, // Updated parameter
-        $synced,
+        $synced, // Always set to "1"
         $conflict,
         $last_edited,
         $raw_json
