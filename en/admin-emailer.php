@@ -101,25 +101,28 @@ if (!empty($date_registered)) {
 }
 
 // Initialize the email body
+// Initialize the email body
 $body = "
 Hi there $first_name,<br><br>";
-$body .= "GoBrik has been totally revamped for 2025! <br><br>"
+$body .= "GoBrik has been totally revamped for 2025! <br><br>";
 $body .= "You've been with us since you registered on $date_registered.<br><br>";
 $body .= "In your account, we have your $ecobricks_made ecobricks and the $brk_balance Brikcoins you earned.<br><br>";
 
-
-$body .= "However, to align with our ecological principles, we've removed our reliance on Google, Facebook and Amazon services. Not only are we up and running on our own servers, we have developed our own, fully open source account system.  We now need you to re-activate your new GoBrik account with our new Buwana authentication protocol-- that will soon work for accessing other regenerative apps.";
-$body .="(read more about our 2025 big tech transition <a href=\"https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/\">here</a>)<br><br>";
+$body .= "However, to align with our ecological principles, we've removed our reliance on Google, Facebook, and Amazon services.
+Not only are we up and running on our own servers, but we have also developed our own, fully open-source account system.
+We now need you to re-activate your new GoBrik account with our new Buwana authentication protocol — which will soon work for accessing other regenerative apps.
+(Read more about our 2025 big tech transition <a href=\"https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/\">here</a>.)<br><br>";
 
 $body .= "
 Your ecobricking work was a great service to your local $city_txt ecology and your $region_txt bioregion of $country_txt, Earth.<br><br>
 We'd like to encourage you to activate your account and try logging your latest ecobricks.<br><br>
-Please do so by logging in with your email ($email_addr) at <a href='https://gobrik.com'>https://gobrik.com</a><br><br>
+Please do so by logging in with your email ($email_addr) at <a href=\"https://gobrik.com\">https://gobrik.com</a><br><br>
 See you on the app!<br><br>
-GEA Dev Team
+GEA Dev Team<br><br>
 
-P.S.  If you'd like to delete your account with us, you can do that too during the activation process.
+P.S. If you'd like to delete your account with us, you can do that too during the activation process.
 ";
+
 
 // Send email function
 function sendAccountActivationEmail($to, $subject, $body_html, $body_text) {

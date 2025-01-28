@@ -75,6 +75,7 @@ try {
 
     // Prepare the response
     $response['success'] = true;
+    $response['buwana_id'] = $buwana_id; // Include the buwana_id in the response
     $response['calendars'] = $allCalendars;
 
     if (empty($allCalendars)) {
