@@ -110,7 +110,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
          <div class="form-item" style="margin: 70px 10px 40px 10px;">
             <p style="text-align:center;"><span data-lang-id="0007-not-interested">If you're not interested and would like your old </span><?php echo htmlspecialchars($email_addr); ?><span data-lang-id="0009-that-too"> account completely deleted, you can do that too.</span></p>
             <!-- DELETE ACCOUNT FORM -->
-            <form id="delete-account-form" method="post" action="delete_account.php?id=<?php echo htmlspecialchars($ecobricker_id); ?>">
+            <form id="delete-account-form" method="post" action="../api/delete_accounts.php?id=<?php echo htmlspecialchars($ecobricker_id); ?>">
                 <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
                     <button type="button" class="submit-button delete" onclick="confirmDeletion()" data-lang-id="0010-delete-button">Delete My Account</button>
                 </div>
@@ -130,7 +130,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <script>
 function confirmDeletion() {
     if (confirm("Are you certain you wish to delete your account? This cannot be undone.")) {
-        if (confirm("Ok. We will delete your account! Note that this does not affect ecobrick data that has been permanently archived in the brikchain. Note that currently our Earthen newsletter is separate from GoBrik-- which has its own easy unsubscribe mechanism.")) {
+        if (confirm("Ok. We will delete your account! Note that this does not affect ecobrick data that has been permanently archived in the brikchain. If you have a Buwana account and/or a subscription to our Earthen newsletter it will also be deleted.")) {
             document.getElementById('delete-account-form').submit();
         }
     }
