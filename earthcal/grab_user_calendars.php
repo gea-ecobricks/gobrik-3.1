@@ -61,7 +61,7 @@ try {
     }
 
     // Fetch all calendars associated with the user
-    $sqlAllCalendars = "SELECT calendar_id AS id, calendar_name AS name, calendar_color AS color
+    $sqlAllCalendars = "SELECT calendar_id AS cal_id, calendar_name AS name, calendar_color AS color
                         FROM calendars_tb
                         WHERE buwana_id = ?";
     $stmtAll = $cal_conn->prepare($sqlAllCalendars);
@@ -91,3 +91,4 @@ try {
 // Output response as JSON
 echo json_encode($response);
 exit();
+?>
