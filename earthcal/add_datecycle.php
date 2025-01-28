@@ -45,7 +45,7 @@ $data = json_decode($input, true);
 
 // Validate required fields
 $required_fields = [
-    'user_id', 'cal_id', 'title', 'date', 'time', 'time_zone',
+    'buwana_id', 'cal_id', 'title', 'date', 'time', 'time_zone',
     'day', 'month', 'year', 'frequency', 'last_edited'
 ];
 
@@ -57,7 +57,7 @@ foreach ($required_fields as $field) {
 }
 
 // Extract and sanitize inputs
-$user_id = (int) $data['user_id'];
+$buwana_id = (int) $data['buwana_id'];
 $cal_id = (int) $data['cal_id'];
 $title = $cal_conn->real_escape_string($data['title']);
 $date = $cal_conn->real_escape_string($data['date']);
@@ -97,7 +97,7 @@ try {
     // Bind parameters
     $stmt->bind_param(
         'iissssiissssssssssssss',
-        $user_id,
+        $buwana_id,
         $cal_id,
         $title,
         $date,
