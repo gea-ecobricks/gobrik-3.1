@@ -213,40 +213,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
            <!-- Email confirmation form -->
 
     <div id="content-to-refresh" style="text-align:center;">
-        <h2>Send Activation Emails to Unactivated Users</h2>
-        <p>Here are the user's that haven't yet activated their buwana account</p>
-         <div id="table-container" style="overflow-x: auto; width: 100%;">
-           <table id="next-ecobrickers" class="display responsive nowrap" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Ecobricker ID</th>
-                        <th>Email</th>
-                        <th>Notes</th>
-                        <th>First Name</th>
-                        <th>Roles</th>
-                        <th>Briks</th>
-                        <th>Logins</th>
-                        <th>Email Status</th>
-                        <th>Full Name</th>
-                        <th>Location</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-        <p>Use this form to send an email to remind users to activate their account.</p>
-        <form method="post" style="text-align:left;">
-            <label for="email_to">Sending to:</label><br>
-            <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
-
-            <label for="email_subject">Subject:</label><br>
-            <input type="text" id="email_subject" name="email_subject" value="<?php echo htmlspecialchars($subject); ?>" style="width: 80%;"><br><br>
-
-            <label for="email_body">Body:</label><br>
-            <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
-
-            <button type="submit" name="send_email" class="confirm-button enabled">📨 Send Email</button>
-        </form>
+    <h2>Send Activation Emails to Unactivated Users</h2>
+    <p>Here are the users that haven't yet activated their Buwana account:</p>
+    <div id="table-container" style="overflow-x: auto; width: 100%;">
+        <table id="next-ecobrickers" class="display responsive nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Ecobricker ID</th>
+                    <th>Email</th>
+                    <th>Notes</th>
+                    <th>First Name</th>
+                    <th>Roles</th>
+                    <th>Briks</th>
+                    <th>Logins</th>
+                    <th>Email Status</th>
+                    <th>Full Name</th>
+                    <th>Location</th>
+                </tr>
+            </thead>
+        </table>
     </div>
+    <p>Use this form to send an email to remind users to activate their account.</p>
+    <form id="email-form" method="post" style="text-align:left;">
+        <label for="email_to">Sending to:</label><br>
+        <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
+
+        <label for="email_subject">Subject:</label><br>
+        <input type="text" id="email_subject" name="email_subject" value="<?php echo htmlspecialchars($subject); ?>" style="width: 80%;"><br><br>
+
+        <label for="email_body">Body:</label><br>
+        <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
+
+        <button type="button" id="send-email-btn" class="confirm-button enabled">📨 Send Email</button>
+        <div id="countdown-timer" style="margin-top: 10px; display: none;">
+            <p>Refreshing in <span id="countdown">10</span> seconds...</p>
+        </div>
+    </form>
+</div>
+
+<script>
+$(document).ready(function () {
+    // Initialize the DataTable
+    $('#next-ecobrickers').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "../api/fetch_next_ecobrickers.php",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "ecobricker_id" },
+            { "data": "email_addr" },
+            { "data": "account_notes" },
+            { "data": "first_name" },
+            { "data": "user_roles" },
+            { "data": "ecobricks_made" },
+            { "data": "login_count" },
+            { "data": "emailing_status" },
+            { "data": "full_name" },
+            { "data": "location_full" }
+        ]
+    });
+
+    // Handle the email submission with AJAX
+    $('#send-email-btn').on('click', function () {
+        const emailTo = $('#email_to').val().trim();
+        const emailSubject = $('#email_subject').val().trim();
+        const emailBody = $('#email_body').val().trim();
+
+        if (!emailTo || !emailSubject || !emailBody) {
+            alert("Please fill out all fields before sending the email.");
+            return;
+        }
+
+        $.ajax({
+            url: 'admin-emailer.php',
+            type: 'POST',
+            data: {
+                send_email: true,
+                email_to: emailTo,
+                email_subject: emailSubject,
+                email_body: emailBody
+            },
+            success: function (response) {
+                // Reload the content-to-refresh div
+                $('#content-to-refresh').load(location.href + " #content-to-refresh > *", function () {
+                    // Start the countdown timer
+                    startCountdown();
+                });
+            },
+            error: function () {
+                alert("Failed to send the email. Please try again.");
+            }
+        });
+    });
+
+    // Countdown timer function
+    function startCountdown() {
+        let countdown = 10;
+        $('#countdown').text(countdown);
+        $('#countdown-timer').show();
+
+        const timer = setInterval(function () {
+            countdown--;
+            $('#countdown').text(countdown);
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                // Automatically submit the form via AJAX after countdown
+                $('#send-email-btn').trigger('click');
+            }
+        }, 1000);
+    }
+});
+</script>
+
 
 
 
