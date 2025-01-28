@@ -254,8 +254,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 
 <script>
 $(document).ready(function () {
-    let countdownTimer; // Reference for the timer
-    let countdown = 10; // Countdown starting value
+    // Initialize the DataTable
+    const dataTable = $('#next-ecobrickers').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "../api/fetch_next_ecobrickers.php",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "ecobricker_id" },
+            { "data": "email_addr" },
+            { "data": "account_notes" },
+            { "data": "first_name" },
+            { "data": "user_roles" },
+            { "data": "ecobricks_made" },
+            { "data": "login_count" },
+            { "data": "emailing_status" },
+            { "data": "full_name" },
+            { "data": "location_full" }
+        ]
+    });
+
+    let countdownTimer; // Reference for the countdown timer
+    let countdown = 10; // Initial countdown value
 
     // Start the countdown timer on page load
     startCountdown();
@@ -323,75 +345,20 @@ $(document).ready(function () {
         $('#countdown-timer').hide(); // Hide the timer
         $(this).hide(); // Hide the stop button
     });
-});
 
-
-$(document).ready(function () {
-    // Initialize the DataTable
-    $('#next-ecobrickers').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-            "url": "../api/fetch_next_ecobrickers.php",
-            "type": "POST"
-        },
-        "columns": [
-            { "data": "ecobricker_id" },
-            { "data": "email_addr" },
-            { "data": "account_notes" },
-            { "data": "first_name" },
-            { "data": "user_roles" },
-            { "data": "ecobricks_made" },
-            { "data": "login_count" },
-            { "data": "emailing_status" },
-            { "data": "full_name" },
-            { "data": "location_full" }
-        ]
-    });
-
-    let countdownTimer; // Reference for the timer
-    let countdown = 10; // Countdown starting value
-
-    // Handle the email submission
-    $('#send-email-btn').on('click', function () {
-        const emailTo = $('#email_to').val().trim();
-        const emailSubject = $('#email_subject').val().trim();
-        const emailBody = $('#email_body').val().trim();
-
-        if (!emailTo || !emailSubject || !emailBody) {
-            alert("Please fill out all fields before sending the email.");
-            return;
-        }
-
-        $.ajax({
-            url: 'admin-emailer.php',
-            type: 'POST',
-            data: {
-                send_email: true,
-                email_to: emailTo,
-                email_subject: emailSubject,
-                email_body: emailBody
-            },
-            success: function () {
-                // Update the button text to indicate success
-                $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
-
-                // Wait 1 second, then reload the page
-                setTimeout(function () {
-                    location.reload();
-                }, 1000);
-
-                // Start the countdown after reloading
-                startCountdown();
-            },
-            error: function () {
-                alert("Failed to send the email. Please try again.");
+    // Update the email field dynamically when new data is loaded into the DataTable
+    $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
+        if (json.data.length > 0) {
+            const firstRecord = json.data[0];
+            const currentEmail = $('#email_to').val();
+            if (!currentEmail || currentEmail !== firstRecord.email_addr) {
+                $('#email_to').val(firstRecord.email_addr);
             }
-        });
+        }
     });
-
-
+});
 </script>
+
 
 
 
