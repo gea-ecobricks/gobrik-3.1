@@ -82,10 +82,10 @@ $last_edited = date('Y-m-d H:i:s');
 $raw_json = $cal_conn->real_escape_string(json_encode($data)); // Store raw JSON for debugging
 
 try {
-    // Insert query
+    // Insert query with `delete` properly escaped
     $query = "
         INSERT INTO datecycles_tb
-        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, comment, comments, datecycle_color, cal_name, cal_color, frequency, pinned, completed, public, delete, synced, conflict, last_edited, raw_json)
+        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, comment, comments, datecycle_color, cal_name, cal_color, frequency, pinned, completed, public, `delete`, synced, conflict, last_edited, raw_json)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ";
 
