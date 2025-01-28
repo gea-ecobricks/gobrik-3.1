@@ -82,7 +82,7 @@ $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
 $gea_status = getGEA_status($buwana_id);
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 $ecobrick_unique_id = '';
-$first_name = getFirstName($buwana_conn, $buwana_id);
+
 
 // Initialize variables for the email form
 $email_addr = $nextEcobricker['email_addr'] ?? '';
@@ -186,6 +186,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     }
 }
 
+// Fetch overall stats
+require_once '../gobrikconn_env.php';
+
+// Initialize variables
+$total_ecobrickers = 0;
+$total_with_buwana_id = 0;
+$unsent = 0;
+$delivered = 0;
+$failed = 0;
+
+// Fetch counts
+$sql = "SELECT
+            COUNT(*) as total_ecobrickers,
+            SUM(CASE WHEN buwana_id IS NOT NULL AND buwana_id != '' THEN 1 ELSE 0 END) as total_with_buwana_id,
+            SUM(CASE WHEN emailing_status = 'unsent' THEN 1 ELSE 0 END) as unsent,
+            SUM(CASE WHEN emailing_status = 'delivered' THEN 1 ELSE 0 END) as delivered,
+            SUM(CASE WHEN emailing_status = 'failed' THEN 1 ELSE 0 END) as failed
+        FROM tb_ecobrickers";
+
+$result = $gobrik_conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $total_ecobrickers = intval($row['total_ecobrickers'] ?? 0);
+    $total_with_buwana_id = intval($row['total_with_buwana_id'] ?? 0);
+    $unsent = intval($row['unsent'] ?? 0);
+    $delivered = intval($row['delivered'] ?? 0);
+    $failed = intval($row['failed'] ?? 0);
+}
+
+// Calculate percentage of users with Buwana accounts
+$percent_with_buwana = $total_ecobrickers > 0 ? round(($total_with_buwana_id / $total_ecobrickers) * 100, 2) : 0;
+
+$gobrik_conn->close();
+
 ?>
 
 
@@ -214,6 +249,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 
     <div id="content-to-refresh" style="text-align:center;">
     <h2>Send Activation Emails to Unactivated Users</h2>
+
+     <p id="admin-welcome-stats">
+    So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik.
+    <?php echo $percent_with_buwana; ?>% have an active Buwana account.
+    Of these, <?php echo number_format($unsent); ?> have not received the test email,
+    <?php echo number_format($delivered); ?> have received it, and
+    <?php echo number_format($failed); ?> account emails failed to receive it.</p>
+
+
     <p>Here are the users that haven't yet activated their Buwana account:</p>
     <div id="table-container" style="overflow-x: auto; width: 100%;">
         <table id="next-ecobrickers" class="display responsive nowrap" style="width:100%">
