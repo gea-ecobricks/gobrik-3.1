@@ -102,14 +102,14 @@ if (!empty($date_registered)) {
 
 // Initialize the email body
 $body = "
-Hi there $first_name,<br><br>
-GoBrik has been totally revamped for 2025! <br><br>
-To align with our ecological principles, we've removed our reliance on Google, Facebook and Amazon services.  We are using our own database and server now and need you to re-activate your new account with our new Buwana authentication protocol-- a new account system for GoBrik and other regenerative apps ()read more about our 2025 big tech transition <a href=\"https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/\">here</a><br><br>
-You've been with us since you registered on $date_registered.<br><br>";
+Hi there $first_name,<br><br>";
+$body .= "GoBrik has been totally revamped for 2025! <br><br>"
+$body .= "You've been with us since you registered on $date_registered.<br><br>";
+$body .= "In your account, we have your $ecobricks_made ecobricks and the $brk_balance Brikcoins you earned.<br><br>";
 
 
-$body .= "In your old account, we have your $ecobricks_made ecobricks and the $brk_balance Brikcoins you earned.<br><br>";
-
+$body .= "However, to align with our ecological principles, we've removed our reliance on Google, Facebook and Amazon services. Not only are we up and running on our own servers, we have developed our own, fully open source account system.  We now need you to re-activate your new GoBrik account with our new Buwana authentication protocol-- that will soon work for accessing other regenerative apps.";
+$body .="(read more about our 2025 big tech transition <a href=\"https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/\">here</a>)<br><br>";
 
 $body .= "
 Your ecobricking work was a great service to your local $city_txt ecology and your $region_txt bioregion of $country_txt, Earth.<br><br>
