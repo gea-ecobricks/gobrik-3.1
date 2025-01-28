@@ -278,23 +278,33 @@ $gobrik_conn->close();
         </table>
     </div>
     <p>Use this form to send an email to remind users to activate their account.</p>
-    <form id="email-form" method="post" style="text-align:left;">
-    <label for="email_to">Sending to:</label><br>
+    <form id="email-form" method="post" style="text-align:center;">
+    <label for="email_to" style="text-align:left;">Sending to:</label><br>
     <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
 
-    <label for="email_subject">Subject:</label><br>
+    <label for="email_subject" style="text-align:left;">Subject:</label><br>
     <input type="text" id="email_subject" name="email_subject" value="<?php echo htmlspecialchars($subject); ?>" style="width: 80%;"><br><br>
 
-    <label for="email_body">Body:</label><br>
+    <label for="email_body" style="text-align:left;">Body:</label><br>
     <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
 
     <button type="button" id="send-email-btn" class="confirm-button enabled">📨 Send Email</button>
 
     <div id="countdown-timer" style="margin-top: 10px; display: none;text-align:center;width:80%;">
-        <p>Page will refresh in <span id="countdown">10</span> seconds...</p>
+        <p>Email will send in refresh in <span id="countdown">8</span> seconds...</p>
         <button type="button" id="stop-timer-btn" style="display: none;" class="confirm-button delete">🛑 Stop Timer</button>
     </div>
 </form>
+
+
+
+</div>
+
+</div>
+
+
+</div> <!--Closes main-->
+
 
 
 <script>
@@ -409,12 +419,6 @@ $(document).ready(function () {
 
 
 
-
-
-</div>
-
-
-</div> <!--Closes main-->
 
 
 <!--FOOTER STARTS HERE-->
