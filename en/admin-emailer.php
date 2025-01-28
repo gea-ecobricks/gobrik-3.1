@@ -235,26 +235,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     </div>
     <p>Use this form to send an email to remind users to activate their account.</p>
     <form id="email-form" method="post" style="text-align:left;">
-        <label for="email_to">Sending to:</label><br>
-        <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
+    <label for="email_to">Sending to:</label><br>
+    <input type="email" id="email_to" name="email_to" value="<?php echo htmlspecialchars($email_addr); ?>" style="width: 80%;"><br><br>
 
-        <label for="email_subject">Subject:</label><br>
-        <input type="text" id="email_subject" name="email_subject" value="<?php echo htmlspecialchars($subject); ?>" style="width: 80%;"><br><br>
+    <label for="email_subject">Subject:</label><br>
+    <input type="text" id="email_subject" name="email_subject" value="<?php echo htmlspecialchars($subject); ?>" style="width: 80%;"><br><br>
 
-        <label for="email_body">Body:</label><br>
-        <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
+    <label for="email_body">Body:</label><br>
+    <textarea id="email_body" name="email_body" rows="10" style="width: 80%;"><?php echo htmlspecialchars($body); ?></textarea><br><br>
 
-        <button type="button" id="send-email-btn" class="confirm-button enabled">📨 Send Email</button>
-        <div id="countdown-timer" style="margin-top: 10px; display: none;">
-            <p>Refreshing in <span id="countdown">10</span> seconds...</p>
-        </div>
-    </form>
-</div>
+    <button type="button" id="send-email-btn" class="confirm-button enabled">📨 Send Email</button>
+    <div id="countdown-timer" style="margin-top: 10px; display: none;">
+        <p>Page will refresh in <span id="countdown">10</span> seconds...</p>
+        <button type="button" id="stop-timer-btn" style="display: none;">🛑 Stop Timer</button>
+    </div>
+</form>
+
 
 <script>
 $(document).ready(function () {
     // Initialize the DataTable
-    const dataTable = $('#next-ecobrickers').DataTable({
+    $('#next-ecobrickers').DataTable({
         "processing": true,
         "serverSide": true,
         "ajax": {
@@ -275,18 +276,10 @@ $(document).ready(function () {
         ]
     });
 
-    // Automatically update the email field based on the first record in the DataTable
-    $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
-        if (json.data.length > 0) {
-            const firstRecord = json.data[0];
-            const currentEmail = $('#email_to').val();
-            if (!currentEmail || currentEmail !== firstRecord.email_addr) {
-                $('#email_to').val(firstRecord.email_addr);
-            }
-        }
-    });
+    let countdownTimer; // Reference for the timer
+    let countdown = 10; // Countdown starting value
 
-    // Handle the email submission with AJAX
+    // Handle the email submission
     $('#send-email-btn').on('click', function () {
         const emailTo = $('#email_to').val().trim();
         const emailSubject = $('#email_subject').val().trim();
@@ -306,12 +299,17 @@ $(document).ready(function () {
                 email_subject: emailSubject,
                 email_body: emailBody
             },
-            success: function (response) {
-                // Reload the content-to-refresh div
-                $('#content-to-refresh').load(location.href + " #content-to-refresh > *", function () {
-                    // Start the countdown timer
-                    startCountdown();
-                });
+            success: function () {
+                // Update the button text to indicate success
+                $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
+
+                // Wait 1 second, then reload the page
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+
+                // Start the countdown after reloading
+                startCountdown();
             },
             error: function () {
                 alert("Failed to send the email. Please try again.");
@@ -321,23 +319,31 @@ $(document).ready(function () {
 
     // Countdown timer function
     function startCountdown() {
-        let countdown = 10;
+        countdown = 10; // Reset countdown
         $('#countdown').text(countdown);
         $('#countdown-timer').show();
+        $('#stop-timer-btn').show();
 
-        const timer = setInterval(function () {
+        countdownTimer = setInterval(function () {
             countdown--;
             $('#countdown').text(countdown);
 
             if (countdown <= 0) {
-                clearInterval(timer);
-                // Automatically trigger the send email button
-                $('#send-email-btn').trigger('click');
+                clearInterval(countdownTimer);
+                location.reload(); // Reload the page when countdown reaches 0
             }
         }, 1000);
     }
+
+    // Stop the countdown timer
+    $('#stop-timer-btn').on('click', function () {
+        clearInterval(countdownTimer);
+        $('#countdown-timer').hide();
+        $(this).hide();
+    });
 });
 </script>
+
 
 
 
