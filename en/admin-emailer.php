@@ -93,7 +93,7 @@ $ecobricks_made = $nextEcobricker['ecobricks_made'] ?? 0;
 $city_txt = $nextEcobricker['city_txt'] ?? '';
 $region_txt = $nextEcobricker['region_txt'] ?? '';
 $country_txt = $nextEcobricker['country_txt'] ?? '';
-$subject = "Please activate your 2025 GoBrik account";
+$subject = "Ditch big-tech with us: Activate your GoBrik 2025 account.";
 
 // Format the date to exclude the time
 if (!empty($date_registered)) {
@@ -110,8 +110,8 @@ $body .= "In your account, we have your $ecobricks_made ecobricks and the $brk_b
 
 $body .= "However, we need you to upgrade your account!<br><br>
 To align with our ecological principles, we've removed our reliance on Google, Facebook, and Amazon services.
-Not only are we up and running on our own servers and newsletters, but we have also developed our own, fully open-source account system.<br><br>
-We now need you to activate your new GoBrik account with our new Buwana authentication protocol — which will soon work for other regenerative apps!
+Not only are we up and running on our own servers, but we have also developed our own, fully open-source account system.  On it we are deploying an array of regenerative Earthen newsletters (also using an opensource, not-for-profit platform, of course).<br><br>
+However, first we now need you to activate your new GoBrik account with our new Buwana authentication protocol — which will soon work for other regenerative apps!
 <br><br>(You can read more about our transition off big tech <a href=\"https://earthen.io/gobrik-3-launch/\">here</a>.)<br><br>";
 
 $body .= "
