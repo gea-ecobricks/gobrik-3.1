@@ -25,7 +25,7 @@ if (empty($origin)) {
     header('Access-Control-Allow-Origin: ' . $origin);
 } else {
     header('HTTP/1.1 403 Forbidden');
-    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin v2']);
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
     exit();
 }
 
@@ -51,11 +51,11 @@ if (!isset($data['buwana_id'])) {
 $buwana_id = (int) $data['buwana_id'];
 
 try {
-    // 🔹 **Fetch Unique Calendars from `datecycles_tb` Instead of `calendars_tb`**
+    // 🔹 **Fetch Unique Calendars from `calendars_tb` Instead of `datecycles_tb`**
     $query = "
-        SELECT DISTINCT cal_id, cal_name, cal_color, public AS calendar_public, last_edited AS last_updated
-        FROM datecycles_tb
-        WHERE (buwana_id = ? OR public = 1) AND delete_it = 0
+        SELECT cal_id, cal_name, cal_color, calendar_public, last_edited AS last_updated
+        FROM calendars_tb
+        WHERE (buwana_id = ? OR calendar_public = 1) AND deleted = 0
     ";
 
     $stmt = $cal_conn->prepare($query);
@@ -64,7 +64,7 @@ try {
     }
 
     // Bind parameters
-    $stmt->bind_param('i', $buwana_id);
+    $stmt->bind_param('i', $buwana_id); // Ensure buwana_id is properly bound
 
     // Execute the query
     $stmt->execute();
@@ -88,7 +88,7 @@ try {
         exit();
     }
 
-    // Return the calendars data
+    // ✅ Return the calendars data
     echo json_encode([
         "success" => true,
         "calendars" => $calendars
