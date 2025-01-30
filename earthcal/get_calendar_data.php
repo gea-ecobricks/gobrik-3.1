@@ -52,6 +52,9 @@ if (!isset($data['buwana_id']) || !isset($data['cal_id'])) {
 $buwana_id = (int) $data['buwana_id'];
 $cal_id = (int) $data['cal_id'];
 
+// Debugging: Log the received values
+error_log("🔹 get_calendar_data.php called with buwana_id: $buwana_id, cal_id: $cal_id");
+
 try {
     // 🔹 **Fetch all dateCycles from `datecycles_tb` for the given calendar**
     $query = "
@@ -66,6 +69,9 @@ try {
     if (!$stmt) {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
+
+    // Debugging: Log SQL query execution
+    error_log("🔹 Executing query: SELECT * FROM datecycles_tb WHERE cal_id = $cal_id AND (buwana_id = $buwana_id OR public = 1) AND delete_it = 0");
 
     // Bind parameters (cal_id and buwana_id)
     $stmt->bind_param('ii', $cal_id, $buwana_id);
@@ -83,6 +89,9 @@ try {
     // Close the statement
     $stmt->close();
 
+    // Debugging: Log retrieved data
+    error_log("🔹 Retrieved " . count($dateCycles) . " dateCycles for cal_id: $cal_id");
+
     // Check if any dateCycles were found
     if (count($dateCycles) === 0) {
         echo json_encode([
@@ -98,7 +107,7 @@ try {
         "dateCycles" => $dateCycles
     ]);
 } catch (Exception $e) {
-    error_log('Error: ' . $e->getMessage());
+    error_log('❌ Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
 ?>
