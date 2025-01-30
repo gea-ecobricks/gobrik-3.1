@@ -53,7 +53,7 @@ $buwana_id = (int) $data['buwana_id'];
 try {
     // 🔹 **Fetch Unique Calendars from `calendars_tb` Instead of `datecycles_tb`**
     $query = "
-        SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_edited AS last_updated
+        SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_edited AS last_edited
         FROM calendars_tb
         WHERE (buwana_id = ? OR calendar_public = 1) AND deleted = 0
     ";
