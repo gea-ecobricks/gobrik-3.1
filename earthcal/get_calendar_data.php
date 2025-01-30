@@ -51,12 +51,11 @@ if (!isset($data['buwana_id'])) {
 $buwana_id = (int) $data['buwana_id'];
 
 try {
-    // Prepare the query
+    // 🔹 **Fetch Unique Calendars from `datecycles_tb` Instead of `calendars_tb`**
     $query = "
-        SELECT calendar_id, calendar_name, calendar_color, calendar_public,
-               last_updated, synked, deleted, conflict_flag
-        FROM calendars_tb
-        WHERE (buwana_id = ? OR calendar_public = 1) AND deleted = 0
+        SELECT DISTINCT cal_id, cal_name, cal_color, public AS calendar_public, last_edited AS last_updated
+        FROM datecycles_tb
+        WHERE (buwana_id = ? OR public = 1) AND delete_it = 0
     ";
 
     $stmt = $cal_conn->prepare($query);

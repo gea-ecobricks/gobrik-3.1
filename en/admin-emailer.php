@@ -332,7 +332,7 @@ $(document).ready(function () {
     });
 
     let countdownTimer; // Reference for the countdown timer
-    let countdown = 10; // Initial countdown value
+    let countdown = 5; // Initial countdown value
 
     // Start the countdown timer on page load
     startCountdown();
