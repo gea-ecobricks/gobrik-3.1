@@ -62,7 +62,7 @@ try {
                frequency, completed, pinned, public, comment, comments, datecycle_color,
                cal_name, cal_color, synced, conflict, delete_it, last_edited
         FROM datecycles_tb
-        WHERE cal_id = ? AND buwana_id = ? AND delete_it = 0
+        WHERE cal_id = ? AND (buwana_id = ? OR public = 1) AND delete_it = 0
     ";
 
     $stmt = $cal_conn->prepare($query);
