@@ -43,19 +43,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
-if (!isset($data['buwana_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Missing required field: buwana_id.']);
+// Check if required fields are present
+if (!isset($data['buwana_id']) || !isset($data['cal_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Missing required fields: buwana_id or cal_id.']);
     exit();
 }
 
 $buwana_id = (int) $data['buwana_id'];
+$cal_id = (int) $data['cal_id'];
 
 try {
-    // 🔹 **Fetch Unique Calendars from `datecycles_tb` Instead of `calendars_tb`**
+    // 🔹 **Fetch all dateCycles from `datecycles_tb` for the given calendar**
     $query = "
-        SELECT DISTINCT cal_id, cal_name, cal_color, public AS calendar_public, last_edited AS last_updated
+        SELECT ID, buwana_id, cal_id, title, date, time, time_zone, day, month, year,
+               frequency, completed, pinned, public, comment, comments, datecycle_color,
+               cal_name, cal_color, synced, conflict, delete_it, last_edited
         FROM datecycles_tb
-        WHERE (buwana_id = ? OR public = 1) AND delete_it = 0
+        WHERE cal_id = ? AND (buwana_id = ? OR public = 1) AND delete_it = 0
     ";
 
     $stmt = $cal_conn->prepare($query);
@@ -63,35 +67,35 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // Bind parameters
-    $stmt->bind_param('i', $buwana_id);
+    // Bind parameters (cal_id and buwana_id)
+    $stmt->bind_param('ii', $cal_id, $buwana_id);
 
     // Execute the query
     $stmt->execute();
 
     // Fetch results
     $result = $stmt->get_result();
-    $calendars = [];
+    $dateCycles = [];
     while ($row = $result->fetch_assoc()) {
-        $calendars[] = $row;
+        $dateCycles[] = $row;
     }
 
     // Close the statement
     $stmt->close();
 
-    // Check if calendars are found
-    if (count($calendars) === 0) {
+    // Check if any dateCycles were found
+    if (count($dateCycles) === 0) {
         echo json_encode([
             "success" => true,
-            "calendars" => []
+            "dateCycles" => []
         ]);
         exit();
     }
 
-    // Return the calendars data
+    // Return the fetched dateCycles
     echo json_encode([
         "success" => true,
-        "calendars" => $calendars
+        "dateCycles" => $dateCycles
     ]);
 } catch (Exception $e) {
     error_log('Error: ' . $e->getMessage());

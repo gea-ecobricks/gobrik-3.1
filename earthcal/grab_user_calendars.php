@@ -25,70 +25,76 @@ if (empty($origin)) {
     header('Access-Control-Allow-Origin: ' . $origin);
 } else {
     header('HTTP/1.1 403 Forbidden');
-    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin v2']);
     exit();
 }
 
-// Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     exit(0);
 }
 
-// Ensure the request is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405); // Method Not Allowed
-    echo json_encode(['success' => false, 'message' => 'Invalid request method. Use POST.']);
+    echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
     exit();
 }
 
-// Initialize response structure
-$response = ['success' => false];
+$input = file_get_contents('php://input');
+$data = json_decode($input, true);
+
+if (!isset($data['buwana_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Missing required field: buwana_id.']);
+    exit();
+}
+
+$buwana_id = (int) $data['buwana_id'];
 
 try {
-    // Parse JSON input
-    $input = json_decode(file_get_contents('php://input'), true);
-    error_log('Incoming request: ' . print_r($input, true)); // Log input for debugging
+    // 🔹 **Fetch Unique Calendars from `datecycles_tb` Instead of `calendars_tb`**
+    $query = "
+        SELECT DISTINCT cal_id, cal_name, cal_color, public AS calendar_public, last_edited AS last_updated
+        FROM datecycles_tb
+        WHERE (buwana_id = ? OR public = 1) AND delete_it = 0
+    ";
 
-    $buwana_id = $input['buwana_id'] ?? null;
+    $stmt = $cal_conn->prepare($query);
+    if (!$stmt) {
+        throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
+    }
 
-    // Validate Buwana ID
-    if (empty($buwana_id) || !is_numeric($buwana_id)) {
-        http_response_code(400); // Bad Request
-        echo json_encode(['success' => false, 'message' => 'Invalid or missing Buwana ID.']);
+    // Bind parameters
+    $stmt->bind_param('i', $buwana_id);
+
+    // Execute the query
+    $stmt->execute();
+
+    // Fetch results
+    $result = $stmt->get_result();
+    $calendars = [];
+    while ($row = $result->fetch_assoc()) {
+        $calendars[] = $row;
+    }
+
+    // Close the statement
+    $stmt->close();
+
+    // Check if calendars are found
+    if (count($calendars) === 0) {
+        echo json_encode([
+            "success" => true,
+            "calendars" => []
+        ]);
         exit();
     }
 
-    // Fetch all calendars associated with the user
-    $sqlAllCalendars = "SELECT calendar_id AS cal_id, calendar_name AS name, calendar_color AS color
-                        FROM calendars_tb
-                        WHERE buwana_id = ?";
-    $stmtAll = $cal_conn->prepare($sqlAllCalendars);
-    $stmtAll->bind_param("i", $buwana_id);
-    $stmtAll->execute();
-    $allCalendars = $stmtAll->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmtAll->close();
-
-    // Log fetched calendars
-    error_log('Fetched calendars: ' . print_r($allCalendars, true));
-
-    // Prepare the response
-    $response['success'] = true;
-    $response['buwana_id'] = $buwana_id; // Include the buwana_id in the response
-    $response['calendars'] = $allCalendars;
-
-    if (empty($allCalendars)) {
-        $response['message'] = 'No calendars found for this user.';
-    }
+    // Return the calendars data
+    echo json_encode([
+        "success" => true,
+        "calendars" => $calendars
+    ]);
 } catch (Exception $e) {
-    error_log('Error in grab_user_calendars.php: ' . $e->getMessage());
-    $response['message'] = 'An error occurred while fetching calendars.';
-} finally {
-    $cal_conn->close();
+    error_log('Error: ' . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
-
-// Output response as JSON
-echo json_encode($response);
-exit();
 ?>
