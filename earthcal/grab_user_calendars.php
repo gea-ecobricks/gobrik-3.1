@@ -51,11 +51,11 @@ $buwana_id = (int) $data['buwana_id'];
 
 
 try {
-    // ✅ Fetch calendars including `created_at`
+    // ✅ Fetch calendars including `created_at`-- THIS NEEDS UPDATING TO SUBSCRIPTIONS FOR PUBLIC CALS
     $query = "
         SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_updated, created_at
         FROM calendars_tb
-        WHERE (buwana_id = ? OR calendar_public = 1) AND deleted = 0
+        WHERE (buwana_id = ? AND deleted = 0
     ";
 
     $stmt = $cal_conn->prepare($query);
