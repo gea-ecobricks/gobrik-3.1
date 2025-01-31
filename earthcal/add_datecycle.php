@@ -85,7 +85,7 @@ try {
 
     // Bind parameters
     $stmt->bind_param(
-        'iissssiiis',
+        'iissssiiiss',
         $buwana_id,
         $cal_id,
         $title,
