@@ -16,6 +16,7 @@ $allowed_origins = [
     'file://'
 ];
 
+// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
 if (empty($origin)) {
@@ -24,8 +25,14 @@ if (empty($origin)) {
     header('Access-Control-Allow-Origin: ' . $origin);
 } else {
     header('HTTP/1.1 403 Forbidden');
-    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin v2']);
     exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    exit(0);
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -35,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
+
 
 // Validate required fields
 $required_fields = [
@@ -103,3 +111,4 @@ try {
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
 ?>
+
