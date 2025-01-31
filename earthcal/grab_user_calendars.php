@@ -28,12 +28,6 @@ if (empty($origin)) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Methods: POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
-    exit(0);
-}
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
     exit();
@@ -50,8 +44,9 @@ if (!isset($data['buwana_id'])) {
 $buwana_id = (int) $data['buwana_id'];
 
 try {
+    // ✅ Fetch calendars including `created_at`
     $query = "
-        SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_updated
+        SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_updated, created_at
         FROM calendars_tb
         WHERE (buwana_id = ? OR calendar_public = 1) AND deleted = 0
     ";
@@ -74,7 +69,7 @@ try {
 
     echo json_encode([
         "success" => true,
-        "buwana_id" => $buwana_id, // ✅ Include `buwana_id`
+        "buwana_id" => $buwana_id,
         "calendars" => $calendars
     ]);
 
