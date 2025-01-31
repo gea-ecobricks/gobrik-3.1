@@ -42,7 +42,7 @@ try {
     $inputData = json_decode(file_get_contents('php://input'), true);
 
     // Validate input
-    $requiredFields = ['name', 'color', 'public'];
+    $requiredFields = ['name', 'color', 'public', 'created_at'];
     foreach ($requiredFields as $field) {
         if (!isset($inputData[$field]) || ($field === 'public' && !in_array($inputData[$field], [0, 1], true))) {
             http_response_code(400); // Bad Request
@@ -55,6 +55,7 @@ try {
     $name = htmlspecialchars($inputData['name']);
     $color = htmlspecialchars($inputData['color']);
     $public = intval($inputData['public']); // Map "public" from request to "calendar_public" in the database
+    $createdAt = intval($inputData['created_at']); // Convert milliseconds timestamp to INT
     $buwanaId = isset($inputData['buwana_id']) && is_numeric($inputData['buwana_id']) ? intval($inputData['buwana_id']) : null;
 
     if (!$buwanaId) {
@@ -65,11 +66,11 @@ try {
 
     // Prepare SQL to insert the calendar
     $sql = "INSERT INTO calendars_tb (
-                buwana_id, calendar_name, calendar_color, calendar_public
-            ) VALUES (?, ?, ?, ?)";
+                buwana_id, calendar_name, calendar_color, calendar_public, created_at
+            ) VALUES (?, ?, ?, ?, ?)";
 
     $stmt = $cal_conn->prepare($sql);
-    $stmt->bind_param("issi", $buwanaId, $name, $color, $public);
+    $stmt->bind_param("issii", $buwanaId, $name, $color, $public, $createdAt);
 
     // Execute the query
     if ($stmt->execute()) {
@@ -80,7 +81,8 @@ try {
         echo json_encode([
             'success' => true,
             'message' => 'Calendar successfully created.',
-            'calendar_id' => $calendarId
+            'calendar_id' => $calendarId,
+            'created_at' => $createdAt // ✅ Return created_at for debugging
         ]);
     } else {
         throw new Exception("Failed to insert calendar into the database.");
