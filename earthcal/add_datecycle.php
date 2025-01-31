@@ -28,12 +28,6 @@ if (empty($origin)) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Methods: POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
-    exit(0);
-}
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
     exit();
@@ -45,7 +39,7 @@ $data = json_decode($input, true);
 // Validate required fields
 $required_fields = [
     'buwana_id', 'cal_id', 'title', 'date', 'time', 'time_zone',
-    'day', 'month', 'year', 'frequency', 'last_edited'
+    'day', 'month', 'year', 'frequency', 'last_edited', 'created_at'
 ];
 
 foreach ($required_fields as $field) {
@@ -65,27 +59,15 @@ $time_zone = $cal_conn->real_escape_string($data['time_zone']);
 $day = (int) $data['day'];
 $month = (int) $data['month'];
 $year = (int) $data['year'];
-$comment = isset($data['comment']) ? $cal_conn->real_escape_string($data['comment']) : '0';
-$comments = isset($data['comments']) ? $cal_conn->real_escape_string($data['comments']) : '';
-$datecycle_color = isset($data['datecycle_color']) ? $cal_conn->real_escape_string($data['datecycle_color']) : 'green';
-$cal_name = isset($data['cal_name']) ? $cal_conn->real_escape_string($data['cal_name']) : 'Unknown Calendar';
-$cal_color = isset($data['cal_color']) ? $cal_conn->real_escape_string($data['cal_color']) : 'gray';
-$frequency = isset($data['frequency']) ? $cal_conn->real_escape_string($data['frequency']) : 'One-time';
-$pinned = isset($data['pinned']) ? $cal_conn->real_escape_string($data['pinned']) : 'No';
-$completed = isset($data['completed']) ? $cal_conn->real_escape_string($data['completed']) : 'No';
-$public = isset($data['public']) ? $cal_conn->real_escape_string($data['public']) : 'No';
-$delete_it = isset($data['delete_it']) ? $cal_conn->real_escape_string($data['delete_it']) : 'No';
-$synced = 1; // Always set to 1 (tinyint equivalent of "Yes")
-$conflict = isset($data['conflict']) ? $cal_conn->real_escape_string($data['conflict']) : 'No';
+$created_at = (int) $data['created_at']; // Convert milliseconds timestamp to INT
 $last_edited = date('Y-m-d H:i:s');
-$raw_json = $cal_conn->real_escape_string(json_encode($data));
 
 try {
-    // Insert query with `raw_json`
+    // Insert query with `created_at`
     $query = "
         INSERT INTO datecycles_tb
-        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, comment, comments, datecycle_color, cal_name, cal_color, frequency, pinned, completed, public, delete_it, synced, conflict, last_edited, raw_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, created_at, last_edited)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ";
 
     $stmt = $cal_conn->prepare($query);
@@ -95,7 +77,7 @@ try {
 
     // Bind parameters
     $stmt->bind_param(
-        'iissssiiissssssssssssss',
+        'iissssiiis',
         $buwana_id,
         $cal_id,
         $title,
@@ -105,20 +87,8 @@ try {
         $day,
         $month,
         $year,
-        $comment,
-        $comments,
-        $datecycle_color,
-        $cal_name,
-        $cal_color,
-        $frequency,
-        $pinned,
-        $completed,
-        $public,
-        $delete_it, // Updated parameter
-        $synced, // Always set to "1"
-        $conflict,
-        $last_edited,
-        $raw_json
+        $created_at,
+        $last_edited
     );
 
     // Execute the query
@@ -132,5 +102,4 @@ try {
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
-
 ?>
