@@ -67,43 +67,44 @@ $time_zone = $cal_conn->real_escape_string($data['time_zone']);
 $day = (int) $data['day'];
 $month = (int) $data['month'];
 $year = (int) $data['year'];
-$created_at = isset($data['created_at']) ? (int) $data['created_at'] : round(microtime(true) * 1000);
+$created_at = isset($data['created_at'])
+    ? strtotime($data['created_at']) * 1000  // Convert ISO 8601 to Unix timestamp in milliseconds
+    : round(microtime(true) * 1000);         // Fallback to current time
 
 $last_edited = date('Y-m-d H:i:s');
 
 try {
     // Insert query with `created_at`
     $query = "
-        INSERT INTO datecycles_tb
-        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, created_at, last_edited)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ";
+    INSERT INTO datecycles_tb
+    (buwana_id, cal_id, title, date, time, time_zone, day, month, year, created_at, last_edited)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+";
 
     $stmt = $cal_conn->prepare($query);
-    if (!$stmt) {
-        throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
-    }
+if (!$stmt) {
+    throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
+}
 
     // Bind parameters
     $stmt->bind_param(
-        'iissssiiiis',
-        $buwana_id,
-        $cal_id,
-        $title,
-        $date,
-        $time,
-        $time_zone,
-        $day,
-        $month,
-        $year,
-        $created_at,
-        $last_edited
-    );
-
+    'iissssiiiii',
+    $buwana_id,
+    $cal_id,
+    $title,
+    $date,
+    $time,
+    $time_zone,
+    $day,
+    $month,
+    $year,
+    $created_at,   // ✅ Ensure this is a BIGINT
+    $last_edited
+);
     // Execute the query
     $stmt->execute();
-    $new_id = $stmt->insert_id;
-    $stmt->close();
+$new_id = $stmt->insert_id;
+$stmt->close();
 
     // Return success response with the new ID
     echo json_encode(['success' => true, 'id' => $new_id]);
