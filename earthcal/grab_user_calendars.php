@@ -55,7 +55,7 @@ try {
     $query = "
         SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_updated, created_at
         FROM calendars_tb
-        WHERE (buwana_id = ? AND deleted = 0
+        WHERE buwana_id = ? AND deleted = 0
     ";
 
     $stmt = $cal_conn->prepare($query);
