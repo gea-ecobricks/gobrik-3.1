@@ -28,6 +28,12 @@ if (empty($origin)) {
     exit();
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    exit(0);
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
     exit();
@@ -42,6 +48,7 @@ if (!isset($data['buwana_id'])) {
 }
 
 $buwana_id = (int) $data['buwana_id'];
+
 
 try {
     // ✅ Fetch calendars including `created_at`
