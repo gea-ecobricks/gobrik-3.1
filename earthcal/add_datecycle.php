@@ -16,7 +16,6 @@ $allowed_origins = [
     'file://'
 ];
 
-// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
 if (empty($origin)) {
@@ -25,7 +24,7 @@ if (empty($origin)) {
     header('Access-Control-Allow-Origin: ' . $origin);
 } else {
     header('HTTP/1.1 403 Forbidden');
-    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin v2']);
+    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
     exit();
 }
 
@@ -66,23 +65,23 @@ $time_zone = $cal_conn->real_escape_string($data['time_zone']);
 $day = (int) $data['day'];
 $month = (int) $data['month'];
 $year = (int) $data['year'];
-$comment = $cal_conn->real_escape_string($data['comment'] ?? '0');
-$comments = $cal_conn->real_escape_string($data['comments'] ?? null);
-$datecycle_color = $cal_conn->real_escape_string($data['datecycle_color'] ?? 'green');
-$cal_name = $cal_conn->real_escape_string($data['cal_name'] ?? null);
-$cal_color = $cal_conn->real_escape_string($data['cal_color'] ?? 'under development');
-$frequency = $cal_conn->real_escape_string($data['frequency'] ?? 'One-time');
-$pinned = $cal_conn->real_escape_string($data['pinned'] ?? 'No');
-$completed = $cal_conn->real_escape_string($data['completed'] ?? 'No');
-$public = $cal_conn->real_escape_string($data['public'] ?? 'No');
-$delete_it = $cal_conn->real_escape_string($data['delete_it'] ?? $data['delete'] ?? 'No'); // Ensure "delete" is mapped to "delete_it"
+$comment = isset($data['comment']) ? $cal_conn->real_escape_string($data['comment']) : '0';
+$comments = isset($data['comments']) ? $cal_conn->real_escape_string($data['comments']) : '';
+$datecycle_color = isset($data['datecycle_color']) ? $cal_conn->real_escape_string($data['datecycle_color']) : 'green';
+$cal_name = isset($data['cal_name']) ? $cal_conn->real_escape_string($data['cal_name']) : 'Unknown Calendar';
+$cal_color = isset($data['cal_color']) ? $cal_conn->real_escape_string($data['cal_color']) : 'gray';
+$frequency = isset($data['frequency']) ? $cal_conn->real_escape_string($data['frequency']) : 'One-time';
+$pinned = isset($data['pinned']) ? $cal_conn->real_escape_string($data['pinned']) : 'No';
+$completed = isset($data['completed']) ? $cal_conn->real_escape_string($data['completed']) : 'No';
+$public = isset($data['public']) ? $cal_conn->real_escape_string($data['public']) : 'No';
+$delete_it = isset($data['delete_it']) ? $cal_conn->real_escape_string($data['delete_it']) : 'No';
 $synced = 1; // Always set to 1 (tinyint equivalent of "Yes")
-$conflict = $cal_conn->real_escape_string($data['conflict'] ?? 'No');
+$conflict = isset($data['conflict']) ? $cal_conn->real_escape_string($data['conflict']) : 'No';
 $last_edited = date('Y-m-d H:i:s');
-$raw_json = $cal_conn->real_escape_string(json_encode($data)); // Store raw JSON for debugging
+$raw_json = $cal_conn->real_escape_string(json_encode($data));
 
 try {
-    // Insert query with `raw_json` and renamed `delete_it`
+    // Insert query with `raw_json`
     $query = "
         INSERT INTO datecycles_tb
         (buwana_id, cal_id, title, date, time, time_zone, day, month, year, comment, comments, datecycle_color, cal_name, cal_color, frequency, pinned, completed, public, delete_it, synced, conflict, last_edited, raw_json)
@@ -133,4 +132,5 @@ try {
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
+
 ?>
