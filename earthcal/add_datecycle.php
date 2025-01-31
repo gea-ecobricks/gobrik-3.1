@@ -67,7 +67,8 @@ $time_zone = $cal_conn->real_escape_string($data['time_zone']);
 $day = (int) $data['day'];
 $month = (int) $data['month'];
 $year = (int) $data['year'];
-$created_at = (int) $data['created_at']; // Convert milliseconds timestamp to INT
+$created_at = isset($data['created_at']) ? (int) $data['created_at'] : round(microtime(true) * 1000);
+
 $last_edited = date('Y-m-d H:i:s');
 
 try {
@@ -85,7 +86,7 @@ try {
 
     // Bind parameters
     $stmt->bind_param(
-        'iissssiiiss',
+        'iissssiiiis',
         $buwana_id,
         $cal_id,
         $title,
