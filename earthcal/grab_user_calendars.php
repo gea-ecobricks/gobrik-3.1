@@ -16,7 +16,6 @@ $allowed_origins = [
     'file://'
 ];
 
-// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
 if (empty($origin)) {
@@ -51,9 +50,8 @@ if (!isset($data['buwana_id'])) {
 $buwana_id = (int) $data['buwana_id'];
 
 try {
-    // 🔹 **Fetch Unique Calendars from `calendars_tb` Instead of `datecycles_tb`**
     $query = "
-        SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_updated AS last_updated
+        SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_updated
         FROM calendars_tb
         WHERE (buwana_id = ? OR calendar_public = 1) AND deleted = 0
     ";
@@ -63,36 +61,23 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // Bind parameters
-    $stmt->bind_param('i', $buwana_id); // Ensure buwana_id is properly bound
-
-    // Execute the query
+    $stmt->bind_param('i', $buwana_id);
     $stmt->execute();
-
-    // Fetch results
     $result = $stmt->get_result();
     $calendars = [];
+
     while ($row = $result->fetch_assoc()) {
         $calendars[] = $row;
     }
 
-    // Close the statement
     $stmt->close();
 
-    // Check if calendars are found
-    if (count($calendars) === 0) {
-        echo json_encode([
-            "success" => true,
-            "calendars" => []
-        ]);
-        exit();
-    }
-
-    // ✅ Return the calendars data
     echo json_encode([
         "success" => true,
+        "buwana_id" => $buwana_id, // ✅ Include `buwana_id`
         "calendars" => $calendars
     ]);
+
 } catch (Exception $e) {
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
