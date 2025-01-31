@@ -70,8 +70,8 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // Debugging: Log SQL query execution
-    error_log("🔹 Executing query: SELECT * FROM datecycles_tb WHERE cal_id = $cal_id AND (buwana_id = $buwana_id OR public = 1) AND delete_it = 0");
+    // Debugging: Log SQL query execution  UPDATE FOR PUB CALENDARS
+    error_log("🔹 Executing query: SELECT * FROM datecycles_tb WHERE cal_id = $cal_id AND buwana_id = $buwana_id AND delete_it = 0");
 
     // Bind parameters (cal_id and buwana_id)
     $stmt->bind_param('ii', $cal_id, $buwana_id);
