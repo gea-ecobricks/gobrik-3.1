@@ -521,7 +521,7 @@ function pruneFailedAccounts() {
     `;
 
     // Fetch the first 50 failed accounts
-    fetch('../api/fetch_failed_accounts.php?limit=50')
+    fetch('../api/fetch_failed_accounts.php?limit=25')
         .then(response => response.json())
         .then(data => {
             if (data.error) {
