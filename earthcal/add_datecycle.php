@@ -44,8 +44,9 @@ $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
 // Validate required fields
+// Validate required fields (include cal_name and cal_color if they are mandatory)
 $required_fields = [
-    'buwana_id', 'cal_id', 'title', 'date', 'time', 'time_zone',
+    'buwana_id', 'cal_id', 'cal_name', 'cal_color', 'title', 'date', 'time', 'time_zone',
     'day', 'month', 'year', 'frequency', 'last_edited', 'created_at'
 ];
 
@@ -59,6 +60,8 @@ foreach ($required_fields as $field) {
 // Extract and sanitize inputs
 $buwana_id = (int) $data['buwana_id'];
 $cal_id = (int) $data['cal_id'];
+$cal_name = $cal_conn->real_escape_string($data['cal_name']);
+$cal_color = $cal_conn->real_escape_string($data['cal_color']);
 $title = $cal_conn->real_escape_string($data['title']);
 $date = $cal_conn->real_escape_string($data['date']);
 $time = $cal_conn->real_escape_string($data['time']);
@@ -68,50 +71,47 @@ $month = (int) $data['month'];
 $year = (int) $data['year'];
 $frequency = $cal_conn->real_escape_string($data['frequency']);
 
+// Format created_at and last_edited
 $created_at = isset($data['created_at'])
-    ? date('Y-m-d H:i:s.u', strtotime($data['created_at'])) // ✅ Converts ISO format to DATETIME(3)
-    : date('Y-m-d H:i:s.u'); // ✅ Fallback to current time
-
-
-// Ensure `last_edited` is in MySQL DATETIME format
+    ? date('Y-m-d H:i:s.u', strtotime($data['created_at']))
+    : date('Y-m-d H:i:s.u');
 $last_edited = date('Y-m-d H:i:s', strtotime($data['last_edited'] ?? 'now'));
 
-// Set `synced` to 1 (always synced when added)
+// Set synced flag
 $synced = 1;
 
 try {
-    // Insert query including `synced`
+    // Prepare the insert query
     $query = "
     INSERT INTO datecycles_tb
     (buwana_id, cal_id, cal_name, cal_color, title, date, time, time_zone, day, month, year, frequency, created_at, last_edited, synced)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-";
+    ";
 
-$stmt = $cal_conn->prepare($query);
-if (!$stmt) {
-    throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
-}
+    $stmt = $cal_conn->prepare($query);
+    if (!$stmt) {
+        throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
+    }
 
-// Bind parameters including `cal_name` and `cal_color`
-$stmt->bind_param(
-    'iissssssiiissss',
-    $buwana_id,
-    $cal_id,
-    $cal_name,
-    $cal_color,
-    $title,
-    $date,
-    $time,
-    $time_zone,
-    $day,
-    $month,
-    $year,
-    $frequency,
-    $created_at,
-    $last_edited,
-    $synced
-);
-
+    // Bind the parameters
+    $stmt->bind_param(
+        'iissssssiiissss',
+        $buwana_id,
+        $cal_id,
+        $cal_name,
+        $cal_color,
+        $title,
+        $date,
+        $time,
+        $time_zone,
+        $day,
+        $month,
+        $year,
+        $frequency,
+        $created_at,
+        $last_edited,
+        $synced
+    );
 
     // Execute the query
     $stmt->execute();
@@ -124,4 +124,5 @@ $stmt->bind_param(
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
+
 ?>
