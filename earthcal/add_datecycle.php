@@ -43,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
-// Validate required fields
 // Validate required fields (include cal_name and cal_color if they are mandatory)
 $required_fields = [
     'buwana_id', 'cal_id', 'cal_name', 'cal_color', 'title', 'date', 'time', 'time_zone',
@@ -77,7 +76,7 @@ $created_at = isset($data['created_at'])
     : date('Y-m-d H:i:s.u');
 $last_edited = date('Y-m-d H:i:s', strtotime($data['last_edited'] ?? 'now'));
 
-// Set synced flag
+// Set synced flag to integer 1 (meaning synced)
 $synced = 1;
 
 try {
@@ -93,9 +92,10 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // Bind the parameters
+    // Bind the parameters.
+    // The type string is now 'iissssssiiisssi' where the final 'i' is for the integer $synced.
     $stmt->bind_param(
-        'iissssssiiissss',
+        'iissssssiiisssi',
         $buwana_id,
         $cal_id,
         $cal_name,
@@ -124,5 +124,4 @@ try {
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
 }
-
 ?>
