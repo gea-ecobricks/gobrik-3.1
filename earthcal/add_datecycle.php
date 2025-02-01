@@ -94,7 +94,7 @@ try {
     }
 
     // Bind the parameters.
-    // The type string is now 'iissssssiiisssi' where the final 'i' is for the integer $synced.
+    // The type string is now 'iissssssiiisisi' where the final 'i' is for the integer $synced.
     $stmt->bind_param(
         'iissssssiiisssi',
         $buwana_id,
