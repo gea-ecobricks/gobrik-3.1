@@ -72,8 +72,9 @@ $frequency = $cal_conn->real_escape_string($data['frequency']);
 
 // Format created_at and last_edited
 $created_at = isset($data['created_at'])
-    ? date('Y-m-d H:i:s.u', strtotime($data['created_at']))
-    : date('Y-m-d H:i:s.u');
+    ? (int)$data['created_at']
+    : time() * 1000; // time() returns seconds; multiply to get ms
+
 $last_edited = date('Y-m-d H:i:s', strtotime($data['last_edited'] ?? 'now'));
 
 // Set synced flag to integer 1 (meaning synced)
