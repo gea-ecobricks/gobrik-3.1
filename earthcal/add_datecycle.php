@@ -82,33 +82,36 @@ $synced = 1;
 try {
     // Insert query including `synced`
     $query = "
-        INSERT INTO datecycles_tb
-        (buwana_id, cal_id, title, date, time, time_zone, day, month, year, frequency, created_at, last_edited, synced)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ";
+    INSERT INTO datecycles_tb
+    (buwana_id, cal_id, cal_name, cal_color, title, date, time, time_zone, day, month, year, frequency, created_at, last_edited, synced)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+";
 
-    $stmt = $cal_conn->prepare($query);
-    if (!$stmt) {
-        throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
-    }
+$stmt = $cal_conn->prepare($query);
+if (!$stmt) {
+    throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
+}
 
-    // Bind parameters with correct types
-    $stmt->bind_param(
-        'iissssiiissss',
-        $buwana_id,
-        $cal_id,
-        $title,
-        $date,
-        $time,
-        $time_zone,
-        $day,
-        $month,
-        $year,
-        $frequency,
-        $created_at,
-        $last_edited,
-        $synced
-    );
+// Bind parameters including `cal_name` and `cal_color`
+$stmt->bind_param(
+    'iissssssiiissss',
+    $buwana_id,
+    $cal_id,
+    $cal_name,
+    $cal_color,
+    $title,
+    $date,
+    $time,
+    $time_zone,
+    $day,
+    $month,
+    $year,
+    $frequency,
+    $created_at,
+    $last_edited,
+    $synced
+);
+
 
     // Execute the query
     $stmt->execute();
