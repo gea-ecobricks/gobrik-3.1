@@ -40,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
-// Validate required fields. (You may add more if needed.)
+// Validate required fields, including unique_key.
 $required_fields = [
-    'unique_key', 'buwana_id', 'cal_id', 'cal_name', 'cal_color', 'title', 'date',
-    'time', 'time_zone', 'day', 'month', 'year', 'frequency', 'last_edited', 'created_at'
+    'unique_key', 'buwana_id', 'cal_id', 'cal_name', 'cal_color', 'title', 'date', 'time', 'time_zone',
+    'day', 'month', 'year', 'frequency', 'last_edited', 'created_at'
 ];
 foreach ($required_fields as $field) {
     if (!isset($data[$field])) {
@@ -52,22 +52,22 @@ foreach ($required_fields as $field) {
     }
 }
 
-// Sanitize and extract input.
-$unique_key  = $cal_conn->real_escape_string($data['unique_key']);
-$buwana_id   = (int)$data['buwana_id'];
-$cal_id      = (int)$data['cal_id'];
-$cal_name    = $cal_conn->real_escape_string($data['cal_name']);
-$cal_color   = $cal_conn->real_escape_string($data['cal_color']);
-$title       = $cal_conn->real_escape_string($data['title']);
-$date        = $cal_conn->real_escape_string($data['date']);  // e.g., "2025-2-1"
-$time        = $cal_conn->real_escape_string($data['time']);
-$time_zone   = $cal_conn->real_escape_string($data['time_zone']);
-$day         = (int)$data['day'];
-$month       = (int)$data['month'];
-$year        = (int)$data['year'];
-$frequency   = $cal_conn->real_escape_string($data['frequency']);
+// Extract and sanitize inputs.
+$buwana_id  = (int)$data['buwana_id'];
+$cal_id     = (int)$data['cal_id'];
+$cal_name   = $cal_conn->real_escape_string($data['cal_name']);
+$cal_color  = $cal_conn->real_escape_string($data['cal_color']);
+$title      = $cal_conn->real_escape_string($data['title']);
+$date       = $cal_conn->real_escape_string($data['date']);  // e.g., "2025-02-02"
+$time       = $cal_conn->real_escape_string($data['time']);
+$time_zone  = $cal_conn->real_escape_string($data['time_zone']);
+$day        = (int)$data['day'];
+$month      = (int)$data['month'];
+$year       = (int)$data['year'];
+$frequency  = $cal_conn->real_escape_string($data['frequency']);
 $last_edited = date('Y-m-d H:i:s', strtotime($data['last_edited']));
-$created_at  = $cal_conn->real_escape_string($data['created_at']);
+$created_at  = $cal_conn->real_escape_string($data['created_at']); // Human-readable date string.
+$unique_key  = $cal_conn->real_escape_string($data['unique_key']);
 
 // Optional fields.
 $completed       = isset($data['completed']) ? $cal_conn->real_escape_string($data['completed']) : "0";
@@ -94,9 +94,57 @@ try {
         throw new Exception('Failed to prepare statement: ' . $cal_conn->error);
     }
 
-    // Bind parameters. (Adjust the type string as necessary.)
+    // The order of parameters is:
+    // 1. buwana_id (i)
+    // 2. cal_id (i)
+    // 3. cal_name (s)
+    // 4. cal_color (s)
+    // 5. title (s)
+    // 6. date (s)
+    // 7. time (s)
+    // 8. time_zone (s)
+    // 9. day (i)
+    // 10. month (i)
+    // 11. year (i)
+    // 12. frequency (s)
+    // 13. last_edited (s)
+    // 14. created_at (s)
+    // 15. completed (s)
+    // 16. pinned (s)
+    // 17. public (s)
+    // 18. comment (s)
+    // 19. comments (s)
+    // 20. datecycle_color (s)
+    // 21. synced (i)
+    // 22. conflict (s)
+    // 23. delete_it (s)
+    // 24. unique_key (s)
+    //
+    // Thus, the type string is:
+    // "ii" + "ssssss" + "iii" + "s" + "s" + "s" + "s" + "s" + "s" + "s" + "s" + "i" + "s" + "s"
+    // Which equates to:
+    $type_string = "iissssssiiisssssssssisss";
+    // Let's break it down:
+    // "ii"               => parameters 1-2
+    // "ssssss"           => parameters 3-8
+    // "iii"              => parameters 9-11
+    // "s"                => parameter 12
+    // "s"                => parameter 13
+    // "s"                => parameter 14
+    // "s"                => parameter 15
+    // "s"                => parameter 16
+    // "s"                => parameter 17
+    // "s"                => parameter 18
+    // "s"                => parameter 19
+    // "s"                => parameter 20
+    // "i"                => parameter 21
+    // "s"                => parameter 22
+    // "s"                => parameter 23
+    // "s"                => parameter 24
+    // Total letters: 2 + 6 + 3 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = 24
+
     $stmt->bind_param(
-        'iissssssiiisssiisssis',
+        $type_string,
         $buwana_id,
         $cal_id,
         $cal_name,
