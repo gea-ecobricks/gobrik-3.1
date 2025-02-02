@@ -56,11 +56,11 @@ $cal_id = (int) $data['cal_id'];
 error_log("🔹 get_calendar_data.php called with buwana_id: $buwana_id, cal_id: $cal_id");
 
 try {
-    // 🔹 **Fetch all dateCycles from `datecycles_tb` for the given calendar**
+    // Fetch all dateCycles for the given calendar.
     $query = "
         SELECT ID, buwana_id, cal_id, title, date, time, time_zone, day, month, year,
                frequency, completed, pinned, public, comment, comments, datecycle_color,
-               cal_name, cal_color, synced, conflict, delete_it, last_edited
+               cal_name, cal_color, synced, conflict, delete_it, last_edited, created_at, unique_key
         FROM datecycles_tb
         WHERE cal_id = ? AND (buwana_id = ? OR public = 1) AND delete_it = 0
     ";
@@ -70,38 +70,23 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // Debugging: Log SQL query execution  UPDATE FOR PUB CALENDARS
-    error_log("🔹 Executing query: SELECT * FROM datecycles_tb WHERE cal_id = $cal_id AND buwana_id = $buwana_id AND delete_it = 0");
+    error_log("🔹 Executing query for cal_id: $cal_id and buwana_id: $buwana_id");
 
-    // Bind parameters (cal_id and buwana_id)
+    // Bind parameters.
     $stmt->bind_param('ii', $cal_id, $buwana_id);
 
-    // Execute the query
     $stmt->execute();
 
-    // Fetch results
     $result = $stmt->get_result();
     $dateCycles = [];
     while ($row = $result->fetch_assoc()) {
         $dateCycles[] = $row;
     }
 
-    // Close the statement
     $stmt->close();
 
-    // Debugging: Log retrieved data
     error_log("🔹 Retrieved " . count($dateCycles) . " dateCycles for cal_id: $cal_id");
 
-    // Check if any dateCycles were found
-    if (count($dateCycles) === 0) {
-        echo json_encode([
-            "success" => true,
-            "dateCycles" => []
-        ]);
-        exit();
-    }
-
-    // Return the fetched dateCycles
     echo json_encode([
         "success" => true,
         "dateCycles" => $dateCycles
