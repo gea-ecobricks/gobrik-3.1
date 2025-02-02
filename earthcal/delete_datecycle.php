@@ -41,26 +41,29 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     $inputData = json_decode(file_get_contents('php://input'), true);
 
-    // Validate input
+    // Validate input.
     if (empty($inputData['buwana_id']) || !is_numeric($inputData['buwana_id'])) {
         http_response_code(400); // Bad Request
         echo json_encode(['success' => false, 'message' => 'Missing or invalid Buwana ID.']);
         exit();
     }
 
-    if (empty($inputData['datecycle_id'])) {
+    if (empty($inputData['unique_key'])) {
         http_response_code(400); // Bad Request
-        echo json_encode(['success' => false, 'message' => 'Missing DateCycle ID.']);
+        echo json_encode(['success' => false, 'message' => 'Missing unique_key for DateCycle.']);
         exit();
     }
 
     $buwanaId = intval($inputData['buwana_id']);
-    $dateCycleId = htmlspecialchars($inputData['datecycle_id']);
+    $uniqueKey = htmlspecialchars($inputData['unique_key']);
 
-    // Delete the dateCycle from the database
-    $sql = "DELETE FROM datecycles_tb WHERE id = ? AND user_id = ?";
+    // Prepare the DELETE query using unique_key and buwana_id.
+    $sql = "DELETE FROM datecycles_tb WHERE unique_key = ? AND buwana_id = ?";
     $stmt = $cal_conn->prepare($sql);
-    $stmt->bind_param("si", $dateCycleId, $buwanaId);
+    if (!$stmt) {
+        throw new Exception('Failed to prepare statement: ' . $cal_conn->error);
+    }
+    $stmt->bind_param("si", $uniqueKey, $buwanaId);
 
     if ($stmt->execute()) {
         if ($stmt->affected_rows > 0) {
@@ -75,7 +78,9 @@ try {
     http_response_code(500); // Internal Server Error
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 } finally {
-    $stmt->close();
+    if (isset($stmt) && $stmt) {
+        $stmt->close();
+    }
     $cal_conn->close();
 }
 ?>
