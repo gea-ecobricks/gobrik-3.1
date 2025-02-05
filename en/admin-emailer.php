@@ -291,7 +291,7 @@ $gobrik_conn->close();
     <button type="button" id="send-email-btn" class="confirm-button enabled">📨 Send Email</button>
 
     <div id="countdown-timer" style="margin-top: 10px; display: none;text-align:center;width:100%;">
-        <p>Email will send in refresh in <span id="countdown">7</span> seconds...</p>
+        <p>Email will send in refresh in <span id="countdown">3</span> seconds...</p>
         <button type="button" id="stop-timer-btn" style="display: none;" class="confirm-button delete">🛑 Stop Timer</button>
     </div>
 </form>
