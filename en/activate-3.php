@@ -249,7 +249,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     </div>
 
-   <!-- COMMUNITY FIELD -->
+  <!-- COMMUNITY FIELD -->
 <div class="form-item" id="community-section" style="display: none; margin-top:20px;">
     <label for="community_name" data-lang-id="012-community-name">Select and confirm your GoBrik community:</label><br>
     <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
@@ -261,9 +261,18 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>
             </option>
         <?php endforeach; ?>
+        <option value="+Add a new community..." onclick="openAddCommunityModal()">+ Add a new community...</option>
     </datalist>
-    <p class="form-caption" data-lang-id="012-community-caption">Start typing to see and select a community. Only GoBrik 2.0 currently available. Soon you'll be able to add a new community!</p>
+
+    <!-- "Add a new community" text link -->
+    <p class="form-caption" data-lang-id="012-community-caption">
+        Start typing to see and select a community. Only GoBrik 2.0 currently available. Soon you'll be able to add a new community!<br>
+        <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
+            Don't see your community? Add it.
+        </a>
+    </p>
 </div>
+
 
 
     <!-- SUBMIT SECTION -->
@@ -294,6 +303,50 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
 <script>
+
+    function openAddCommunityModal() {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    // Lock scrolling and blur background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    // Set up modal styles
+    modalBox.style.maxHeight = '80vh';
+    modalBox.style.overflowY = 'auto';
+
+    // Inject the form for adding a new community
+    modalBox.innerHTML = `
+        <h4 style="text-align:center;">Add Your Community</h4>
+        <p>Add your community to GoBrik so you can manage local projects and ecobricks</p>
+
+        <form id="addCommunityForm">
+            <label for="newCommunityName">Name of Community:</label>
+            <input type="text" id="newCommunityName" name="newCommunityName" required>
+
+            <label for="newCommunityType">Type of Community:</label>
+            <select id="newCommunityType" name="newCommunityType" required>
+                <option value="">Select Type</option>
+                <option value="neighborhood">Neighborhood</option>
+                <option value="city">City</option>
+                <option value="school">School</option>
+                <option value="organization">Organization</option>
+            </select>
+
+            <input type="hidden" id="community_location" name="community_location">
+            <input type="hidden" id="community_country" name="community_country">
+
+            <button type="submit" style="margin-top:10px;">Submit</button>
+        </form>
+    `;
+}
+
 
 //FUnctions to access the openstreetmaps api and to populate the local area field and watershed field.
 $(function () {
