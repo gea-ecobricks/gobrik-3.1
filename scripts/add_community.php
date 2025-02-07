@@ -7,16 +7,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $com_name = trim($_POST['newCommunityName']);
     $com_type = trim($_POST['newCommunityType']);
     $country_id = intval($_POST['communityCountry']);
-    $com_lang = intval($_POST['communityLanguage']);
+    $language_code = trim($_POST['communityLanguage']); // Using language code instead of direct integer
 
-    // Get the country name based on country_id
+    // Fetch country name based on country_id
     $sql_get_country = "SELECT country_name FROM countries_tb WHERE country_id = ?";
-    $stmt = $buwana_conn->prepare($sql_get_country);
-    $stmt->bind_param("i", $country_id);
-    $stmt->execute();
-    $stmt->bind_result($com_country);
-    $stmt->fetch();
-    $stmt->close();
+    $stmt_country = $buwana_conn->prepare($sql_get_country);
+    $stmt_country->bind_param("i", $country_id);
+    $stmt_country->execute();
+    $stmt_country->bind_result($com_country);
+    $stmt_country->fetch();
+    $stmt_country->close();
+
+    // Fetch language_id based on language_code
+    $sql_get_language = "SELECT language_id FROM languages_tb WHERE language_code = ?";
+    $stmt_lang = $buwana_conn->prepare($sql_get_language);
+    $stmt_lang->bind_param("s", $language_code);
+    $stmt_lang->execute();
+    $stmt_lang->bind_result($com_lang);
+    $stmt_lang->fetch();
+    $stmt_lang->close();
+
+    // Debugging: Log received values
+    error_log("Received: Name=$com_name, Type=$com_type, Country ID=$country_id, Country=$com_country, Lang Code=$language_code, Lang ID=$com_lang");
 
     // Validate inputs
     if (empty($com_name) || empty($com_type) || empty($com_country) || empty($com_lang)) {
