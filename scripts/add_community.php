@@ -1,5 +1,5 @@
 <?php
-require_once("../buwana_conn.php");
+require_once '../buwanaconn_env.php';
 
 header('Content-Type: application/json');
 

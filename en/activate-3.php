@@ -342,7 +342,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     modalBox.style.overflowY = 'auto';
 
     modalBox.innerHTML = `
-        <h1 style="text-align:center;">Add Your Community</h1>
+        <h2 style="text-align:center;">Add Your Community</h2>
         <p>Add your community to GoBrik so you can manage local projects and ecobricks.</p>
 
         <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
@@ -378,7 +378,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <?php endforeach; ?>
             </select>
 
-            <button type="submit" style="margin-top:10px;" class="submit-button enabled">Submit</button>
+            <button type="submit" style="margin-top:10px;width:100%;" class="submit-button enabled">Submit</button>
         </form>
     `;
 }
