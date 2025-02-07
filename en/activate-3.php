@@ -88,6 +88,31 @@ if ($result_communities && $result_communities->num_rows > 0) {
     }
 }
 
+
+// Fetch all countries
+$countries = [];
+$sql_countries = "SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC";
+$result_countries = $buwana_conn->query($sql_countries);
+
+if ($result_countries && $result_countries->num_rows > 0) {
+    while ($row = $result_countries->fetch_assoc()) {
+        $countries[] = $row;
+    }
+}
+
+// Fetch all languages
+$languages = [];
+$sql_languages = "SELECT language_id, languages_native_name FROM languages_tb ORDER BY languages_native_name ASC";
+$result_languages = $buwana_conn->query($sql_languages);
+
+if ($result_languages && $result_languages->num_rows > 0) {
+    while ($row = $result_languages->fetch_assoc()) {
+        $languages[] = $row;
+    }
+}
+
+
+
 // PART 6: Handle form submission (if needed)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_location_full = $_POST['location_full'];
@@ -303,15 +328,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <script>
 
-    function openAddCommunityModal() {
+   function openAddCommunityModal() {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
-    // Show the modal
+    // Show modal & lock scrolling
     modal.style.display = 'flex';
     modalBox.style.flexFlow = 'column';
-
-    // Lock scrolling and blur background
     document.getElementById('page-content')?.classList.add('blurred');
     document.getElementById('footer-full')?.classList.add('blurred');
     document.body.classList.add('modal-open');
@@ -320,15 +343,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     modalBox.style.maxHeight = '80vh';
     modalBox.style.overflowY = 'auto';
 
-    // Inject the form for adding a new community
+    // Inject form with country & language dropdowns
     modalBox.innerHTML = `
         <h4 style="text-align:center;">Add Your Community</h4>
-        <p>Add your community to GoBrik so you can manage local projects and ecobricks</p>
+        <p>Add your community to GoBrik so you can manage local projects and ecobricks.</p>
 
         <form id="addCommunityForm">
+            <!-- Community Name -->
             <label for="newCommunityName">Name of Community:</label>
             <input type="text" id="newCommunityName" name="newCommunityName" required>
 
+            <!-- Community Type -->
             <label for="newCommunityType">Type of Community:</label>
             <select id="newCommunityType" name="newCommunityType" required>
                 <option value="">Select Type</option>
@@ -338,13 +363,33 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <option value="organization">Organization</option>
             </select>
 
-            <input type="hidden" id="community_location" name="community_location">
-            <input type="hidden" id="community_country" name="community_country">
+            <!-- Country -->
+            <label for="communityCountry">Country:</label>
+            <select id="communityCountry" name="communityCountry" required>
+                <option value="">Select Country</option>
+                <?php foreach ($countries as $country) : ?>
+                    <option value="<?php echo $country['country_id']; ?>">
+                        <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <!-- Language -->
+            <label for="communityLanguage">Preferred Language:</label>
+            <select id="communityLanguage" name="communityLanguage" required>
+                <option value="">Select Language</option>
+                <?php foreach ($languages as $language) : ?>
+                    <option value="<?php echo $language['language_id']; ?>">
+                        <?php echo htmlspecialchars($language['languages_native_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
             <button type="submit" style="margin-top:10px;">Submit</button>
         </form>
     `;
 }
+
 
 
 //FUnctions to access the openstreetmaps api and to populate the local area field and watershed field.
