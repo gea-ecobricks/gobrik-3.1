@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.42';
+$version = '0.43';
 $page = 'signup';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -265,9 +265,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </datalist>
 
     <!-- "Add a new community" text link -->
-    <p class="form-caption" data-lang-id="012-community-caption">
-        Start typing to see and select a community. Only GoBrik 2.0 currently available. Soon you'll be able to add a new community!<br>
-        <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
+    <p class="form-caption" data-lang-id="012-community-caption-xx">
+        Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
             Don't see your community? Add it.
         </a>
     </p>
