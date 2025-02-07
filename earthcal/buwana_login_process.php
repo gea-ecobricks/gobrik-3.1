@@ -19,8 +19,7 @@ $allowed_origins = [
 // Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
-// Log the detected origin
-error_log('Incoming HTTP_ORIGIN: ' . $origin);
+
 
 if (empty($origin)) {
     // Allow requests with no origin for local development
@@ -47,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Credentials: true');
     exit(0);
 }
+
+$response = ['success' => false];
 
 startSecureSession();
 
