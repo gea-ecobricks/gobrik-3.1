@@ -400,7 +400,7 @@ function addCommunity2Buwana(event) {
 
         if (data.success) {
             // Close modal
-            closeModal();
+            closeInfoModal();
 
             // Add the new community to the dropdown
             const communityInput = document.getElementById('community_name');
