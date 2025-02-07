@@ -328,32 +328,27 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <script>
 
-   function openAddCommunityModal() {
+ function openAddCommunityModal() {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
-    // Show modal & lock scrolling
     modal.style.display = 'flex';
     modalBox.style.flexFlow = 'column';
     document.getElementById('page-content')?.classList.add('blurred');
     document.getElementById('footer-full')?.classList.add('blurred');
     document.body.classList.add('modal-open');
 
-    // Set up modal styles
     modalBox.style.maxHeight = '80vh';
     modalBox.style.overflowY = 'auto';
 
-    // Inject form with country & language dropdowns
     modalBox.innerHTML = `
         <h4 style="text-align:center;">Add Your Community</h4>
         <p>Add your community to GoBrik so you can manage local projects and ecobricks.</p>
 
-        <form id="addCommunityForm">
-            <!-- Community Name -->
+        <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
             <label for="newCommunityName">Name of Community:</label>
             <input type="text" id="newCommunityName" name="newCommunityName" required>
 
-            <!-- Community Type -->
             <label for="newCommunityType">Type of Community:</label>
             <select id="newCommunityType" name="newCommunityType" required>
                 <option value="">Select Type</option>
@@ -363,7 +358,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <option value="organization">Organization</option>
             </select>
 
-            <!-- Country -->
             <label for="communityCountry">Country:</label>
             <select id="communityCountry" name="communityCountry" required>
                 <option value="">Select Country</option>
@@ -374,7 +368,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <?php endforeach; ?>
             </select>
 
-            <!-- Language -->
             <label for="communityLanguage">Preferred Language:</label>
             <select id="communityLanguage" name="communityLanguage" required>
                 <option value="">Select Language</option>
@@ -389,6 +382,48 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </form>
     `;
 }
+
+
+function addCommunity2Buwana(event) {
+    event.preventDefault(); // Prevent normal form submission
+
+    const form = document.getElementById('addCommunityForm');
+    const formData = new FormData(form);
+
+    fetch('scripts/add_community.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message); // Show success or error message
+
+        if (data.success) {
+            // Close modal
+            closeModal();
+
+            // Add the new community to the dropdown
+            const communityInput = document.getElementById('community_name');
+            const communityList = document.getElementById('community_list');
+
+            // Create new option
+            const newOption = document.createElement('option');
+            newOption.value = data.community_name;
+            newOption.textContent = data.community_name;
+            communityList.appendChild(newOption);
+
+            // Set selected value
+            communityInput.value = data.community_name;
+        }
+    })
+    .catch(error => {
+        alert('Error adding community. Please try again.');
+        console.error('Error:', error);
+    });
+}
+
+
+
 
 
 
