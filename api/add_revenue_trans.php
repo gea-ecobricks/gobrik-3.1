@@ -26,15 +26,21 @@ $receiving_gea_acct = $gobrik_conn->real_escape_string($_POST['receiving_gea_acc
 $currency_code = 'IDR';
 $type_of_transaction = 'Revenue';
 $receiver_for_display = 'Global Ecobrick Alliance'; // Set receiver_for_display field
-$datetime_sent_ts = date('Y-m-d H:i:s', strtotime($transaction_date));
+
+// Set datetime_sent_ts to the current date and time
+$datetime_sent_ts = date('Y-m-d H:i:s');
+
+// Set transaction_date_dt to the passed transaction_date
+$transaction_date_dt = date('Y-m-d', strtotime($transaction_date));
 
 // Insert transaction into the database
 $sql = "INSERT INTO tb_cash_transaction (
             native_ccy_amt, idr_amount, sender_for_display,
             datetime_sent_ts, tran_name_desc, currency_code,
             receiving_gea_acct, type_of_transaction,
-            revenue_accounting_type, receiver_for_display
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            revenue_accounting_type, receiver_for_display,
+            transaction_date_dt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $gobrik_conn->prepare($sql);
 if (!$stmt) {
@@ -44,11 +50,12 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    'iissssssss',
+    'iisssssssss',
     $amount_idr, $amount_idr, $sender,
     $datetime_sent_ts, $description, $currency_code,
     $receiving_gea_acct, $type_of_transaction,
-    $revenue_type, $receiver_for_display
+    $revenue_type, $receiver_for_display,
+    $transaction_date_dt
 );
 
 if ($stmt->execute()) {

@@ -105,7 +105,7 @@ $subject = "Please activate your 2025 GoBrik account";
         <div class="menu-buttons-row">
             <!-- Add Revenue button with onclick and aria property -->
             <button class="page-button" id="add-revenue" onclick="addRevenueTrans()" aria-label="Click to add a revenue transaction">➕ Add Revenue</button>
-                       <button class="page-button" id="open-books" href="https://ecobricks.org/en/open-books.php" aria-label="go to ecobricks.org">↗️ OpenBooks</button>
+<a class="page-button" href="https://ecobricks.org/en/open-books.php" target="_blank" aria-label="Go to ecobricks.org">↗️ OpenBooks</a>
             <button class="page-button" id="add-expense" onclick="addExpenseTrans()" aria-label="Click to add an expense transaction">➕ Add Expenses</button>
 
         </div>
