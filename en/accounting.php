@@ -527,12 +527,12 @@ function submitRevenueTrans(event) {
     const formData = new FormData();
     formData.append('amount_idr', document.getElementById('amount-idr').value);
     formData.append('sender', document.getElementById('sender').value);
-    formData.append('sender_ecobricker', document.getElementById('sender-ecobricker').value);
+    //formData.append('sender_ecobricker', document.getElementById('sender-ecobricker').value);
     formData.append('transaction_date', document.getElementById('transaction-date').value);
     formData.append('description', document.getElementById('description').value);
     formData.append('revenue_type', document.getElementById('revenue-type').value);
     formData.append('receiving_gea_acct', document.getElementById('receiving-gea-acct').value);
-    formData.append('transaction_image', document.getElementById('transaction-image').files[0]);
+    //formData.append('transaction_image', document.getElementById('transaction-image').files[0]);
 
     // Send the data to the backend
     $.ajax({
