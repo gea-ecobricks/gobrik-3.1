@@ -13,7 +13,7 @@ $allowed_origins = [
     'http://localhost',
     'file://',
     'file:///home/russs/PycharmProjects/earthcalendar/',
-    'https://cal.earthen.io',// Allow local Snap apps or filesystem-based origins
+    'https://cal.earthen.io'// Allow local Snap apps or filesystem-based origins
 ];
 
 // Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)

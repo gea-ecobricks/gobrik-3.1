@@ -43,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
-// Validate required fields, including unique_key.
+// ✅ **Add `datecycle_color` to required fields**
 $required_fields = [
     'buwana_id', 'cal_id', 'cal_name', 'cal_color', 'title', 'date', 'time', 'time_zone',
-    'day', 'month', 'year', 'frequency', 'last_edited', 'created_at', 'unique_key'
+    'day', 'month', 'year', 'frequency', 'last_edited', 'created_at', 'unique_key', 'datecycle_color'
 ];
 
 foreach ($required_fields as $field) {
@@ -69,25 +69,22 @@ $day        = (int) $data['day'];
 $month      = (int) $data['month'];
 $year       = (int) $data['year'];
 $frequency  = $cal_conn->real_escape_string($data['frequency']);
-
-// Since created_at is now human-readable, we leave it as a string.
 $created_at = $cal_conn->real_escape_string($data['created_at']);
-
-// For last_edited, we continue to format it as before.
 $last_edited = date('Y-m-d H:i:s', strtotime($data['last_edited'] ?? 'now'));
-
-// Extract and sanitize the unique_key.
 $unique_key = $cal_conn->real_escape_string($data['unique_key']);
+
+// ✅ **Extract and sanitize `datecycle_color`**
+$datecycle_color = $cal_conn->real_escape_string($data['datecycle_color']);
 
 // Set synced flag to integer 1 (meaning synced)
 $synced = 1;
 
 try {
-    // Prepare the insert query – note the addition of the unique_key field.
+    // ✅ **Modify SQL query to include `datecycle_color`**
     $query = "
         INSERT INTO datecycles_tb
-        (buwana_id, cal_id, cal_name, cal_color, title, date, time, time_zone, day, month, year, frequency, created_at, last_edited, synced, unique_key)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (buwana_id, cal_id, cal_name, cal_color, title, date, time, time_zone, day, month, year, frequency, created_at, last_edited, synced, unique_key, datecycle_color)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ";
 
     $stmt = $cal_conn->prepare($query);
@@ -95,13 +92,9 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // Bind the parameters.
-    // Parameter types: i = integer, s = string.
-    // Order: buwana_id (i), cal_id (i), cal_name (s), cal_color (s), title (s),
-    // date (s), time (s), time_zone (s), day (i), month (i), year (i),
-    // frequency (s), created_at (s), last_edited (s), synced (i), unique_key (s)
+    // ✅ **Bind `datecycle_color` in the parameters**
     $stmt->bind_param(
-        'iissssssiiisssis',
+        'iissssssiiisssiss',
         $buwana_id,
         $cal_id,
         $cal_name,
@@ -117,7 +110,8 @@ try {
         $created_at,
         $last_edited,
         $synced,
-        $unique_key
+        $unique_key,
+        $datecycle_color // Bind this newly added field
     );
 
     // Execute the query.
@@ -125,8 +119,8 @@ try {
     $new_id = $stmt->insert_id;
     $stmt->close();
 
-    // Return success response with the new ID.
-    echo json_encode(['success' => true, 'id' => $new_id]);
+    // ✅ **Return success response with stored `datecycle_color`**
+    echo json_encode(['success' => true, 'id' => $new_id, 'stored_color' => $datecycle_color]);
 } catch (Exception $e) {
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
