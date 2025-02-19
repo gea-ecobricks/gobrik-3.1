@@ -3,31 +3,9 @@ session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Database credentials
-$gobrik_servername = "localhost";
-$gobrik_username = "ecobricks_brikchain_viewer";
-$gobrik_password = "desperate-like-the-Dawn";
-$gobrik_dbname = "ecobricks_gobrik_msql_db";
-
-$buwana_servername = "localhost";
-$buwana_username = "ecobricks_gobrik_app";
-$buwana_password = "1EarthenAuth!";
-$buwana_dbname = "ecobricks_earthenAuth_db";
-
-// Establish connections to both databases
-$buwana_conn = new mysqli($buwana_servername, $buwana_username, $buwana_password, $buwana_dbname);
-$gobrik_conn = new mysqli($gobrik_servername, $gobrik_username, $gobrik_password, $gobrik_dbname);
-
-// Check connections
-if ($buwana_conn->connect_error) {
-    die("Buwana Database connection failed: " . $buwana_conn->connect_error);
-}
-if ($gobrik_conn->connect_error) {
-    die("GoBrik Database connection failed: " . $gobrik_conn->connect_error);
-}
-
-$buwana_conn->set_charset("utf8mb4");
-$gobrik_conn->set_charset("utf8mb4");
+    // Include database connections
+    require_once '../gobrikconn_env.php';
+    require_once '../buwanaconn_env.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['buwana_id'])) {
     $buwana_id = $_SESSION['buwana_id'];
