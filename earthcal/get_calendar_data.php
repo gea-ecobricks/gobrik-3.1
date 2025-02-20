@@ -59,9 +59,10 @@ try {
     // Fetch all dateCycles for the given calendar.
     $query = "
         SELECT ID, buwana_id, cal_id, title, date, time, time_zone, day, month, year,
-               frequency, completed, pinned, public, comment, comments, datecycle_color,
-               cal_name, cal_color, synced, conflict, delete_it, last_edited, created_at, unique_key
-        FROM datecycles_tb
+       frequency, completed, pinned, public, comment, comments, datecycle_color,
+       cal_name, cal_color, cal_emoji, synced, conflict, delete_it, last_edited, created_at, unique_key
+    FROM datecycles_tb
+
         WHERE cal_id = ? AND (buwana_id = ? OR public = 1) AND delete_it = 0
     ";
 
