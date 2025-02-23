@@ -12,7 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Fetch a batch of failed email addresses
         $sql_fetch = "SELECT id, email_addr FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
         $stmt_fetch = $buwana_conn->prepare($sql_fetch);
-        $stmt_fetch->bind_param('i', BATCH_SIZE);
+
+        // Fix: Use a variable instead of a constant in bind_param()
+        $batch_size = BATCH_SIZE;
+        $stmt_fetch->bind_param('i', $batch_size);
+
         $stmt_fetch->execute();
         $result = $stmt_fetch->get_result();
 
