@@ -2,8 +2,9 @@
 header('Content-Type: application/json');
 require_once '../scripts/earthen_subscribe_functions.php';
 
-// Include your database connection setup
-require_once '../gobrikconn_env.php';
+// Include database connection setups
+require_once '../gobrikconn_env.php';  // Gobrik DB (for tb_ecobrickers)
+require_once '../buwanaconn_env.php';  // Buwana DB (for failed_emails_tb)
 
 // Retrieve Mailgun webhook signing key from the environment
 $mailgun_signing_key = getenv('MAILGUN_WEBHOOK');
@@ -28,7 +29,7 @@ try {
         exit();
     }
 
-    // Define failure events (Fix for Undefined Variable Issue)
+    // Define failure events
     $failure_events = ['failed', 'bounced', 'complained'];
 
     // Validate the webhook signature
@@ -64,7 +65,7 @@ try {
     // Log a concise summary of the event
     error_log("Mailgun Event: $email_subject to $email_addr was sent on $timestamp and returned: \"$response_message\"");
 
-    // Update the database with the new emailing status
+    // Update the database with the new emailing status (Gobrik database)
     $sql_update_status = "
         UPDATE tb_ecobrickers
         SET emailing_status = ?
@@ -96,24 +97,25 @@ try {
     http_response_code(500); // Internal Server Error
 }
 
-// Now safe to use $failure_events
+// Now using Buwana DB to insert failed emails
 if (!empty($email_addr) && in_array($basic_mailgun_status, $failure_events)) {
-    error_log("Adding $email_addr to failed unsubscribe queue.");
+    error_log("Adding $email_addr to failed unsubscribe queue (Buwana DB).");
 
-    // Insert failed email into the queue table
+    // Insert failed email into the queue table (Buwana database)
     $sql_insert_failed = "
         INSERT INTO failed_emails_tb (email_addr, fail_reason)
         VALUES (?, ?)
         ON DUPLICATE KEY UPDATE fail_reason = VALUES(fail_reason), created_at = CURRENT_TIMESTAMP
     ";
 
-    $stmt_insert_failed = $gobrik_conn->prepare($sql_insert_failed);
+    $stmt_insert_failed = $buwana_conn->prepare($sql_insert_failed);
     if ($stmt_insert_failed) {
         $stmt_insert_failed->bind_param('ss', $email_addr, $response_message);
         $stmt_insert_failed->execute();
         $stmt_insert_failed->close();
+        error_log("Inserted $email_addr into failed_emails_tb successfully.");
     } else {
-        error_log("Failed to insert $email_addr into unsubscribe queue: " . $gobrik_conn->error);
+        error_log("Failed to insert $email_addr into unsubscribe queue: " . $buwana_conn->error);
     }
 }
 
