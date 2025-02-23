@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once '../scripts/earthen_subscribe_functions.php';
 
 // Include your database connection setup
 require_once '../gobrikconn_env.php';
@@ -91,6 +92,29 @@ try {
     error_log("Error in webhook_handler: " . $e->getMessage());
     http_response_code(500); // Internal Server Error
 }
+
+if (!empty($email_addr) && in_array($basic_mailgun_status, $failure_events)) {
+    error_log("Adding $email_addr to failed unsubscribe queue.");
+
+    // Insert failed email into the queue table
+    $sql_insert_failed = "
+        INSERT INTO tb_failed_unsubscribes (email_addr, fail_reason)
+        VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE fail_reason = VALUES(fail_reason), created_at = CURRENT_TIMESTAMP
+    ";
+
+    $stmt_insert_failed = $gobrik_conn->prepare($sql_insert_failed);
+    if ($stmt_insert_failed) {
+        $stmt_insert_failed->bind_param('ss', $email_addr, $response_message);
+        $stmt_insert_failed->execute();
+        $stmt_insert_failed->close();
+    } else {
+        error_log("Failed to insert $email_addr into unsubscribe queue: " . $gobrik_conn->error);
+    }
+}
+
+
+
 
 exit();
 ?>

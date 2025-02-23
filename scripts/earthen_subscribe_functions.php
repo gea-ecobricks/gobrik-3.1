@@ -584,13 +584,15 @@ function getMemberIdByEmail($email) {
     return null;
 }
 
+
 function earthenUnsubscribe($email) {
-error_log("Unsubscribe process initiated for email: $email"); // At start of earthenUnsubscribe
+    error_log("Unsubscribe process initiated for email: $email");
     $member_id = getMemberIdByEmail($email);
-error_log("Member ID retrieved: $member_id"); // After retrieving member ID
+    error_log("Member ID retrieved: $member_id");
+
     if (!$member_id) {
-        echo json_encode(['status' => 'error', 'message' => 'User not found for given email.']);
-        return;
+        error_log("No member found for email: $email");
+        return false; // Return false to indicate failure
     }
 
     // Proceed with unsubscribe using the member ID
@@ -610,15 +612,15 @@ error_log("Member ID retrieved: $member_id"); // After retrieving member ID
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-
     if ($http_code >= 200 && $http_code < 300) {
-        echo json_encode(['status' => 'success', 'message' => 'User has been unsubscribed.']);
-        error_log("Unsubscribe request completed with status code: $http_code"); // After cURL response
+        error_log("Successfully unsubscribed $email.");
+        return true; // Return true for success
     } else {
-        error_log('HTTP status ' . $http_code . ': ' . $response);
-        echo json_encode(['status' => 'error', 'message' => 'Unsubscribe failed with HTTP code: ' . $http_code]);
+        error_log("Failed to unsubscribe $email. HTTP status: $http_code, Response: $response");
+        return false; // Return false for failure
     }
 }
+
 
 
 
