@@ -98,7 +98,7 @@ if (!empty($email_addr) && in_array($basic_mailgun_status, $failure_events)) {
 
     // Insert failed email into the queue table
     $sql_insert_failed = "
-        INSERT INTO tb_failed_unsubscribes (email_addr, fail_reason)
+        INSERT INTO failed_emails_tb (email_addr, fail_reason)
         VALUES (?, ?)
         ON DUPLICATE KEY UPDATE fail_reason = VALUES(fail_reason), created_at = CURRENT_TIMESTAMP
     ";

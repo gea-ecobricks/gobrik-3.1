@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Fetch a batch of failed email addresses
-        $sql_fetch = "SELECT id, email_addr FROM tb_failed_unsubscribes ORDER BY created_at ASC LIMIT ?";
+        $sql_fetch = "SELECT id, email_addr FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
         $stmt_fetch = $buwana_conn->prepare($sql_fetch);
         $stmt_fetch->bind_param('i', BATCH_SIZE);
         $stmt_fetch->execute();
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($success) {
                 // Remove successfully unsubscribed emails from the queue
-                $sql_delete = "DELETE FROM tb_failed_unsubscribes WHERE id = ?";
+                $sql_delete = "DELETE FROM failed_emails_tb WHERE id = ?";
                 $stmt_delete = $buwana_conn->prepare($sql_delete);
                 $stmt_delete->bind_param('i', $id);
                 $stmt_delete->execute();
