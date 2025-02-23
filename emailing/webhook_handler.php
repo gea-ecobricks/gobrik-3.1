@@ -28,6 +28,9 @@ try {
         exit();
     }
 
+    // Define failure events (Fix for Undefined Variable Issue)
+    $failure_events = ['failed', 'bounced', 'complained'];
+
     // Validate the webhook signature
     $signature = $data['signature'] ?? null;
     if (!isset($signature['timestamp'], $signature['token'], $signature['signature'])) {
@@ -93,6 +96,7 @@ try {
     http_response_code(500); // Internal Server Error
 }
 
+// Now safe to use $failure_events
 if (!empty($email_addr) && in_array($basic_mailgun_status, $failure_events)) {
     error_log("Adding $email_addr to failed unsubscribe queue.");
 
@@ -112,9 +116,6 @@ if (!empty($email_addr) && in_array($basic_mailgun_status, $failure_events)) {
         error_log("Failed to insert $email_addr into unsubscribe queue: " . $gobrik_conn->error);
     }
 }
-
-
-
 
 exit();
 ?>
