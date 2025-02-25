@@ -141,16 +141,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 // Email sending function
 function sendEmail($to, $htmlBody) {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
-    $mailgunApiKey = getenv('MAILGUN_API_KEY');
-    $mailgunDomain = 'mail.gobrik.com';
+    $mailgunApiKey = getenv('EARTHEN_MAILGUN_API_KEY');
+    $mailgunDomain = 'mail2.earthen.io';
 
     try {
         $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
-                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
+                'from' => 'GEA Center Circle <gea@earthen.io>',
                 'to' => $to,
-                'subject' => 'GoBrik Newsletter',
+                'subject' => 'GEA Earthen Newsletter',
                 'html' => $htmlBody,
                 'text' => strip_tags($htmlBody),
             ]
