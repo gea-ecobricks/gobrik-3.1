@@ -8,10 +8,10 @@ use GuzzleHttp\Exception\RequestException;
 // Page setup
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '1.0';
-$page = 'admin-panel';
+$page = 'test-ghost-emailer';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// LOGIN & ADMIN CHECK using gobrik database
+// LOGIN & ADMIN CHECK using GoBrik database
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
@@ -51,9 +51,9 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     exit();
 }
 
-
 require_once '../buwanaconn_env.php';
-// Fetch email stats from buwana db
+
+// Fetch email stats from Buwana DB
 $query = "
     SELECT
         COUNT(*) AS total_members,
@@ -66,7 +66,7 @@ $total_members = intval($row['total_members'] ?? 0);
 $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Get next 10 unsent members
+// Get next 10 unsent members for display purposes
 $query = "SELECT id, email, name, test_sent, test_sent_date_time
           FROM ghost_test_email_tb
           WHERE test_sent = 0
@@ -75,42 +75,26 @@ $query = "SELECT id, email, name, test_sent, test_sent_date_time
 $members_result = $buwana_conn->query($query);
 $next_members = $members_result->fetch_all(MYSQLI_ASSOC);
 
-// Handle form submission (send email)
+// Handle form submission (send email to a fixed email)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     $email_html = $_POST['email_html'];
 
     if (empty($email_html)) {
         echo "<script>alert('Please provide email HTML content.');</script>";
     } else {
-        // Get next unsent subscriber
-        $query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
-        $result = $buwana_conn->query($query);
-        $subscriber = $result->fetch_assoc();
+        $email = "russ@ecobricks.org"; // Hardcoded test email
+        $subject = "Test Ghost Email - GoBrik Newsletter";
 
-        if ($subscriber) {
-            $email = $subscriber['email'];
-            $name = $subscriber['name'] ?? "Subscriber";
-
-            if (sendEmail($email, $email_html)) {
-                // Mark as sent
-                $updateQuery = "UPDATE ghost_test_email_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?";
-                $stmt = $buwana_conn->prepare($updateQuery);
-                $stmt->bind_param("s", $subscriber['id']);
-                $stmt->execute();
-                $stmt->close();
-
-                echo "<script>alert('Email sent to $email'); window.location.reload();</script>";
-            } else {
-                echo "<script>alert('Failed to send email.');</script>";
-            }
+        if (sendEmail($email, $subject, $email_html)) {
+            echo "<script>alert('Test email sent to $email');</script>";
         } else {
-            echo "<script>alert('No more unsent members.');</script>";
+            echo "<script>alert('Failed to send test email.');</script>";
         }
     }
 }
 
 // Email sending function
-function sendEmail($to, $htmlBody) {
+function sendEmail($to, $subject, $htmlBody) {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
     $mailgunApiKey = getenv('MAILGUN_API_KEY');
     $mailgunDomain = 'mail.gobrik.com';
@@ -121,7 +105,7 @@ function sendEmail($to, $htmlBody) {
             'form_params' => [
                 'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
                 'to' => $to,
-                'subject' => 'GoBrik Newsletter',
+                'subject' => $subject,
                 'html' => $htmlBody,
                 'text' => strip_tags($htmlBody),
             ]
@@ -132,20 +116,19 @@ function sendEmail($to, $htmlBody) {
         return false;
     }
 }
-
 ?>
 
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Ghost Emailer</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <?php require_once ("../includes/admin-panel-inc.php"); ?>
-<div class="splash-title-block"></div>
-    <div id="splash-bar"></div>
+</head>
+<body>
 
-    <!-- PAGE CONTENT -->
-    <div id="top-page-image" class="message-birded top-page-image"></div>
-
-    <div id="form-submission-box" class="landing-page-form">
-        <div class="form-container">
-
+<div class="container">
     <h2>Ghost Newsletter Emailer</h2>
     <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
     <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
@@ -154,10 +137,10 @@ function sendEmail($to, $htmlBody) {
         <label for="email_html">Newsletter HTML:</label>
         <textarea name="email_html" id="email_html" rows="6" style="width:100%;"></textarea>
         <br><br>
-        <button type="submit" name="send_email">Send Next Email</button>
+        <button type="submit" name="send_email">Send Test Email</button>
     </form>
 
-    <h3>Next 10 Subscribers:</h3>
+    <h3>Next 10 Subscribers (Preview Only):</h3>
     <table border="1" width="100%">
         <thead>
             <tr>
