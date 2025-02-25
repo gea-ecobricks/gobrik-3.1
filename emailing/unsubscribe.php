@@ -19,7 +19,7 @@ if (empty($email_addr) || !filter_var($email_addr, FILTER_VALIDATE_EMAIL)) {
 }
 
 // Debug log file
-$log_file = '../logs/unsubscribe.log';
+$log_file = 'unsubscribe.log';
 
 // Function to log debug messages
 function log_debug($message) {
