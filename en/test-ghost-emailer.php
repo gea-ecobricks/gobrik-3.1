@@ -28,23 +28,35 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
     if ($stmt->fetch()) {
         if (stripos($user_roles, 'admin') === false) {
-            echo "<script>alert('Sorry, only admins can see this page.'); window.location.href = 'dashboard.php';</script>";
+            echo "<script>
+                alert('Sorry, only admins can see this page.');
+                window.location.href = 'dashboard.php';
+            </script>";
             exit();
         }
     } else {
-        echo "<script>alert('User record not found.'); window.location.href = 'dashboard.php';</script>";
+        echo "<script>
+            alert('User record not found.');
+            window.location.href = 'dashboard.php';
+        </script>";
         exit();
     }
     $stmt->close();
 } else {
-    echo "<script>alert('Error checking user role. Please try again later.'); window.location.href = 'dashboard.php';</script>";
+    echo "<script>
+        alert('Error checking user role. Please try again later.');
+        window.location.href = 'dashboard.php';
+    </script>";
     exit();
 }
 
 require_once '../buwanaconn_env.php';
 
-// Fetch email stats
-$query = "SELECT COUNT(*) AS total_members, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count FROM ghost_test_email_tb";
+// Fetch email stats from buwana db
+$query = "
+    SELECT COUNT(*) AS total_members,
+           SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count
+    FROM ghost_test_email_tb";
 $result = $buwana_conn->query($query);
 $row = $result->fetch_assoc();
 
@@ -52,59 +64,28 @@ $total_members = intval($row['total_members'] ?? 0);
 $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Get next unsent subscriber
-$query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
-$subscriber_result = $buwana_conn->query($query);
-$subscriber = $subscriber_result->fetch_assoc();
+// Get next 10 unsent members
+$query = "SELECT id, email, name, test_sent, test_sent_date_time
+          FROM ghost_test_email_tb
+          WHERE test_sent = 0
+          ORDER BY id ASC
+          LIMIT 10";
+$members_result = $buwana_conn->query($query);
+$next_members = $members_result->fetch_all(MYSQLI_ASSOC);
 
-// Define test recipient
-$test_email = 'russ@ecobricks.org';
-
-// Function to generate the unsubscribe link
-function generateUnsubscribeLink($subscriber_id) {
-    $secret_key = 'your-secret-key';
-    $base_url = "https://earthen.io/";
-    $hash = hash_hmac('sha256', $subscriber_id, $secret_key);
-    return "{$base_url}?uuid={$subscriber_id}&key={$hash}&action=unsubscribe";
-}
-
-// Insert unsubscribe link into email
-$unsubscribe_link = generateUnsubscribeLink($subscriber['id'] ?? 'test');
-
-// Pre-fill newsletter HTML
-$email_html = <<<HTML
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>We've moved on from the US Dollar</title>
-</head>
-<body>
-    <h1>We've moved on from the US Dollar</h1>
-    <p>Today, we're announcing our transition from US dollars in our finances and accounting.</p>
-    <p>Over the last year, we've been appalled by the dramatic escalation of ecocide and genocide in Palestine...</p>
-    <p><strong>No more.</strong></p>
-    <p>From now on, our open book finances will be denominated in Indonesian Rupiahs.</p>
-    <p>To regeneration and beyond,<br>GEA Team</p>
-    <p><a href="{$unsubscribe_link}" style="color: #738a94; text-decoration: underline;">Unsubscribe here</a></p>
-</body>
-</html>
-HTML;
-
-// Handle form submission
+// Handle form submission (send email)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
-    if (sendEmail($test_email, $email_html)) {
-        // Update the test_sent field
-        if ($subscriber) {
-            $updateQuery = "UPDATE ghost_test_email_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?";
-            $stmt = $buwana_conn->prepare($updateQuery);
-            $stmt->bind_param("s", $subscriber['id']);
-            $stmt->execute();
-            $stmt->close();
-        }
-        echo "<script>alert('Test email sent to $test_email'); window.location.reload();</script>";
+    $email_html = $_POST['email_html'];
+    $test_email = 'russ@ecobricks.org';  // Hardcoded recipient
+
+    if (empty($email_html)) {
+        echo "<script>alert('Please provide email HTML content.');</script>";
     } else {
-        echo "<script>alert('Failed to send test email.');</script>";
+        if (sendEmail($test_email, $email_html)) {
+            echo "<script>alert('Test email sent to $test_email');</script>";
+        } else {
+            echo "<script>alert('Failed to send test email.');</script>";
+        }
     }
 }
 
@@ -131,12 +112,14 @@ function sendEmail($to, $htmlBody) {
         return false;
     }
 }
+
 ?>
 
 <?php require_once ("../includes/admin-panel-inc.php"); ?>
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
 
+<!-- PAGE CONTENT -->
 <div id="top-page-image" class="message-birded top-page-image"></div>
 
 <div id="form-submission-box" class="landing-page-form">
@@ -146,7 +129,7 @@ function sendEmail($to, $htmlBody) {
 
         <form method="POST">
             <label for="email_html">Newsletter HTML:</label>
-            <textarea name="email_html" id="email_html" rows="12" style="width:100%;"><?php echo htmlspecialchars($email_html); ?></textarea>
+            <textarea name="email_html" id="email_html" rows="6" style="width:100%;"></textarea>
             <br><br>
             <button type="submit" name="send_email">Send Test Email</button>
         </form>
@@ -176,5 +159,6 @@ function sendEmail($to, $htmlBody) {
         </table>
     </div>
 </div>
+
 </body>
 </html>
