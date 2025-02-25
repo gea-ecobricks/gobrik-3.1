@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unsubscribe']
         }
 
         // Call external unsubscribe function
-        echo "<script>document.getElementById('progress').innerHTML += '<p>Unsubscribing from external mailing lists...</p>';</script>";
+        echo "<script>document.getElementById('progress').innerHTML += '<p>Unsubscribing from Earthen newsletter...</p>';</script>";
         ob_flush();
         flush();
         sleep(1);
