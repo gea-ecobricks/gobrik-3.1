@@ -76,23 +76,51 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
+// Get next recipient (default to test email first)
+$query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
+$result = $buwana_conn->query($query);
+$subscriber = $result->fetch_assoc();
+
+$test_email = "russ@ecobricks.org"; // Default test email
+$subscriber_id = null;
+
+if ($subscriber) {
+    $test_email = $subscriber['email']; // Use actual recipient if available
+    $subscriber_id = $subscriber['id'];
+}
+
+// Generate unsubscribe link
+$unsubscribe_link = "https://mail2.earthen.io/unsubscribe/" . urlencode($test_email);
+
+// Default email HTML with dynamic unsubscribe link
+$email_template = <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>We've moved on from the US Dollar</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #15212A; line-height: 1.5;">
+    <div style="max-width: 600px; margin: auto; padding: 20px; background-color: #ffffff;">
+        <h2 style="text-align: center;">We've moved on from the US Dollar</h2>
+        <p>Today, we're announcing our transition from US dollars in our finances and accounting.</p>
+        <p>Over the last year, we've been appalled by the dramatic escalation of ecocide and genocide in Palestine...</p>
+
+        <p>To regeneration and beyond,</p>
+        <p><strong>Russell, Ani, Lucie, Paula, Fran, Setiadji, Rere & Aang</strong></p>
+
+        <p style="text-align: center; font-size: 12px; color: #738a94;">
+            Earthen © 2025 • <a href="$unsubscribe_link" style="color: #4B8501; text-decoration: none;">Unsubscribe</a>
+        </p>
+    </div>
+</body>
+</html>
+HTML;
+
 // Handle form submission (send email)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     $email_html = $_POST['email_html'];
-
-    // Get the next recipient (start with russ@ecobricks.org, then pick from DB)
-    $query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
-    $result = $buwana_conn->query($query);
-    $subscriber = $result->fetch_assoc();
-
-    $test_email = "russ@ecobricks.org"; // Start with test email
-
-    if (!$subscriber) {
-        $test_email = null; // Stop if no more unsent users
-    } else {
-        $test_email = $subscriber['email'];
-        $subscriber_id = $subscriber['id'];
-    }
 
     if (!empty($email_html) && $test_email) {
         if (sendEmail($test_email, $email_html)) {
@@ -120,7 +148,7 @@ function sendEmail($to, $htmlBody) {
         $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
-                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
+                'from' => 'GoBrik Team <gea@mail2.earthen.io>',
                 'to' => $to,
                 'subject' => 'GoBrik Newsletter',
                 'html' => $htmlBody,
@@ -138,46 +166,17 @@ function sendEmail($to, $htmlBody) {
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
-<div class="splash-title-block"></div>
-<div id="splash-bar"></div>
+<div class="form-container">
+    <h2>Ghost Newsletter Emailer</h2>
+    <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
+    <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
 
-<div id="form-submission-box" class="landing-page-form">
-    <div class="form-container">
-        <h2>Ghost Newsletter Emailer</h2>
-        <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
-        <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
-
-        <form method="POST">
-            <label for="email_html">Newsletter HTML:</label>
-            <textarea name="email_html" id="email_html" rows="6" style="width:100%;"></textarea>
-            <br><br>
-            <button type="submit" name="send_email">Send Next Email</button>
-        </form>
-
-        <h3>Email Sending Status:</h3>
-        <table border="1" width="100%">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Email</th>
-                    <th>Name</th>
-                    <th>Sent</th>
-                    <th>Sent Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($all_members as $member): ?>
-                    <tr>
-                        <td><?php echo $member['id']; ?></td>
-                        <td><?php echo $member['email']; ?></td>
-                        <td><?php echo $member['name']; ?></td>
-                        <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
-                        <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+    <form method="POST">
+        <label for="email_html">Newsletter HTML:</label>
+        <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
+        <br><br>
+        <button type="submit" name="send_email">Send Next Email</button>
+    </form>
 </div>
 
 </body>
