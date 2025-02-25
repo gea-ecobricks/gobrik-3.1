@@ -108,7 +108,8 @@ if ($subscriber) {
 }
 
 // Generate unsubscribe link
-$unsubscribe_link = "https://mail2.earthen.io/unsubscribe/" . urlencode($test_email);
+$unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($test_email);
+
 
 // Default email HTML with dynamic unsubscribe link
 $email_template = <<<HTML
@@ -118,22 +119,149 @@ $email_template = <<<HTML
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>We've moved on from the US Dollar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #15212A;
+            line-height: 1.5;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header img {
+            max-width: 100%;
+            height: auto;
+        }
+        .post-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .post-meta {
+            font-size: 14px;
+            color: #738a94;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            margin-top: 20px;
+        }
+        .content p {
+            margin-bottom: 15px;
+        }
+        .image-caption {
+            font-size: 14px;
+            color: #738a94;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .footer {
+            font-size: 12px;
+            text-align: center;
+            color: #738a94;
+            margin-top: 20px;
+        }
+        .footer a {
+            color: #4B8501;
+            text-decoration: none;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4B8501;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #3A6A00;
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; color: #15212A; line-height: 1.5;">
-    <div style="max-width: 600px; margin: auto; padding: 20px; background-color: #ffffff;">
-        <h2 style="text-align: center;">We've moved on from the US Dollar</h2>
-        <p>Today, we're announcing our transition from US dollars in our finances and accounting.</p>
-        <p>Over the last year, we've been appalled by the dramatic escalation of ecocide and genocide in Palestine...</p>
+<body>
+    <div class="container">
 
-        <p>To regeneration and beyond,</p>
-        <p><strong>Russell, Ani, Lucie, Paula, Fran, Setiadji, Rere & Aang</strong></p>
+        <!-- Header -->
+        <div class="header">
+            <a href="https://earthen.io/">
+                <img src="https://earthen.io/content/images/size/w1200/2022/08/email-cover-1200px.jpg" alt="Earthen">
+            </a>
+        </div>
 
-        <p style="text-align: center; font-size: 12px; color: #738a94;">
-            Earthen © 2025 • <a href="$unsubscribe_link" style="color: #4B8501; text-decoration: none;">Unsubscribe</a>
-        </p>
+        <!-- View in Browser Link -->
+        <div class="post-meta">
+            <a href="https://earthen.io/p/f021c1cc-d488-4564-86aa-65c095a8a2c2/" style="color: #738a94; text-decoration: underline;">
+                View in Browser
+            </a>
+        </div>
+
+        <!-- Title -->
+        <div class="post-title">
+            <a href="https://earthen.io/p/f021c1cc-d488-4564-86aa-65c095a8a2c2/" style="text-decoration: none; color: #15212A;">
+                We've moved on from the US Dollar
+            </a>
+        </div>
+
+        <!-- Meta Information -->
+        <div class="post-meta">
+            By GEA Center Circle • 25 Feb 2025
+        </div>
+
+        <!-- Feature Image -->
+        <div class="header">
+            <img src="https://earthen.io/content/images/size/w1200/2025/02/Nasser-Ishtayeh---Nablus-Olive-Tree-cut-down-by-IDF.jpg" alt="Feature Image">
+        </div>
+        <div class="image-caption">
+            A Palestinian woman despairs as her olive trees are destroyed by occupying forces funded in USD - Nablus, Palestine, 2005 - Nasser Ishtayeh
+        </div>
+
+        <!-- Email Content -->
+        <div class="content">
+            <p>Today, we're announcing our transition from US dollars in our finances and accounting.</p>
+            <p>Over the last year, we've been appalled by the dramatic escalation of ecocide and genocide in Palestine. With thousands of American-made and funded bombs being dropped on Gaza, the correlation between our own finances and the occupation became all too clear.</p>
+            <p>As a global organization, we receive funds and pay bills in various countries and currencies. We also have a principle of making our books publicly available. Seven years ago, when we set up our Open Books system on ecobricks.org, choosing USD seemed like a harmless and universal way to present our finances in a way that could be well understood by folks around the world.</p>
+            <p><strong>No more.</strong></p>
+            <p>Gaza has been a shocking reminder of the correlation between Global North Currency and global oppression. US dollars are the currency by which both global petroleum is bought and the bombs in Gaza have been funded.</p>
+            <p>It may be a drop in the ocean given the meager size of our accounts. However, there is no other way to stay true to our regenerative principles than to stop using the Global North currency most connected with the military-industrial complex and petro-capital economy behind the onslaught of Gaza.</p>
+            <p>After all, when we use a currency, we play a part in validating and energizing the system behind it.</p>
+
+            <p>It hasn't been easy. It has taken us a year of extricating ourselves from various accounts, systems, and services (and revamping our in-house accounting database!). However, as of now, we have ceased using any US-based financial platforms and accounts.</p>
+
+            <p>From now on, our <a href="https://ecobricks.org/en/open-books.php"open book finances</a> will be denominated in Indonesian Rupiahs.</p>
+
+            <p>To regeneration and beyond,</p>
+            <p><strong>Russell, Ani, Lucie, Paula, Fran, Setiadji, Rere & Aang</strong></p>
+            <p>GEA Center Circle</p>
+            <p><a href="https://ecobricks.org/en/open-books.php">Ecobricks.org/openbooks</a></p>
+
+            <p>P.S. And also... Directly connected to this, in 2024 <a href="https://earthen.io/gobrik-3-launch/">we let go of our use of corporate digital services based in the Global North.</a></p>
+        </div>
+        <br><br>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Together we can be the transition to ever increasing harmony with the cycles of life.</p>
+            <p>Earthen © 2025 • <a href="$unsubscribe_link">Unsubscribe</a></p>
+            <p>Powered by <a href="https://ghost.org/">Ghost</a></p>
+        </div>
+
     </div>
 </body>
 </html>
+
 HTML;
 
 // Handle form submission (send email)
@@ -166,9 +294,9 @@ function sendEmail($to, $htmlBody) {
         $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
-                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
+                'from' => 'GEA Center Circle <gea@earthen.io>',
                 'to' => $to,
-                'subject' => 'GoBrik Newsletter',
+                'subject' => 'We\'ve moved on from the US dollar',
                 'html' => $htmlBody,
                 'text' => strip_tags($htmlBody),
             ]
