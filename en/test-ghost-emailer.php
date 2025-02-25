@@ -1,17 +1,17 @@
 <?php
-require_once '../earthenAuth_helper.php'; // Authentication helper
-require '../vendor/autoload.php'; // Composer dependencies
+require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require '../vendor/autoload.php'; // Path to Composer's autoloader
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
-// Page setup
+// Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '1.0';
+$version = '0.53';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// LOGIN & ADMIN CHECK using gobrik database
+// LOGIN AND ROLE CHECK:
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
@@ -28,20 +28,28 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
     if ($stmt->fetch()) {
         if (stripos($user_roles, 'admin') === false) {
-            header("Location: dashboard.php");
+            echo "<script>
+                alert('Sorry, only admins can see this page.');
+                window.location.href = 'dashboard.php';
+            </script>";
             exit();
         }
     } else {
-        header("Location: dashboard.php");
+        echo "<script>
+            alert('User record not found.');
+            window.location.href = 'dashboard.php';
+        </script>";
         exit();
     }
     $stmt->close();
 } else {
-    header("Location: dashboard.php");
+    echo "<script>
+        alert('Error checking user role. Please try again later.');
+        window.location.href = 'dashboard.php';
+    </script>";
     exit();
 }
 
-require_once '../buwanaconn_env.php';
 
 // Fetch email stats from buwana db
 $query = "
