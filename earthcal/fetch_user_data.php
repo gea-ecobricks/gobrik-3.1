@@ -1,124 +1,184 @@
 <?php
-require_once '../earthenAuth_helper.php';
-require_once '../buwanaconn_env.php';
-require_once '../calconn_env.php'; // Include EarthCal database connection
+require_once '../earthenAuth_helper.php'; // Authentication helper
+require '../vendor/autoload.php'; // Composer dependencies
 
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING); // Suppress warnings and notices
-ini_set('display_errors', '0'); // Disable error display for production
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
-$allowed_origins = [
-    'https://cycles.earthen.io',
-    'https://ecobricks.org',
-    'https://gobrik.com',
-    'http://localhost',
-    'file://',
-    'file:///home/russs/PycharmProjects/earthcalendar/',
-    'https://cal.earthen.io',// Allow local Snap apps or filesystem-based origins
-];
+// Page setup
+$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
+$version = '1.0';
+$page = 'admin-panel';
+$lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
-$origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
+// LOGIN & ADMIN CHECK using gobrik database
+if (!isLoggedIn()) {
+    header("Location: login.php");
+    exit();
+}
 
+$buwana_id = $_SESSION['buwana_id'];
+require_once '../gobrikconn_env.php';
 
+$query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
+if ($stmt = $gobrik_conn->prepare($query)) {
+    $stmt->bind_param("i", $buwana_id);
+    $stmt->execute();
+    $stmt->bind_result($user_roles);
 
-if (empty($origin)) {
-    // Allow requests with no origin for local development
-    header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
-    header('Access-Control-Allow-Credentials: true');
-} elseif (in_array($origin, $allowed_origins)) {
-    header('Access-Control-Allow-Origin: ' . $origin);
-    header('Access-Control-Allow-Methods: POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
-    header('Access-Control-Allow-Credentials: true');
+    if ($stmt->fetch()) {
+        if (stripos($user_roles, 'admin') === false) {
+            header("Location: dashboard.php");
+            exit();
+        }
+    } else {
+        header("Location: dashboard.php");
+        exit();
+    }
+    $stmt->close();
 } else {
-    error_log('CORS error: Invalid or missing HTTP_ORIGIN - ' . $origin);
-    header('HTTP/1.1 403 Forbidden');
-    echo json_encode(['success' => false, 'message' => 'CORS error: Invalid origin']);
+    header("Location: dashboard.php");
     exit();
 }
 
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Methods: POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
-    header('Access-Control-Allow-Credentials: true');
-    exit(0);
-}
+require_once '../buwanaconn_env.php';
 
-$response = ['success' => false];
+// Fetch email stats from buwana db
+$query = "
+    SELECT COUNT(*) AS total_members,
+           SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count
+    FROM ghost_test_email_tb";
+$result = $buwana_conn->query($query);
+$row = $result->fetch_assoc();
 
-// Check the request method
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    $response['message'] = 'Invalid request method. Use POST.';
-    echo json_encode($response);
-    exit();
-}
+$total_members = intval($row['total_members'] ?? 0);
+$sent_count = intval($row['sent_count'] ?? 0);
+$sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Get the JSON input from the request
-$input = json_decode(file_get_contents('php://input'), true);
-$buwana_id = $input['buwana_id'] ?? null;
+// Fetch the 3 most recently updated (sent) accounts
+$query_sent = "SELECT id, email, name, test_sent, test_sent_date_time
+               FROM ghost_test_email_tb
+               WHERE test_sent = 1
+               ORDER BY test_sent_date_time DESC
+               LIMIT 3";
+$sent_result = $buwana_conn->query($query_sent);
+$sent_members = $sent_result->fetch_all(MYSQLI_ASSOC);
 
-// Validate inputs
-if (empty($buwana_id) || !is_numeric($buwana_id)) {
-    $response['message'] = 'Invalid or missing Buwana ID.';
-    echo json_encode($response);
-    exit();
-}
+// Fetch the next 7 pending (unsent) accounts
+$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time
+                  FROM ghost_test_email_tb
+                  WHERE test_sent = 0
+                  ORDER BY id ASC
+                  LIMIT 7";
+$pending_result = $buwana_conn->query($query_pending);
+$pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 
-try {
-    // Fetch user data from users_tb
-    $sqlUser = "SELECT first_name, last_sync_ts, continent_code, location_full FROM users_tb WHERE buwana_id = ?";
-    $stmtUser = $cal_conn->prepare($sqlUser);
-    $stmtUser->bind_param("i", $buwana_id);
-    $stmtUser->execute();
-    $userData = $stmtUser->get_result()->fetch_assoc();
-    $stmtUser->close();
+// Merge sent and pending for display
+$all_members = array_merge($sent_members, $pending_members);
 
-    if (!$userData) {
-        throw new Exception("User not found.");
+// Handle form submission (send email)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
+    $email_html = $_POST['email_html'];
+
+    // Get the next recipient (start with russ@ecobricks.org, then pick from DB)
+    $query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
+    $result = $buwana_conn->query($query);
+    $subscriber = $result->fetch_assoc();
+
+    $test_email = "russ@ecobricks.org"; // Start with test email
+
+    if (!$subscriber) {
+        $test_email = null; // Stop if no more unsent users
+    } else {
+        $test_email = $subscriber['email'];
+        $subscriber_id = $subscriber['id'];
     }
 
-    // Fetch personal calendars
-    $sqlPersonalCalendars = "SELECT calendar_id, calendar_name FROM calendars_tb WHERE buwana_id = ?";
-    $stmtPersonal = $cal_conn->prepare($sqlPersonalCalendars);
-    $stmtPersonal->bind_param("i", $buwana_id);
-    $stmtPersonal->execute();
-    $personalCalendars = $stmtPersonal->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmtPersonal->close();
+    if (!empty($email_html) && $test_email) {
+        if (sendEmail($test_email, $email_html)) {
+            // Mark as sent in database
+            $updateQuery = "UPDATE ghost_test_email_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?";
+            $stmt = $buwana_conn->prepare($updateQuery);
+            $stmt->bind_param("s", $subscriber_id);
+            $stmt->execute();
+            $stmt->close();
 
-    // Fetch subscribed calendars
-    $sqlSubscribedCalendars = "SELECT c.calendar_id, c.calendar_name FROM cal_subscriptions_tb s
-                               JOIN calendars_tb c ON s.calendar_id = c.calendar_id
-                               WHERE s.buwana_id = ?";
-    $stmtSubscribed = $cal_conn->prepare($sqlSubscribedCalendars);
-    $stmtSubscribed->bind_param("i", $buwana_id);
-    $stmtSubscribed->execute();
-    $subscribedCalendars = $stmtSubscribed->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmtSubscribed->close();
-
-    // Fetch public calendars
-    $sqlPublicCalendars = "SELECT calendar_id, calendar_name FROM calendars_tb WHERE calendar_public = 1";
-    $stmtPublic = $cal_conn->prepare($sqlPublicCalendars);
-    $stmtPublic->execute();
-    $publicCalendars = $stmtPublic->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmtPublic->close();
-
-    // Prepare response
-    $response['success'] = true;
-    $response['user'] = $userData;
-    $response['personal_calendars'] = $personalCalendars;
-    $response['subscribed_calendars'] = $subscribedCalendars;
-    $response['public_calendars'] = $publicCalendars;
-
-
-} catch (Exception $e) {
-    $response['message'] = $e->getMessage();
-} finally {
-    $cal_conn->close();
+            // Refresh the page without an alert
+            header("Location: test-ghost-emailer.php");
+            exit();
+        }
+    }
 }
 
-echo json_encode($response);
-exit();
+// Email sending function
+function sendEmail($to, $htmlBody) {
+    $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
+    $mailgunApiKey = getenv('MAILGUN_API_KEY');
+    $mailgunDomain = 'mail.gobrik.com';
+
+    try {
+        $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
+            'auth' => ['api', $mailgunApiKey],
+            'form_params' => [
+                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
+                'to' => $to,
+                'subject' => 'GoBrik Newsletter',
+                'html' => $htmlBody,
+                'text' => strip_tags($htmlBody),
+            ]
+        ]);
+        return $response->getStatusCode() == 200;
+    } catch (Exception $e) {
+        error_log("Error sending email: " . $e->getMessage());
+        return false;
+    }
+}
+
 ?>
+
+<?php require_once("../includes/admin-panel-inc.php"); ?>
+
+<div class="splash-title-block"></div>
+<div id="splash-bar"></div>
+
+<div id="form-submission-box" class="landing-page-form">
+    <div class="form-container">
+        <h2>Ghost Newsletter Emailer</h2>
+        <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
+        <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
+
+        <form method="POST">
+            <label for="email_html">Newsletter HTML:</label>
+            <textarea name="email_html" id="email_html" rows="6" style="width:100%;"></textarea>
+            <br><br>
+            <button type="submit" name="send_email">Send Next Email</button>
+        </form>
+
+        <h3>Email Sending Status:</h3>
+        <table border="1" width="100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Sent</th>
+                    <th>Sent Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($all_members as $member): ?>
+                    <tr>
+                        <td><?php echo $member['id']; ?></td>
+                        <td><?php echo $member['email']; ?></td>
+                        <td><?php echo $member['name']; ?></td>
+                        <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
+                        <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
