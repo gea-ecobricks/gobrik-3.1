@@ -52,6 +52,14 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 require_once '../buwanaconn_env.php';
 
+// Fetch the user's location data
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+$ecobrick_unique_id = '';
+
 // Fetch email stats from buwana db
 $query = "
     SELECT COUNT(*) AS total_members,
