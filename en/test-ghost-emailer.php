@@ -135,17 +135,17 @@ function sendEmail($to, $htmlBody) {
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Test Ghost Emailer</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <?php require_once ("../includes/admin-panel-inc.php"); ?>
-</head>
-<body>
 
-<div class="container">
+    <?php require_once ("../includes/admin-panel-inc.php"); ?>
+<div class="splash-title-block"></div>
+    <div id="splash-bar"></div>
+
+    <!-- PAGE CONTENT -->
+    <div id="top-page-image" class="message-birded top-page-image"></div>
+
+    <div id="form-submission-box" class="landing-page-form">
+        <div class="form-container">
+
     <h2>Ghost Newsletter Emailer</h2>
     <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
     <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
