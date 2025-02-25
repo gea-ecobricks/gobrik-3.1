@@ -1,17 +1,17 @@
 <?php
-require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
-require '../vendor/autoload.php'; // Path to Composer's autoloader
+require_once '../earthenAuth_helper.php'; // Authentication helper
+require '../vendor/autoload.php'; // Composer dependencies
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
-// Set page variables
+// Page setup
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.53';
+$version = '1.0';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// LOGIN AND ROLE CHECK:
+// LOGIN & ADMIN CHECK using gobrik database
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
@@ -28,28 +28,20 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
     if ($stmt->fetch()) {
         if (stripos($user_roles, 'admin') === false) {
-            echo "<script>
-                alert('Sorry, only admins can see this page.');
-                window.location.href = 'dashboard.php';
-            </script>";
+            header("Location: dashboard.php");
             exit();
         }
     } else {
-        echo "<script>
-            alert('User record not found.');
-            window.location.href = 'dashboard.php';
-        </script>";
+        header("Location: dashboard.php");
         exit();
     }
     $stmt->close();
 } else {
-    echo "<script>
-        alert('Error checking user role. Please try again later.');
-        window.location.href = 'dashboard.php';
-    </script>";
+    header("Location: dashboard.php");
     exit();
 }
 
+require_once '../buwanaconn_env.php';
 
 // Fetch email stats from buwana db
 $query = "
@@ -149,16 +141,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 // Email sending function
 function sendEmail($to, $htmlBody) {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
-    $mailgunApiKey = getenv('EARTHEN_MAILGUN_API_KEY');
-    $mailgunDomain = 'mail2.earthen.io';
+    $mailgunApiKey = getenv('MAILGUN_API_KEY');
+    $mailgunDomain = 'mail.gobrik.com';
 
     try {
         $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
-                'from' => 'GEA Center Circle <gea@earthen.io>',
+                'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
                 'to' => $to,
-                'subject' => 'GEA Earthen Newsletter',
+                'subject' => 'GoBrik Newsletter',
                 'html' => $htmlBody,
                 'text' => strip_tags($htmlBody),
             ]
@@ -185,6 +177,8 @@ function sendEmail($to, $htmlBody) {
         <br><br>
         <button type="submit" name="send_email">Send Next Email</button>
     </form>
+</div>
+
 
 
 
