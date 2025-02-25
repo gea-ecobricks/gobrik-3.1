@@ -11,18 +11,18 @@ $version = '1.0';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// LOGIN & ADMIN CHECK
+// LOGIN & ADMIN CHECK using gobrik database
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
 }
 
 $buwana_id = $_SESSION['buwana_id'];
-require_once '../buwanaconn_env.php';
 
-// Ensure only admins can access
+require_once '../gobrikconn_env.php';
+
 $query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
-if ($stmt = $buwana_conn->prepare($query)) {
+if ($stmt = $gobrik_conn->prepare($query)) {
     $stmt->bind_param("i", $buwana_id);
     $stmt->execute();
     $stmt->bind_result($user_roles);
@@ -45,13 +45,15 @@ if ($stmt = $buwana_conn->prepare($query)) {
     $stmt->close();
 } else {
     echo "<script>
-        alert('Error checking user role.');
+        alert('Error checking user role. Please try again later.');
         window.location.href = 'dashboard.php';
     </script>";
     exit();
 }
 
-// Fetch email stats
+
+require_once '../buwanaconn_env.php';
+// Fetch email stats from buwana db
 $query = "
     SELECT
         COUNT(*) AS total_members,
