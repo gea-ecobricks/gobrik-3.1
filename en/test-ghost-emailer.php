@@ -160,10 +160,14 @@ function sendEmail($to, $htmlBody) {
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
-    // Initialize DataTable
+    // Ensure DataTables is available
+    if (!$.fn.DataTable) {
+        console.error("DataTables library is not loaded!");
+        return;
+    }
+
     let table = $('#email-status-table').DataTable({
         "ajax": "fetch-email-data.php",
         "processing": true,
@@ -205,6 +209,7 @@ $(document).ready(function () {
         });
     });
 });
+
 </script>
 
 </body>
