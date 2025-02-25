@@ -20,7 +20,6 @@ if (!isLoggedIn()) {
 $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
 
-// Check admin role
 $query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
 if ($stmt = $gobrik_conn->prepare($query)) {
     $stmt->bind_param("i", $buwana_id);
@@ -29,25 +28,16 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
     if ($stmt->fetch()) {
         if (stripos($user_roles, 'admin') === false) {
-            echo "<script>
-                alert('Sorry, only admins can see this page.');
-                window.location.href = 'dashboard.php';
-            </script>";
+            header("Location: dashboard.php");
             exit();
         }
     } else {
-        echo "<script>
-            alert('User record not found.');
-            window.location.href = 'dashboard.php';
-        </script>";
+        header("Location: dashboard.php");
         exit();
     }
     $stmt->close();
 } else {
-    echo "<script>
-        alert('Error checking user role. Please try again later.');
-        window.location.href = 'dashboard.php';
-    </script>";
+    header("Location: dashboard.php");
     exit();
 }
 
@@ -65,35 +55,59 @@ $total_members = intval($row['total_members'] ?? 0);
 $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Fetch next recipient (starts with russ@ecobricks.org)
-$query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
-$result = $buwana_conn->query($query);
-$next_recipient = $result->fetch_assoc();
-$next_email = $next_recipient['email'] ?? 'russ@ecobricks.org'; // Start with Russ if no pending emails
+// Fetch the 3 most recently updated (sent) accounts
+$query_sent = "SELECT id, email, name, test_sent, test_sent_date_time
+               FROM ghost_test_email_tb
+               WHERE test_sent = 1
+               ORDER BY test_sent_date_time DESC
+               LIMIT 3";
+$sent_result = $buwana_conn->query($query_sent);
+$sent_members = $sent_result->fetch_all(MYSQLI_ASSOC);
 
-// Handle AJAX email sending
+// Fetch the next 7 pending (unsent) accounts
+$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time
+                  FROM ghost_test_email_tb
+                  WHERE test_sent = 0
+                  ORDER BY id ASC
+                  LIMIT 7";
+$pending_result = $buwana_conn->query($query_pending);
+$pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
+
+// Merge sent and pending for display
+$all_members = array_merge($sent_members, $pending_members);
+
+// Handle form submission (send email)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     $email_html = $_POST['email_html'];
-    $recipient_email = $_POST['email_to'];
 
-    if (empty($email_html)) {
-        echo json_encode(['status' => 'error', 'message' => 'Please provide email HTML content.']);
-        exit();
-    }
+    // Get the next recipient (start with russ@ecobricks.org, then pick from DB)
+    $query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
+    $result = $buwana_conn->query($query);
+    $subscriber = $result->fetch_assoc();
 
-    if (sendEmail($recipient_email, $email_html)) {
-        // Update database record
-        $updateQuery = "UPDATE ghost_test_email_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ?";
-        $stmt = $buwana_conn->prepare($updateQuery);
-        $stmt->bind_param("s", $recipient_email);
-        $stmt->execute();
-        $stmt->close();
+    $test_email = "russ@ecobricks.org"; // Start with test email
 
-        echo json_encode(['status' => 'success']);
+    if (!$subscriber) {
+        $test_email = null; // Stop if no more unsent users
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to send email.']);
+        $test_email = $subscriber['email'];
+        $subscriber_id = $subscriber['id'];
     }
-    exit();
+
+    if (!empty($email_html) && $test_email) {
+        if (sendEmail($test_email, $email_html)) {
+            // Mark as sent in database
+            $updateQuery = "UPDATE ghost_test_email_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?";
+            $stmt = $buwana_conn->prepare($updateQuery);
+            $stmt->bind_param("s", $subscriber_id);
+            $stmt->execute();
+            $stmt->close();
+
+            // Refresh the page without an alert
+            header("Location: test-ghost-emailer.php");
+            exit();
+        }
+    }
 }
 
 // Email sending function
@@ -122,12 +136,10 @@ function sendEmail($to, $htmlBody) {
 
 ?>
 
-<?php require_once ("../includes/admin-panel-inc.php"); ?>
+<?php require_once("../includes/admin-panel-inc.php"); ?>
+
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
-
-<!-- PAGE CONTENT -->
-<div id="top-page-image" class="message-birded top-page-image"></div>
 
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container">
@@ -135,18 +147,15 @@ function sendEmail($to, $htmlBody) {
         <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
         <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
 
-        <form id="email-form">
-            <label for="email_to">Sending to:</label>
-            <input type="email" id="email_to" name="email_to" value="<?php echo $next_email; ?>" readonly style="width: 100%;">
-
+        <form method="POST">
             <label for="email_html">Newsletter HTML:</label>
             <textarea name="email_html" id="email_html" rows="6" style="width:100%;"></textarea>
-
-            <button type="button" id="send-email-btn">Send Email</button>
+            <br><br>
+            <button type="submit" name="send_email">Send Next Email</button>
         </form>
 
-        <h3>Recent & Pending Subscribers:</h3>
-        <table id="email-status-table" class="display">
+        <h3>Email Sending Status:</h3>
+        <table border="1" width="100%">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -156,61 +165,20 @@ function sendEmail($to, $htmlBody) {
                     <th>Sent Date</th>
                 </tr>
             </thead>
+            <tbody>
+                <?php foreach ($all_members as $member): ?>
+                    <tr>
+                        <td><?php echo $member['id']; ?></td>
+                        <td><?php echo $member['email']; ?></td>
+                        <td><?php echo $member['name']; ?></td>
+                        <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
+                        <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
         </table>
     </div>
 </div>
-
-<script>
-$(document).ready(function () {
-    // Ensure DataTables is available
-    if (!$.fn.DataTable) {
-        console.error("DataTables library is not loaded!");
-        return;
-    }
-
-    let table = $('#email-status-table').DataTable({
-        "ajax": "fetch-email-data.php",
-        "processing": true,
-        "serverSide": true,
-        "order": [[4, "desc"]],
-        "columns": [
-            { "data": "id" },
-            { "data": "email" },
-            { "data": "name" },
-            { "data": "test_sent", "render": function(data) {
-                return data == 1 ? '✅' : '❌';
-            }},
-            { "data": "test_sent_date_time" }
-        ]
-    });
-
-    // Handle email sending
-    $('#send-email-btn').on('click', function () {
-        let emailHtml = $('#email_html').val();
-        let emailTo = $('#email_to').val();
-
-        $.ajax({
-            url: 'test-ghost-emailer.php',
-            type: 'POST',
-            data: {
-                send_email: true,
-                email_to: emailTo,
-                email_html: emailHtml
-            },
-            dataType: 'json',
-            success: function (response) {
-                if (response.status === 'success') {
-                    table.ajax.reload(); // Refresh DataTable
-                    $.get('fetch-next-email.php', function(data) {
-                        $('#email_to').val(data.next_email);
-                    });
-                }
-            }
-        });
-    });
-});
-
-</script>
 
 </body>
 </html>
