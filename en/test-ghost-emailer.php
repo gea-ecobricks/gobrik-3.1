@@ -8,17 +8,16 @@ use GuzzleHttp\Exception\RequestException;
 // Page setup
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '1.0';
-$page = 'test-ghost-emailer';
+$page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// LOGIN & ADMIN CHECK using GoBrik database
+// LOGIN & ADMIN CHECK using gobrik database
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
 }
 
 $buwana_id = $_SESSION['buwana_id'];
-
 require_once '../gobrikconn_env.php';
 
 $query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
@@ -53,11 +52,10 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 require_once '../buwanaconn_env.php';
 
-// Fetch email stats from Buwana DB
+// Fetch email stats from buwana db
 $query = "
-    SELECT
-        COUNT(*) AS total_members,
-        SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count
+    SELECT COUNT(*) AS total_members,
+           SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count
     FROM ghost_test_email_tb";
 $result = $buwana_conn->query($query);
 $row = $result->fetch_assoc();
@@ -66,7 +64,7 @@ $total_members = intval($row['total_members'] ?? 0);
 $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Get next 10 unsent members for display purposes
+// Get next 10 unsent members
 $query = "SELECT id, email, name, test_sent, test_sent_date_time
           FROM ghost_test_email_tb
           WHERE test_sent = 0
@@ -75,18 +73,16 @@ $query = "SELECT id, email, name, test_sent, test_sent_date_time
 $members_result = $buwana_conn->query($query);
 $next_members = $members_result->fetch_all(MYSQLI_ASSOC);
 
-// Handle form submission (send email to a fixed email)
+// Handle form submission (send email)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     $email_html = $_POST['email_html'];
+    $test_email = 'russ@ecobricks.org';  // Hardcoded recipient
 
     if (empty($email_html)) {
         echo "<script>alert('Please provide email HTML content.');</script>";
     } else {
-        $email = "russ@ecobricks.org"; // Hardcoded test email
-        $subject = "Test Ghost Email - GoBrik Newsletter";
-
-        if (sendEmail($email, $subject, $email_html)) {
-            echo "<script>alert('Test email sent to $email');</script>";
+        if (sendEmail($test_email, $email_html)) {
+            echo "<script>alert('Test email sent to $test_email');</script>";
         } else {
             echo "<script>alert('Failed to send test email.');</script>";
         }
@@ -94,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
 }
 
 // Email sending function
-function sendEmail($to, $subject, $htmlBody) {
+function sendEmail($to, $htmlBody) {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
     $mailgunApiKey = getenv('MAILGUN_API_KEY');
     $mailgunDomain = 'mail.gobrik.com';
@@ -105,7 +101,7 @@ function sendEmail($to, $subject, $htmlBody) {
             'form_params' => [
                 'from' => 'GoBrik Team <no-reply@mail.gobrik.com>',
                 'to' => $to,
-                'subject' => $subject,
+                'subject' => 'GoBrik Newsletter Test',
                 'html' => $htmlBody,
                 'text' => strip_tags($htmlBody),
             ]
@@ -116,53 +112,52 @@ function sendEmail($to, $subject, $htmlBody) {
         return false;
     }
 }
+
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Test Ghost Emailer</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <?php require_once ("../includes/admin-panel-inc.php"); ?>
-</head>
-<body>
+<?php require_once ("../includes/admin-panel-inc.php"); ?>
+<div class="splash-title-block"></div>
+<div id="splash-bar"></div>
 
-<div class="container">
-    <h2>Ghost Newsletter Emailer</h2>
-    <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
-    <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
+<!-- PAGE CONTENT -->
+<div id="top-page-image" class="message-birded top-page-image"></div>
 
-    <form method="POST">
-        <label for="email_html">Newsletter HTML:</label>
-        <textarea name="email_html" id="email_html" rows="6" style="width:100%;"></textarea>
-        <br><br>
-        <button type="submit" name="send_email">Send Test Email</button>
-    </form>
+<div id="form-submission-box" class="landing-page-form">
+    <div class="form-container">
+        <h2>Ghost Newsletter Emailer (Test Mode)</h2>
+        <p>This test will send an email to: <strong>russ@ecobricks.org</strong></p>
 
-    <h3>Next 10 Subscribers (Preview Only):</h3>
-    <table border="1" width="100%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Name</th>
-                <th>Sent</th>
-                <th>Sent Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($next_members as $member): ?>
+        <form method="POST">
+            <label for="email_html">Newsletter HTML:</label>
+            <textarea name="email_html" id="email_html" rows="6" style="width:100%;"></textarea>
+            <br><br>
+            <button type="submit" name="send_email">Send Test Email</button>
+        </form>
+
+        <h3>Next 10 Subscribers:</h3>
+        <table border="1" width="100%">
+            <thead>
                 <tr>
-                    <td><?php echo $member['id']; ?></td>
-                    <td><?php echo $member['email']; ?></td>
-                    <td><?php echo $member['name']; ?></td>
-                    <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
-                    <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Sent</th>
+                    <th>Sent Date</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($next_members as $member): ?>
+                    <tr>
+                        <td><?php echo $member['id']; ?></td>
+                        <td><?php echo $member['email']; ?></td>
+                        <td><?php echo $member['name']; ?></td>
+                        <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
+                        <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 </body>
