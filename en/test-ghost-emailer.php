@@ -1,6 +1,6 @@
 <?php
-require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
-require '../vendor/autoload.php'; // Path to Composer's autoloader
+require_once '../earthenAuth_helper.php'; // Authentication helper
+require '../vendor/autoload.php'; // Composer autoload
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -11,7 +11,7 @@ $version = '0.53';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// LOGIN AND ROLE CHECK:
+// LOGIN & ADMIN CHECK:
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
@@ -20,23 +20,15 @@ if (!isLoggedIn()) {
 $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
 
+// Check admin privileges
 $query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
 if ($stmt = $gobrik_conn->prepare($query)) {
     $stmt->bind_param("i", $buwana_id);
     $stmt->execute();
     $stmt->bind_result($user_roles);
-
-    if ($stmt->fetch()) {
-        if (stripos($user_roles, 'admin') === false) {
-            echo "<script>
-                alert('Sorry, only admins can see this page.');
-                window.location.href = 'dashboard.php';
-            </script>";
-            exit();
-        }
-    } else {
+    if ($stmt->fetch() && stripos($user_roles, 'admin') === false) {
         echo "<script>
-            alert('User record not found.');
+            alert('Sorry, only admins can see this page.');
             window.location.href = 'dashboard.php';
         </script>";
         exit();
@@ -52,20 +44,22 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 require_once '../buwanaconn_env.php';
 
-// Fetch the user's location data
-$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-$gea_status = getGEA_status($buwana_id);
-$user_community_name = getCommunityName($buwana_conn, $buwana_id);
-$ecobrick_unique_id = '';
-$first_name = getFirstName($buwana_conn, $buwana_id);
+// 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
+$has_alerts = false;
+$alerts = [];
 
-// Fetch email stats from buwana db
-$query = "
-    SELECT COUNT(*) AS total_members,
-           SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count
-    FROM ghost_test_email_tb";
+$alert_query = "SELECT alert_title, alert_message FROM admin_alerts WHERE addressed = 0 ORDER BY date_posted DESC LIMIT 3";
+$result = $buwana_conn->query($alert_query);
+
+if ($result->num_rows > 0) {
+    $has_alerts = true;
+    while ($row = $result->fetch_assoc()) {
+        $alerts[] = $row;
+    }
+}
+
+// Fetch email stats
+$query = "SELECT COUNT(*) AS total_members, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count FROM ghost_test_email_tb";
 $result = $buwana_conn->query($query);
 $row = $result->fetch_assoc();
 
@@ -73,28 +67,20 @@ $total_members = intval($row['total_members'] ?? 0);
 $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Fetch the 3 most recently updated (sent) accounts
-$query_sent = "SELECT id, email, name, test_sent, test_sent_date_time
-               FROM ghost_test_email_tb
-               WHERE test_sent = 1
-               ORDER BY test_sent_date_time DESC
-               LIMIT 3";
+// Fetch the 3 most recently sent emails
+$query_sent = "SELECT id, email, name, test_sent, test_sent_date_time FROM ghost_test_email_tb WHERE test_sent = 1 ORDER BY test_sent_date_time DESC LIMIT 3";
 $sent_result = $buwana_conn->query($query_sent);
 $sent_members = $sent_result->fetch_all(MYSQLI_ASSOC);
 
-// Fetch the next 7 pending (unsent) accounts
-$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time
-                  FROM ghost_test_email_tb
-                  WHERE test_sent = 0
-                  ORDER BY id ASC
-                  LIMIT 7";
+// Fetch the next 7 pending emails
+$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 7";
 $pending_result = $buwana_conn->query($query_pending);
 $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
-// Get next recipient (default to test email first)
+// Get next recipient (start with test email)
 $query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
 $subscriber = $result->fetch_assoc();
@@ -264,8 +250,8 @@ $email_template = <<<HTML
 
 HTML;
 
-// Handle form submission (send email)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'];
 
     if (!empty($email_html) && $test_email) {
@@ -296,7 +282,7 @@ function sendEmail($to, $htmlBody) {
             'form_params' => [
                 'from' => 'GEA Center Circle <gea@earthen.io>',
                 'to' => $to,
-                'subject' => 'Now We\'ve moved on from the US dollar',
+                'subject' => 'We\'ve moved on from the US dollar',
                 'html' => $htmlBody,
                 'text' => strip_tags($htmlBody),
             ]
@@ -307,48 +293,58 @@ function sendEmail($to, $htmlBody) {
         return false;
     }
 }
-
 ?>
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
 <div class="form-container">
     <h2>Ghost Newsletter Emailer</h2>
+
+    <?php if ($has_alerts): ?>
+        <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
+            <h3 style="color: red;">⚠️ Admin Alerts Found!</h3>
+            <ul>
+                <?php foreach ($alerts as $alert): ?>
+                    <li><strong><?php echo htmlspecialchars($alert['alert_title']); ?>:</strong> <?php echo htmlspecialchars($alert['alert_message']); ?></li>
+                <?php endforeach; ?>
+            </ul>
+            <p>Please resolve these alerts before proceeding.</p>
+        </div>
+    <?php endif; ?>
+
     <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
     <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
 
     <form method="POST">
         <label for="email_html">Newsletter HTML:</label>
-        <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
+        <textarea name="email_html" id="email_html" rows="10" style="width:100%;"></textarea>
         <br><br>
-        <button type="submit" name="send_email">Send Next Email</button>
+        <button type="submit" name="send_email" <?php echo $has_alerts ? 'disabled' : ''; ?>>Send Next Email</button>
     </form>
 
-
-        <h3>Email Sending Status:</h3>
-        <table border="1" width="100%">
-            <thead>
+    <h3>Email Sending Status:</h3>
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Sent</th>
+                <th>Sent Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($all_members as $member): ?>
                 <tr>
-                    <th>ID</th>
-                    <th>Email</th>
-                    <th>Name</th>
-                    <th>Sent</th>
-                    <th>Sent Date</th>
+                    <td><?php echo $member['id']; ?></td>
+                    <td><?php echo $member['email']; ?></td>
+                    <td><?php echo $member['name']; ?></td>
+                    <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
+                    <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($all_members as $member): ?>
-                    <tr>
-                        <td><?php echo $member['id']; ?></td>
-                        <td><?php echo $member['email']; ?></td>
-                        <td><?php echo $member['name']; ?></td>
-                        <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
-                        <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 </div>
 
 </body>
