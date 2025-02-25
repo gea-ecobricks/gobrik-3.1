@@ -11,24 +11,12 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Get email from query string
-$email_addr = trim($_GET['email'] ?? ''); // Trim to remove any extra spaces
+$email_addr = $_GET['email'] ?? '';
 
 // Validate email
 if (empty($email_addr) || !filter_var($email_addr, FILTER_VALIDATE_EMAIL)) {
     die("<p style='color: red;'>Invalid email address. Please try again.</p>");
 }
-
-// Debug log file
-$log_file = 'unsubscribe.log';
-
-// Function to log debug messages
-function log_debug($message) {
-    global $log_file;
-    file_put_contents($log_file, date("[Y-m-d H:i:s]") . " " . $message . "\n", FILE_APPEND);
-}
-
-// Log email received
-log_debug("Received unsubscribe request for: $email_addr");
 
 // If form is submitted, process unsubscription
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unsubscribe'])) {
@@ -38,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unsubscribe']
     sleep(1); // Simulate loading time
 
     try {
-        // 🔹 Fetch user details from tb_ecobrickers
-        $sql_fetch_details = "SELECT ecobricker_id, buwana_id FROM tb_ecobrickers WHERE LOWER(email_addr) = LOWER(?)";
+        // Fetch user details from tb_ecobrickers
+        $sql_fetch_details = "SELECT ecobricker_id, buwana_id FROM tb_ecobrickers WHERE email_addr = ?";
         $stmt_fetch_details = $gobrik_conn->prepare($sql_fetch_details);
         $stmt_fetch_details->bind_param('s', $email_addr);
         $stmt_fetch_details->execute();
@@ -47,11 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unsubscribe']
         $stmt_fetch_details->fetch();
         $stmt_fetch_details->close();
 
-        log_debug("Fetched from tb_ecobrickers - Ecobricker ID: " . ($ecobricker_id ?? 'NULL') . ", Buwana ID: " . ($buwana_id ?? 'NULL'));
-
-        // If no matching account is found
         if (empty($ecobricker_id)) {
-            log_debug("No matching tb_ecobrickers record found for email: $email_addr");
             echo "<script>document.getElementById('progress').innerHTML += '<p>No account found in GoBrik.</p>';</script>";
             ob_flush();
             flush();
@@ -61,27 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unsubscribe']
             flush();
             sleep(1);
 
-            // 🔹 Mark as unsubscribed (ADD ERROR CHECKING)
+            // Mark as unsubscribed
             $sql_unsubscribe_ecobricker = "UPDATE tb_ecobrickers SET subscribed_to_emails = 0 WHERE ecobricker_id = ?";
             $stmt_unsubscribe_ecobricker = $gobrik_conn->prepare($sql_unsubscribe_ecobricker);
-            if (!$stmt_unsubscribe_ecobricker) {
-                log_debug("Error preparing unsubscribe statement: " . $gobrik_conn->error);
-                throw new Exception("Database error: Unable to prepare unsubscribe query.");
-            }
-
             $stmt_unsubscribe_ecobricker->bind_param('i', $ecobricker_id);
             $stmt_unsubscribe_ecobricker->execute();
-
-            if ($stmt_unsubscribe_ecobricker->affected_rows === 0) {
-                log_debug("No rows updated in tb_ecobrickers for ecobricker_id: $ecobricker_id");
-            } else {
-                log_debug("Successfully unsubscribed ecobricker_id: $ecobricker_id");
-            }
-
             $stmt_unsubscribe_ecobricker->close();
         }
 
-        // 🔹 Unsubscribe in users_tb
+        // Unsubscribe in users_tb
         if (!empty($buwana_id)) {
             echo "<script>document.getElementById('progress').innerHTML += '<p>Checking Buwana account...</p>';</script>";
             ob_flush();
@@ -100,30 +72,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unsubscribe']
             $stmt_unsubscribe_credentials->execute();
             $stmt_unsubscribe_credentials->close();
 
-            log_debug("Buwana account unsubscribed for buwana_id: $buwana_id");
-
             echo "<script>document.getElementById('progress').innerHTML += '<p>Buwana account unsubscribed.</p>';</script>";
             ob_flush();
             flush();
         } else {
-            log_debug("No linked Buwana account found for email: $email_addr");
             echo "<script>document.getElementById('progress').innerHTML += '<p>No linked Buwana account found.</p>';</script>";
             ob_flush();
             flush();
         }
 
-        // 🔹 Call external unsubscribe function
+        // Call external unsubscribe function
         echo "<script>document.getElementById('progress').innerHTML += '<p>Unsubscribing from Earthen newsletter...</p>';</script>";
         ob_flush();
         flush();
         sleep(1);
         earthenUnsubscribe($email_addr);
-        log_debug("Earthen unsubscribe API called for: $email_addr");
 
         echo "<script>document.getElementById('progress').innerHTML += '<p><strong>✅ Unsubscribe complete.</strong></p>';</script>";
 
     } catch (Exception $e) {
-        log_debug("ERROR: " . $e->getMessage());
         echo "<script>document.getElementById('progress').innerHTML += '<p style=\"color: red;\">Error: " . $e->getMessage() . "</p>';</script>";
     }
 
@@ -131,3 +98,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unsubscribe']
     exit();
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsubscribe Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        button {
+            background-color: #d9534f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Unsubscribe from Earthen Newsletter</h2>
+    <p>We've received your request to remove <strong><?php echo htmlspecialchars($email_addr); ?></strong> from our Earthen newsletter system.</p>
+    <p>This will also check and delete your Buwana account on <a href="https://gobrik.com">GoBrik.com</a> (if one exists).</p>
+
+    <form method="POST">
+        <button type="submit" name="confirm_unsubscribe">Confirm Unsubscribe and Account Deletion</button>
+    </form>
+</div>
+
+</body>
+</html>
