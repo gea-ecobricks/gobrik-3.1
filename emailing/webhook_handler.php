@@ -116,7 +116,7 @@ try {
     if ($stmt_update_status->affected_rows > 0) {
         error_log("✅ Delivered!  Emailing_status set to '$basic_mailgun_status' for $email_addr.");
     } else {
-        error_log("⚠️ No ecobricker record found for $email_addr. No update was made.");
+        error_log("⚠️ No record found for $email_addr. No update was made.");
     }
 
     $stmt_update_status->close();

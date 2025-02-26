@@ -346,6 +346,7 @@ function sendEmail($to, $htmlBody) {
 
 
 
+
     <h3>Email Sending Status:</h3>
     <table border="1" width="100%">
         <thead>
@@ -388,35 +389,10 @@ function sendEmail($to, $htmlBody) {
     // ✅ Start countdown only if no alerts
     startCountdown();
 
-    // 📨 Handle the email submission (now works on both button click & countdown)
-    $('#email-form').on('submit', function (event) {
+    // 📨 Handle the email submission when button is clicked
+    $('#send-email-btn').on('click', function (event) {
         event.preventDefault(); // Prevent default form submission
-
-        const emailTo = $('#email_to').val().trim();
-        const emailBody = $('#email_html').val().trim();
-
-        if (!emailTo || !emailBody) {
-            alert("Please fill out all fields before sending the email.");
-            return;
-        }
-
-        // AJAX request to send email
-        $.ajax({
-            url: 'test-ghost-emailer.php',
-            type: 'POST',
-            data: {
-                send_email: "1",  // ✅ Changed to a string
-                email_to: emailTo,
-                email_body: emailBody
-            },
-            success: function () {
-                $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
-                setTimeout(() => location.reload(), 1000);
-            },
-            error: function () {
-                alert("Failed to send the email. Please try again.");
-            }
-        });
+        sendEmail(); // Call function to send email via AJAX
     });
 
     // ⏳ Countdown function
@@ -431,7 +407,7 @@ function sendEmail($to, $htmlBody) {
 
             if (countdown <= 0) {
                 clearInterval(countdownTimer);
-                document.getElementById('email-form').submit(); // ✅ Now submits form correctly!
+                sendEmail(); // ✅ Automatically sends when countdown reaches 0
             }
         }, 1000);
     }
@@ -447,7 +423,36 @@ function sendEmail($to, $htmlBody) {
         $('#countdown-timer').hide();
         $(this).hide();
     });
+
+    // ✅ Function to send email via AJAX
+    function sendEmail() {
+        const emailTo = $('#email_to').val().trim();
+        const emailBody = $('#email_html').val().trim();
+
+        if (!emailTo || !emailBody) {
+            alert("Please fill out all fields before sending the email.");
+            return;
+        }
+
+        $.ajax({
+            url: 'test-ghost-emailer.php',
+            type: 'POST',
+            data: {
+                send_email: "1",  // ✅ Send this as a string
+                email_to: emailTo,
+                email_html: emailBody // ✅ Now using correct field name
+            },
+            success: function () {
+                $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
+                setTimeout(() => location.reload(), 1000);
+            },
+            error: function () {
+                alert("Failed to send the email. Please try again.");
+            }
+        });
+    }
 });
+
 
 
 
