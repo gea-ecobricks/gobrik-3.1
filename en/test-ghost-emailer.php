@@ -317,7 +317,8 @@ function sendEmail($to, $htmlBody) {
 
     <form method="POST">
         <label for="email_html">Newsletter HTML:</label>
-        <textarea name="email_html" id="email_html" rows="10" style="width:100%;"></textarea>
+        <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
+
         <br><br>
         <button type="submit" name="send_email" <?php echo $has_alerts ? 'disabled' : ''; ?>>Send Next Email</button>
     </form>
