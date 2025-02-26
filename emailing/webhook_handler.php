@@ -4,7 +4,7 @@ require_once '../scripts/earthen_subscribe_functions.php';
 
 // Include database connection setups
 require_once '../gobrikconn_env.php';  // Gobrik DB (for tb_ecobrickers)
-require_once '../buwanaconn_env.php';  // Buwana DB (for failed_emails_tb)
+require_once '../buwanaconn_env.php';  // Buwana DB (for failed_emails_tb, admin_alerts)
 
 // Retrieve Mailgun webhook signing key from the environment
 $mailgun_signing_key = getenv('MAILGUN_WEBHOOK');
@@ -63,7 +63,39 @@ try {
     $response_message = $data['event-data']['delivery-status']['message'] ?? 'No response message';
 
     // Log a concise summary of the event
-    error_log("Mailgun Event: $email_subject to $email_addr was sent on $timestamp and returned: \"$response_message\"");
+    $log_message = "Mailgun Event: $email_subject to $email_addr was sent on $timestamp and returned: \"$response_message\"";
+    error_log($log_message);
+
+    // 🚨 Detect and log rate limiting issues 🚨
+    if (stripos($response_message, "rate limited") !== false) {
+        error_log("⚠️ Rate Limiting detected! Logging to admin_alerts.");
+
+        $alert_title = "Rate Limited!";
+        $alert_description = "A critical Mailgun log has reported that: \"$log_message\"";
+        $alert_unaddressed = 1;
+
+
+        // Insert alert into `admin_alerts` (avoid duplicates)
+        $sql_insert_alert = "
+            INSERT INTO admin_alerts (alert_title, alert_message, alert_server_log, addressed, date_posted)
+            VALUES (?, ?, ?, ?, NOW())
+            ON DUPLICATE KEY UPDATE
+                alert_message = VALUES(alert_message),
+                alert_server_log = VALUES(alert_server_log),
+                addressed = VALUES(addressed),
+                date_posted = NOW()
+        ";
+
+        $stmt_insert_alert = $buwana_conn->prepare($sql_insert_alert);
+        if ($stmt_insert_alert) {
+            $stmt_insert_alert->bind_param('sssi', $alert_title, $alert_description, $log_message, $alert_unaddressed);
+            $stmt_insert_alert->execute();
+            $stmt_insert_alert->close();
+            error_log("✅ Rate limiting issue logged to admin_alerts.");
+        } else {
+            error_log("❌ Failed to insert rate limiting alert: " . $buwana_conn->error);
+        }
+    }
 
     // Update the database with the new emailing status (Gobrik database)
     $sql_update_status = "
@@ -82,9 +114,9 @@ try {
     $stmt_update_status->execute();
 
     if ($stmt_update_status->affected_rows > 0) {
-        error_log("Successfully updated emailing_status to '$basic_mailgun_status' for $email_addr.");
+        error_log("✅ Successfully updated emailing_status to '$basic_mailgun_status' for $email_addr.");
     } else {
-        error_log("No record found for $email_addr. No update was made.");
+        error_log("⚠️ No record found for $email_addr. No update was made.");
     }
 
     $stmt_update_status->close();
@@ -93,13 +125,13 @@ try {
     http_response_code(200);
 } catch (Exception $e) {
     // Handle exceptions and log errors
-    error_log("Error in webhook_handler: " . $e->getMessage());
+    error_log("❌ Error in webhook_handler: " . $e->getMessage());
     http_response_code(500); // Internal Server Error
 }
 
-// Now using Buwana DB to insert failed emails
+// 🚨 Handle failed emails by logging them to Buwana DB 🚨
 if (!empty($email_addr) && in_array($basic_mailgun_status, $failure_events)) {
-    error_log("Adding $email_addr to failed unsubscribe queue (Buwana DB).");
+    error_log("⚠️ Adding $email_addr to failed unsubscribe queue (Buwana DB).");
 
     // Insert failed email into the queue table (Buwana database)
     $sql_insert_failed = "
@@ -113,9 +145,9 @@ if (!empty($email_addr) && in_array($basic_mailgun_status, $failure_events)) {
         $stmt_insert_failed->bind_param('ss', $email_addr, $response_message);
         $stmt_insert_failed->execute();
         $stmt_insert_failed->close();
-        error_log("Inserted $email_addr into failed_emails_tb successfully.");
+        error_log("✅ Inserted $email_addr into failed_emails_tb successfully.");
     } else {
-        error_log("Failed to insert $email_addr into unsubscribe queue: " . $buwana_conn->error);
+        error_log("❌ Failed to insert $email_addr into unsubscribe queue: " . $buwana_conn->error);
     }
 }
 

@@ -50,6 +50,23 @@ if ($stmt = $gobrik_conn->prepare($query)) {
     exit();
 }
 
+
+require_once '../buwanaconn_env.php';
+
+// 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
+$has_alerts = false;
+$alerts = [];
+
+$alert_query = "SELECT alert_title, alert_message FROM admin_alerts WHERE addressed = 0 ORDER BY date_posted DESC LIMIT 3";
+$result = $buwana_conn->query($alert_query);
+
+if ($result->num_rows > 0) {
+    $has_alerts = true;
+    while ($row = $result->fetch_assoc()) {
+        $alerts[] = $row;
+    }
+}
+
 // PART 2: Function to grab the next ecobricker record
 function getNextEcobricker($conn) {
     $query = "
@@ -186,6 +203,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email'])) {
     }
 }
 
+
+
 // Fetch overall stats
 require_once '../gobrikconn_env.php';
 
@@ -248,6 +267,20 @@ $gobrik_conn->close();
            <!-- Email confirmation form -->
 
     <div id="content-to-refresh" style="text-align:center;">
+
+        <!-- 🚨 Show alert messages if any exist -->
+    <?php if ($has_alerts): ?>
+        <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
+            <h3 style="color: red;">⚠️ Admin Alerts Found!</h3>
+            <ul>
+                <?php foreach ($alerts as $alert): ?>
+                    <li><strong><?php echo htmlspecialchars($alert['alert_title']); ?>:</strong> <?php echo htmlspecialchars($alert['alert_message']); ?></li>
+                <?php endforeach; ?>
+            </ul>
+            <p>Please resolve these alerts before proceeding.</p>
+        </div>
+    <?php endif; ?>
+
     <h2>Send Activation Emails to Unactivated Users</h2>
 
      <p id="admin-welcome-stats">
@@ -332,7 +365,7 @@ $(document).ready(function () {
     });
 
     let countdownTimer; // Reference for the countdown timer
-    let countdown = 5; // Initial countdown value
+    let countdown = 2; // Initial countdown value
 
     // Start the countdown timer on page load
     startCountdown();
@@ -417,7 +450,13 @@ $(document).ready(function () {
 
 
 
-
+<script>
+$(document).ready(function () {
+    if (<?php echo $has_alerts ? 'true' : 'false'; ?>) {
+        alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
+    }
+});
+</script>
 
 
 
