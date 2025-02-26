@@ -68,7 +68,7 @@ try {
 
     // 🚨 Detect and log rate limiting issues 🚨
     if (stripos($response_message, "rate limited") !== false) {
-        error_log("⚠️ Rate Limiting detected! Logging to admin_alerts.");
+        error_log("🚨️ Rate Limiting detected! Logging to admin_alerts.");
 
         $alert_title = "Rate Limited!";
         $alert_description = "A critical Mailgun log has reported that: \"$log_message\"";
@@ -114,9 +114,9 @@ try {
     $stmt_update_status->execute();
 
     if ($stmt_update_status->affected_rows > 0) {
-        error_log("✅ Successfully updated emailing_status to '$basic_mailgun_status' for $email_addr.");
+        error_log("✅ Delivered!  Emailing_status set to '$basic_mailgun_status' for $email_addr.");
     } else {
-        error_log("⚠️ No record found for $email_addr. No update was made.");
+        error_log("⚠️ No ecobricker record found for $email_addr. No update was made.");
     }
 
     $stmt_update_status->close();
@@ -131,7 +131,7 @@ try {
 
 // 🚨 Handle failed emails by logging them to Buwana DB 🚨
 if (!empty($email_addr) && in_array($basic_mailgun_status, $failure_events)) {
-    error_log("⚠️ Adding $email_addr to failed unsubscribe queue (Buwana DB).");
+    error_log("🚫 Adding $email_addr to Buwana failed_emails queue.");
 
     // Insert failed email into the queue table (Buwana database)
     $sql_insert_failed = "
