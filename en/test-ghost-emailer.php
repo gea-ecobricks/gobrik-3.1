@@ -324,21 +324,25 @@ function sendEmail($to, $htmlBody) {
     <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
     <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
 
-    <form id="email-form" method="POST">
+   <form id="email-form" method="POST">
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
 
-    <!-- Hidden field for email_to -->
-    <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($test_email); ?>">
+    <!-- Hidden field for recipient email -->
+    <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
 
     <br><br>
-    <button type="submit" id="send-email-btn" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>📨 Send Email</button>
+    <!-- Updated button text with recipient email -->
+    <button type="submit" id="send-email-btn" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+        📨 Send to <?php echo htmlspecialchars($recipient_email); ?>
+    </button>
 </form>
 
 <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
     <p>Email will send in <span id="countdown">10</span> seconds...</p>
     <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
+
 
 
 
