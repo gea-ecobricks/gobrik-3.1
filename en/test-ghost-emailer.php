@@ -355,46 +355,53 @@ function sendEmail($to, $htmlBody) {
 </div>
 
 
-
 <script>
-$(document).ready(function () {
+    $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 2; // Initial countdown value
+    let countdown = 10; // Start countdown from 10 seconds
 
-    // 🚨 Show alert if there are unaddressed admin alerts & disable sending 🚨
+    // 🚨 Alert if unaddressed admin alerts exist & disable sending 🚨
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
-        $('#send-email').prop('disabled', true); // Disable the send button
+        $('#send-email-btn').prop('disabled', true); // Disable the send button
         return; // Stop further execution (countdown won't start)
     }
 
-    // Initialize the DataTable
-    const dataTable = $('#next-ecobrickers').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-            "url": "../api/fetch_next_ecobrickers.php",
-            "type": "POST"
-        },
-        "columns": [
-            { "data": "ecobricker_id" },
-            { "data": "email_addr" },
-            { "data": "account_notes" },
-            { "data": "first_name" },
-            { "data": "user_roles" },
-            { "data": "ecobricks_made" },
-            { "data": "login_count" },
-            { "data": "emailing_status" },
-            { "data": "full_name" },
-            { "data": "location_full" }
-        ]
-    });
-
-    // ✅ Start the countdown timer on page load
+    // ✅ Start countdown only if there are no alerts
     startCountdown();
 
+    // 📨 Handle the email submission
+    $('#send-email-btn').on('click', function () {
+        const emailTo = $('#email_to').val().trim();
+        const emailSubject = $('#email_subject').val().trim();
+        const emailBody = $('#email_body').val().trim();
 
+        if (!emailTo || !emailSubject || !emailBody) {
+            alert("Please fill out all fields before sending the email.");
+            return;
+        }
+
+        $.ajax({
+            url: 'admin-emailer.php',
+            type: 'POST',
+            data: {
+                send_email: true,
+                email_to: emailTo,
+                email_subject: emailSubject,
+                email_body: emailBody
+            },
+            success: function () {
+                $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            },
+            error: function () {
+                alert("Failed to send the email. Please try again.");
+            }
+        });
+    });
 
     // ⏳ Countdown timer function
     function startCountdown() {
@@ -408,7 +415,7 @@ $(document).ready(function () {
 
             if (countdown <= 0) {
                 clearInterval(countdownTimer);
-                $('#send-email-btn').trigger('click');
+                $('#send-email-btn').trigger('click'); // ✅ Now correctly triggers email send
             }
         }, 1000);
     }
@@ -435,7 +442,6 @@ $(document).ready(function () {
         }
     });
 });
-
 </script>
 
 
