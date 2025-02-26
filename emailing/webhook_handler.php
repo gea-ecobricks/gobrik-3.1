@@ -133,7 +133,7 @@ try {
         error_log("✅ Delivered! Emailing_status set to '$basic_mailgun_status' for $email_addr.");
     } else {
         if ($current_status === $basic_mailgun_status) {
-            error_log("⚠️ No update needed for $email_addr. Emailing_status was already '$basic_mailgun_status'.");
+            error_log("👌️ No update needed for $email_addr. Emailing_status was already '$basic_mailgun_status'.");
         } else {
             error_log("⚠️ No record found for $email_addr in tb_ecobrickers. No update was made.");
         }
