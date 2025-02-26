@@ -320,8 +320,14 @@ function sendEmail($to, $htmlBody) {
         <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
 
         <br><br>
-        <button type="submit" name="send_email" <?php echo $has_alerts ? 'disabled' : ''; ?>>Send Next Email</button>
+        <button type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>📨 Send Email</button>
     </form>
+
+
+    <div id="countdown-timer" style="margin-top: 10px; display: none;text-align:center;width:100%;">
+        <p>Email will send in refresh in <span id="countdown">3</span> seconds...</p>
+        <button type="button" id="stop-timer-btn" style="display: none;" class="confirm-button delete">🛑 Stop Timer</button>
+    </div>
 
     <h3>Email Sending Status:</h3>
     <table border="1" width="100%">
@@ -347,6 +353,97 @@ function sendEmail($to, $htmlBody) {
         </tbody>
     </table>
 </div>
+
+
+
+<script>
+$(document).ready(function () {
+    const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
+    let countdownTimer;
+    let countdown = 2; // Initial countdown value
+
+    // 🚨 Show alert if there are unaddressed admin alerts & disable sending 🚨
+    if (hasAlerts) {
+        alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
+        $('#send-email').prop('disabled', true); // Disable the send button
+        return; // Stop further execution (countdown won't start)
+    }
+
+    // Initialize the DataTable
+    const dataTable = $('#next-ecobrickers').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "../api/fetch_next_ecobrickers.php",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "ecobricker_id" },
+            { "data": "email_addr" },
+            { "data": "account_notes" },
+            { "data": "first_name" },
+            { "data": "user_roles" },
+            { "data": "ecobricks_made" },
+            { "data": "login_count" },
+            { "data": "emailing_status" },
+            { "data": "full_name" },
+            { "data": "location_full" }
+        ]
+    });
+
+    // ✅ Start the countdown timer on page load
+    startCountdown();
+
+
+
+    // ⏳ Countdown timer function
+    function startCountdown() {
+        $('#countdown-timer').show();
+        $('#stop-timer-btn').show();
+        updateCountdownText();
+
+        countdownTimer = setInterval(function () {
+            countdown--;
+            updateCountdownText();
+
+            if (countdown <= 0) {
+                clearInterval(countdownTimer);
+                $('#send-email-btn').trigger('click');
+            }
+        }, 1000);
+    }
+
+    // 🔄 Update the countdown text
+    function updateCountdownText() {
+        $('#countdown').text(countdown);
+    }
+
+    // 🛑 Stop the countdown timer
+    $('#stop-timer-btn').on('click', function () {
+        clearInterval(countdownTimer);
+        $('#countdown-timer').hide();
+        $(this).hide();
+    });
+
+    // 🔄 Update the email field dynamically when DataTable loads new data
+    $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
+        if (json.data.length > 0) {
+            const firstRecord = json.data[0];
+            if ($('#email_to').val() !== firstRecord.email_addr) {
+                $('#email_to').val(firstRecord.email_addr);
+            }
+        }
+    });
+});
+
+</script>
+
+
+
+<!--FOOTER STARTS HERE-->
+<?php require_once ("../footer-2024.php"); ?>
+
+
 
 </body>
 </html>
