@@ -339,9 +339,19 @@ $gobrik_conn->close();
 </div> <!--Closes main-->
 
 
-
 <script>
 $(document).ready(function () {
+    const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
+    let countdownTimer;
+    let countdown = 2; // Initial countdown value
+
+    // 🚨 Show alert if there are unaddressed admin alerts & disable sending 🚨
+    if (hasAlerts) {
+        alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
+        $('#send-email-btn').prop('disabled', true); // Disable the send button
+        return; // Stop further execution (countdown won't start)
+    }
+
     // Initialize the DataTable
     const dataTable = $('#next-ecobrickers').DataTable({
         "processing": true,
@@ -364,13 +374,10 @@ $(document).ready(function () {
         ]
     });
 
-    let countdownTimer; // Reference for the countdown timer
-    let countdown = 2; // Initial countdown value
-
-    // Start the countdown timer on page load
+    // ✅ Start the countdown timer on page load
     startCountdown();
 
-    // Handle the email submission
+    // 📨 Handle the email submission
     $('#send-email-btn').on('click', function () {
         const emailTo = $('#email_to').val().trim();
         const emailSubject = $('#email_subject').val().trim();
@@ -391,10 +398,7 @@ $(document).ready(function () {
                 email_body: emailBody
             },
             success: function () {
-                // Update the button text to indicate success
                 $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
-
-                // Reload the page after the form submission
                 setTimeout(function () {
                     location.reload();
                 }, 1000);
@@ -405,10 +409,10 @@ $(document).ready(function () {
         });
     });
 
-    // Countdown timer function
+    // ⏳ Countdown timer function
     function startCountdown() {
-        $('#countdown-timer').show(); // Show the timer
-        $('#stop-timer-btn').show(); // Show the stop button
+        $('#countdown-timer').show();
+        $('#stop-timer-btn').show();
         updateCountdownText();
 
         countdownTimer = setInterval(function () {
@@ -417,45 +421,34 @@ $(document).ready(function () {
 
             if (countdown <= 0) {
                 clearInterval(countdownTimer);
-                $('#send-email-btn').trigger('click'); // Submit the form when countdown reaches 0
+                $('#send-email-btn').trigger('click');
             }
         }, 1000);
     }
 
-    // Update the countdown text
+    // 🔄 Update the countdown text
     function updateCountdownText() {
         $('#countdown').text(countdown);
     }
 
-    // Stop the countdown timer
+    // 🛑 Stop the countdown timer
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownTimer);
-        $('#countdown-timer').hide(); // Hide the timer
-        $(this).hide(); // Hide the stop button
+        $('#countdown-timer').hide();
+        $(this).hide();
     });
 
-    // Update the email field dynamically when new data is loaded into the DataTable
+    // 🔄 Update the email field dynamically when DataTable loads new data
     $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
         if (json.data.length > 0) {
             const firstRecord = json.data[0];
-            const currentEmail = $('#email_to').val();
-            if (!currentEmail || currentEmail !== firstRecord.email_addr) {
+            if ($('#email_to').val() !== firstRecord.email_addr) {
                 $('#email_to').val(firstRecord.email_addr);
             }
         }
     });
 });
-</script>
 
-
-
-
-<script>
-$(document).ready(function () {
-    if (<?php echo $has_alerts ? 'true' : 'false'; ?>) {
-        alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
-    }
-});
 </script>
 
 
