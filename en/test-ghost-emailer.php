@@ -279,7 +279,7 @@ function sendEmail($to, $htmlBody) {
     try {
         $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
-            'form_params' => [calc(-265px + 100vh)
+            'form_params' => [
                 'from' => 'GEA Center Circle <earthen@ecobricks.org>',
                 'to' => $to,
                 'subject' => 'We\'ve moved on from the US dollar',
