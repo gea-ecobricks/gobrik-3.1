@@ -315,19 +315,19 @@ function sendEmail($to, $htmlBody) {
     <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
     <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
 
-    <form method="POST">
-        <label for="email_html">Newsletter HTML:</label>
-        <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
+    <form id="email-form" method="POST">
+    <label for="email_html">Newsletter HTML:</label>
+    <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
 
-        <br><br>
-        <button type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>📨 Send Email</button>
-    </form>
+    <br><br>
+    <button type="submit" id="send-email-btn" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>📨 Send Email</button>
+</form>
 
+<div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
+    <p>Email will send in <span id="countdown">10</span> seconds...</p>
+    <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
+</div>
 
-    <div id="countdown-timer" style="margin-top: 10px; display: none;text-align:center;width:100%;">
-        <p>Email will send in refresh in <span id="countdown">3</span> seconds...</p>
-        <button type="button" id="stop-timer-btn" style="display: none;" class="confirm-button delete">🛑 Stop Timer</button>
-    </div>
 
     <h3>Email Sending Status:</h3>
     <table border="1" width="100%">
@@ -356,46 +356,47 @@ function sendEmail($to, $htmlBody) {
 
 
 <script>
-    $(document).ready(function () {
+   $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
     let countdown = 10; // Start countdown from 10 seconds
 
-    // 🚨 Alert if unaddressed admin alerts exist & disable sending 🚨
+    // 🚨 Stop countdown if there are alerts & disable sending 🚨
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
-        $('#send-email-btn').prop('disabled', true); // Disable the send button
-        return; // Stop further execution (countdown won't start)
+        $('#send-email-btn').prop('disabled', true);
+        return; // Stop execution
     }
 
-    // ✅ Start countdown only if there are no alerts
+    // ✅ Start countdown only if no alerts
     startCountdown();
 
-    // 📨 Handle the email submission
-    $('#send-email-btn').on('click', function () {
+    // 📨 Handle the email submission (now works on both button click & countdown)
+    $('#email-form').on('submit', function (event) {
+        event.preventDefault(); // Prevent default form submission
+
         const emailTo = $('#email_to').val().trim();
         const emailSubject = $('#email_subject').val().trim();
-        const emailBody = $('#email_body').val().trim();
+        const emailBody = $('#email_html').val().trim();
 
         if (!emailTo || !emailSubject || !emailBody) {
             alert("Please fill out all fields before sending the email.");
             return;
         }
 
+        // AJAX request to send email
         $.ajax({
             url: 'admin-emailer.php',
             type: 'POST',
             data: {
-                send_email: true,
+                send_email: true,  // ✅ Added missing `send_email` flag
                 email_to: emailTo,
                 email_subject: emailSubject,
                 email_body: emailBody
             },
             success: function () {
                 $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
-                setTimeout(function () {
-                    location.reload();
-                }, 1000);
+                setTimeout(() => location.reload(), 1000);
             },
             error: function () {
                 alert("Failed to send the email. Please try again.");
@@ -403,36 +404,36 @@ function sendEmail($to, $htmlBody) {
         });
     });
 
-    // ⏳ Countdown timer function
+    // ⏳ Countdown function
     function startCountdown() {
         $('#countdown-timer').show();
         $('#stop-timer-btn').show();
         updateCountdownText();
 
-        countdownTimer = setInterval(function () {
+        countdownTimer = setInterval(() => {
             countdown--;
             updateCountdownText();
 
             if (countdown <= 0) {
                 clearInterval(countdownTimer);
-                $('#send-email-btn').trigger('click'); // ✅ Now correctly triggers email send
+                $('#email-form').trigger('submit'); // ✅ Now submits form correctly!
             }
         }, 1000);
     }
 
-    // 🔄 Update the countdown text
+    // 🔄 Update countdown text
     function updateCountdownText() {
         $('#countdown').text(countdown);
     }
 
-    // 🛑 Stop the countdown timer
+    // 🛑 Stop countdown
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownTimer);
         $('#countdown-timer').hide();
         $(this).hide();
     });
 
-    // 🔄 Update the email field dynamically when DataTable loads new data
+    // 🔄 Update email field dynamically when DataTable loads
     $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
         if (json.data.length > 0) {
             const firstRecord = json.data[0];
@@ -442,6 +443,7 @@ function sendEmail($to, $htmlBody) {
         }
     });
 });
+
 </script>
 
 
