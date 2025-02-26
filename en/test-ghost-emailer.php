@@ -273,14 +273,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 // Email sending function
 function sendEmail($to, $htmlBody) {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
-    $mailgunApiKey = getenv('MAILGUN_API_KEY');
-    $mailgunDomain = 'mail2.earthen.io';
+    $mailgunApiKey = getenv('EARTHEN_MAILGUN_SENDING_KEY');
+    $mailgunDomain = 'earthen.ecobricks.org';
 
     try {
         $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
-            'form_params' => [
-                'from' => 'GEA Center Circle <gea@earthen.io>',
+            'form_params' => [calc(-265px + 100vh)
+                'from' => 'GEA Center Circle <earthen@ecobricks.org>',
                 'to' => $to,
                 'subject' => 'We\'ve moved on from the US dollar',
                 'html' => $htmlBody,
