@@ -80,21 +80,28 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
-// Get next recipient (start with test email)
+// Get the next recipient who hasn't received the test email
 $query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
 $subscriber = $result->fetch_assoc();
 
-$test_email = "russ@ecobricks.org"; // Default test email
+// Initialize variables
 $subscriber_id = null;
+$recipient_email = null;
 
 if ($subscriber) {
-    $test_email = $subscriber['email']; // Use actual recipient if available
+    $recipient_email = $subscriber['email']; // Use actual recipient from the database
     $subscriber_id = $subscriber['id'];
 }
 
+// Ensure there is always an email to send to avoid errors
+if (!$recipient_email) {
+    die("No pending recipients found. Email sending process stopped.");
+}
+
 // Generate unsubscribe link
-$unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($test_email);
+$unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email);
+
 
 
 // Default email HTML with dynamic unsubscribe link
