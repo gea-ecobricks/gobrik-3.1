@@ -252,14 +252,15 @@ HTML;
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
-    $email_html = $_POST['email_html'];
+    $email_html = $_POST['email_body'] ?? '';  // ✅ Fixed incorrect field name
+    $test_email = $_POST['email_to'] ?? '';    // ✅ Now correctly retrieves email
 
-    if (!empty($email_html) && $test_email) {
+    if (!empty($email_html) && !empty($test_email)) {
         if (sendEmail($test_email, $email_html)) {
             // Mark as sent in database
-            $updateQuery = "UPDATE ghost_test_email_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?";
+            $updateQuery = "UPDATE ghost_test_email_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ?";
             $stmt = $buwana_conn->prepare($updateQuery);
-            $stmt->bind_param("s", $subscriber_id);
+            $stmt->bind_param("s", $test_email);
             $stmt->execute();
             $stmt->close();
 
@@ -269,6 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
         }
     }
 }
+
 
 // Email sending function
 function sendEmail($to, $htmlBody) {
@@ -319,6 +321,9 @@ function sendEmail($to, $htmlBody) {
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
 
+    <!-- Hidden field for email_to -->
+    <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($test_email); ?>">
+
     <br><br>
     <button type="submit" id="send-email-btn" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>📨 Send Email</button>
 </form>
@@ -327,6 +332,7 @@ function sendEmail($to, $htmlBody) {
     <p>Email will send in <span id="countdown">10</span> seconds...</p>
     <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
+
 
 
     <h3>Email Sending Status:</h3>
@@ -356,7 +362,7 @@ function sendEmail($to, $htmlBody) {
 
 
 <script>
-   $(document).ready(function () {
+ $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
     let countdown = 10; // Start countdown from 10 seconds
@@ -376,22 +382,20 @@ function sendEmail($to, $htmlBody) {
         event.preventDefault(); // Prevent default form submission
 
         const emailTo = $('#email_to').val().trim();
-        const emailSubject = $('#email_subject').val().trim();
         const emailBody = $('#email_html').val().trim();
 
-        if (!emailTo || !emailSubject || !emailBody) {
+        if (!emailTo || !emailBody) {
             alert("Please fill out all fields before sending the email.");
             return;
         }
 
         // AJAX request to send email
         $.ajax({
-            url: 'admin-emailer.php',
+            url: 'test-ghost-emailer.php',
             type: 'POST',
             data: {
-                send_email: true,  // ✅ Added missing `send_email` flag
+                send_email: "1",  // ✅ Changed to a string
                 email_to: emailTo,
-                email_subject: emailSubject,
                 email_body: emailBody
             },
             success: function () {
@@ -416,7 +420,7 @@ function sendEmail($to, $htmlBody) {
 
             if (countdown <= 0) {
                 clearInterval(countdownTimer);
-                $('#email-form').trigger('submit'); // ✅ Now submits form correctly!
+                document.getElementById('email-form').submit(); // ✅ Now submits form correctly!
             }
         }, 1000);
     }
@@ -432,17 +436,9 @@ function sendEmail($to, $htmlBody) {
         $('#countdown-timer').hide();
         $(this).hide();
     });
-
-    // 🔄 Update email field dynamically when DataTable loads
-    $('#next-ecobrickers').on('xhr.dt', function (e, settings, json) {
-        if (json.data.length > 0) {
-            const firstRecord = json.data[0];
-            if ($('#email_to').val() !== firstRecord.email_addr) {
-                $('#email_to').val(firstRecord.email_addr);
-            }
-        }
-    });
 });
+
+
 
 </script>
 
