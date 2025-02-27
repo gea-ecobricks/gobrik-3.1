@@ -2,13 +2,12 @@
 require_once '../scripts/earthen_subscribe_functions.php';
 require_once '../buwanaconn_env.php'; // Use the Buwana database connection
 
-define('BATCH_SIZE', 50); // Limit number of emails processed at a time
+define('BATCH_SIZE', 50);
 
-// Fetch failed email records for the chart
+// Fetch failed email records for the table
 function getFailedEmails($buwana_conn) {
-    $sql_fetch = "SELECT id, email_addr FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
+    $sql_fetch = "SELECT id, email_addr, failed_reason FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
     $stmt_fetch = $buwana_conn->prepare($sql_fetch);
-
     $batch_size = BATCH_SIZE;
     $stmt_fetch->bind_param('i', $batch_size);
     $stmt_fetch->execute();
@@ -23,6 +22,7 @@ function getFailedEmails($buwana_conn) {
     return $emails;
 }
 
+// Handle AJAX request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['process'])) {
     $emails_to_process = getFailedEmails($buwana_conn);
     $response = [];
@@ -42,10 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['process'])) {
             $stmt_delete->execute();
             $stmt_delete->close();
 
-            $response[] = ["email" => $email_addr, "status" => "Success ✅"];
+            $response[] = ["id" => $id, "status" => "Success ✅"];
         } else {
-            // If the email doesn't exist in Earthen Ghost, remove it from the failures table
-            $response[] = ["email" => $email_addr, "status" => "No matching earthen account. Removed from failures table"];
+            // If email doesn't exist in Earthen Ghost, remove it from failures table
+            $response[] = ["id" => $id, "status" => "No matching earthen account. Removed from failures table"];
 
             $sql_delete = "DELETE FROM failed_emails_tb WHERE id = ?";
             $stmt_delete = $buwana_conn->prepare($sql_delete);
@@ -55,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['process'])) {
         }
     }
 
-    // Return JSON response
     echo json_encode($response);
     exit();
 }
@@ -69,12 +68,15 @@ $failedEmails = getFailedEmails($buwana_conn);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Process Failed Email Unsubscribes</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
         button { padding: 10px 15px; font-size: 16px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; }
         button:hover { background-color: #218838; }
-        canvas { max-width: 600px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .success { color: green; }
+        .error { color: red; }
     </style>
 </head>
 <body>
@@ -84,41 +86,28 @@ $failedEmails = getFailedEmails($buwana_conn);
     <button id="processButton">Process Failed Emails</button>
 
     <h2>Emails Ready for Deletion</h2>
-    <canvas id="emailChart"></canvas>
-
-    <h2>Processing Results</h2>
-    <ul id="results"></ul>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Failed Reason</th>
+                <th>Deletion Report</th>
+            </tr>
+        </thead>
+        <tbody id="emailTable">
+            <?php foreach ($failedEmails as $email): ?>
+                <tr id="row-<?php echo $email['id']; ?>">
+                    <td><?php echo $email['id']; ?></td>
+                    <td><?php echo $email['email_addr']; ?></td>
+                    <td><?php echo $email['failed_reason']; ?></td>
+                    <td class="deletion-status"></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 
     <script>
-        let failedEmails = <?php echo json_encode($failedEmails); ?>;
-        let ctx = document.getElementById('emailChart').getContext('2d');
-
-        // Function to update chart
-        function updateChart() {
-            let labels = failedEmails.map(e => e.email_addr);
-            let data = Array(labels.length).fill(1); // Just a placeholder for bar height
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Failed Emails',
-                        data: data,
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { display: false } }
-                    }
-                }
-            });
-        }
-
-        updateChart();
-
         document.getElementById('processButton').addEventListener('click', function() {
             fetch('', {
                 method: 'POST',
@@ -127,18 +116,19 @@ $failedEmails = getFailedEmails($buwana_conn);
             })
             .then(response => response.json())
             .then(data => {
-                let resultsList = document.getElementById('results');
-                resultsList.innerHTML = ''; // Clear old results
-                failedEmails = failedEmails.filter(e => !data.some(d => d.email === e.email_addr)); // Remove processed emails
-
                 data.forEach(item => {
-                    let li = document.createElement('li');
-                    li.textContent = `${item.email}: ${item.status}`;
-                    li.style.color = item.status.includes('Success') ? 'green' : 'red';
-                    resultsList.appendChild(li);
-                });
+                    let row = document.getElementById('row-' + item.id);
+                    if (row) {
+                        let statusCell = row.querySelector('.deletion-status');
+                        statusCell.textContent = item.status;
+                        statusCell.classList.add(item.status.includes('Success') ? 'success' : 'error');
 
-                updateChart(); // Refresh the chart with new data
+                        // Remove the row if the email was deleted
+                        if (item.status.includes("Removed from failures table")) {
+                            setTimeout(() => row.remove(), 1000);
+                        }
+                    }
+                });
             })
             .catch(error => console.error('Error:', error));
         });
