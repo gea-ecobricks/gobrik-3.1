@@ -6,7 +6,7 @@ define('BATCH_SIZE', 50);
 
 // Fetch failed email records for the table
 function getFailedEmails($buwana_conn) {
-    $sql_fetch = "SELECT id, email_addr, failed_reason FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
+    $sql_fetch = "SELECT id, email_addr, fail_reason FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
     $stmt_fetch = $buwana_conn->prepare($sql_fetch);
     $batch_size = BATCH_SIZE;
     $stmt_fetch->bind_param('i', $batch_size);
@@ -100,7 +100,7 @@ $failedEmails = getFailedEmails($buwana_conn);
                 <tr id="row-<?php echo $email['id']; ?>">
                     <td><?php echo $email['id']; ?></td>
                     <td><?php echo $email['email_addr']; ?></td>
-                    <td><?php echo $email['failed_reason']; ?></td>
+                    <td><?php echo $email['fail_reason']; ?></td>
                     <td class="deletion-status"></td>
                 </tr>
             <?php endforeach; ?>
