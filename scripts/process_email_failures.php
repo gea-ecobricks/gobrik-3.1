@@ -4,9 +4,9 @@ require_once '../buwanaconn_env.php'; // Use the Buwana database connection
 
 define('BATCH_SIZE', 50);
 
-// Fetch failed email records for the table
+// Fetch failed emails
 function getFailedEmails($buwana_conn) {
-    $sql_fetch = "SELECT id, email_addr, fail_reason FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
+    $sql_fetch = "SELECT id, email_addr, failed_reason FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
     $stmt_fetch = $buwana_conn->prepare($sql_fetch);
     $batch_size = BATCH_SIZE;
     $stmt_fetch->bind_param('i', $batch_size);
@@ -22,7 +22,7 @@ function getFailedEmails($buwana_conn) {
     return $emails;
 }
 
-// Handle AJAX request
+// Handle AJAX request for processing emails
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['process'])) {
     $emails_to_process = getFailedEmails($buwana_conn);
     $response = [];
@@ -31,31 +31,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['process'])) {
         $id = $email_data['id'];
         $email_addr = $email_data['email_addr'];
 
-        // Attempt to unsubscribe
+        // Attempt to unsubscribe in Earthen
         $success = earthenUnsubscribe($email_addr);
 
         if ($success) {
-            // Remove successfully unsubscribed emails from the queue
             $sql_delete = "DELETE FROM failed_emails_tb WHERE id = ?";
             $stmt_delete = $buwana_conn->prepare($sql_delete);
             $stmt_delete->bind_param('i', $id);
             $stmt_delete->execute();
             $stmt_delete->close();
 
-            $response[] = ["id" => $id, "status" => "Success ✅"];
+            $response[] = ["id" => $id, "status" => "User found in Earthen. Unsubscribed.", "success" => true];
         } else {
-            // If email doesn't exist in Earthen Ghost, remove it from failures table
-            $response[] = ["id" => $id, "status" => "No matching earthen account. Removed from failures table"];
-
+            // Assume user not found and remove from failures table
             $sql_delete = "DELETE FROM failed_emails_tb WHERE id = ?";
             $stmt_delete = $buwana_conn->prepare($sql_delete);
             $stmt_delete->bind_param('i', $id);
             $stmt_delete->execute();
             $stmt_delete->close();
+
+            $response[] = ["id" => $id, "status" => "User not found in Earthen. Removed from failed list.", "success" => false];
         }
     }
 
     echo json_encode($response);
+    exit();
+}
+
+// Handle AJAX request for loading the next batch
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['load_next'])) {
+    echo json_encode(getFailedEmails($buwana_conn));
     exit();
 }
 
@@ -70,13 +75,14 @@ $failedEmails = getFailedEmails($buwana_conn);
     <title>Process Failed Email Unsubscribes</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
-        button { padding: 10px 15px; font-size: 16px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; }
+        button { padding: 10px 15px; font-size: 16px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; margin: 10px 0; }
         button:hover { background-color: #218838; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f4f4f4; }
         .success { color: green; }
         .error { color: red; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -100,12 +106,14 @@ $failedEmails = getFailedEmails($buwana_conn);
                 <tr id="row-<?php echo $email['id']; ?>">
                     <td><?php echo $email['id']; ?></td>
                     <td><?php echo $email['email_addr']; ?></td>
-                    <td><?php echo $email['fail_reason']; ?></td>
+                    <td><?php echo $email['failed_reason']; ?></td>
                     <td class="deletion-status"></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <button id="loadNextButton" class="hidden">Load Next 50 Failed Emails</button>
 
     <script>
         document.getElementById('processButton').addEventListener('click', function() {
@@ -116,19 +124,61 @@ $failedEmails = getFailedEmails($buwana_conn);
             })
             .then(response => response.json())
             .then(data => {
+                let allProcessed = true;
+
                 data.forEach(item => {
                     let row = document.getElementById('row-' + item.id);
                     if (row) {
                         let statusCell = row.querySelector('.deletion-status');
                         statusCell.textContent = item.status;
-                        statusCell.classList.add(item.status.includes('Success') ? 'success' : 'error');
+                        statusCell.classList.add(item.success ? 'success' : 'error');
 
-                        // Remove the row if the email was deleted
-                        if (item.status.includes("Removed from failures table")) {
+                        // Remove row if the email was deleted from failures
+                        if (!item.success) {
                             setTimeout(() => row.remove(), 1000);
                         }
+                    } else {
+                        allProcessed = false;
                     }
                 });
+
+                // Show "Load Next 50 Failed Emails" button if all emails are processed
+                if (allProcessed) {
+                    document.getElementById('loadNextButton').classList.remove('hidden');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('loadNextButton').addEventListener('click', function() {
+            fetch('', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'load_next=true'
+            })
+            .then(response => response.json())
+            .then(data => {
+                let tableBody = document.getElementById('emailTable');
+                tableBody.innerHTML = ''; // Clear table
+
+                if (data.length === 0) {
+                    alert("No more failed emails to process.");
+                } else {
+                    data.forEach(email => {
+                        let row = document.createElement('tr');
+                        row.id = "row-" + email.id;
+
+                        row.innerHTML = `
+                            <td>${email.id}</td>
+                            <td>${email.email_addr}</td>
+                            <td>${email.failed_reason}</td>
+                            <td class="deletion-status"></td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+
+                    document.getElementById('loadNextButton').classList.add('hidden');
+                }
             })
             .catch(error => console.error('Error:', error));
         });
