@@ -4,6 +4,14 @@ require_once '../buwanaconn_env.php'; // Use the Buwana database connection
 
 define('BATCH_SIZE', 50);
 
+// Get total count of failed emails
+function getFailedEmailsCount($buwana_conn) {
+    $sql = "SELECT COUNT(*) AS total FROM failed_emails_tb";
+    $result = $buwana_conn->query($sql);
+    $row = $result->fetch_assoc();
+    return $row['total'];
+}
+
 // Fetch failed emails
 function getFailedEmails($buwana_conn) {
     $sql_fetch = "SELECT id, email_addr, fail_reason FROM failed_emails_tb ORDER BY created_at ASC LIMIT ?";
@@ -54,17 +62,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['process'])) {
         }
     }
 
-    echo json_encode($response);
+    echo json_encode(["processed" => $response, "remaining" => getFailedEmailsCount($buwana_conn)]);
     exit();
 }
 
 // Handle AJAX request for loading the next batch
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['load_next'])) {
-    echo json_encode(getFailedEmails($buwana_conn));
+    echo json_encode(["emails" => getFailedEmails($buwana_conn), "remaining" => getFailedEmailsCount($buwana_conn)]);
     exit();
 }
 
 $failedEmails = getFailedEmails($buwana_conn);
+$totalFailedEmails = getFailedEmailsCount($buwana_conn);
 ?>
 
 <!DOCTYPE html>
@@ -100,7 +109,10 @@ $failedEmails = getFailedEmails($buwana_conn);
 <body>
 
     <h1>Manual Email Unsubscribe Processing</h1>
-    <p>Click the button below to process the next <strong><?php echo BATCH_SIZE; ?></strong> failed email unsubscribes.</p>
+    <p id="remainingCount">
+        Click the button below to process the next <strong><?php echo BATCH_SIZE; ?></strong> failed email unsubscribes
+        out of the remaining <strong><?php echo $totalFailedEmails; ?></strong> emails in the failed_emails table.
+    </p>
     <button id="processButton">Process Failed Emails</button>
 
     <h2>Emails Ready for Deletion</h2>
@@ -143,44 +155,25 @@ $failedEmails = getFailedEmails($buwana_conn);
             })
             .then(response => response.json())
             .then(data => {
-                data.forEach(item => {
+                data.processed.forEach(item => {
                     let row = document.getElementById('row-' + item.id);
                     if (row) {
                         let statusCell = row.querySelector('.deletion-status');
                         statusCell.innerHTML = item.status;
                         statusCell.classList.add(item.success ? 'success' : 'error');
 
-                        // Remove row if the email was deleted from failures
                         if (!item.success) {
                             setTimeout(() => row.remove(), 1000);
                         }
                     }
                 });
 
+                document.getElementById('remainingCount').innerHTML = `
+                    Click the button below to process the next <strong><?php echo BATCH_SIZE; ?></strong> failed email unsubscribes
+                    out of the remaining <strong>${data.remaining}</strong> emails in the failed_emails table.
+                `;
+
                 document.getElementById('loadNextButton').classList.remove('hidden');
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
-        document.getElementById('loadNextButton').addEventListener('click', function() {
-            fetch('', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'load_next=true'
-            })
-            .then(response => response.json())
-            .then(data => {
-                let tableBody = document.getElementById('emailTable');
-                tableBody.innerHTML = '';
-
-                data.forEach(email => {
-                    let row = document.createElement('tr');
-                    row.id = "row-" + email.id;
-                    row.innerHTML = `<td>${email.id}</td><td>${email.email_addr}</td><td>${email.fail_reason}</td><td class="deletion-status"></td>`;
-                    tableBody.appendChild(row);
-                });
-
-                document.getElementById('loadNextButton').classList.add('hidden');
             })
             .catch(error => console.error('Error:', error));
         });
