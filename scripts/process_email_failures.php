@@ -82,7 +82,19 @@ $failedEmails = getFailedEmails($buwana_conn);
         th { background-color: #f4f4f4; }
         .success { color: green; }
         .error { color: red; }
+        .processing { color: #ff9800; }
         .hidden { display: none; }
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #ddd;
+            border-top: 2px solid #ff9800;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 5px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -97,7 +109,7 @@ $failedEmails = getFailedEmails($buwana_conn);
             <tr>
                 <th>ID</th>
                 <th>Email</th>
-                <th>Failed Reason</th>
+                <th>Fail Reason</th>
                 <th>Deletion Report</th>
             </tr>
         </thead>
@@ -117,6 +129,13 @@ $failedEmails = getFailedEmails($buwana_conn);
 
     <script>
         document.getElementById('processButton').addEventListener('click', function() {
+            let rows = document.querySelectorAll('#emailTable tr');
+
+            rows.forEach(row => {
+                let statusCell = row.querySelector('.deletion-status');
+                statusCell.innerHTML = 'Processing... <span class="spinner"></span>';
+            });
+
             fetch('', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -124,28 +143,21 @@ $failedEmails = getFailedEmails($buwana_conn);
             })
             .then(response => response.json())
             .then(data => {
-                let allProcessed = true;
-
                 data.forEach(item => {
                     let row = document.getElementById('row-' + item.id);
                     if (row) {
                         let statusCell = row.querySelector('.deletion-status');
-                        statusCell.textContent = item.status;
+                        statusCell.innerHTML = item.status;
                         statusCell.classList.add(item.success ? 'success' : 'error');
 
                         // Remove row if the email was deleted from failures
                         if (!item.success) {
                             setTimeout(() => row.remove(), 1000);
                         }
-                    } else {
-                        allProcessed = false;
                     }
                 });
 
-                // Show "Load Next 50 Failed Emails" button if all emails are processed
-                if (allProcessed) {
-                    document.getElementById('loadNextButton').classList.remove('hidden');
-                }
+                document.getElementById('loadNextButton').classList.remove('hidden');
             })
             .catch(error => console.error('Error:', error));
         });
@@ -159,26 +171,16 @@ $failedEmails = getFailedEmails($buwana_conn);
             .then(response => response.json())
             .then(data => {
                 let tableBody = document.getElementById('emailTable');
-                tableBody.innerHTML = ''; // Clear table
+                tableBody.innerHTML = '';
 
-                if (data.length === 0) {
-                    alert("No more failed emails to process.");
-                } else {
-                    data.forEach(email => {
-                        let row = document.createElement('tr');
-                        row.id = "row-" + email.id;
+                data.forEach(email => {
+                    let row = document.createElement('tr');
+                    row.id = "row-" + email.id;
+                    row.innerHTML = `<td>${email.id}</td><td>${email.email_addr}</td><td>${email.fail_reason}</td><td class="deletion-status"></td>`;
+                    tableBody.appendChild(row);
+                });
 
-                        row.innerHTML = `
-                            <td>${email.id}</td>
-                            <td>${email.email_addr}</td>
-                            <td>${email.fail_reason}</td>
-                            <td class="deletion-status"></td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-
-                    document.getElementById('loadNextButton').classList.add('hidden');
-                }
+                document.getElementById('loadNextButton').classList.add('hidden');
             })
             .catch(error => console.error('Error:', error));
         });
