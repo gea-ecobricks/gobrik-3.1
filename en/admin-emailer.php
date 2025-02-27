@@ -324,7 +324,7 @@ $gobrik_conn->close();
     <button type="button" id="send-email-btn" class="confirm-button enabled">📨 Send Email</button>
 
     <div id="countdown-timer" style="margin-top: 10px; display: none;text-align:center;width:100%;">
-        <p>Email will send in refresh in <span id="countdown">3</span> seconds...</p>
+        <p>Email will send in refresh in <span id="countdown">1</span> seconds...</p>
         <button type="button" id="stop-timer-btn" style="display: none;" class="confirm-button delete">🛑 Stop Timer</button>
     </div>
 </form>
@@ -343,7 +343,7 @@ $gobrik_conn->close();
 $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 2; // Initial countdown value
+    let countdown = 1; // Initial countdown value
 
     // 🚨 Show alert if there are unaddressed admin alerts & disable sending 🚨
     if (hasAlerts) {
