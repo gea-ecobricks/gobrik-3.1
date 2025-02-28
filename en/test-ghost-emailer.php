@@ -127,6 +127,7 @@ $email_template = <<<HTML
             padding: 20px;
             background-color: #ffffff;
         }
+
         .header {
             text-align: center;
             padding-bottom: 20px;
@@ -386,7 +387,7 @@ function sendEmail($to, $htmlBody) {
     $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 5; // Start countdown from 10 seconds
+    let countdown = 2; // Start countdown from 10 seconds
 
     // 🚨 Stop countdown if there are alerts & disable sending 🚨
     if (hasAlerts) {
