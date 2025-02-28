@@ -72,7 +72,7 @@ try {
 
         $alert_title = "Rate Limited!";
         $alert_description = "A critical Mailgun log has reported that: \"$log_message\"";
-        $alert_unaddressed = 1;
+        $alert_unaddressed = 0;
 
         // Insert alert into `admin_alerts` (avoid duplicates)
         $sql_insert_alert = "
