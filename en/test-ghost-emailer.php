@@ -80,8 +80,10 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
-// Get the next recipient who hasn't received the test email
-$query = "SELECT id, email, name FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 1";
+// Get the next recipient who hasn't received the test email and is NOT using @outlook
+$query = "SELECT id, email, name FROM ghost_test_email_tb
+          WHERE test_sent = 0 AND email NOT LIKE '%@outlook.%'
+          ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
 $subscriber = $result->fetch_assoc();
 
@@ -94,10 +96,16 @@ if ($subscriber) {
     $subscriber_id = $subscriber['id'];
 }
 
-// Ensure there is always an email to send to avoid errors
+// Ensure there is always an email to send, otherwise stop the process
 if (!$recipient_email) {
     die("No pending recipients found. Email sending process stopped.");
 }
+
+// Validate again before sending to avoid errors in form submission
+if (strpos($recipient_email, '@outlook.') !== false) {
+    die("Skipping @outlook email. No valid recipient found.");
+}
+
 
 // Generate unsubscribe link
 $unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email);
