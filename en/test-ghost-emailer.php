@@ -397,7 +397,7 @@ function sendEmail($to, $htmlBody) {
     $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 3; // Start countdown from 3 seconds
+    let countdown = 1; // Start countdown from 3 seconds
 
     // 🚨 Stop countdown if there are alerts & disable sending 🚨
     if (hasAlerts) {
