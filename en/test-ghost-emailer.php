@@ -105,7 +105,7 @@ if (!$recipient_email) {
 }
 
 // Validate again before sending to avoid errors in form submission
-if (strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false) {
+if (strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
     die("Skipping @outlook & @hotmail emails. No valid recipient found.");
 }
 
