@@ -80,12 +80,12 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
-// Get the next recipient who hasn't received the test email and is NOT using @outlook
+// Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
 $query = "SELECT id, email, name FROM ghost_test_email_tb
           WHERE test_sent = 0
           AND email NOT LIKE '%@outlook.%'
           AND email NOT LIKE '%@hotmail.%'
-          AND email NOT LIKE '%@comcast.%'
+          AND email NOT LIKE '%@comcast%'
           ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
 $subscriber = $result->fetch_assoc();
