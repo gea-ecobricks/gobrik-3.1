@@ -84,6 +84,7 @@ $all_members = array_merge($sent_members, $pending_members);
 $query = "SELECT id, email, name FROM ghost_test_email_tb
           WHERE test_sent = 0
           AND email NOT LIKE '%@outlook.%'
+          AND email NOT LIKE '%@live.%'
           AND email NOT LIKE '%@hotmail.%'
           AND email NOT LIKE '%@comcast%'
           ORDER BY id ASC LIMIT 1";
@@ -105,7 +106,7 @@ if (!$recipient_email) {
 }
 
 // Validate again before sending to avoid errors in form submission
-if (strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+if (strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
     die("Skipping @outlook & @hotmail emails. No valid recipient found.");
 }
 
