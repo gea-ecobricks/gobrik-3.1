@@ -67,34 +67,35 @@ try {
     error_log($log_message);
 
     // 🚨 Detect and log rate limiting issues 🚨
-    if (stripos($response_message, "rate limited") !== false) {
-        error_log("🚨 Rate Limiting detected! Logging to admin_alerts.");
+if (stripos($response_message, "rate limited") !== false || stripos($response_message, "throttled") !== false) {
+    error_log("🚨 Rate Limiting detected! Logging to admin_alerts.");
 
-        $alert_title = "Rate Limited!";
-        $alert_description = "A critical Mailgun log has reported that: \"$log_message\"";
-        $alert_unaddressed = 0;
+    $alert_title = "Rate Limited!";
+    $alert_description = "A critical Mailgun log has reported that: \"$log_message\"";
+    $alert_unaddressed = 0;
 
-        // Insert alert into `admin_alerts` (avoid duplicates)
-        $sql_insert_alert = "
-            INSERT INTO admin_alerts (alert_title, alert_message, alert_server_log, addressed, date_posted)
-            VALUES (?, ?, ?, ?, NOW())
-            ON DUPLICATE KEY UPDATE
-                alert_message = VALUES(alert_message),
-                alert_server_log = VALUES(alert_server_log),
-                addressed = VALUES(addressed),
-                date_posted = NOW()
-        ";
+    // Insert alert into `admin_alerts` (avoid duplicates)
+    $sql_insert_alert = "
+        INSERT INTO admin_alerts (alert_title, alert_message, alert_server_log, addressed, date_posted)
+        VALUES (?, ?, ?, ?, NOW())
+        ON DUPLICATE KEY UPDATE
+            alert_message = VALUES(alert_message),
+            alert_server_log = VALUES(alert_server_log),
+            addressed = VALUES(addressed),
+            date_posted = NOW()
+    ";
 
-        $stmt_insert_alert = $buwana_conn->prepare($sql_insert_alert);
-        if ($stmt_insert_alert) {
-            $stmt_insert_alert->bind_param('sssi', $alert_title, $alert_description, $log_message, $alert_unaddressed);
-            $stmt_insert_alert->execute();
-            $stmt_insert_alert->close();
-            error_log("✅ Rate limiting issue logged to admin_alerts.");
-        } else {
-            error_log("❌ Failed to insert rate limiting alert: " . $buwana_conn->error);
-        }
+    $stmt_insert_alert = $buwana_conn->prepare($sql_insert_alert);
+    if ($stmt_insert_alert) {
+        $stmt_insert_alert->bind_param('sssi', $alert_title, $alert_description, $log_message, $alert_unaddressed);
+        $stmt_insert_alert->execute();
+        $stmt_insert_alert->close();
+        error_log("✅ Rate limiting issue logged to admin_alerts.");
+    } else {
+        error_log("❌ Failed to insert rate limiting alert: " . $buwana_conn->error);
     }
+}
+
 
     // 🚨 Fetch current emailing_status before updating 🚨
     $sql_check_status = "SELECT emailing_status FROM tb_ecobrickers WHERE email_addr = ?";

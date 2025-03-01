@@ -85,6 +85,7 @@ $query = "SELECT id, email, name FROM ghost_test_email_tb
           WHERE test_sent = 0
           AND email NOT LIKE '%@outlook.%'
           AND email NOT LIKE '%@hotmail.%'
+          AND email NOT LIKE '%@comcast.%'
           ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
 $subscriber = $result->fetch_assoc();
