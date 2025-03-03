@@ -97,32 +97,28 @@ try {
     echo '<p>Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
 }
 ?>
-
 <div id="aes-purchase-form" class="dashboard-panel">
     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
 
         <!-- Plastic Order Input -->
-        <label for="plastic-order-amount" style="font-size: 2.2em; margin-bottom: 10px;">Enter Plastic to Offset (kg):</label>
+        <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px;">Enter Plastic to Offset (kg):</label>
         <input type="number" id="plastic-order-amount" min="1" step="0.1" placeholder="0"
-            style="font-size: 2em; text-align: center; width: 150px; padding: 10px;">
+            style="font-size: 4em; text-align: center; width: 250px; padding: 10px;">
 
-        <!-- Price Calculation Display -->
-        <div id="price-calculation" style="font-size: 1.5em; margin-top: 15px;">
-            0 IDR
+        <!-- Price Calculation Display with Currency Selection -->
+        <div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
+            <span id="price-calculation">0</span>
+            <select id="currency-selector" style="font-size: 1em; margin-left: 10px; padding: 5px; border: none; background: none; font-weight: bold;">
+                <option value="IDR" selected>IDR</option>
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="CAD">CAD</option>
+                <option value="GBP">GBP</option>
+            </select>
         </div>
 
-        <!-- Currency Selection -->
-        <label for="currency-selector" style="margin-top: 10px;">Choose Currency:</label>
-        <select id="currency-selector" style="font-size: 1.1em; padding: 5px; margin-top: 5px; width:60px;">
-            <option value="IDR" selected>IDR (Indonesian Rupiah)</option>
-            <option value="EUR">EUR</option>
-            <option value="USD">USD</option>
-            <option value="CAD">CAD</option>
-            <option value="GBP">GBP </option>
-        </select>
-
         <!-- Order Button -->
-        <button id="order-button" class="confirm-button enabled"">
+        <button id="order-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
             Set up Purchase
         </button>
 
@@ -155,10 +151,10 @@ document.addEventListener("DOMContentLoaded", function() {
         let convertedPrice = priceInIDR / conversionRates[selectedCurrency];
 
         // Format price with commas and two decimal places
-        priceDisplay.innerHTML = convertedPrice.toLocaleString(undefined, {
+        priceDisplay.textContent = convertedPrice.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
-        }) + ` ${selectedCurrency}`;
+        });
     }
 
     // Update price whenever input or currency changes
@@ -171,6 +167,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
+
 
 
 
