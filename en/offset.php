@@ -50,53 +50,12 @@ echo '<!DOCTYPE html>
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
                 <h1 data-lang-id="001-offsetting-title">Plastic Offsetting</h1>
-                <!--<h4 data-lang-id="002-under-construction" style="color:orange;">🚧 Under construction</h4>-->
-                <p data-lang-id="003-apology-XX">Offset your plastic with us.</p>
+                <!--<h4 data-lang-id="002-under-construction" style="color:orange;">🚧 Under construction</h4>
+                <p data-lang-id="003-apology-XX">Offset your plastic with us.</p>-->
 
 
 
-<!-- LIVE AES PRICING -->
-<?php
-// Include the GoBrik database connection credentials
-require_once '../gobrikconn_env.php';
 
-try {
-    // Query to fetch required data
-    $sql = "SELECT brick_count, weight, tot_idr_exp_amt FROM vw_detail_sums_by_year_idr";
-    $result = $gobrik_conn->query($sql);
-
-    if (!$result || $result->num_rows === 0) {
-        throw new Exception("Failed to retrieve data or no data available.");
-    }
-
-    // Initialize variables
-    $sum_ecobricks = 0;
-    $sum_weight = 0;
-    $sum_expenses = 0;
-
-    // Aggregate data
-    while ($row = $result->fetch_assoc()) {
-        $sum_ecobricks += (float)str_replace(',', '', $row['brick_count']);
-        $sum_weight += (float)str_replace(',', '', $row['weight']);
-        $sum_expenses += (float)str_replace(',', '', $row['tot_idr_exp_amt']);
-    }
-
-    // Calculate AES rolling cost
-    $aes_rolling = $sum_weight > 0 ? $sum_expenses / $sum_weight : 0;
-
-    // Output the simplified HTML
-    echo '
-    <div class="live-aes-pricing">
-        <p><span class="blink">◉</span> ' . number_format($aes_rolling, 2) . ' IDR per 1 Kg of AES Plastic</p>
-        <p style="font-size: 0.85em; margin-top:10px;">
-            Our AES plastic offsets price is a function of the costs of authenticating the ' . number_format($sum_ecobricks) . ' ecobricks recorded on the GEA\'s brikchain.
-        </p>
-    </div>';
-} catch (Exception $e) {
-    // Handle errors gracefully
-    echo '<p>Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
-}
-?>
 <div id="aes-purchase-form" class="dashboard-panel">
     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
 
@@ -104,13 +63,13 @@ try {
        <!-- Plastic Order Input with "Kg" inside -->
 <div style="position: relative; display: inline-block; text-align: center;">
     <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px; display: block;">
-        Enter Plastic to Offset:
+        Offset your plastic with us!  Start by entering the amount you'd like to offset in kilograms...
     </label>
 
     <input type="number" id="plastic-order-amount" min="1" step="1" value="10"
         style="font-size: 3em !important; text-align: center; width: 250px; padding: 10px; padding-right: 50px;">
 
-    <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.5em; font-weight: bold; pointer-events: none;">
+    <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 3em; font-weight: bold; pointer-events: none;color:grey">
         Kg
     </span>
 </div>
@@ -181,6 +140,49 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+<!-- LIVE AES PRICING -->
+<?php
+// Include the GoBrik database connection credentials
+require_once '../gobrikconn_env.php';
+
+try {
+    // Query to fetch required data
+    $sql = "SELECT brick_count, weight, tot_idr_exp_amt FROM vw_detail_sums_by_year_idr";
+    $result = $gobrik_conn->query($sql);
+
+    if (!$result || $result->num_rows === 0) {
+        throw new Exception("Failed to retrieve data or no data available.");
+    }
+
+    // Initialize variables
+    $sum_ecobricks = 0;
+    $sum_weight = 0;
+    $sum_expenses = 0;
+
+    // Aggregate data
+    while ($row = $result->fetch_assoc()) {
+        $sum_ecobricks += (float)str_replace(',', '', $row['brick_count']);
+        $sum_weight += (float)str_replace(',', '', $row['weight']);
+        $sum_expenses += (float)str_replace(',', '', $row['tot_idr_exp_amt']);
+    }
+
+    // Calculate AES rolling cost
+    $aes_rolling = $sum_weight > 0 ? $sum_expenses / $sum_weight : 0;
+
+    // Output the simplified HTML
+    echo '
+    <div class="live-aes-pricing">
+        <p>Current price per kg:</p>
+        <p><span class="blink">◉</span> ' . number_format($aes_rolling, 2) . ' IDR per 1 Kg of AES Plastic</p>
+        <p style="font-size: 0.85em; margin-top:10px;">
+            Our AES plastic offsets price is a function of the costs of authenticating the ' . number_format($sum_ecobricks) . ' ecobricks recorded on the GEA\'s brikchain.
+        </p>
+    </div>';
+} catch (Exception $e) {
+    // Handle errors gracefully
+    echo '<p>Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
+}
+?>
 
  <div id="offset-learn-more" class="dashboard-panel">
      <p>Learn more about the core concepts being plastic offsetting and the way we calculate our cost per kg.
