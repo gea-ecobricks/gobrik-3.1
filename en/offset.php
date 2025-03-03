@@ -87,7 +87,8 @@ try {
     // Output the simplified HTML
     echo '
     <div class="live-aes-pricing">
-        <p><span class="blink">◉</span> ' . number_format($aes_rolling, 2) . ' IDR per 1 Kg of AES Plastic</p>
+        <p style="font-size: 1em; margin-top:10px;">2025 price per 1Kg of AES Plastic:</p>
+        <p><span class="blink">◉</span> ' . number_format($aes_rolling, 2) . ' IDR</p>
         <p style="font-size: 0.85em; margin-top:10px;">
             Our AES plastic offsets price is a function of the costs of authenticating the ' . number_format($sum_ecobricks) . ' ecobricks recorded on the GEA\'s brikchain.
         </p>
@@ -100,12 +101,12 @@ try {
 
 <div id="aes-purchase-form" class="dashboard-panel">
     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
-
-       <!-- Plastic Order Input with "Kg" inside -->
-       <div style="display: flex; align-items: center; position: relative; text-align: center;">
-            <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px; display: block; width: 100%;">
+<label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px; display: block; width: 100%;">
                 Enter Plastic to Offset:
             </label>
+       <!-- Plastic Order Input with "Kg" inside -->
+       <div style="display: flex; align-items: center; position: relative; text-align: center;">
+
 
             <div style="position: relative; display: inline-flex; align-items: center;">
                 <input type="number" id="plastic-order-amount" min="1" step="1" value="10"
