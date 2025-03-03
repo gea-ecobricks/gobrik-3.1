@@ -83,10 +83,10 @@ $all_members = array_merge($sent_members, $pending_members);
 // Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
 $query = "SELECT id, email, name FROM ghost_test_email_tb
           WHERE test_sent = 0
-          AND email NOT LIKE '%@outlook.%'
-          AND email NOT LIKE '%@live.%'
-
-          AND email NOT LIKE '%@comcast%'
+--           AND email NOT LIKE '%@outlook.%'
+--           AND email NOT LIKE '%@live.%'
+          AND email NOT LIKE '%@hotmail.%'
+--           AND email NOT LIKE '%@comcast%'
           ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
 $subscriber = $result->fetch_assoc();
@@ -106,9 +106,9 @@ if (!$recipient_email) {
 }
 
 // Validate again before sending to avoid errors in form submission
-if (strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-    die("Skipping @outlook & @hotmail emails. No valid recipient found.");
-}
+// if (strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+//     die("Skipping @outlook & @hotmail emails. No valid recipient found.");
+// }
 
 
 // Generate unsubscribe link

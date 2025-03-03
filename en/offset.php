@@ -50,8 +50,8 @@ echo '<!DOCTYPE html>
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
                 <h1 data-lang-id="001-offsetting-title">Plastic Offsetting</h1>
-                <h4 data-lang-id="002-under-construction" style="color:orange;">🚧 Under construction</h4>
-                <p data-lang-id="003-apology">Offset your plastic with us.</p>
+                <!--<h4 data-lang-id="002-under-construction" style="color:orange;">🚧 Under construction</h4>-->
+                <p data-lang-id="003-apology-XX">Offset your plastic with us.</p>
 
 
 
@@ -102,11 +102,12 @@ try {
 
  <div style="display:flex;flex-flow:row;width:100%;justify-content:center;">
      <p>Learn more about the core concepts being plastic offsetting and the way we calculate our cost per kg.
-            <a href="https://ecobricks.org/en/open-books.php" class="confirm-button enabled" id="open-books-button" data-lang-id="001-log-an-ecobrickXX" style="margin: 10px;">↗️  GEA Open Books</a>
-             <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="confirm-button enabled" id="about-offsetting-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗️ Learn about Plastic Offsetting</a>
-             <a href="https://ecobricks.org/en/brikchain.php" target="_blank" class="confirm-button enabled" id="brikcahin-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗️ Brikchain</a>
+            <a href="https://ecobricks.org/en/open-books.php" class="page-button" id="open-books-button" data-lang-id="001-log-an-ecobrickXX" style="margin: 10px;">↗ GEA Open Books</a>
+             <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="page-button" id="about-offsetting-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗ Learn about Plastic Offsetting</a>
+             <a href="https://ecobricks.org/en/brikchain.php" target="_blank" class="page-button" id="brikcahin-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗ Brikchain</a>
 
-
+<p style="font-size: 0.85em; margin-top:10px;">
+↗️ Links open to ecobricks.org</p>
         </div>
 
             </div>
