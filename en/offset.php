@@ -110,7 +110,7 @@ try {
     <input type="number" id="plastic-order-amount" min="1" step="1" value="10"
         style="font-size: 3em !important; text-align: center; width: 250px; padding: 10px; padding-right: 50px;">
 
-    <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 3em; font-weight: bold; pointer-events: none;">
+    <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 3em; font-weight: bold; pointer-events: none;color: grey;">
         Kg
     </span>
 </div>
