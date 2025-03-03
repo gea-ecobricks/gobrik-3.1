@@ -100,12 +100,13 @@ try {
 
 
 
- <div style="display:flex;flex-flow:row;width:100%;justify-content:center;">
+ <div id="offset-learn-more" class="dashboard-panel">
      <p>Learn more about the core concepts being plastic offsetting and the way we calculate our cost per kg.
+         <div class="menu-buttons-row">
             <a href="https://ecobricks.org/en/open-books.php" class="page-button" id="open-books-button" data-lang-id="001-log-an-ecobrickXX" style="margin: 10px;">↗ GEA Open Books</a>
              <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="page-button" id="about-offsetting-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗ Learn about Plastic Offsetting</a>
              <a href="https://ecobricks.org/en/brikchain.php" target="_blank" class="page-button" id="brikcahin-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗ Brikchain</a>
-
+         </div>
 <p style="font-size: 0.85em; margin-top:10px;">
 ↗️ Links open to ecobricks.org</p>
         </div>
