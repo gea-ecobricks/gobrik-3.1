@@ -360,7 +360,7 @@ function sendEmail($to, $htmlBody) {
 </form>
 
 <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
-    <p>Email will send in <span id="countdown">2</span> seconds...</p>
+    <p>Email will send in <span id="countdown">5</span> seconds...</p>
     <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
 
@@ -399,7 +399,7 @@ function sendEmail($to, $htmlBody) {
     $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 1; // Start countdown from 3 seconds
+    let countdown = 5; // Start countdown from 3 seconds
 
     // 🚨 Stop countdown if there are alerts & disable sending 🚨
     if (hasAlerts) {
