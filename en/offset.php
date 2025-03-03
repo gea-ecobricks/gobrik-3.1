@@ -51,7 +51,9 @@ echo '<!DOCTYPE html>
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
                 <h1 data-lang-id="001-offsetting-title">Plastic Offsetting</h1>
                 <h4 data-lang-id="002-under-construction" style="color:orange;">🚧 Under construction</h4>
-                <p data-lang-id="003-apology">Our plastic offsetting system is offline as we move from GoBrik 2.0 to GoBrik 3.0.  Stay tuned... it will be back and better soon!</p>
+                <p data-lang-id="003-apology">Offset your plastic with us.</p>
+
+
 
 <!-- LIVE AES PRICING -->
 <?php
@@ -60,7 +62,7 @@ require_once '../gobrikconn_env.php';
 
 try {
     // Query to fetch required data
-    $sql = "SELECT weight, tot_idr_exp_amt FROM vw_detail_sums_by_year_idr";
+    $sql = "SELECT brick_count, weight, tot_idr_exp_amt FROM vw_detail_sums_by_year_idr";
     $result = $gobrik_conn->query($sql);
 
     if (!$result || $result->num_rows === 0) {
@@ -68,11 +70,13 @@ try {
     }
 
     // Initialize variables
+    $sum_ecobricks = 0;
     $sum_weight = 0;
     $sum_expenses = 0;
 
     // Aggregate data
     while ($row = $result->fetch_assoc()) {
+        $sum_ecobricks += (float)str_replace(',', '', $row['brick_count']);
         $sum_weight += (float)str_replace(',', '', $row['weight']);
         $sum_expenses += (float)str_replace(',', '', $row['tot_idr_exp_amt']);
     }
@@ -85,7 +89,7 @@ try {
     <div id="live-aes-pricing">
         <p><span class="blink">◉</span> ' . number_format($aes_rolling, 2) . ' IDR per 1 Kg of AES Plastic</p>
         <p style="font-size: 0.85em; margin-top:10px;">
-            Our AES plastic offsets price is a function of the costs of authenticating the plastic on the GEA\'s brikchain.
+            Our AES plastic offsets price is a function of the costs of authenticating the ' . number_format($sum_ecobricks) . ' ecobricks recorded on the GEA\'s brikchain.
         </p>
     </div>';
 } catch (Exception $e) {
@@ -97,8 +101,10 @@ try {
 
 
  <div style="display:flex;flex-flow:row;width:100%;justify-content:center;">
-            <a href="log.php" class="confirm-button enabled" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick" style="margin: 10px;">➕ Log an Ecobrick</a>
-             <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="confirm-button enabled" id="log-ecobrick-button" data-lang-id="002-learn-about-offsetting" style="margin: 10px;">↗️ Learn about Plastic Offsetting</a>
+     <p>Learn more about the core concepts being plastic offsetting and the way we calculate our cost per kg.
+            <a href="https://ecobricks.org/en/open-books.php" class="confirm-button" id="open-books-button" data-lang-id="001-log-an-ecobrick" style="margin: 10px;">↗️  GEA Open Books</a>
+             <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="confirm-button enabled" id="about-offsetting-button" data-lang-id="002-learn-about-offsetting" style="margin: 10px;">↗️ Learn about Plastic Offsetting</a>
+             <a href="https://ecobricks.org/en/brikchain.php" target="_blank" class="confirm-button enabled" id="brikcahin-button" data-lang-id="002-learn-about-offsetting" style="margin: 10px;">↗️ Brikchain</a>
 
 
         </div>
