@@ -101,21 +101,32 @@ try {
     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
 
         <!-- Plastic Order Input -->
-        <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px;">Enter Plastic to Offset (kg):</label>
-        <input type="number" id="plastic-order-amount" min="1" step="0.1" placeholder="0"
-            style="font-size: 4em; text-align: center; width: 250px; padding: 10px;">
+       <!-- Plastic Order Input with "Kg" inside -->
+<div style="position: relative; display: inline-block; text-align: center;">
+    <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px; display: block;">
+        Enter Plastic to Offset:
+    </label>
 
-        <!-- Price Calculation Display with Currency Selection -->
-        <div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
-            <span id="price-calculation">0</span>
-            <select id="currency-selector" style="font-size: 1em; margin-left: 10px; padding: 5px; border: none; background: none; font-weight: bold;">
-                <option value="IDR" selected>IDR</option>
-                <option value="EUR">EUR</option>
-                <option value="USD">USD</option>
-                <option value="CAD">CAD</option>
-                <option value="GBP">GBP</option>
-            </select>
-        </div>
+    <input type="number" id="plastic-order-amount" min="1" step="1" value="10"
+        style="font-size: 3em; text-align: center; width: 250px; padding: 10px; padding-right: 50px;">
+
+    <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.5em; font-weight: bold; pointer-events: none;">
+        Kg
+    </span>
+</div>
+
+<!-- Price Calculation Display with Currency Selection -->
+<div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
+    <span id="price-calculation">0</span>
+    <select id="currency-selector" style="font-size: 1em; margin-left: 10px; padding: 5px; border: none; background: none; font-weight: bold;">
+        <option value="IDR" selected>IDR</option>
+        <option value="EUR">EUR</option>
+        <option value="USD">USD</option>
+        <option value="CAD">CAD</option>
+        <option value="GBP">GBP</option>
+    </select>
+</div>
+
 
         <!-- Order Button -->
         <button id="order-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
