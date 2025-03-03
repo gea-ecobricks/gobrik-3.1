@@ -100,11 +100,11 @@ try {
 <div id="aes-purchase-form" class="dashboard-panel">
     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
 <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px; display: block; width: 100%;">
-                Enter Plastic to Offset:
+                Enter your amount of plastic to offset in Kg:
             </label>
        <!-- Plastic Order Input with "Kg" inside -->
        <div style="display: flex; align-items: center; position: relative; text-align: center;">
-
+<p style="font-size: 0.95em; margin-top:10px;">Calculated total cost:</p>
 
             <div style="position: relative; display: inline-flex; align-items: center;">
                 <input type="number" id="plastic-order-amount" min="1" value="10"
@@ -117,6 +117,7 @@ try {
 
         <!-- Price Calculation Display with Currency Selection -->
         <div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
+
             <span id="price-calculation">0</span>
             <select id="currency-selector" style="font-size: 1em; margin-left: 10px; padding: 5px; border: none; background: none; font-weight: bold;">
                 <option value="IDR" selected>IDR</option>
