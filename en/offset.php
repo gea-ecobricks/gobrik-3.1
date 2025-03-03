@@ -98,6 +98,80 @@ try {
 }
 ?>
 
+<div id="aes-purchase-form" class="dashboard-panel">
+    <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
+
+        <!-- Plastic Order Input -->
+        <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px;">Enter Plastic to Offset (kg):</label>
+        <input type="number" id="plastic-order-amount" min="1" step="0.1" placeholder="0"
+            style="font-size: 2em; text-align: center; width: 150px; padding: 10px;">
+
+        <!-- Price Calculation Display -->
+        <div id="price-calculation" style="font-size: 1.5em; margin-top: 15px;">
+            0 IDR
+        </div>
+
+        <!-- Currency Selection -->
+        <label for="currency-selector" style="margin-top: 10px;">Choose Currency:</label>
+        <select id="currency-selector" style="font-size: 1.1em; padding: 5px; margin-top: 5px;">
+            <option value="IDR" selected>IDR (Indonesian Rupiah)</option>
+            <option value="EUR">EUR (Euros)</option>
+            <option value="USD">USD (US Dollars)</option>
+            <option value="CAD">CAD (Canadian Dollars)</option>
+            <option value="GBP">GBP (British Pounds)</option>
+        </select>
+
+        <!-- Order Button -->
+        <button id="order-button" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
+            Set up Purchase
+        </button>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const plasticInput = document.getElementById("plastic-order-amount");
+    const priceDisplay = document.getElementById("price-calculation");
+    const currencySelector = document.getElementById("currency-selector");
+    const orderButton = document.getElementById("order-button");
+
+    // AES Rolling Price per kg (from PHP)
+    const aesRollingPrice = <?php echo json_encode($aes_rolling, JSON_NUMERIC_CHECK); ?>;
+
+    // Conversion rates
+    const conversionRates = {
+        "IDR": 1,
+        "EUR": 17193.174,
+        "USD": 16451,
+        "CAD": 11403,
+        "GBP": 20818
+    };
+
+    function updatePrice() {
+        let kg = parseFloat(plasticInput.value) || 0;
+        let selectedCurrency = currencySelector.value;
+        let priceInIDR = kg * aesRollingPrice;
+        let convertedPrice = priceInIDR / conversionRates[selectedCurrency];
+
+        // Format price with commas and two decimal places
+        priceDisplay.innerHTML = convertedPrice.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }) + ` ${selectedCurrency}`;
+    }
+
+    // Update price whenever input or currency changes
+    plasticInput.addEventListener("input", updatePrice);
+    currencySelector.addEventListener("change", updatePrice);
+
+    // Order button alert
+    orderButton.addEventListener("click", function() {
+        alert("Sorry! AES offsetting is still in development. Orders cannot yet be completed.");
+    });
+});
+</script>
+
 
 
  <div id="offset-learn-more" class="dashboard-panel">
