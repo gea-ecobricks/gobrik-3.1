@@ -113,11 +113,12 @@ try {
                 </span>
             </div>
         </div>
-    <p style="font-size: 0.95em; margin-top:10px;">Calculated total cost:</p>
 
 
         <!-- Price Calculation Display with Currency Selection -->
         <div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
+                <p style="font-size: 0.95em; margin-top:10px;">Calculated total cost:</p>
+
 
             <span id="price-calculation">0</span>
             <select id="currency-selector" style="font-size: 1em; margin-left: 10px; padding: 5px; border: none; background: none; font-weight: bold;">
@@ -188,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
  <div id="offset-learn-more" class="dashboard-panel">
-     <p style="font-size: 0.95em; margin-top:10px;">
+     <p style="font-size: 1.1em; margin-top:20px;">
             <?php
               echo 'Our AES plastic offsets price is a function of the costs of authenticating the ' . number_format($sum_ecobricks) . ' ecobricks recorded on the GEA\'s brikchain.  Learn more about the core concepts being plastic offsetting and the way we calculate our cost per kg.';
               ?>
