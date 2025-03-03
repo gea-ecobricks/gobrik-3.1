@@ -104,7 +104,6 @@ try {
             </label>
        <!-- Plastic Order Input with "Kg" inside -->
        <div style="display: flex; align-items: center; position: relative; text-align: center;">
-<p style="font-size: 0.95em; margin-top:10px;">Calculated total cost:</p>
 
             <div style="position: relative; display: inline-flex; align-items: center;">
                 <input type="number" id="plastic-order-amount" min="1" value="10"
@@ -114,6 +113,8 @@ try {
                 </span>
             </div>
         </div>
+    <p style="font-size: 0.95em; margin-top:10px;">Calculated total cost:</p>
+
 
         <!-- Price Calculation Display with Currency Selection -->
         <div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
