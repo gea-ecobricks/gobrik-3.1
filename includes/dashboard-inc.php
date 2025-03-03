@@ -31,12 +31,7 @@
     margin:10px;
 }
 
-.menu-buttons-row {
-    display: flex;
-    flex-wrap: wrap; /* Allow buttons to wrap to a new row if there isn't enough space */
-    gap: 10px; /* Space between buttons */
-    justify-content: center; /* Center the buttons horizontally */
-}
+
 
 
 

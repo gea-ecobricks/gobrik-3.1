@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.51';
+$version = '0.52';
 $page = 'offset';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -86,7 +86,7 @@ try {
 
     // Output the simplified HTML
     echo '
-    <div id="live-aes-pricing">
+    <div class="live-aes-pricing">
         <p><span class="blink">◉</span> ' . number_format($aes_rolling, 2) . ' IDR per 1 Kg of AES Plastic</p>
         <p style="font-size: 0.85em; margin-top:10px;">
             Our AES plastic offsets price is a function of the costs of authenticating the ' . number_format($sum_ecobricks) . ' ecobricks recorded on the GEA\'s brikchain.
@@ -102,7 +102,7 @@ try {
     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
 
         <!-- Plastic Order Input -->
-        <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px;">Enter Plastic to Offset (kg):</label>
+        <label for="plastic-order-amount" style="font-size: 2.2em; margin-bottom: 10px;">Enter Plastic to Offset (kg):</label>
         <input type="number" id="plastic-order-amount" min="1" step="0.1" placeholder="0"
             style="font-size: 2em; text-align: center; width: 150px; padding: 10px;">
 
@@ -113,16 +113,16 @@ try {
 
         <!-- Currency Selection -->
         <label for="currency-selector" style="margin-top: 10px;">Choose Currency:</label>
-        <select id="currency-selector" style="font-size: 1.1em; padding: 5px; margin-top: 5px;">
+        <select id="currency-selector" style="font-size: 1.1em; padding: 5px; margin-top: 5px; width:60px;">
             <option value="IDR" selected>IDR (Indonesian Rupiah)</option>
-            <option value="EUR">EUR (Euros)</option>
-            <option value="USD">USD (US Dollars)</option>
-            <option value="CAD">CAD (Canadian Dollars)</option>
-            <option value="GBP">GBP (British Pounds)</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+            <option value="CAD">CAD</option>
+            <option value="GBP">GBP </option>
         </select>
 
         <!-- Order Button -->
-        <button id="order-button" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
+        <button id="order-button" class="confirm-button enabled"">
             Set up Purchase
         </button>
 
