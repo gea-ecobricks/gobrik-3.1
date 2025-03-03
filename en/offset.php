@@ -97,36 +97,36 @@ try {
     echo '<p>Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
 }
 ?>
+
 <div id="aes-purchase-form" class="dashboard-panel">
     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
 
-        <!-- Plastic Order Input -->
        <!-- Plastic Order Input with "Kg" inside -->
-<div style="position: relative; display: inline-block; text-align: center;">
-    <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px; display: block;">
-        Enter Plastic to Offset:
-    </label>
+       <div style="display: flex; align-items: center; position: relative; text-align: center;">
+            <label for="plastic-order-amount" style="font-size: 1.2em; margin-bottom: 10px; display: block; width: 100%;">
+                Enter Plastic to Offset:
+            </label>
 
-    <input type="number" id="plastic-order-amount" min="1" step="1" value="10"
-        style="font-size: 3em !important; text-align: center; width: 250px; padding: 10px; padding-right: 50px;">
+            <div style="position: relative; display: inline-flex; align-items: center;">
+                <input type="number" id="plastic-order-amount" min="1" step="1" value="10"
+                    style="font-size: 3em !important; text-align: right; width: 200px; padding: 10px; padding-right: 50px;">
+                <span style="position: absolute; right: 10px; font-size: 1.5em; font-weight: bold; color: grey;">
+                    Kg
+                </span>
+            </div>
+        </div>
 
-    <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 3em; font-weight: bold; pointer-events: none;color: grey;">
-        Kg
-    </span>
-</div>
-
-<!-- Price Calculation Display with Currency Selection -->
-<div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
-    <span id="price-calculation">0</span>
-    <select id="currency-selector" style="font-size: 1em; margin-left: 10px; padding: 5px; border: none; background: none; font-weight: bold;">
-        <option value="IDR" selected>IDR</option>
-        <option value="EUR">EUR</option>
-        <option value="USD">USD</option>
-        <option value="CAD">CAD</option>
-        <option value="GBP">GBP</option>
-    </select>
-</div>
-
+        <!-- Price Calculation Display with Currency Selection -->
+        <div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
+            <span id="price-calculation">0</span>
+            <select id="currency-selector" style="font-size: 1em; margin-left: 10px; padding: 5px; border: none; background: none; font-weight: bold;">
+                <option value="IDR" selected>IDR</option>
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="CAD">CAD</option>
+                <option value="GBP">GBP</option>
+            </select>
+        </div>
 
         <!-- Order Button -->
         <button id="order-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
@@ -168,6 +168,9 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // Initialize the price display on page load
+    updatePrice();
+
     // Update price whenever input or currency changes
     plasticInput.addEventListener("input", updatePrice);
     currencySelector.addEventListener("change", updatePrice);
@@ -178,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
+
 
 
 
