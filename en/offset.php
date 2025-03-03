@@ -102,9 +102,9 @@ try {
 
  <div style="display:flex;flex-flow:row;width:100%;justify-content:center;">
      <p>Learn more about the core concepts being plastic offsetting and the way we calculate our cost per kg.
-            <a href="https://ecobricks.org/en/open-books.php" class="confirm-button" id="open-books-button" data-lang-id="001-log-an-ecobrick" style="margin: 10px;">↗️  GEA Open Books</a>
-             <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="confirm-button enabled" id="about-offsetting-button" data-lang-id="002-learn-about-offsetting" style="margin: 10px;">↗️ Learn about Plastic Offsetting</a>
-             <a href="https://ecobricks.org/en/brikchain.php" target="_blank" class="confirm-button enabled" id="brikcahin-button" data-lang-id="002-learn-about-offsetting" style="margin: 10px;">↗️ Brikchain</a>
+            <a href="https://ecobricks.org/en/open-books.php" class="confirm-button enabled" id="open-books-button" data-lang-id="001-log-an-ecobrickXX" style="margin: 10px;">↗️  GEA Open Books</a>
+             <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="confirm-button enabled" id="about-offsetting-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗️ Learn about Plastic Offsetting</a>
+             <a href="https://ecobricks.org/en/brikchain.php" target="_blank" class="confirm-button enabled" id="brikcahin-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗️ Brikchain</a>
 
 
         </div>

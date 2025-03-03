@@ -83,9 +83,9 @@ $all_members = array_merge($sent_members, $pending_members);
 // Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
 $query = "SELECT id, email, name FROM ghost_test_email_tb
           WHERE test_sent = 0
---           AND email NOT LIKE '%@outlook.%'
+          AND email NOT LIKE '%@outlook.%'
           AND email NOT LIKE '%@live.%'
---           AND email NOT LIKE '%@hotmail.%'
+
           AND email NOT LIKE '%@comcast%'
           ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
@@ -106,7 +106,7 @@ if (!$recipient_email) {
 }
 
 // Validate again before sending to avoid errors in form submission
-if (strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+if (strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@comcast.') !== false) {
     die("Skipping @outlook & @hotmail emails. No valid recipient found.");
 }
 
@@ -399,7 +399,7 @@ function sendEmail($to, $htmlBody) {
     $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 1; // Start countdown from 3 seconds
+    let countdown = 2; // Start countdown from 3 seconds
 
     // 🚨 Stop countdown if there are alerts & disable sending 🚨
     if (hasAlerts) {
