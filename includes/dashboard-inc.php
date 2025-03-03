@@ -38,26 +38,7 @@
     justify-content: center; /* Center the buttons horizontally */
 }
 
-.page-button {
-    background: var(--darker);
-    color: var(--text-color);
-    text-decoration: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    text-align: center;
-    flex: 1 1 90%; /* Make each button take 90% of the width of the container */
-    max-width: 200px; /* Prevent buttons from becoming too wide */
-}
 
-.page-button:hover {
-    background: var(--form-background); /* Adjust hover color if needed */
-    text-decoration: none;
-}
-
-.page-button.disabled {
-    pointer-events: none;
-    opacity: 0.6;
-}
 
 
 //Databables
