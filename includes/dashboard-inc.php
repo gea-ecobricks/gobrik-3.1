@@ -15,23 +15,6 @@
 <STYLE>
 
 
-.dashboard-panel {
-    background: var(--lighter);
-    border-radius: 10px;
-    padding: 15px;
-    margin: 20px 0;
-    opacity: 0.9;
-}
-
-.panel-title {
-    text-align: center;
-    font-size: 1.2em;
-    margin-bottom: 10px;
-    font-weight: bold;
-    margin:10px;
-}
-
-
 
 
 

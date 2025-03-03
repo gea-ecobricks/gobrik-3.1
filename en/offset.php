@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.52';
+$version = '0.53';
 $page = 'offset';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -114,10 +114,10 @@ try {
             </div>
         </div>
 
+                <p style="font-size: 0.95em; margin-top:15px;">Calculated total cost:</p>
 
         <!-- Price Calculation Display with Currency Selection -->
-        <div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 15px;">
-                <p style="font-size: 0.95em; margin-top:10px;">Calculated total cost:</p>
+        <div style="display: flex; align-items: center; font-size: 1.5em; margin-top: 5px;">
 
 
             <span id="price-calculation">0</span>
