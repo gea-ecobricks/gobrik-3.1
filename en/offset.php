@@ -89,9 +89,7 @@ try {
     <div class="live-aes-pricing">
         <p style="font-size: 1em; margin-top:10px;">2025 price per 1Kg of AES Plastic:</p>
         <p><span class="blink">◉</span> ' . number_format($aes_rolling, 2) . ' IDR</p>
-        <p style="font-size: 0.85em; margin-top:10px;">
-            Our AES plastic offsets price is a function of the costs of authenticating the ' . number_format($sum_ecobricks) . ' ecobricks recorded on the GEA\'s brikchain.
-        </p>
+
     </div>';
 } catch (Exception $e) {
     // Handle errors gracefully
@@ -109,7 +107,7 @@ try {
 
 
             <div style="position: relative; display: inline-flex; align-items: center;">
-                <input type="number" id="plastic-order-amount" min="1" step="1" value="10"
+                <input type="number" id="plastic-order-amount" min="1" value="10"
                     style="font-size: 3em !important; text-align: right; width: 200px; padding: 10px; padding-right: 50px;">
                 <span style="position: absolute; right: 10px; font-size: 1.5em; font-weight: bold; color: grey;">
                     Kg
@@ -188,7 +186,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
  <div id="offset-learn-more" class="dashboard-panel">
-     <p>Learn more about the core concepts being plastic offsetting and the way we calculate our cost per kg.
+     <p style="font-size: 0.95em; margin-top:10px;">
+            Our AES plastic offsets price is a function of the costs of authenticating the ' . number_format($sum_ecobricks) . ' ecobricks recorded on the GEA\'s brikchain.  Learn more about the core concepts being plastic offsetting and the way we calculate our cost per kg.</p>
          <div class="menu-buttons-row">
             <a href="https://ecobricks.org/en/open-books.php" class="page-button" id="open-books-button" data-lang-id="001-log-an-ecobrickXX" style="margin: 10px;">↗ GEA Open Books</a>
              <a href="https://ecobricks.org/en/offsets.php" target="_blank" class="page-button" id="about-offsetting-button" data-lang-id="002-learn-about-offsettingXX" style="margin: 10px;">↗ Learn about Plastic Offsetting</a>
