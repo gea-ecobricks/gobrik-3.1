@@ -84,9 +84,9 @@ $all_members = array_merge($sent_members, $pending_members);
 $query = "SELECT id, email, name FROM ghost_test_email_tb
           WHERE test_sent = 0
 --           AND email NOT LIKE '%@outlook.%'
---           AND email NOT LIKE '%@live.%'
+          AND email NOT LIKE '%@live.%'
 --           AND email NOT LIKE '%@hotmail.%'
---           AND email NOT LIKE '%@comcast%'
+          AND email NOT LIKE '%@comcast%'
           ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
 $subscriber = $result->fetch_assoc();
@@ -106,9 +106,9 @@ if (!$recipient_email) {
 }
 
 // Validate again before sending to avoid errors in form submission
-// if (strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-//     die("Skipping @outlook & @hotmail emails. No valid recipient found.");
-// }
+if (strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+    die("Skipping @outlook & @hotmail emails. No valid recipient found.");
+}
 
 
 // Generate unsubscribe link
@@ -360,7 +360,7 @@ function sendEmail($to, $htmlBody) {
 </form>
 
 <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
-    <p>Email will send in <span id="countdown">5</span> seconds...</p>
+    <p>Email will send in <span id="countdown">2</span> seconds...</p>
     <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
 
@@ -399,7 +399,7 @@ function sendEmail($to, $htmlBody) {
     $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 5; // Start countdown from 3 seconds
+    let countdown = 1; // Start countdown from 3 seconds
 
     // 🚨 Stop countdown if there are alerts & disable sending 🚨
     if (hasAlerts) {
