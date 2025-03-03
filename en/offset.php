@@ -108,7 +108,7 @@ try {
     </label>
 
     <input type="number" id="plastic-order-amount" min="1" step="1" value="10"
-        style="font-size: 3em; text-align: center; width: 250px; padding: 10px; padding-right: 50px;">
+        style="font-size: 3em !important; text-align: center; width: 250px; padding: 10px; padding-right: 50px;">
 
     <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.5em; font-weight: bold; pointer-events: none;">
         Kg
@@ -130,7 +130,7 @@ try {
 
         <!-- Order Button -->
         <button id="order-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
-            Set up Purchase
+            Set up Purchase ➡️
         </button>
 
     </div>
