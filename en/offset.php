@@ -140,7 +140,6 @@ try {
 </div>
 
 <script>
-
 document.addEventListener("DOMContentLoaded", function() {
     const plasticInput = document.getElementById("plastic-order-amount");
     const priceDisplay = document.getElementById("price-calculation");
@@ -162,12 +161,12 @@ document.addEventListener("DOMContentLoaded", function() {
     function updatePrice() {
         let kg = parseFloat(plasticInput.value) || 0;
         let selectedCurrency = currencySelector.value;
-        let priceInIDR = kg * aesRollingPrice;
+        let priceInIDR = Math.round(kg * aesRollingPrice);
         let convertedPrice = priceInIDR / conversionRates[selectedCurrency];
 
         // Apply different formatting based on currency
         if (selectedCurrency === "IDR") {
-            priceDisplay.textContent = Math.round(convertedPrice).toLocaleString() + " IDR"; // No decimals
+            priceDisplay.textContent = priceInIDR.toLocaleString() + " IDR"; // No decimals
         } else {
             priceDisplay.textContent = convertedPrice.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
@@ -176,68 +175,73 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Initialize the price display on page load
+    // Initialize price on page load
     updatePrice();
 
-    // Update price whenever input or currency changes
+    // Update price when input or currency changes
     plasticInput.addEventListener("input", updatePrice);
     currencySelector.addEventListener("change", updatePrice);
 
-    // Order button logic
+    // Order button logic (Sandbox API)
     orderButton.addEventListener("click", function() {
         let kg = parseFloat(plasticInput.value) || 0;
         let selectedCurrency = currencySelector.value;
         let priceInIDR = Math.round(kg * aesRollingPrice);
-        let convertedPrice = priceInIDR / conversionRates[selectedCurrency];
 
-        // Define order payload
+        // Order payload for Durian Pay
         let orderData = {
-            amount: priceInIDR,  // Amount in IDR
+            amount: priceInIDR,  // Amount in IDR (rounded)
             currency: "IDR",
-            payment_option: "va",  // Virtual Account (can be updated)
+            payment_option: "va",  // Virtual Account (can change later)
             metadata: {
                 plastic_offset_kg: kg,
                 selected_currency: selectedCurrency
             },
             customer: {
-                given_name: "John", // Replace with actual user data
-                email: "john.doe@example.com" // Replace with actual user email
+                given_name: "Test User",  // Replace with actual user data later
+                email: "testuser@example.com"  // Replace with actual user email
             }
         };
 
-        // Make API request to Durian Pay
-        fetch("https://api.durianpay.id/v1/orders", {
+        // Sandbox API request
+        fetch("https://api.sandbox.durianpay.id/v1/orders", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer YOUR_DURIANPAY_SECRET_KEY"
+                "Authorization": "Bearer YOUR_SANDBOX_SECRET_KEY"  // Replace with your sandbox key
             },
             body: JSON.stringify(orderData)
         })
         .then(response => response.json())
         .then(data => {
             if (data.id) {
-                showModal(`Order Created!<br>Amount: ${priceInIDR.toLocaleString()} IDR<br>Order ID: ${data.id}<br><a href="${data.payment_link}" target="_blank">Proceed to Payment</a>`);
+                showModal(`
+                    <strong>Order Created!</strong><br>
+                    Amount: ${priceInIDR.toLocaleString()} IDR<br>
+                    Order ID: ${data.id}<br>
+                    <a href="${data.payment_link}" target="_blank" style="font-weight: bold; color: blue;">Proceed to Payment</a>
+                `);
             } else {
-                showModal(`Failed to create order: ${data.message}`);
+                showModal(`<strong>Failed to create order:</strong> ${data.message}`);
             }
         })
         .catch(error => {
-            showModal(`Error: ${error.message}`);
+            showModal(`<strong>Error:</strong> ${error.message}`);
         });
     });
 
-    // Function to show modal
+    // Function to show the modal
     function showModal(message) {
         document.querySelector(".modal-message").innerHTML = message;
         document.getElementById("form-modal-message").classList.remove("modal-hidden");
     }
 
-    // Close modal function
+    // Function to close the modal
     function closeInfoModal() {
         document.getElementById("form-modal-message").classList.add("modal-hidden");
     }
 });
+
 
 
 </script>
