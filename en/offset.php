@@ -140,6 +140,7 @@ try {
 </div>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", function() {
     const plasticInput = document.getElementById("plastic-order-amount");
     const priceDisplay = document.getElementById("price-calculation");
@@ -182,11 +183,62 @@ document.addEventListener("DOMContentLoaded", function() {
     plasticInput.addEventListener("input", updatePrice);
     currencySelector.addEventListener("change", updatePrice);
 
-    // Order button alert
+    // Order button logic
     orderButton.addEventListener("click", function() {
-        alert("Sorry! AES offsetting is still in development. Orders cannot yet be completed.");
+        let kg = parseFloat(plasticInput.value) || 0;
+        let selectedCurrency = currencySelector.value;
+        let priceInIDR = Math.round(kg * aesRollingPrice);
+        let convertedPrice = priceInIDR / conversionRates[selectedCurrency];
+
+        // Define order payload
+        let orderData = {
+            amount: priceInIDR,  // Amount in IDR
+            currency: "IDR",
+            payment_option: "va",  // Virtual Account (can be updated)
+            metadata: {
+                plastic_offset_kg: kg,
+                selected_currency: selectedCurrency
+            },
+            customer: {
+                given_name: "John", // Replace with actual user data
+                email: "john.doe@example.com" // Replace with actual user email
+            }
+        };
+
+        // Make API request to Durian Pay
+        fetch("https://api.durianpay.id/v1/orders", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer YOUR_DURIANPAY_SECRET_KEY"
+            },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                showModal(`Order Created!<br>Amount: ${priceInIDR.toLocaleString()} IDR<br>Order ID: ${data.id}<br><a href="${data.payment_link}" target="_blank">Proceed to Payment</a>`);
+            } else {
+                showModal(`Failed to create order: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            showModal(`Error: ${error.message}`);
+        });
     });
+
+    // Function to show modal
+    function showModal(message) {
+        document.querySelector(".modal-message").innerHTML = message;
+        document.getElementById("form-modal-message").classList.remove("modal-hidden");
+    }
+
+    // Close modal function
+    function closeInfoModal() {
+        document.getElementById("form-modal-message").classList.add("modal-hidden");
+    }
 });
+
 
 </script>
 
