@@ -88,7 +88,7 @@ try {
     echo '
     <div class="live-aes-pricing">
         <p style="font-size: 1em; margin-top:10px;">2025 price per 1Kg of AES Plastic:</p>
-        <p><span class="blink">◉</span> ' . number_format($aes_rolling, 2) . ' IDR</p>
+        <p><span class="blink">◉</span> ' . number_format($aes_rolling) . ' IDR</p>
 
     </div>';
 } catch (Exception $e) {
@@ -96,6 +96,7 @@ try {
     echo '<p>Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
 }
 ?>
+
 
 <div id="aes-purchase-form" class="dashboard-panel">
     <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
@@ -151,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Conversion rates
     const conversionRates = {
         "IDR": 1,
-        "EUR": 17193.174,
+        "EUR": 17193,
         "USD": 16451,
         "CAD": 11403,
         "GBP": 20818
