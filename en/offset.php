@@ -164,11 +164,15 @@ document.addEventListener("DOMContentLoaded", function() {
         let priceInIDR = kg * aesRollingPrice;
         let convertedPrice = priceInIDR / conversionRates[selectedCurrency];
 
-        // Format price with commas and two decimal places
-        priceDisplay.textContent = convertedPrice.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
+        // Apply different formatting based on currency
+        if (selectedCurrency === "IDR") {
+            priceDisplay.textContent = Math.round(convertedPrice).toLocaleString() + " IDR"; // No decimals
+        } else {
+            priceDisplay.textContent = convertedPrice.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + ` ${selectedCurrency}`; // Two decimal places for other currencies
+        }
     }
 
     // Initialize the price display on page load
@@ -183,6 +187,7 @@ document.addEventListener("DOMContentLoaded", function() {
         alert("Sorry! AES offsetting is still in development. Orders cannot yet be completed.");
     });
 });
+
 </script>
 
 
