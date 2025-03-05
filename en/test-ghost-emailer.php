@@ -86,7 +86,7 @@ $query = "SELECT id, email, name FROM ghost_test_email_tb
 --           AND email NOT LIKE '%@outlook.%'
 --           AND email NOT LIKE '%@live.%'
           AND email NOT LIKE '%@hotmail.%'
---           AND email NOT LIKE '%@comcast%'
+          AND email NOT LIKE '%@comcast%'
           ORDER BY id ASC LIMIT 1";
 $result = $buwana_conn->query($query);
 $subscriber = $result->fetch_assoc();
@@ -105,10 +105,11 @@ if (!$recipient_email) {
     die("No pending recipients found. Email sending process stopped.");
 }
 
-// Validate again before sending to avoid errors in form submission
-// if (strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false || strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-//     die("Skipping @outlook & @hotmail emails. No valid recipient found.");
-// }
+//Validate again before sending to avoid errors in form submission
+//strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false ||
+if ( strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+    die("Skipping @outlook & @hotmail emails. No valid recipient found.");
+}
 
 
 // Generate unsubscribe link
