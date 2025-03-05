@@ -308,15 +308,17 @@ function sendEmail($to, $htmlBody) {
     $mailgunDomain = 'earthen.ecobricks.org';
 
     try {
-        $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
-            'auth' => ['api', $mailgunApiKey],
-            'form_params' => [
-                'from' => '[Earthen] GEA Center Circle <earthen@ecobricks.org>',
-                'to' => $to,
-                'subject' => 'We\'ve moved on from the US dollar',
-                'html' => $htmlBody,
-                'text' => strip_tags($htmlBody),
-            ]
+         $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
+        'auth' => ['api', $mailgunApiKey],
+        'form_params' => [
+            'from' => '[Earthen] GEA Center Circle <earthen@ecobricks.org>',
+            'to' => $to,
+            'subject' => 'We\'ve moved on from the US dollar',
+            'html' => $htmlBody,
+            'text' => strip_tags($htmlBody),
+            'o:stop-retrying' => 'yes',  // Stops Mailgun from retrying if delivery fails
+            'o:deliverytime' => gmdate('D, d M Y H:i:s T', strtotime('-1 hour'))  // Past time to prevent retry
+        ]
         ]);
         return $response->getStatusCode() == 200;
     } catch (Exception $e) {
