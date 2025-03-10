@@ -90,28 +90,30 @@ try {
     }
 
     // ✅ **Bind `date_emoji` and `pinned` in the parameters**
-    $stmt->bind_param(
-        'iissssssiiisssisssi',
-        $buwana_id,
-        $cal_id,
-        $cal_name,
-        $cal_color,
-        $title,
-        $date,
-        $time,
-        $time_zone,
-        $day,
-        $month,
-        $year,
-        $frequency,
-        $created_at,
-        $last_edited,
-        $synced = 1, // Set to 1 (meaning synced)
-        $unique_key,
-        $datecycle_color,
-        $date_emoji,
-        $pinned
-    );
+    $synced = 1; // ✅ Define `synced` separately before binding
+$stmt->bind_param(
+    'iissssssiiisssisssi',
+    $buwana_id,
+    $cal_id,
+    $cal_name,
+    $cal_color,
+    $title,
+    $date,
+    $time,
+    $time_zone,
+    $day,
+    $month,
+    $year,
+    $frequency,
+    $created_at,
+    $last_edited,
+    $synced, // ✅ Now passing a variable
+    $unique_key,
+    $datecycle_color,
+    $date_emoji,
+    $pinned
+);
+
 
     // Execute the query.
     $stmt->execute();
