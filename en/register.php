@@ -87,15 +87,15 @@ echo '<!DOCTYPE html>
     <div id="splash-bar"></div>
 
     <!-- PAGE CONTENT -->
-    <div id="top-page-image" class="offsetting top-page-image"></div>
+    <div id="top-page-image" class="gea-logo top-page-image"></div>
 
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-                <small><?php echo $training_type; ?></small>
+                <p style="font-size:smaller"><?php echo $training_type; ?></small>
                 <h1><?php echo $training_title; ?></h1>
-                <strong><?php echo $training_date; ?></strong>
-                <p><small>Lead by <?php echo $lead_trainer; ?></small></p>
+                <p style="font-size:medium"><strong><?php echo $training_date; ?></strong>
+                <p style="font-size:medium">Lead by <?php echo $lead_trainer; ?></small></p>
                 <p><?php echo $training_summary; ?></p>
 
                 <?php if (!empty($training_url)) : ?>
@@ -103,29 +103,28 @@ echo '<!DOCTYPE html>
                 <?php endif; ?>
             </div>
         </div>
-    </div>
 
-    <div id="offset-learn-more" class="dashboard-panel">
-        <h2>Training Details</h2>
-        <p><strong>Location:</strong> <?php echo $training_location; ?> (<?php echo $training_country; ?>)</p>
-        <p><strong>Training Agenda:</strong> <?php echo $training_agenda; ?></p>
+        <div id="offset-learn-more" class="dashboard-panel">
+            <h2>Training Details</h2>
+            <p><strong>Location:</strong> <?php echo $training_location; ?> (<?php echo $training_country; ?>)</p>
+            <p><strong>Training Agenda:</strong> <?php echo $training_agenda; ?></p>
 
-        <?php if (!empty($training_success)) : ?>
-            <p><strong>Training Success:</strong> <?php echo $training_success; ?></p>
-        <?php endif; ?>
+            <?php if (!empty($training_success)) : ?>
+                <p><strong>Training Success:</strong> <?php echo $training_success; ?></p>
+            <?php endif; ?>
 
-        <?php if (!empty($training_challenges)) : ?>
-            <p><strong>Challenges:</strong> <?php echo $training_challenges; ?></p>
-        <?php endif; ?>
+            <?php if (!empty($training_challenges)) : ?>
+                <p><strong>Challenges:</strong> <?php echo $training_challenges; ?></p>
+            <?php endif; ?>
 
-        <?php if (!empty($training_lessons_learned)) : ?>
-            <p><strong>Lessons Learned:</strong> <?php echo $training_lessons_learned; ?></p>
-        <?php endif; ?>
+            <?php if (!empty($training_lessons_learned)) : ?>
+                <p><strong>Lessons Learned:</strong> <?php echo $training_lessons_learned; ?></p>
+            <?php endif; ?>
 
-        <p><strong>Briks Made:</strong> <?php echo $briks_made; ?></p>
-        <p><strong>Avg Brik Weight:</strong> <?php echo $avg_brik_weight; ?>g</p>
-        <p><strong>Plastic Packed:</strong> <?php echo $est_plastic_packed; ?>g</p>
-    </div>
+            <p><strong>Briks Made:</strong> <?php echo $briks_made; ?></p>
+            <p><strong>Avg Brik Weight:</strong> <?php echo $avg_brik_weight; ?>g</p>
+            <p><strong>Plastic Packed:</strong> <?php echo $est_plastic_packed; ?>g</p>
+        </div>
 
     <!-- FOOTER -->
     <?php require_once("../footer-2024.php"); ?>
