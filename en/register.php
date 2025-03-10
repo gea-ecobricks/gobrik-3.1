@@ -108,7 +108,7 @@ echo '<!DOCTYPE html>
 
 
         <div id="offset-learn-more" class="dashboard-panel">
-            <h2>Training Details</h2>
+            <h4>Community Event Details</h4>
             <p><strong>Location:</strong> <?php echo $training_location; ?> (<?php echo $training_country; ?>)</p>
             <p><strong>Training Agenda:</strong> <?php echo $training_agenda; ?></p>
 
@@ -128,6 +128,7 @@ echo '<!DOCTYPE html>
             <p><strong>Avg Brik Weight:</strong> <?php echo $avg_brik_weight; ?>g</p>
             <p><strong>Plastic Packed:</strong> <?php echo $est_plastic_packed; ?>g</p>
         </div>
+    </div>
 
     <!-- FOOTER -->
     <?php require_once("../footer-2024.php"); ?>
