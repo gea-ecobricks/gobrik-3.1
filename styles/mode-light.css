@@ -606,4 +606,8 @@ background: url(../webps/brikchain-450px.webp) no-repeat center;
       background-size: contain;
   }
 
+    .gea-logo {
+background: url(../svgs/gea-logo-top-day.svg) no-repeat center;
+      background-size: contain;
+  }
 /* Light mode pastel colors */
