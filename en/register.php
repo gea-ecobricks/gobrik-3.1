@@ -9,9 +9,13 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in
 
 // Initialize training variables
-$training_title = $training_date = $lead_trainer = $training_type = "";
-$training_country = $training_location = $training_url = "";
-$first_name = ""; // Default empty
+$training_title = $training_date = $training_logged = $lead_trainer = "";
+$trained_community = $training_type = $briks_made = $avg_brik_weight = $est_plastic_packed = "";
+$training_country = $training_location = $location_full = $training_summary = "";
+$training_agenda = $training_success = $training_challenges = $training_lessons_learned = "";
+$training_url = $connected_ecobricks = "";
+$ready_to_show = 0;
+$first_name = ""; // Default empty first_name
 
 // Check if the user is logged in
 if ($is_logged_in) {
@@ -21,7 +25,12 @@ if ($is_logged_in) {
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch user data
+    // Fetch the user's data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
     $buwana_conn->close();  // Close the database connection
@@ -45,19 +54,20 @@ if ($result->num_rows > 0) {
     $training_type = htmlspecialchars($row['training_type'], ENT_QUOTES, 'UTF-8');
     $training_country = htmlspecialchars($row['training_country'], ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'], ENT_QUOTES, 'UTF-8');
+    $training_summary = nl2br(htmlspecialchars($row['training_summary'], ENT_QUOTES, 'UTF-8'));
     $training_url = htmlspecialchars($row['training_url'], ENT_QUOTES, 'UTF-8');
 }
 
 $stmt->close();
 $gobrik_conn->close();
-?>
 
-<!DOCTYPE html>
-<html lang="<?php echo $lang; ?>">
+echo '<!DOCTYPE html>
+<html lang="' . $lang . '">
 <head>
-    <meta charset="UTF-8">
-    <title><?php echo $training_title; ?></title>
-</head>
+<meta charset="UTF-8">
+<title>' . $training_title . '</title>
+';
+?>
 
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/register-inc.php"); ?>
@@ -74,28 +84,24 @@ $gobrik_conn->close();
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
             <p style="font-size:small"><?php echo $training_type; ?></p>
+            <p style="font-size:medium"><strong><?php echo $training_date; ?></strong></p>
+
             <h2><?php echo $training_title; ?></h2>
-            <p><strong><?php echo $training_date; ?></strong></p>
             <h3 style="font-size:medium">Lead by <?php echo $lead_trainer; ?></h3>
+            <p><?php echo $training_summary; ?></p>
 
-            <!-- RSVP BUTTON -->
-            <a href="<?php echo $training_url; ?>">
-                <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
-                    <?php echo $is_logged_in && !empty($first_name) ? "RSVP as $first_name" : "RSVP"; ?>
-                </button>
-            </a>
+            <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;"
+                href="<?php echo $training_url; ?>">
+                <?php echo $is_logged_in ? "RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "RSVP"; ?>
+            </button>
 
-            <!-- Message for non-logged-in users -->
             <?php if (!$is_logged_in): ?>
-                <p style="font-size: 0.9em; margin-top: 10px;">
-                    To RSVP, you'll need to log in with your GoBrik account or sign up for an account.
-                </p>
+                <p>To RSVP you'll need to log in with your GoBrik account or sign up for an account.</p>
             <?php endif; ?>
         </div>
     </div>
 </div>
 
-<!-- Community Event Details -->
 <div id="offset-learn-more" class="dashboard-panel">
     <h3>Community Event Details</h3>
     <p><strong>Training Title:</strong> <?php echo $training_title; ?></p>
