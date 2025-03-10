@@ -101,7 +101,7 @@ echo '<!DOCTYPE html>
                 <?php if (!empty($training_url)) : ?>
 
                 <button id="order-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;" href="<?php echo $training_url; ?>">
-            Set up Purchase ➡️
+            Register
         </button>
     <?php endif; ?>
             </div>
@@ -129,6 +129,7 @@ echo '<!DOCTYPE html>
             <p><strong>Plastic Packed:</strong> <?php echo $est_plastic_packed; ?>g</p>
         </div>
     </div>
+</div>
 
     <!-- FOOTER -->
     <?php require_once("../footer-2024.php"); ?>
