@@ -89,6 +89,8 @@ echo '<!DOCTYPE html>
     <!-- PAGE CONTENT -->
     <div id="top-page-image" class="gea-logo top-page-image"></div>
 
+    <img scr="../photos/events/terraces-forests-gladys.jpg" width:100%>
+
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
