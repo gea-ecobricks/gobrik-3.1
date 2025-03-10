@@ -111,7 +111,7 @@ echo '<!DOCTYPE html>
             </button>
 
             <?php if (!$is_logged_in) : ?>
-                <p>To RSVP, you'll need to log in with your GoBrik account or sign up for an account.</p>
+                <p style="color:red;font-size:1em;">To RSVP, you'll need to log in with your GoBrik account or sign up for an account.</p>
             <?php endif; ?>
 
             </div>
@@ -119,12 +119,12 @@ echo '<!DOCTYPE html>
 
         <div id="offset-learn-more" class="dashboard-panel">
     <h3>Community Event Details</h3>
-    <p><strong>Training Title:</strong> <?php echo $training_title; ?></p>
-    <p><strong>Training Date:</strong> <?php echo $training_date; ?></p>
+    <p><strong>Title:</strong> <?php echo $training_title; ?></p>
+    <p><strong>Date:</strong> <?php echo $training_date; ?></p>
     <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
     <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
-    <p><strong>Training Country:</strong> <?php echo $training_country; ?></p>
-    <p><strong>Training Location:</strong> <?php echo $training_location; ?></p>
+    <p><strong>Country:</strong> <?php echo $training_country; ?></p>
+    <p><strong>Location:</strong> <?php echo $training_location; ?></p>
 </div>
 
     </div>
