@@ -99,22 +99,22 @@ echo '<!DOCTYPE html>
 
                 <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
 
-                <h1><?php echo $training_title; ?></h1>
-                <h4 style="font-size:medium">Lead by <?php echo $lead_trainer; ?></h4>
+                <h2><?php echo $training_title; ?></h2>
+                <h3 style="font-size:medium">Lead by <?php echo $lead_trainer; ?></h3>
                 <p><?php echo $training_summary; ?></p>
                 <p><?php echo $training_agenda; ?></p>
 
-                <?php if (!empty($training_url)) : ?>
 
-                <button id="order-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;" href="<?php echo $training_url; ?>">
-            Register
+
+                <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;" href="<?php echo $training_url; ?>">
+            RSVP
         </button>
-    <?php endif; ?>
+
             </div>
 
 
         <div id="offset-learn-more" class="dashboard-panel">
-            <h4>Community Event Details</h4>
+            <h3>Community Event Details</h3>
             <p><strong>Location:</strong><?php echo $training_location; ?> (<?php echo $training_country; ?>)</p>
 
             <p><strong>Lead trainers:</strong> <?php echo $briks_made; ?></p>
