@@ -10,12 +10,9 @@ $is_logged_in = isLoggedIn(); // Check if the user is logged in
 
 // Initialize training variables
 $training_title = $training_date = $training_logged = $lead_trainer = "";
-$trained_community = $training_type = $briks_made = $avg_brik_weight = $est_plastic_packed = "";
-$training_country = $training_location = $location_full = $training_summary = "";
-$training_agenda = $training_success = $training_challenges = $training_lessons_learned = "";
-$training_url = $connected_ecobricks = "";
-$ready_to_show = 0;
-$first_name = ""; // Default empty first_name
+$training_type = $training_country = $training_location = "";
+$training_url = "";
+$first_name = "";
 
 // Check if the user is logged in
 if ($is_logged_in) {
@@ -25,12 +22,7 @@ if ($is_logged_in) {
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch the user's data
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    // Fetch the user's first name
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
     $buwana_conn->close();  // Close the database connection
@@ -40,7 +32,7 @@ if ($is_logged_in) {
 require_once '../gobrikconn_env.php';
 
 $training_id = 818; // Specific training record to fetch
-$sql = "SELECT * FROM `tb_trainings` WHERE `training_id` = ?";
+$sql = "SELECT training_title, training_date, lead_trainer, training_type, training_country, training_location, training_url FROM `tb_trainings` WHERE `training_id` = ?";
 $stmt = $gobrik_conn->prepare($sql);
 $stmt->bind_param("i", $training_id);
 $stmt->execute();
@@ -54,7 +46,6 @@ if ($result->num_rows > 0) {
     $training_type = htmlspecialchars($row['training_type'], ENT_QUOTES, 'UTF-8');
     $training_country = htmlspecialchars($row['training_country'], ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'], ENT_QUOTES, 'UTF-8');
-    $training_summary = nl2br(htmlspecialchars($row['training_summary'], ENT_QUOTES, 'UTF-8'));
     $training_url = htmlspecialchars($row['training_url'], ENT_QUOTES, 'UTF-8');
 }
 
@@ -88,29 +79,26 @@ echo '<!DOCTYPE html>
 
             <h2><?php echo $training_title; ?></h2>
             <h3 style="font-size:medium">Lead by <?php echo $lead_trainer; ?></h3>
-            <p><?php echo $training_summary; ?></p>
 
-            <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;"
-                href="<?php echo $training_url; ?>">
+            <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;" href="<?php echo $training_url; ?>">
                 <?php echo $is_logged_in ? "RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "RSVP"; ?>
             </button>
 
-            <?php if (!$is_logged_in): ?>
-                <p>To RSVP you'll need to log in with your GoBrik account or sign up for an account.</p>
+            <?php if (!$is_logged_in) : ?>
+                <p>To RSVP, you'll need to log in with your GoBrik account or sign up for an account.</p>
             <?php endif; ?>
         </div>
     </div>
+</div>
 
-
-    <div id="offset-learn-more" class="dashboard-panel">
-        <h3>Community Event Details</h3>
-        <p><strong>Training Title:</strong> <?php echo $training_title; ?></p>
-        <p><strong>Training Date:</strong> <?php echo $training_date; ?></p>
-        <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
-        <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
-        <p><strong>Training Country:</strong> <?php echo $training_country; ?></p>
-        <p><strong>Training Location:</strong> <?php echo $training_location; ?></p>
-    </div>
+<div id="offset-learn-more" class="dashboard-panel">
+    <h3>Community Event Details</h3>
+    <p><strong>Training Title:</strong> <?php echo $training_title; ?></p>
+    <p><strong>Training Date:</strong> <?php echo $training_date; ?></p>
+    <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
+    <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
+    <p><strong>Training Country:</strong> <?php echo $training_country; ?></p>
+    <p><strong>Training Location:</strong> <?php echo $training_location; ?></p>
 </div>
 
 <!-- FOOTER -->
