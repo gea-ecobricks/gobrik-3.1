@@ -16,7 +16,6 @@ $allowed_origins = [
     'file://'
 ];
 
-// Normalize the HTTP_ORIGIN (remove trailing slashes or fragments)
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? rtrim($_SERVER['HTTP_ORIGIN'], '/') : '';
 
 if (empty($origin)) {
@@ -43,10 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
-// ✅ **Add `datecycle_color` to required fields**
+// ✅ **Add `date_emoji` and `pinned` to required fields**
 $required_fields = [
     'buwana_id', 'cal_id', 'cal_name', 'cal_color', 'title', 'date', 'time', 'time_zone',
-    'day', 'month', 'year', 'frequency', 'last_edited', 'created_at', 'unique_key', 'datecycle_color'
+    'day', 'month', 'year', 'frequency', 'last_edited', 'created_at', 'unique_key',
+    'datecycle_color', 'date_emoji', 'pinned'
 ];
 
 foreach ($required_fields as $field) {
@@ -56,35 +56,32 @@ foreach ($required_fields as $field) {
     }
 }
 
-// Extract and sanitize inputs.
-$buwana_id  = (int) $data['buwana_id'];
-$cal_id     = (int) $data['cal_id'];
-$cal_name   = $cal_conn->real_escape_string($data['cal_name']);
-$cal_color  = $cal_conn->real_escape_string($data['cal_color']);
-$title      = $cal_conn->real_escape_string($data['title']);
-$date       = $cal_conn->real_escape_string($data['date']); // e.g., "2025-2-1"
-$time       = $cal_conn->real_escape_string($data['time']);
-$time_zone  = $cal_conn->real_escape_string($data['time_zone']);
-$day        = (int) $data['day'];
-$month      = (int) $data['month'];
-$year       = (int) $data['year'];
-$frequency  = $cal_conn->real_escape_string($data['frequency']);
-$created_at = $cal_conn->real_escape_string($data['created_at']);
-$last_edited = date('Y-m-d H:i:s', strtotime($data['last_edited'] ?? 'now'));
-$unique_key = $cal_conn->real_escape_string($data['unique_key']);
-
-// ✅ **Extract and sanitize `datecycle_color`**
+// ✅ **Extract and sanitize all fields**
+$buwana_id      = (int) $data['buwana_id'];
+$cal_id         = (int) $data['cal_id'];
+$cal_name       = $cal_conn->real_escape_string($data['cal_name']);
+$cal_color      = $cal_conn->real_escape_string($data['cal_color']);
+$title          = $cal_conn->real_escape_string($data['title']);
+$date           = $cal_conn->real_escape_string($data['date']);
+$time           = $cal_conn->real_escape_string($data['time']);
+$time_zone      = $cal_conn->real_escape_string($data['time_zone']);
+$day            = (int) $data['day'];
+$month          = (int) $data['month'];
+$year           = (int) $data['year'];
+$frequency      = $cal_conn->real_escape_string($data['frequency']);
+$created_at     = $cal_conn->real_escape_string($data['created_at']);
+$last_edited    = date('Y-m-d H:i:s', strtotime($data['last_edited'] ?? 'now'));
+$unique_key     = $cal_conn->real_escape_string($data['unique_key']);
 $datecycle_color = $cal_conn->real_escape_string($data['datecycle_color']);
+$date_emoji     = $cal_conn->real_escape_string($data['date_emoji']);
+$pinned         = (int) $data['pinned']; // Convert to integer (0 or 1)
 
-// Set synced flag to integer 1 (meaning synced)
-$synced = 1;
-
+// ✅ **Modify SQL query to include `date_emoji` and `pinned`**
 try {
-    // ✅ **Modify SQL query to include `datecycle_color`**
     $query = "
         INSERT INTO datecycles_tb
-        (buwana_id, cal_id, cal_name, cal_color, title, date, time, time_zone, day, month, year, frequency, created_at, last_edited, synced, unique_key, datecycle_color)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (buwana_id, cal_id, cal_name, cal_color, title, date, time, time_zone, day, month, year, frequency, created_at, last_edited, synced, unique_key, datecycle_color, date_emoji, pinned)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ";
 
     $stmt = $cal_conn->prepare($query);
@@ -92,9 +89,9 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // ✅ **Bind `datecycle_color` in the parameters**
+    // ✅ **Bind `date_emoji` and `pinned` in the parameters**
     $stmt->bind_param(
-        'iissssssiiisssiss',
+        'iissssssiiisssisssi',
         $buwana_id,
         $cal_id,
         $cal_name,
@@ -109,9 +106,11 @@ try {
         $frequency,
         $created_at,
         $last_edited,
-        $synced,
+        $synced = 1, // Set to 1 (meaning synced)
         $unique_key,
-        $datecycle_color // Bind this newly added field
+        $datecycle_color,
+        $date_emoji,
+        $pinned
     );
 
     // Execute the query.
@@ -119,8 +118,15 @@ try {
     $new_id = $stmt->insert_id;
     $stmt->close();
 
-    // ✅ **Return success response with stored `datecycle_color`**
-    echo json_encode(['success' => true, 'id' => $new_id, 'stored_color' => $datecycle_color]);
+    // ✅ **Return success response with stored fields**
+    echo json_encode([
+        'success' => true,
+        'id' => $new_id,
+        'stored_emoji' => $date_emoji,
+        'stored_pinned' => $pinned,
+        'stored_color' => $datecycle_color
+    ]);
+
 } catch (Exception $e) {
     error_log('Error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
