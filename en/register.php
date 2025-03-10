@@ -105,7 +105,7 @@ echo '<!DOCTYPE html>
         </button>
     <?php endif; ?>
             </div>
-        </div>
+
 
         <div id="offset-learn-more" class="dashboard-panel">
             <h2>Training Details</h2>
