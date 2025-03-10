@@ -99,8 +99,11 @@ echo '<!DOCTYPE html>
                 <p><?php echo $training_summary; ?></p>
 
                 <?php if (!empty($training_url)) : ?>
-                    <p><a href="<?php echo $training_url; ?>" target="_blank">Join the Event</a></p>
-                <?php endif; ?>
+
+                <button id="order-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;" href="<?php echo $training_url; ?>">
+            Set up Purchase ➡️
+        </button>
+    <?php endif; ?>
             </div>
         </div>
 
