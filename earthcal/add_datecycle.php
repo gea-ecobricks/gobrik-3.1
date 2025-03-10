@@ -3,10 +3,8 @@ require_once '../earthenAuth_helper.php';
 require_once '../buwanaconn_env.php';
 require_once '../calconn_env.php'; // Include EarthCal database connection
 
-// Set headers for JSON response
 header('Content-Type: application/json');
 
-// CORS configuration
 $allowed_origins = [
     'https://cal.earthen.io',
     'https://cycles.earthen.io',
@@ -76,8 +74,28 @@ $datecycle_color = $cal_conn->real_escape_string($data['datecycle_color']);
 $date_emoji     = $cal_conn->real_escape_string($data['date_emoji']);
 $pinned         = (int) $data['pinned']; // Convert to integer (0 or 1)
 
-// ✅ **Modify SQL query to include `date_emoji` and `pinned`**
+// ✅ Define `synced` as a separate variable
+$synced = 1;
+
 try {
+    // ✅ Check if the unique_key already exists
+    $checkQuery = "SELECT COUNT(*) as count FROM datecycles_tb WHERE unique_key = ?";
+    $stmtCheck = $cal_conn->prepare($checkQuery);
+    $stmtCheck->bind_param('s', $unique_key);
+    $stmtCheck->execute();
+    $resultCheck = $stmtCheck->get_result();
+    $row = $resultCheck->fetch_assoc();
+    $stmtCheck->close();
+
+    if ($row['count'] > 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'DateCycle already exists. No need to add.'
+        ]);
+        exit();
+    }
+
+    // ✅ Modify SQL query to include `date_emoji` and `pinned`
     $query = "
         INSERT INTO datecycles_tb
         (buwana_id, cal_id, cal_name, cal_color, title, date, time, time_zone, day, month, year, frequency, created_at, last_edited, synced, unique_key, datecycle_color, date_emoji, pinned)
@@ -89,38 +107,36 @@ try {
         throw new Exception('Failed to prepare the statement: ' . $cal_conn->error);
     }
 
-    // ✅ **Bind `date_emoji` and `pinned` in the parameters**
-    $synced = 1; // ✅ Define `synced` separately before binding
-$stmt->bind_param(
-    'iissssssiiisssisssi',
-    $buwana_id,
-    $cal_id,
-    $cal_name,
-    $cal_color,
-    $title,
-    $date,
-    $time,
-    $time_zone,
-    $day,
-    $month,
-    $year,
-    $frequency,
-    $created_at,
-    $last_edited,
-    $synced, // ✅ Now passing a variable
-    $unique_key,
-    $datecycle_color,
-    $date_emoji,
-    $pinned
-);
+    // ✅ Bind all parameters properly
+    $stmt->bind_param(
+        'iissssssiiisssisssi',
+        $buwana_id,
+        $cal_id,
+        $cal_name,
+        $cal_color,
+        $title,
+        $date,
+        $time,
+        $time_zone,
+        $day,
+        $month,
+        $year,
+        $frequency,
+        $created_at,
+        $last_edited,
+        $synced,
+        $unique_key,
+        $datecycle_color,
+        $date_emoji,
+        $pinned
+    );
 
-
-    // Execute the query.
+    // Execute query
     $stmt->execute();
     $new_id = $stmt->insert_id;
     $stmt->close();
 
-    // ✅ **Return success response with stored fields**
+    // ✅ Return success response with stored fields
     echo json_encode([
         'success' => true,
         'id' => $new_id,
