@@ -89,7 +89,7 @@ echo '<!DOCTYPE html>
     <!-- PAGE CONTENT -->
     <div id="top-page-image" class="gea-logo top-page-image"></div>
 
-    <img scr="../photos/events/terraces-forests-gladys.jpg" width:100%>
+    <img scr="../photos/events/terraces-forests-gladys.jpg" style="width:100%;">
 
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
@@ -130,6 +130,7 @@ echo '<!DOCTYPE html>
             <p><strong>Avg Brik Weight:</strong> <?php echo $avg_brik_weight; ?>g</p>
             <p><strong>Plastic Packed:</strong> <?php echo $est_plastic_packed; ?>g</p>
         </div>
+    DING!
     </div>
 
 
