@@ -100,16 +100,17 @@ echo '<!DOCTYPE html>
             <?php endif; ?>
         </div>
     </div>
-</div>
 
-<div id="offset-learn-more" class="dashboard-panel">
-    <h3>Community Event Details</h3>
-    <p><strong>Training Title:</strong> <?php echo $training_title; ?></p>
-    <p><strong>Training Date:</strong> <?php echo $training_date; ?></p>
-    <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
-    <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
-    <p><strong>Training Country:</strong> <?php echo $training_country; ?></p>
-    <p><strong>Training Location:</strong> <?php echo $training_location; ?></p>
+
+    <div id="offset-learn-more" class="dashboard-panel">
+        <h3>Community Event Details</h3>
+        <p><strong>Training Title:</strong> <?php echo $training_title; ?></p>
+        <p><strong>Training Date:</strong> <?php echo $training_date; ?></p>
+        <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
+        <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
+        <p><strong>Training Country:</strong> <?php echo $training_country; ?></p>
+        <p><strong>Training Location:</strong> <?php echo $training_location; ?></p>
+    </div>
 </div>
 
 <!-- FOOTER -->
