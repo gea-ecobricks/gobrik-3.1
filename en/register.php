@@ -129,7 +129,7 @@ echo '<!DOCTYPE html>
             <p><strong>Plastic Packed:</strong> <?php echo $est_plastic_packed; ?>g</p>
         </div>
     </div>
-</div>
+
 
     <!-- FOOTER -->
     <?php require_once("../footer-2024.php"); ?>
