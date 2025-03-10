@@ -17,9 +17,9 @@
 <STYLE>
 
 
-
     #main {
-        height: fit-content;
+        height: fit-content !important;
+        padding-bottom: 100px;
     }
 
 

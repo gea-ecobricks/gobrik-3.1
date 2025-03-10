@@ -9,12 +9,9 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in
 
 // Initialize training variables
-$training_title = $training_date = $training_logged = $lead_trainer = "";
-$trained_community = $training_type = $briks_made = $avg_brik_weight = $est_plastic_packed = "";
-$training_country = $training_location = $location_full = $training_summary = "";
-$training_agenda = $training_success = $training_challenges = $training_lessons_learned = "";
-$training_url = $connected_ecobricks = "";
-$ready_to_show = 0;
+$training_title = $training_date = $lead_trainer = $training_type = "";
+$training_country = $training_location = $training_url = "";
+$first_name = ""; // Default empty
 
 // Check if the user is logged in
 if ($is_logged_in) {
@@ -24,12 +21,7 @@ if ($is_logged_in) {
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch the user's location data
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    // Fetch user data
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
     $buwana_conn->close();  // Close the database connection
@@ -49,88 +41,73 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $training_title = htmlspecialchars($row['training_title'], ENT_QUOTES, 'UTF-8');
     $training_date = htmlspecialchars($row['training_date'], ENT_QUOTES, 'UTF-8');
-    $training_logged = htmlspecialchars($row['training_logged'], ENT_QUOTES, 'UTF-8');
     $lead_trainer = htmlspecialchars($row['lead_trainer'], ENT_QUOTES, 'UTF-8');
-    $trained_community = htmlspecialchars($row['trained_community'], ENT_QUOTES, 'UTF-8');
     $training_type = htmlspecialchars($row['training_type'], ENT_QUOTES, 'UTF-8');
-    $briks_made = $row['briks_made'];
-    $avg_brik_weight = $row['avg_brik_weight'];
-    $est_plastic_packed = $row['est_plastic_packed'];
     $training_country = htmlspecialchars($row['training_country'], ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'], ENT_QUOTES, 'UTF-8');
-    $location_full = htmlspecialchars($row['location_full'], ENT_QUOTES, 'UTF-8');
-    $training_summary = nl2br(htmlspecialchars($row['training_summary'], ENT_QUOTES, 'UTF-8'));
-    $training_agenda = nl2br(htmlspecialchars($row['training_agenda'], ENT_QUOTES, 'UTF-8'));
-    $training_success = nl2br(htmlspecialchars($row['training_success'], ENT_QUOTES, 'UTF-8'));
-    $training_challenges = nl2br(htmlspecialchars($row['training_challenges'], ENT_QUOTES, 'UTF-8'));
-    $training_lessons_learned = nl2br(htmlspecialchars($row['training_lessons_learned'], ENT_QUOTES, 'UTF-8'));
     $training_url = htmlspecialchars($row['training_url'], ENT_QUOTES, 'UTF-8');
-    $connected_ecobricks = nl2br(htmlspecialchars($row['connected_ecobricks'], ENT_QUOTES, 'UTF-8'));
-    $ready_to_show = $row['ready_to_show'];
 }
 
 $stmt->close();
 $gobrik_conn->close();
-
-echo '<!DOCTYPE html>
-<html lang="' . $lang . '">
-<head>
-<meta charset="UTF-8">
-<title>' . $training_title . '</title>
-';
 ?>
+
+<!DOCTYPE html>
+<html lang="<?php echo $lang; ?>">
+<head>
+    <meta charset="UTF-8">
+    <title><?php echo $training_title; ?></title>
+</head>
 
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/register-inc.php"); ?>
 
-    <div class="splash-title-block"></div>
-    <div id="splash-bar"></div>
+<div class="splash-title-block"></div>
+<div id="splash-bar"></div>
 
-    <!-- PAGE CONTENT -->
-    <div id="top-page-image" class="gea-logo top-page-image"></div>
-
-
-    <div id="form-submission-box" class="landing-page-form">
-        <div class="form-container">
-
-            <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-                <p style="font-size:small"><?php echo $training_type; ?></p>
-                 <p style="font-size:medium"><strong><?php echo $training_date; ?></strong></p>
-
-                <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
-
-                <h2><?php echo $training_title; ?></h2>
-                <h3 style="font-size:medium">Lead by <?php echo $lead_trainer; ?></h3>
-                <p><?php echo $training_summary; ?></p>
-                <p><?php echo $training_agenda; ?></p>
-
-
-
-                <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;" href="<?php echo $training_url; ?>">
-            RSVP
-        </button>
-
-            </div>
-
-
-        <div id="offset-learn-more" class="dashboard-panel">
-            <h3>Community Event Details</h3>
-            <p><strong>Location:</strong><?php echo $training_location; ?> (<?php echo $training_country; ?>)</p>
-
-            <p><strong>Lead trainers:</strong> <?php echo $briks_made; ?></p>
-            <p><strong>Avg Brik Weight:</strong> <?php echo $avg_brik_weight; ?>g</p>
-            <p><strong>Plastic Packed:</strong> <?php echo $est_plastic_packed; ?>g</p>
-        </div>
-
-    </div>
-
+<!-- PAGE CONTENT -->
+<div id="top-page-image" class="gea-logo top-page-image">
+    <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo" alt="Event Lead Photo">
 </div>
 
+<div id="form-submission-box" class="landing-page-form">
+    <div class="form-container">
+        <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+            <p style="font-size:small"><?php echo $training_type; ?></p>
+            <h2><?php echo $training_title; ?></h2>
+            <p><strong><?php echo $training_date; ?></strong></p>
+            <h3 style="font-size:medium">Lead by <?php echo $lead_trainer; ?></h3>
 
+            <!-- RSVP BUTTON -->
+            <a href="<?php echo $training_url; ?>">
+                <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
+                    <?php echo $is_logged_in && !empty($first_name) ? "RSVP as $first_name" : "RSVP"; ?>
+                </button>
+            </a>
 
+            <!-- Message for non-logged-in users -->
+            <?php if (!$is_logged_in): ?>
+                <p style="font-size: 0.9em; margin-top: 10px;">
+                    To RSVP, you'll need to log in with your GoBrik account or sign up for an account.
+                </p>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
 
-    <!-- FOOTER -->
-    <?php require_once("../footer-2024.php"); ?>
+<!-- Community Event Details -->
+<div id="offset-learn-more" class="dashboard-panel">
+    <h3>Community Event Details</h3>
+    <p><strong>Training Title:</strong> <?php echo $training_title; ?></p>
+    <p><strong>Training Date:</strong> <?php echo $training_date; ?></p>
+    <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
+    <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
+    <p><strong>Training Country:</strong> <?php echo $training_country; ?></p>
+    <p><strong>Training Location:</strong> <?php echo $training_location; ?></p>
+</div>
+
+<!-- FOOTER -->
+<?php require_once("../footer-2024.php"); ?>
 
 </body>
 </html>
