@@ -107,7 +107,7 @@ echo '<!DOCTYPE html>
 
 
                  <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;" href="<?php echo $training_url; ?>">
-                <?php echo $is_logged_in ? "RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "RSVP"; ?>
+                <?php echo $is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"; ?>
             </button>
 
             <?php if (!$is_logged_in) : ?>
@@ -115,10 +115,12 @@ echo '<!DOCTYPE html>
             <?php endif; ?>
 
             </div>
+        <br><br>
 
 
         <div id="offset-learn-more" class="dashboard-panel">
     <h3>Community Event Details</h3>
+    <hr>
     <p><strong>Title:</strong> <?php echo $training_title; ?></p>
     <p><strong>Date:</strong> <?php echo $training_date; ?></p>
     <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
