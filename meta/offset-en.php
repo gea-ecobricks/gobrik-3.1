@@ -15,9 +15,9 @@
 <meta property="og:image:width" content="1000" />
 <meta property="og:image:height" content="" />
 <meta property="og:image:alt"     content="A balance of grey and green impacts"/>
-<meta property="og:locale" content="en_GB, id_ID" />
+<meta property="og:locale" content="en_GB" />
 
-<meta property="article:modified_time" content="2023-05-07T09:14:13+00:00" />
+<meta property="article:modified_time" content="2025-03-10T09:14:13+00:00" />
 
 	<meta name="author" content="GoBrik.com">
   
