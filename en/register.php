@@ -92,13 +92,15 @@ echo '<!DOCTYPE html>
 
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
-            <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
 
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-                <p style="font-size:smaller"><?php echo $training_type; ?></small>
+                <p style="font-size:small"><?php echo $training_type; ?></p>
+                 <p style="font-size:medium"><strong><?php echo $training_date; ?></strong></p>
+
+                <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
+
                 <h1><?php echo $training_title; ?></h1>
-                <p style="font-size:medium"><strong><?php echo $training_date; ?></strong>
-                <p style="font-size:medium">Lead by <?php echo $lead_trainer; ?></small></p>
+                <h4 style="font-size:medium">Lead by <?php echo $lead_trainer; ?></h4>
                 <p><?php echo $training_summary; ?></p>
                 <p><?php echo $training_agenda; ?></p>
 
