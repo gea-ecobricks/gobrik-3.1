@@ -89,16 +89,18 @@ echo '<!DOCTYPE html>
     <!-- PAGE CONTENT -->
     <div id="top-page-image" class="gea-logo top-page-image"></div>
 
-<img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
 
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
+            <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
+
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
                 <p style="font-size:smaller"><?php echo $training_type; ?></small>
                 <h1><?php echo $training_title; ?></h1>
                 <p style="font-size:medium"><strong><?php echo $training_date; ?></strong>
                 <p style="font-size:medium">Lead by <?php echo $lead_trainer; ?></small></p>
                 <p><?php echo $training_summary; ?></p>
+                <p><?php echo $training_agenda; ?></p>
 
                 <?php if (!empty($training_url)) : ?>
 
@@ -111,28 +113,16 @@ echo '<!DOCTYPE html>
 
         <div id="offset-learn-more" class="dashboard-panel">
             <h4>Community Event Details</h4>
-            <p><strong>Location:</strong> <?php echo $training_location; ?> (<?php echo $training_country; ?>)</p>
-            <p><strong>Training Agenda:</strong> <?php echo $training_agenda; ?></p>
+            <p><strong>Location:</strong><?php echo $training_location; ?> (<?php echo $training_country; ?>)</p>
 
-            <?php if (!empty($training_success)) : ?>
-                <p><strong>Training Success:</strong> <?php echo $training_success; ?></p>
-            <?php endif; ?>
-
-            <?php if (!empty($training_challenges)) : ?>
-                <p><strong>Challenges:</strong> <?php echo $training_challenges; ?></p>
-            <?php endif; ?>
-
-            <?php if (!empty($training_lessons_learned)) : ?>
-                <p><strong>Lessons Learned:</strong> <?php echo $training_lessons_learned; ?></p>
-            <?php endif; ?>
-
-            <p><strong>Briks Made:</strong> <?php echo $briks_made; ?></p>
+            <p><strong>Lead trainers:</strong> <?php echo $briks_made; ?></p>
             <p><strong>Avg Brik Weight:</strong> <?php echo $avg_brik_weight; ?>g</p>
             <p><strong>Plastic Packed:</strong> <?php echo $est_plastic_packed; ?>g</p>
         </div>
 
     </div>
- DING!
+
+
 
 
     <!-- FOOTER -->
