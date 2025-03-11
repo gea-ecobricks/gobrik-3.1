@@ -86,7 +86,7 @@
   @media screen and (min-width: 769px) {
 
   #main {
-    height: 68vh;
+    height: 68vh !important;
 }
 
    .toggle-container {

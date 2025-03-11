@@ -206,8 +206,8 @@ function openInfoModal(lang) {
         <div class="preview-title">${title}</div>
         <p class="preview-text" style="font-size:medium;">${message}</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <a href="login.php?redirect=register.php" class="modal-button">${loginButton}</a>
-            <a href="signup.php" class="modal-button">${signupButton}</a>
+            <a href="login.php?redirect=register.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">${loginButton}</a>
+            <a href="signup.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">${signupButton}</a>
         </div>
     `;
 
@@ -246,7 +246,7 @@ function openRegistrationSuccessModal(trainingTitle) {
         <h4>${trainingTitle}</h4>
         <p>Check your email for your registration confirmation and Zoom invitation link.</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <a href="dashboard.php" class="modal-button">🏠 Dashboard</a>
+            <a href="dashboard.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">🏠 Dashboard</a>
         </div>
     `;
 
