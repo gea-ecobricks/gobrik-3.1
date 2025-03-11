@@ -125,15 +125,13 @@ echo '<!DOCTYPE html>
                 <p><?php echo $training_summary; ?></p>
                 <p><?php echo $training_agenda; ?></p>
 
+<!-- RSVP Button -->
+<button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
+    <?php echo $is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"; ?>
+</button>
 
- <!-- RSVP Button -->
-            <button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
-                <?php echo $is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"; ?>
-            </button>
 
-            <!-- JavaScript to handle RSVP click -->
 
-        <br><br>
 
 
         <div id="event-details" class="dashboard-panel">
@@ -150,17 +148,29 @@ echo '<!DOCTYPE html>
 </div>
 
 
+<!-- JavaScript to handle RSVP click -->
+<script>
+document.getElementById("rsvp-button").addEventListener("click", function() {
+    <?php if ($is_logged_in && isset($ecobricker_id)): ?>
+        // Redirect logged-in users to registration-confirmed.php
+        window.location.href = "registration-confirmed.php?training_id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>";
+    <?php else: ?>
+        // Show login modal for non-logged-in users
+        openInfoModal('<?php echo $lang; ?>');
+    <?php endif; ?>
+});
+</script>
 
 <script>
-function openInfoModal(lang = '<?php echo $lang; ?>') {
+function openInfoModal(lang) {
     const modal = document.getElementById('form-modal-message');
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
+
+    photobox.style.display = 'none'; // Hide photo box if not needed
+
     let title, message, loginButton, signupButton;
 
-    photobox.style.display = 'none'; // Hide the photo box if not needed
-
-    // Set translations based on language
     switch (lang) {
         case 'fr':
             title = "Connexion requise";
@@ -188,7 +198,6 @@ function openInfoModal(lang = '<?php echo $lang; ?>') {
             break;
     }
 
-    // Construct modal content
     let content = `
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
             <h1>🌍</h1>
@@ -201,18 +210,20 @@ function openInfoModal(lang = '<?php echo $lang; ?>') {
         </div>
     `;
 
-    // Inject content into modal
     messageContainer.innerHTML = content;
 
-    // Show modal
     modal.style.display = 'flex';
-    document.getElementById('page-content').classList.add('blurred');
-    document.getElementById('footer-full').classList.add('blurred');
     document.body.classList.add('modal-open');
 }
 
-//
+// Function to close the modal
+function closeInfoModal() {
+    const modal = document.getElementById('form-modal-message');
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+}
 </script>
+
 
 
 
