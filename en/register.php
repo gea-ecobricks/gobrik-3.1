@@ -92,6 +92,18 @@ echo '<!DOCTYPE html>
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/register-inc.php"); ?>
 
+
+<div id="form-modal-message" class="modal-hidden">
+    <button type="button" onclick="closeInfoModal()" aria-label="Click to close modal" class="x-button"></button>
+    <div class="modal-content-box" id="modal-content-box">
+        <div class="modal-message"></div>
+    </div>
+    <div class="modal-photo-box" id="modal-photo-box">
+        <div class ="modal-photo"></div>
+    </div>
+
+</div>
+
     <div class="splash-title-block"></div>
     <div id="splash-bar"></div>
 
@@ -124,17 +136,19 @@ echo '<!DOCTYPE html>
         <br><br>
 
 
-        <div id="offset-learn-more" class="dashboard-panel">
-    <h3>Details of the event</h3>
-    <hr>
-    <p><strong>Title:</strong> <?php echo $training_title; ?></p>
-    <p><strong>Date:</strong> <?php echo $training_date; ?></p>
-    <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
-    <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
-    <p><strong>Country:</strong> <?php echo $training_country; ?></p>
-    <p><strong>Location:</strong> <?php echo $training_location; ?></p>
+        <div id="event-details" class="dashboard-panel">
+            <h3>Details of the event</h3>
+            <hr>
+            <p><strong>Title:</strong> <?php echo $training_title; ?></p>
+            <p><strong>Date:</strong> <?php echo $training_date; ?></p>
+            <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
+            <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
+            <p><strong>Country:</strong> <?php echo $training_country; ?></p>
+            <p><strong>Location:</strong> <?php echo $training_location; ?></p>
+        </div>
+    </div>
 </div>
-</div>
+
 
 
 <script>
