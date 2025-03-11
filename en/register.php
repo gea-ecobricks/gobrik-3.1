@@ -152,14 +152,15 @@ echo '<!DOCTYPE html>
 <script>
 document.getElementById("rsvp-button").addEventListener("click", function() {
     <?php if ($is_logged_in && isset($ecobricker_id)): ?>
-        // Redirect logged-in users to registration-confirmed.php
-        window.location.href = "registration-confirmed.php?training_id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>";
+        // Redirect logged-in users to registration-confirmation.php
+        window.location.href = "registration_confirmation.php?training_id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>";
     <?php else: ?>
         // Show login modal for non-logged-in users
         openInfoModal('<?php echo $lang; ?>');
     <?php endif; ?>
 });
 </script>
+
 
 <script>
 function openInfoModal(lang) {
@@ -223,6 +224,38 @@ function closeInfoModal() {
     document.body.classList.remove('modal-open');
 }
 </script>
+
+<?php if (isset($_GET['registered']) && $_GET['registered'] == 1): ?>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    openRegistrationSuccessModal("<?php echo htmlspecialchars($training_title, ENT_QUOTES, 'UTF-8'); ?>");
+});
+
+function openRegistrationSuccessModal(trainingTitle) {
+    const modal = document.getElementById('form-modal-message');
+    const messageContainer = modal.querySelector('.modal-message');
+    const photobox = document.getElementById('modal-photo-box');
+
+    photobox.style.display = 'none';
+
+    let content = `
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+            <h1>✅</h1>
+        </div>
+        <div class="preview-title">You're now registered for the community event</div>
+        <h4>${trainingTitle}</h4>
+        <p>Check your email for your registration confirmation and Zoom invitation link.</p>
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+            <a href="dashboard.php" class="modal-button">🏠 Dashboard</a>
+        </div>
+    `;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+}
+</script>
+<?php endif; ?>
 
 
 
