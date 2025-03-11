@@ -125,7 +125,7 @@ echo '<!DOCTYPE html>
 
 
         <div id="offset-learn-more" class="dashboard-panel">
-    <h3>Community Event Details</h3>
+    <h3>Details of the event</h3>
     <hr>
     <p><strong>Title:</strong> <?php echo $training_title; ?></p>
     <p><strong>Date:</strong> <?php echo $training_date; ?></p>
