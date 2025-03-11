@@ -135,34 +135,76 @@ echo '<!DOCTYPE html>
     <p><strong>Location:</strong> <?php echo $training_location; ?></p>
 </div>
 
-    </div>
+<!-- Modal for Non-Logged-In Users -->
+<div id="form-modal-message" class="modal-hidden">
+    <button type="button" onclick="closeInfoModal()" aria-label="Click to close modal" class="x-button"></button>
+    <div class="modal-content-box" id="modal-content-box"></div>
+</div>
 
 
+<script>
+function openInfoModal(lang = '<?php echo $lang; ?>') {
+    const modal = document.getElementById('form-modal-message');
+    const messageContainer = modal.querySelector('.modal-message');
+    const photobox = document.getElementById('modal-photo-box');
+    let title, message, loginButton, signupButton;
 
- <script>
-                document.getElementById("rsvp-button").addEventListener("click", function() {
-                    <?php if ($is_logged_in && $ecobricker_id): ?>
-                        // Redirect logged-in users to registration-confirmed.php with training_id & ecobricker_id
-                        window.location.href = "registration-confirmed.php?training_id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>";
-                    <?php else: ?>
-                        // Show login modal for non-logged-in users
-                        openInfoModal("To RSVP for the Community Event, please log in with your GoBrik Buwana account.",
-                            '<a href="login.php?redirect=register.php" class="modal-button">🔑 Log In</a>' +
-                            '<a href="signup.php" class="modal-button">📝 Sign Up</a>');
-                    <?php endif; ?>
-                });
+    photobox.style.display = 'none'; // Hide the photo box if not needed
 
-                // Function to open modal
-                function openInfoModal(message, buttons) {
-                    document.getElementById("modal-content-box").innerHTML = '<p>' + message + '</p>' + buttons;
-                    document.getElementById("form-modal-message").classList.remove("modal-hidden");
-                }
+    // Set translations based on language
+    switch (lang) {
+        case 'fr':
+            title = "Connexion requise";
+            message = "Pour vous inscrire à l'événement communautaire, veuillez vous connecter avec votre compte GoBrik Buwana.";
+            loginButton = "🔑 Se connecter";
+            signupButton = "📝 S'inscrire";
+            break;
+        case 'es':
+            title = "Inicio de sesión requerido";
+            message = "Para inscribirse en el evento comunitario, inicie sesión con su cuenta de GoBrik Buwana.";
+            loginButton = "🔑 Iniciar sesión";
+            signupButton = "📝 Registrarse";
+            break;
+        case 'id':
+            title = "Diperlukan Login";
+            message = "Untuk mendaftar acara komunitas, silakan masuk dengan akun GoBrik Buwana Anda.";
+            loginButton = "🔑 Masuk";
+            signupButton = "📝 Daftar";
+            break;
+        default: // English (en)
+            title = "Login Required";
+            message = "To RSVP for the Community Event, please log in with your GoBrik Buwana account.";
+            loginButton = "🔑 Log In";
+            signupButton = "📝 Sign Up";
+            break;
+    }
 
-                // Function to close modal
-                function closeInfoModal() {
-                    document.getElementById("form-modal-message").classList.add("modal-hidden");
-                }
-            </script>
+    // Construct modal content
+    let content = `
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+            <h1>🌍</h1>
+        </div>
+        <div class="preview-title">${title}</div>
+        <p class="preview-text" style="font-size:medium;">${message}</p>
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+            <a href="login.php?redirect=register.php" class="modal-button">${loginButton}</a>
+            <a href="signup.php" class="modal-button">${signupButton}</a>
+        </div>
+    `;
+
+    // Inject content into modal
+    messageContainer.innerHTML = content;
+
+    // Show modal
+    modal.style.display = 'flex';
+    document.getElementById('page-content').classList.add('blurred');
+    document.getElementById('footer-full').classList.add('blurred');
+    document.body.classList.add('modal-open');
+}
+
+//
+</script>
+
 
 
     <!-- FOOTER -->

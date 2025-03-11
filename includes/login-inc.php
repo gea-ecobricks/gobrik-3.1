@@ -13,9 +13,7 @@
 
 <STYLE>
 
-#main {
-    height: fit-content;
-}
+
 
 
 .module-btn {
@@ -87,6 +85,10 @@
 
   @media screen and (min-width: 769px) {
 
+  #main {
+    height: 68vh;
+}
+
    .toggle-container {
             width: 350px;
             height: 45px;
@@ -94,6 +96,10 @@
       }
 
     @media screen and (max-width: 769px) {
+
+    #main {
+    height: fit-content;
+}
 
    .toggle-container {
             width: 100%;
