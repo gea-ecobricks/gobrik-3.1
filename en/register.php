@@ -134,11 +134,6 @@ echo '<!DOCTYPE html>
     <p><strong>Country:</strong> <?php echo $training_country; ?></p>
     <p><strong>Location:</strong> <?php echo $training_location; ?></p>
 </div>
-
-<!-- Modal for Non-Logged-In Users -->
-<div id="form-modal-message" class="modal-hidden">
-    <button type="button" onclick="closeInfoModal()" aria-label="Click to close modal" class="x-button"></button>
-    <div class="modal-content-box" id="modal-content-box"></div>
 </div>
 
 
