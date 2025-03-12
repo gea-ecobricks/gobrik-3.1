@@ -53,6 +53,8 @@ if ($is_logged_in) {
     }
 }
 
+    require_once '../gobrikconn_env.php';
+
 // Fetch training details
 $sql = "SELECT * FROM `tb_trainings` WHERE `training_id` = ?";
 $stmt = $gobrik_conn->prepare($sql);
