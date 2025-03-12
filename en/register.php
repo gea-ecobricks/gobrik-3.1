@@ -9,12 +9,13 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in
 
 // Initialize training variables
-$training_title = $training_date = $training_logged = $lead_trainer = "";
-$trained_community = $training_type = $briks_made = $avg_brik_weight = $est_plastic_packed = "";
-$training_country = $training_location = $location_full = $training_summary = "";
-$training_agenda = $training_success = $training_challenges = $training_lessons_learned = "";
-$training_url = $connected_ecobricks = "";
-$ready_to_show = 0;
+$training_id = 818; // Specific training record to fetch
+$training_title = $training_date = $lead_trainer = "";
+$training_type = $training_country = $training_location = "";
+$training_url = "";
+$first_name = "";
+$ecobricker_id = null;
+$is_registered = false; // Default: user is not registered
 
 // Check if the user is logged in
 if ($is_logged_in) {
@@ -24,7 +25,7 @@ if ($is_logged_in) {
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch the user's location data
+    // Fetch the user's details
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
@@ -41,13 +42,27 @@ if ($is_logged_in) {
     $stmt->fetch();
     $stmt->close();
 
+    // Check if the user is already registered for the training
+    if ($ecobricker_id) {
+        $sql_check = "SELECT id FROM tb_training_trainees WHERE training_id = ? AND ecobricker_id = ?";
+        $stmt_check = $gobrik_conn->prepare($sql_check);
+        $stmt_check->bind_param("ii", $training_id, $ecobricker_id);
+        $stmt_check->execute();
+        $stmt_check->store_result();
+
+        if ($stmt_check->num_rows > 0) {
+            $is_registered = true; // User is registered
+        }
+
+        $stmt_check->close();
+    }
+
     $buwana_conn->close();  // Close the database connection
 }
 
 // Connect to GoBrik database and fetch training details
 require_once '../gobrikconn_env.php';
 
-$training_id = 818; // Specific training record to fetch
 $sql = "SELECT * FROM `tb_trainings` WHERE `training_id` = ?";
 $stmt = $gobrik_conn->prepare($sql);
 $stmt->bind_param("i", $training_id);
@@ -58,24 +73,11 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $training_title = htmlspecialchars($row['training_title'], ENT_QUOTES, 'UTF-8');
     $training_date = htmlspecialchars($row['training_date'], ENT_QUOTES, 'UTF-8');
-    $training_logged = htmlspecialchars($row['training_logged'], ENT_QUOTES, 'UTF-8');
     $lead_trainer = htmlspecialchars($row['lead_trainer'], ENT_QUOTES, 'UTF-8');
-    $trained_community = htmlspecialchars($row['trained_community'], ENT_QUOTES, 'UTF-8');
     $training_type = htmlspecialchars($row['training_type'], ENT_QUOTES, 'UTF-8');
-    $briks_made = $row['briks_made'];
-    $avg_brik_weight = $row['avg_brik_weight'];
-    $est_plastic_packed = $row['est_plastic_packed'];
     $training_country = htmlspecialchars($row['training_country'], ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'], ENT_QUOTES, 'UTF-8');
-    $location_full = htmlspecialchars($row['location_full'], ENT_QUOTES, 'UTF-8');
-    $training_summary = nl2br(htmlspecialchars($row['training_summary'], ENT_QUOTES, 'UTF-8'));
-    $training_agenda = nl2br(htmlspecialchars($row['training_agenda'], ENT_QUOTES, 'UTF-8'));
-    $training_success = nl2br(htmlspecialchars($row['training_success'], ENT_QUOTES, 'UTF-8'));
-    $training_challenges = nl2br(htmlspecialchars($row['training_challenges'], ENT_QUOTES, 'UTF-8'));
-    $training_lessons_learned = nl2br(htmlspecialchars($row['training_lessons_learned'], ENT_QUOTES, 'UTF-8'));
     $training_url = htmlspecialchars($row['training_url'], ENT_QUOTES, 'UTF-8');
-    $connected_ecobricks = nl2br(htmlspecialchars($row['connected_ecobricks'], ENT_QUOTES, 'UTF-8'));
-    $ready_to_show = $row['ready_to_show'];
 }
 
 $stmt->close();
@@ -89,20 +91,12 @@ echo '<!DOCTYPE html>
 ';
 ?>
 
+
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/register-inc.php"); ?>
 
 
-<div id="form-modal-message" class="modal-hidden">
-    <button type="button" onclick="closeInfoModal()" aria-label="Click to close modal" class="x-button"></button>
-    <div class="modal-content-box" id="modal-content-box">
-        <div class="modal-message"></div>
-    </div>
-    <div class="modal-photo-box" id="modal-photo-box">
-        <div class ="modal-photo"></div>
-    </div>
 
-</div>
 
     <div class="splash-title-block"></div>
     <div id="splash-bar"></div>
@@ -114,25 +108,30 @@ echo '<!DOCTYPE html>
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
 
-            <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-                <p style="font-size:1em"><?php echo $training_type; ?></p>
-                 <p style="font-size:1.2emm"><strong><?php echo $training_date; ?></strong></p>
+           <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+    <?php if ($is_registered): ?>
+        <div id="registered-notice" style="background-color:#4CAF50; color:white; padding:10px 15px; border-radius:8px; display:block; width:fit-content; margin:auto; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
+            <span style="margin-right:10px;">👍</span> You're registered for this training!
+        </div>
+    <?php endif; ?>
 
-                <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
+    <p style="font-size:1em"><?php echo $training_type; ?></p>
+    <p style="font-size:1.2em"><strong><?php echo $training_date; ?></strong></p>
 
-                <h2><?php echo $training_title; ?></h2>
-                <h4 >Lead by <?php echo $lead_trainer; ?></h4>
-                <p><?php echo $training_summary; ?></p>
+    <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
 
-                <img src="../photos/events/r-a-tractatus.webp" style="width:100%;" id="event-lead-photo">
+    <h2><?php echo $training_title; ?></h2>
+    <h4>Lead by <?php echo $lead_trainer; ?></h4>
+    <p><?php echo $training_summary; ?></p>
 
-                <p><?php echo $training_agenda; ?></p>
+    <img src="../photos/events/r-a-tractatus.webp" style="width:100%;" id="event-lead-photo">
 
-<!-- RSVP Button -->
-<button id="rsvp-button" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">
-    <?php echo $is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"; ?>
-</button>
+    <p><?php echo $training_agenda; ?></p>
 
+    <!-- RSVP Button -->
+    <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
+        <?php echo $is_registered ? "You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
+    </button>
 </div>
 
 
