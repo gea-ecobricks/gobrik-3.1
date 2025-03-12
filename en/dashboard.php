@@ -162,22 +162,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
 
 
-<!--TRAINER MENU-->
-<?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-    <div id="gea-trainer-menu" class="dashboard-panel">
-        <h4 class="panel-title">GEA Trainer Menu</h4>
-        <div class="menu-buttons-row">
-            <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
-            <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>
-            <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
-            <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
-            <a href="bug-report.php" class="page-button">Report a Bug</a>
-            <a href="accounting.php" class="page-button">GEA Accounting</a>
-            <a href="register.php" class="confirm-button enabled" id="event-register-button" data-lang-id="004-event-regist" style="margin: 10px;">Register for GEA Community Event</a>
-
-        </div>
-    </div>
-<?php endif; ?>
 
 <!--ADMIN-->
 
@@ -203,6 +187,24 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
     </div>
 <?php endif; ?>
+
+
+
+<!--TRAINER MENU-->
+<?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
+    <div id="gea-trainer-menu" class="dashboard-panel">
+        <h4 class="panel-title">GEA Trainer Menu</h4>
+        <div class="menu-buttons-row">
+            <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
+            <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>
+            <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
+            <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
+            <a href="bug-report.php" class="page-button">Report a Bug</a>
+            <a href="accounting.php" class="page-button">GEA Accounting</a>
+            <a href="register.php" class="confirm-button enabled" id="event-register-button" data-lang-id="004-event-regist" style="margin: 10px;">Register for GEA Community Event</a>
+
+        </div>
+    </div>
 
 
 <!-- TRAINER TRAININGS -->
@@ -280,7 +282,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 </div>
 
 
-
+<?php endif; ?>
 
 
 
