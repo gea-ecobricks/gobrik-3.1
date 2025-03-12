@@ -395,12 +395,39 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     });
 
 
+
+// REGISTERED TRAININGS
+
+$(document).ready(function() {
+    $("#trainee-trainings").DataTable({
+        "responsive": true,
+        "pageLength": 10,  // Set default number of rows per page to 10
+        "searching": false, // Disable search function
+        "lengthChange": false, // Disable ability to change number of rows displayed
+        "language": {
+            "emptyTable": "You haven't registered for any trainings yet.",
+            "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
+            "infoEmpty": "No trainings available",
+            "loadingRecords": "Loading trainings...",
+            "processing": "Processing...",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
+    });
+});
+
+
 //TRAININGS
 
 $(document).ready(function() {
     $("#trainer-trainings").DataTable({
-        "responsive": true,
-        "pageLength": 5,
+         "pageLength": 10,  // Set default number of rows per page to 10
+        "searching": false, // Disable search function
+        "lengthChange": false, // Disable ability to change number of rows displayed
         "language": {
             "emptyTable": "You are not a trainer for any trainings yet.",
             "lengthMenu": "Show _MENU_ trainings",
@@ -861,29 +888,6 @@ function deleteEcobrick(serial_no) {
 }
 
 
-// REGISTERED TRAININGS
-
-$(document).ready(function() {
-    $("#trainee-trainings").DataTable({
-        "responsive": true,
-        "pageLength": 10,  // Set default number of rows per page to 10
-        "searching": false, // Disable search function
-        "lengthChange": false, // Disable ability to change number of rows displayed
-        "language": {
-            "emptyTable": "You haven't registered for any trainings yet.",
-            "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
-            "infoEmpty": "No trainings available",
-            "loadingRecords": "Loading trainings...",
-            "processing": "Processing...",
-            "paginate": {
-                "first": "First",
-                "last": "Last",
-                "next": "Next",
-                "previous": "Previous"
-            }
-        }
-    });
-});
 
 
 </script>

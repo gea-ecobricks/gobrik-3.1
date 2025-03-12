@@ -19,36 +19,8 @@
 
 
 
-//Databables
-
-
-   #ecobrick-search-return_info {
-   color: grey !important;
-   font-family: 'Mulish', sans-serif !important;
-   }
-
-   #latest-ecobricks_info {
-   color: grey !important;
-   font-family: 'Mulish', sans-serif !important;
-   }
-
-/* Media query for screens less than 769px wide */
-@media screen and (max-width: 768px) {
-    /* Hide the "Location" and "Weight" table headers */
-    #latest-ecobricks th:nth-child(2), /* Weight column header */
-    #latest-ecobricks th:nth-child(3)  /* Location column header */ {
-        display: none;
-    }
-
-    /* Hide the "Location" and "Weight" table cells */
-    #latest-ecobricks td:nth-child(2), /* Weight column cell */
-    #latest-ecobricks td:nth-child(3)  /* Location column cell */ {
-        display: none;
-    }
-}
-
     #main {
-        height: 2000px;
+        height: 2000pxt;
     }
 
     .preview-text {
@@ -89,19 +61,6 @@
   }
 }
 
-#featured_image {
-  margin-bottom: 8px;
-  margin-top: 8px;
-  padding: 5px;
-  font-size: 1em;
-}
-
-#tmb_featured_image {
-  margin-bottom: 8px;
-  margin-top: 8px;
-  padding: 5px;
-  font-size: 1em;
-}
 
 /* Centering the form vertically on larger screens */
 @media screen and (min-width: 701px) {
