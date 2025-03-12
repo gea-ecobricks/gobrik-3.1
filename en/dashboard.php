@@ -209,19 +209,19 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <td><?php echo htmlspecialchars($training['training_country']); ?></td>
                 <td><?php echo htmlspecialchars($training['training_type']); ?></td>
                 <td>
-                    <button class="confirm-button enabled" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
+                    <button class="page-button" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
                         📋 View Trainees
                     </button>
                     <a href="<?php echo htmlspecialchars($training['training_url'] ?? 'https://gobrik.com/en/register.php', ENT_QUOTES, 'UTF-8'); ?>"
-                       target="_blank" class="confirm-button enabled">
+                       target="_blank" class="page-button">
                        🔗 View Registration Page
                     </a>
-                    <a href="add-training.php?training_id=<?php echo $training['training_id']; ?>" class="confirm-button enabled">
+                    <!--<a href="add-training.php?training_id=<?php echo $training['training_id']; ?>" class="confirm-button enabled">
                         📝 Submit Training Report
                     </a>
                     <a href="training.php?training_id=<?php echo $training['training_id']; ?>" class="confirm-button enabled">
                         📄 View Training Report
-                    </a>
+                    </a>-->
                 </td>
 
             </tr>
