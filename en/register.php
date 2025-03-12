@@ -97,7 +97,7 @@ echo '<!DOCTYPE html>
 
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/register-inc.php"); ?>
-<div id="main">
+
 
 <div id="form-modal-message" class="modal-hidden">
     <button type="button" onclick="closeInfoModal()" aria-label="Click to close modal" class="x-button"></button>
@@ -124,7 +124,7 @@ echo '<!DOCTYPE html>
 
                 <?php if ($is_registered): ?>
         <div id="registered-notice" style="background-color:#4CAF50; color:white; padding:10px 15px; border-radius:8px; display:block; width:fit-content; margin:auto; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
-            <span style="margin-right:10px;">👍</span> You're registered for this training!
+            <span style="margin-right:10px;">👍</span> You're registered for this <?php echo $training_type; ?>!
         </div>
     <?php endif; ?>
 
@@ -143,7 +143,7 @@ echo '<!DOCTYPE html>
 
  <!-- RSVP Button -->
     <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
-        <?php echo $is_registered ? "You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
+        <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
     </button>
 </div>
 
