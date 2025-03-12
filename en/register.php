@@ -15,6 +15,7 @@ $training_country = $training_location = $location_full = $training_summary = ""
 $training_agenda = $training_success = $training_challenges = $training_lessons_learned = "";
 $training_url = $connected_ecobricks = "";
 $ready_to_show = 0;
+$is_registered = false; // Default: user is not registered
 
 // Check if the user is logged in
 if ($is_logged_in) {
