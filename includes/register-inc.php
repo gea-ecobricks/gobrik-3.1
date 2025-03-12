@@ -17,12 +17,16 @@
 <STYLE>
 
 
-/*
-    #main {
-        height: 2000px !important;
-        padding-bottom: 100px;
-    }
- */
+html, body {
+    min-height: 100%;
+    height: auto;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+#page-content, #main-content {
+    min-height: 100vh; /* Ensures it fills the screen but expands */
+    height: auto;
+}
 
 
 .module-btn {
