@@ -188,6 +188,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <!-- TRAINER TRAININGS -->
 
 <table id="trainer-trainings" class="display responsive nowrap" style="width:100%">
+    <h3 data-lang-id="002-my-ecobricks">My Trainings</h3>
+    <p>Trainings that you are managing</p>
     <thead>
         <tr>
             <th>Training Title</th>
