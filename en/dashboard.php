@@ -131,6 +131,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
             <a href="bug-report.php" class="page-button">Report a Bug</a>
             <a href="accounting.php" class="page-button">GEA Accounting</a>
+            <a href="register.php" class="confirm-button enabled" id="event-register-button" data-lang-id="004-event-regist" style="margin: 10px;">Register for GEA Community Event</a>
 
         </div>
     </div>
