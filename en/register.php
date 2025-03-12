@@ -115,13 +115,13 @@ echo '<!DOCTYPE html>
         <div class="form-container">
 
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-                <p style="font-size:small"><?php echo $training_type; ?></p>
-                 <p style="font-size:medium"><strong><?php echo $training_date; ?></strong></p>
+                <p style="font-size:1em"><?php echo $training_type; ?></p>
+                 <p style="font-size:1.2emm"><strong><?php echo $training_date; ?></strong></p>
 
                 <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
 
                 <h2><?php echo $training_title; ?></h2>
-                <h3 style="font-size:medium">Lead by <?php echo $lead_trainer; ?></h3>
+                <h4 >Lead by <?php echo $lead_trainer; ?></h4>
                 <p><?php echo $training_summary; ?></p>
                 <p><?php echo $training_agenda; ?></p>
 
@@ -130,12 +130,12 @@ echo '<!DOCTYPE html>
     <?php echo $is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"; ?>
 </button>
 
+</div>
 
 
 
-
-        <div id="event-details" class="dashboard-panel">
-            <h3>Details of the event</h3>
+        <div id="event-details" class="dashboard-panel" style="margin-top:20px;">
+            <h4>Community Event Details</h4>
             <hr>
             <p><strong>Title:</strong> <?php echo $training_title; ?></p>
             <p><strong>Date:</strong> <?php echo $training_date; ?></p>
@@ -145,7 +145,7 @@ echo '<!DOCTYPE html>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
         </div>
     </div>
-</div>
+
 
 
 <!-- JavaScript to handle RSVP click -->
@@ -204,9 +204,10 @@ function openInfoModal(lang) {
             <h1>🌍</h1>
         </div>
         <div class="preview-title">${title}</div>
-        <p class="preview-text" style="font-size:medium;">${message}</p>
+        <p class="preview-text" style="font-size:1.4;">${message}</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
             <a href="login.php?redirect=register.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">${loginButton}</a>
+            <p style="font-size:1.0";color:grey;>Or if you don't have an account yet...</p>
             <a href="signup.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">${signupButton}</a>
         </div>
     `;
