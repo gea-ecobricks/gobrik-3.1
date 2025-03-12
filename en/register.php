@@ -228,10 +228,11 @@ function openInfoModal(lang) {
             <h1>🌍</h1>
         </div>
         <div class="preview-title">${title}</div>
+        <h2>${title}</h2>
         <p class="preview-text" style="font-size:1.4;">${message}</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
             <a href="login.php?redirect=register.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">${loginButton}</a>
-            <p style="font-size:1.0";color:grey;>Or if you don't have an account yet...</p>
+            <p style="font-size:0.9";color:grey;>Or if you don't have an account yet...</p>
             <a href="signup.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">${signupButton}</a>
         </div>
     `;
