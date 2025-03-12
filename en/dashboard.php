@@ -207,7 +207,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <!-- TRAINER TRAININGS -->
 
-<div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+<table id="trainer-trainings" class="display responsive nowrap" style="width:100%; text-align-center">
     <h3 data-lang-id="002-my-trainings">My Trainings</h3>
     <p>Trainings that you are managing.</p>
     <thead>
@@ -249,7 +249,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </tbody>
 </table>
 
-<!-- MY TRAINEE TRAININGS-->
+<!-- MY REGISTERED TRAININGS-->
+
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
     <h3 data-lang-id="002-my-registrations">My Training Registrations</h3>
     <p>Trainings that you've registered for.</p>
@@ -261,6 +262,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <th>Location</th>
                 <th>Country</th>
                 <th>Type</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -271,6 +273,15 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <td><?php echo htmlspecialchars($training['training_location']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_country']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_type']); ?></td>
+                    <td>
+                        <a href="<?php echo htmlspecialchars($training['training_url'] ?? 'https://gobrik.com/en/register.php', ENT_QUOTES, 'UTF-8'); ?>"
+                           target="_blank" class="confirm-button enabled">
+                           🔗 View Registration Page
+                        </a>
+                        <a href="training.php?training_id=<?php echo $training['training_id']; ?>" class="confirm-button enabled">
+                            📄 View Training Report
+                        </a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -860,14 +871,15 @@ function deleteEcobrick(serial_no) {
 
 // REGISTERED TRAININGS
 
+
 $(document).ready(function() {
     $("#trainee-trainings").DataTable({
         "responsive": true,
-        "pageLength": 10,  // Set default number of rows per page to 10
-        "searching": false, // Disable search function
-        "lengthChange": false, // Disable ability to change number of rows displayed
+        "pageLength": 5,
         "language": {
             "emptyTable": "You haven't registered for any trainings yet.",
+            "lengthMenu": "Show _MENU_ trainings",
+            "search": "Search:",
             "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
             "infoEmpty": "No trainings available",
             "loadingRecords": "Loading trainings...",
@@ -881,7 +893,6 @@ $(document).ready(function() {
         }
     });
 });
-
 
 </script>
 
