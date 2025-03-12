@@ -185,35 +185,33 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php endif; ?>
 
 
-<div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-    <h3>My Trainings as a Trainer</h3>
-    <table id="trainer-trainings" class="display responsive nowrap" style="width:100%">
-        <thead>
-            <tr>
-                <th>Training Title</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Country</th>
-                <th>Type</th>
-                <th>Actions</th>
+<table id="trainer-trainings" class="display responsive nowrap" style="width:100%">
+    <thead>
+        <tr>
+            <th>Training Title</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Country</th>
+            <th>Type</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($trainings as $training): ?>
+            <tr onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
+                <td><?php echo htmlspecialchars($training['training_title']); ?></td>
+                <td><?php echo htmlspecialchars($training['training_date']); ?></td>
+                <td><?php echo htmlspecialchars($training['training_location']); ?></td>
+                <td><?php echo htmlspecialchars($training['training_country']); ?></td>
+                <td><?php echo htmlspecialchars($training['training_type']); ?></td>
+                <td>
+                    <button class="confirm-button enabled" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">📋 View Trainees</button>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($trainings as $training): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($training['training_title']); ?></td>
-                    <td><?php echo htmlspecialchars($training['training_date']); ?></td>
-                    <td><?php echo htmlspecialchars($training['training_location']); ?></td>
-                    <td><?php echo htmlspecialchars($training['training_country']); ?></td>
-                    <td><?php echo htmlspecialchars($training['training_type']); ?></td>
-                    <td>
-                        <a href="register.php?training_id=<?php echo $training['training_id']; ?>" class="confirm-button enabled">View</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
 
 
 
