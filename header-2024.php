@@ -720,4 +720,4 @@ function navigateTo(url) {
 </div>
 
 
-<div id="main" class="clearfix">
+<div id="main">

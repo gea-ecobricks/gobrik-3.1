@@ -8,13 +8,15 @@ $page = 'register';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in
 
+// Define training ID at the top
+$training_id = 818; // Ensure this is defined before any queries
+
 // Initialize training variables
-$training_title = $training_date = $training_logged = $lead_trainer = "";
-$trained_community = $training_type = $briks_made = $avg_brik_weight = $est_plastic_packed = "";
-$training_country = $training_location = $location_full = $training_summary = "";
-$training_agenda = $training_success = $training_challenges = $training_lessons_learned = "";
-$training_url = $connected_ecobricks = "";
-$ready_to_show = 0;
+$training_title = $training_date = $lead_trainer = "";
+$training_type = $training_country = $training_location = "";
+$training_url = "";
+$first_name = "";
+$ecobricker_id = null;
 $is_registered = false; // Default: user is not registered
 
 // Check if the user is logged in
@@ -25,14 +27,6 @@ if ($is_logged_in) {
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch the user's location data
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
-    $first_name = getFirstName($buwana_conn, $buwana_id);
-
     // Fetch ecobricker_id using buwana_id
     $sql = "SELECT ecobricker_id FROM tb_ecobrickers WHERE buwana_id = ?";
     $stmt = $gobrik_conn->prepare($sql);
@@ -42,7 +36,7 @@ if ($is_logged_in) {
     $stmt->fetch();
     $stmt->close();
 
-   // Check if the user is already registered for the training
+    // Check if the user is already registered for the training
     if ($ecobricker_id) {
         $sql_check = "SELECT id FROM tb_training_trainees WHERE training_id = ? AND ecobricker_id = ?";
         $stmt_check = $gobrik_conn->prepare($sql_check);
@@ -50,20 +44,16 @@ if ($is_logged_in) {
         $stmt_check->execute();
         $stmt_check->store_result();
 
+        // If a row exists, the user is registered
         if ($stmt_check->num_rows > 0) {
-            $is_registered = true; // User is registered
+            $is_registered = true;
         }
 
         $stmt_check->close();
     }
-
-    $buwana_conn->close();  // Close the database connection
 }
 
-// Connect to GoBrik database and fetch training details
-require_once '../gobrikconn_env.php';
-
-$training_id = 818; // Specific training record to fetch
+// Fetch training details
 $sql = "SELECT * FROM `tb_trainings` WHERE `training_id` = ?";
 $stmt = $gobrik_conn->prepare($sql);
 $stmt->bind_param("i", $training_id);
