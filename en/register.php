@@ -97,7 +97,7 @@ echo '<!DOCTYPE html>
 
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/register-inc.php"); ?>
-
+<div id="main">
 
 <div id="form-modal-message" class="modal-hidden">
     <button type="button" onclick="closeInfoModal()" aria-label="Click to close modal" class="x-button"></button>
