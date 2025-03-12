@@ -92,6 +92,26 @@ if ($stmt_trainings) {
     die("Error preparing statement for trainer trainings: " . $gobrik_conn->error);
 }
 
+// Fetch trainings where the user is a registered trainee
+$registered_trainings = [];
+$sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_country, t.training_type, t.training_url
+                             FROM tb_trainings t
+                             INNER JOIN tb_training_trainees tt ON t.training_id = tt.training_id
+                             WHERE tt.ecobricker_id = ?";
+$stmt_registered_trainings = $gobrik_conn->prepare($sql_registered_trainings);
+
+if ($stmt_registered_trainings) {
+    $stmt_registered_trainings->bind_param("i", $ecobricker_id);
+    $stmt_registered_trainings->execute();
+    $result_registered_trainings = $stmt_registered_trainings->get_result();
+
+    while ($row = $result_registered_trainings->fetch_assoc()) {
+        $registered_trainings[] = $row;
+    }
+    $stmt_registered_trainings->close();
+} else {
+    die("Error preparing statement for registered trainings: " . $gobrik_conn->error);
+}
 
 
     // Close the database connections
@@ -188,8 +208,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <!-- TRAINER TRAININGS -->
 
 <table id="trainer-trainings" class="display responsive nowrap" style="width:100%">
-    <h3 data-lang-id="002-my-ecobricks">My Trainings</h3>
-    <p>Trainings that you are managing</p>
+    <h3 data-lang-id="002-my-trainings">My Trainings</h3>
+    <p>Trainings that you are managing.</p>
     <thead>
         <tr>
             <th>Training Title</th>
@@ -228,6 +248,46 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php endforeach; ?>
     </tbody>
 </table>
+
+<!-- MY REGISTERED TRAININGS-->
+
+<div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+    <h3 data-lang-id="002-my-registrations">My Training Registrations</h3>
+    <p>Trainings that you've registered for.</p>
+    <table id="trainee-trainings" class="display responsive nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Training Title</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Country</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($registered_trainings as $training): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($training['training_title']); ?></td>
+                    <td><?php echo htmlspecialchars($training['training_date']); ?></td>
+                    <td><?php echo htmlspecialchars($training['training_location']); ?></td>
+                    <td><?php echo htmlspecialchars($training['training_country']); ?></td>
+                    <td><?php echo htmlspecialchars($training['training_type']); ?></td>
+                    <td>
+                        <a href="<?php echo htmlspecialchars($training['training_url'] ?? 'https://gobrik.com/en/register.php', ENT_QUOTES, 'UTF-8'); ?>"
+                           target="_blank" class="confirm-button enabled">
+                           🔗 View Registration Page
+                        </a>
+                        <a href="training.php?training_id=<?php echo $training['training_id']; ?>" class="confirm-button enabled">
+                            📄 View Training Report
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+
 
 
 
@@ -807,6 +867,33 @@ function deleteEcobrick(serial_no) {
         });
     }
 }
+
+
+// REGISTERED TRAININGS
+
+
+$(document).ready(function() {
+    $("#trainee-trainings").DataTable({
+        "responsive": true,
+        "pageLength": 5,
+        "language": {
+            "emptyTable": "You haven't registered for any trainings yet.",
+            "lengthMenu": "Show _MENU_ trainings",
+            "search": "Search:",
+            "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
+            "infoEmpty": "No trainings available",
+            "loadingRecords": "Loading trainings...",
+            "processing": "Processing...",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+        }
+    });
+});
+
 </script>
 
 
