@@ -162,6 +162,15 @@ echo '<!DOCTYPE html>
 
 
 
+
+
+
+
+    <!-- FOOTER -->
+    <?php require_once("../footer-2024.php"); ?>
+
+
+
 <!-- JavaScript to handle RSVP click -->
 <script>
 document.getElementById("rsvp-button").addEventListener("click", function() {
@@ -272,12 +281,6 @@ function openRegistrationSuccessModal(trainingTitle) {
 }
 </script>
 <?php endif; ?>
-
-
-
-
-    <!-- FOOTER -->
-    <?php require_once("../footer-2024.php"); ?>
 
 </body>
 </html>
