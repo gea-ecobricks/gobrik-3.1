@@ -23,7 +23,7 @@ html, body {
     overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
-#page-content, #main-content {
+#page-content, #main {
     min-height: 100vh; /* Ensures it fills the screen but expands */
     height: auto;
 }
