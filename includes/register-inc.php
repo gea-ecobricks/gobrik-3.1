@@ -48,7 +48,7 @@
 }
 
     #main {
-        height: fit-content;
+        height: 2000px;
     }
 
     .preview-text {
