@@ -314,7 +314,7 @@ function openRegistrationSuccessModal(trainingTitle) {
     let content = `
         <div class="preview-title">Registered!</div>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <img src="../webp/registration-confirmed.webp" style="width: 50%;
+            <img src="../webps/registration-confirmed.webp" style="width: 50%;
   max-width: 400px;">
             <h1>You're registered!</h1>
             <h4>See you at <i>${trainingTitle}</i></h4>
