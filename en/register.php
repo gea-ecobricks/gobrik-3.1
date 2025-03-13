@@ -128,9 +128,18 @@ echo '<!DOCTYPE html>
     <div id="top-page-image" class="gea-logo top-page-image"></div>
 
 
-     <!--<div id="form-submission-box" class="landing-page-form">
+   <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
 
+            Your mission, should you choose to accept it is...
+1. Set up a test account...
+2. Use your first name + the word test for your first name. Eg. Fran
+3. Use a fake email address with that name with the test.com domain:  i.e.  fran@test.com
+4. Pick a simple 6 character password.  i.e. 111111
+5. When prompted to enter the pin confirm code simply use:  AYYEW
+
+As you go about signing up, observe any typos, confusions, bugs, bad links, et
+  <!--
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
 
                 <?php if ($is_registered): ?>
@@ -157,7 +166,8 @@ echo '<!DOCTYPE html>
         <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
     </button>
 </div>
-
+-->
+</div>
 
 
 
@@ -172,9 +182,7 @@ echo '<!DOCTYPE html>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
         </div>
 
-    -->
 
-Testing!
 
 
     </div>
