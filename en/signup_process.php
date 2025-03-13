@@ -135,36 +135,34 @@ if ($stmt_update_user) {
             exit();
         }
 
+// PART 4.  Now create the Ecobricker account in GoBrik
+$sql_create_ecobricker = "INSERT INTO tb_ecobrickers
+(first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
+VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
 
-            // PART 4.  Now create the Ecobricker account in GoBrik
-            $sql_create_ecobricker = "INSERT INTO tb_ecobrickers
-            (first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
-            VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
-            $stmt_create_ecobricker = $gobrik_conn->prepare($sql_create_ecobricker);
+$stmt_create_ecobricker = $gobrik_conn->prepare($sql_create_ecobricker);
 
-            if (!$stmt_create_ecobricker) {
-                sendJsonError('db_error_create_ecobricker');
-            }
-
-            $full_name = $first_name;
-            $account_notes = "signup_process run. Email unverified";
-
-            $stmt_create_ecobricker->bind_param("ssisss", $first_name, $full_name, $buwana_id, $credential_value, $buwana_id, $account_notes);
-            if ($stmt_create_ecobricker->execute()) {
-                $response['success'] = true;
-                $response['redirect'] = "confirm-email.php?id=" . $gobrik_conn->insert_id;
-            } else {
-                sendJsonError('db_error_ecobricker');
-            }
-            $stmt_create_ecobricker->close(); // Closing the prepared statement
-        } else {
-            sendJsonError('db_error_user_update');
-        }
-        $stmt_update_user->close(); // Closing the update statement
-    } else {
-        sendJsonError('invalid_request');
-    }
+if (!$stmt_create_ecobricker) {
+    sendJsonError('db_error_create_ecobricker');
 }
+
+// Ensure `buwana_id` is valid and not zero
+$buwana_id = ($buwana_id > 0) ? $buwana_id : NULL;
+$maker_id = ($buwana_id > 0) ? $buwana_id : NULL; // Avoid inserting `0` as `maker_id`
+
+$full_name = $first_name; // Ensure full_name has a value
+$account_notes = "signup_process run. Email unverified";
+
+$stmt_create_ecobricker->bind_param("ssisss", $first_name, $full_name, $buwana_id, $credential_value, $maker_id, $account_notes);
+
+if ($stmt_create_ecobricker->execute()) {
+    $response['success'] = true;
+    $response['redirect'] = "confirm-email.php?id=" . $gobrik_conn->insert_id;
+} else {
+    sendJsonError('db_error_ecobricker');
+}
+
+$stmt_create_ecobricker->close(); // Closing the prepared statement
 
 ob_end_clean(); // Clear any previous output
 
