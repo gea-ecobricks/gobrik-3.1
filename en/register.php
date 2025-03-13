@@ -15,9 +15,9 @@ $training_id = 818; // Ensure this is defined before any queries
 $training_title = $training_date = $lead_trainer = "";
 $training_type = $training_country = $training_location = "";
 $training_url = "";
-$first_name = "";
 $ecobricker_id = null;
 $is_registered = false; // Default: user is not registered
+
 
 // Check if the user is logged in
 if ($is_logged_in) {
@@ -34,6 +34,7 @@ if ($is_logged_in) {
     $gea_status = getGEA_status($buwana_id);
     $user_roles = getUser_Role($buwana_id);
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $first_name = getFirstName($buwana_conn, $buwana_id);
 
     // Fetch ecobricker_id using buwana_id
     $sql = "SELECT ecobricker_id FROM tb_ecobrickers WHERE buwana_id = ?";
