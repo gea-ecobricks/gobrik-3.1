@@ -144,17 +144,6 @@ echo '<!DOCTYPE html>
 <?php require_once("../includes/register-inc.php"); ?>
 
 
-<!--<div id="form-modal-message" class="modal-hidden">
-    <button type="button" onclick="closeInfoModal()" aria-label="Click to close modal" class="x-button"></button>
-    <div class="modal-content-box" id="modal-content-box">
-        <div class="modal-message"></div>
-    </div>
-    <div class="modal-photo-box" id="modal-photo-box">
-        <div class ="modal-photo"></div>
-    </div>-->
-
-
-
     <div class="splash-title-block"></div>
     <div id="splash-bar"></div>
 
@@ -173,10 +162,10 @@ echo '<!DOCTYPE html>
         </div>
     <?php endif; ?>
 
-                <p style="font-size:1em"><?php echo $training_type; ?></p>
-                 <p style="font-size:1.2emm"><strong><?php echo $training_date; ?></strong></p>
+                <p style="font-size:1.1em;margin-top:10px;"><?php echo $training_type; ?></p>
+                 <p style="font-size:1.3emm"><strong><?php echo $training_date; ?></strong></p>
 
-                <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;" id="event-lead-photo">
+                <img src="../photos/events/terraces-forests-gladys.jpg" style="width:100%;border-radius: 10px;" id="event-lead-photo">
 
                 <h2><?php echo $training_title; ?></h2>
                 <h4 >Lead by <?php echo $lead_trainer; ?></h4>
