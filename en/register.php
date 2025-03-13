@@ -109,14 +109,14 @@ echo '<!DOCTYPE html>
 <?php require_once("../includes/register-inc.php"); ?>
 
 
-<div id="form-modal-message" class="modal-hidden">
+<!--<div id="form-modal-message" class="modal-hidden">
     <button type="button" onclick="closeInfoModal()" aria-label="Click to close modal" class="x-button"></button>
     <div class="modal-content-box" id="modal-content-box">
         <div class="modal-message"></div>
     </div>
     <div class="modal-photo-box" id="modal-photo-box">
         <div class ="modal-photo"></div>
-    </div>
+    </div>-->
 
 </div>
 
