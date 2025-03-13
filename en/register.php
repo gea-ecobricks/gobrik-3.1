@@ -193,8 +193,6 @@ echo '<!DOCTYPE html>
 
 
 
-    <!-- FOOTER -->
-    <?php require_once("../footer-2024.php"); ?>
 
 
 
@@ -309,6 +307,11 @@ function openRegistrationSuccessModal(trainingTitle) {
 }
 </script>
 <?php endif; ?>
+
+
+    <!-- FOOTER -->
+    <p>Ding</p>
+    <?php require_once("../footer-2024.php"); ?>
 
 </body>
 </html>
