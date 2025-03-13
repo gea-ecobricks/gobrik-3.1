@@ -313,8 +313,8 @@ function openRegistrationSuccessModal(trainingTitle) {
 
     let content = `
         <div class="preview-title">Registered!</div>
-        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <img src="../svgs/registration-confirmed.svg" style="width:440px">
+        <div style="text-align:center;width:100%;margin:auto;margin-top:65px;margin-bottom:10px;">
+            <img src="../svgs/registration-confirmed.svg" style="width:50%">
             <h1>You're registered!</h1>
             <h4>See you at <i>${trainingTitle}</i></h4>
             <p>Check your email for your registration confirmation and Zoom invitation link.</p>
