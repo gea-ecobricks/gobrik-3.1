@@ -119,7 +119,7 @@ echo '<!DOCTYPE html>
         <div class ="modal-photo"></div>
     </div>-->
 
-</div>
+
 
     <div class="splash-title-block"></div>
     <div id="splash-bar"></div>
@@ -167,7 +167,7 @@ As you go about signing up, observe any typos, confusions, bugs, bad links, et
     </button>
 </div>
 -->
-</div>
+
 
 
 
