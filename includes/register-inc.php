@@ -42,9 +42,7 @@
 
 }
 
-/* #main { */
-/*   background-color: #0003 !important; */
-/* } */
+
 
 /* Media Query for screens under 700px */
 @media screen and (max-width: 700px) {
