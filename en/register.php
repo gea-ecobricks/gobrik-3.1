@@ -84,7 +84,7 @@ if ($result->num_rows > 0) {
     $est_plastic_packed = $row['est_plastic_packed'];
     $training_country = htmlspecialchars($row['training_country'], ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'], ENT_QUOTES, 'UTF-8');
-    $registration_scope = htmlspecialchars($row['registration_scope'], ENT_QUOTES, 'UTF-8'); // ✅ Add this
+    $training_scope = htmlspecialchars($row['training_scope'], ENT_QUOTES, 'UTF-8');
     $location_full = htmlspecialchars($row['location_full'], ENT_QUOTES, 'UTF-8');
     $training_summary = nl2br(htmlspecialchars($row['training_summary'], ENT_QUOTES, 'UTF-8'));
     $training_agenda = nl2br(htmlspecialchars($row['training_agenda'], ENT_QUOTES, 'UTF-8'));
@@ -94,7 +94,13 @@ if ($result->num_rows > 0) {
     $training_url = htmlspecialchars($row['training_url'], ENT_QUOTES, 'UTF-8');
     $connected_ecobricks = nl2br(htmlspecialchars($row['connected_ecobricks'], ENT_QUOTES, 'UTF-8'));
     $ready_to_show = $row['ready_to_show'];
+
+    // ✅ Fetch feature photos
+    $feature_photo1_main = htmlspecialchars($row['feature_photo1_main'], ENT_QUOTES, 'UTF-8');
+    $feature_photo2_main = htmlspecialchars($row['feature_photo2_main'], ENT_QUOTES, 'UTF-8');
+    $feature_photo1_tmb = htmlspecialchars($row['feature_photo1_tmb'], ENT_QUOTES, 'UTF-8');
 }
+
 
 
 $stmt->close();
@@ -104,9 +110,35 @@ echo '<!DOCTYPE html>
 <html lang="' . $lang . '">
 <head>
 <meta charset="UTF-8">
-<title>' . $training_title . '</title>
+
 ';
 ?>
+
+<title><?php echo $training_title; ?></title>
+<meta name="keywords" content="GEA Registration, Community, Event, Webinar, Course">
+<meta name="description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo $training_date; ?>">
+
+<!-- Facebook Open Graph Tags for social sharing -->
+<meta property="og:url" content="https://www.gobrik.com/en/register.php">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<?php echo $training_title; ?>">
+<meta property="og:description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo $training_date; ?>">
+<meta property="og:image" content="<?php echo !empty($feature_photo1_main) ? $feature_photo1_main : 'default-image.jpg'; ?>">
+<meta property="fb:app_id" content="1781710898523821">
+<meta property="og:image:width" content="1000">
+<meta property="og:image:height" content="500">
+<meta property="og:image:alt" content="<?php echo $training_title; ?>">
+<meta property="og:locale" content="en_GB">
+
+<meta property="article:modified_time" content="<?php echo date("c"); ?>">
+
+<meta name="author" content="GoBrik.com">
+<meta property="og:type" content="page">
+<meta property="og:site_name" content="GoBrik.com">
+<meta property="article:publisher" content="https://web.facebook.com/ecobricks.org">
+<meta property="og:image:type" content="image/png">
+<meta name="author" content="GoBrik.com">
+
 
 <!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/register-inc.php"); ?>
@@ -312,7 +344,7 @@ function openRegistrationSuccessModal(trainingTitle) {
 
 
     <!-- FOOTER -->
-    <p>Ding</p>
+
     <?php require_once("../footer-2024.php"); ?>
 
 </body>

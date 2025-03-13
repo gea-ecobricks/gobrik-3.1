@@ -8,7 +8,7 @@
 <link rel="preload" as="image" href="../webps/biosphere2.webp">
 <link rel="preload" as="image" href="../webps/biosphere-day.webp">-->
 
-<?php require_once ("../meta/$page-$lang.php");?>
+
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
