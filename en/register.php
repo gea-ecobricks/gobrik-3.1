@@ -123,7 +123,7 @@ echo '<!DOCTYPE html>
 <meta property="og:type" content="website">
 <meta property="og:title" content="<?php echo $training_title; ?>">
 <meta property="og:description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo $training_date; ?>">
-<meta property="og:image" content="<?php echo !empty($feature_photo1_main) ? $feature_photo1_main : 'default-image.jpg'; ?>">
+<meta property="og:image" content="<?php echo !empty($feature_photo1_main) ? $feature_photo1_main : '../photos/events/terraces-forests-gladys.jpg'; ?>">
 <meta property="fb:app_id" content="1781710898523821">
 <meta property="og:image:width" content="1000">
 <meta property="og:image:height" content="500">
