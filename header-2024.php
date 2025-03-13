@@ -337,7 +337,7 @@ display: none;
         border-radius: 8px;
         width: 88%;
         height: 80%;
-        background: none !important;
+        /*background: none !important;*/
     }
 
 }

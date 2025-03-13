@@ -130,7 +130,7 @@ echo '<!DOCTYPE html>
     <div id="top-page-image" class="gea-logo top-page-image"></div>
 
 
-   <div id="form-submission-box" class="landing-page-form">
+   <div id="form-submission-box">
         <div class="form-container">
 
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
@@ -153,6 +153,8 @@ echo '<!DOCTYPE html>
                 <img src="../photos/events/r-a-tractatus.webp" style="width:100%;" id="event-lead-photo">
 
                 <p><?php echo $training_agenda; ?></p>
+
+
 
 
     <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
@@ -184,7 +186,7 @@ echo '<!DOCTYPE html>
 
 </div>
 
-</div>
+
 
 
 
@@ -291,12 +293,12 @@ function openRegistrationSuccessModal(trainingTitle) {
     let content = `
         <div class="preview-title">Registered!</div>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <img src="../svgs/registration-confirmed.svg" style="width:240px">
+            <img src="../svgs/registration-confirmed.svg" style="width:440px">
             <h1>You're registered!</h1>
-            <h4>${trainingTitle}</h4>
+            <h4>See you at <i>${trainingTitle}</i></h4>
             <p>Check your email for your registration confirmation and Zoom invitation link.</p>
             <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="registered.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">Got it!</a>
+                <a href="register.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">Got it!</a>
             </div>
         </div>
     `;
