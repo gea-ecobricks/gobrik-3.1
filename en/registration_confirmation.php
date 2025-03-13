@@ -34,12 +34,12 @@ $stmt_user->fetch();
 $stmt_user->close();
 
 /* ✅ Fetch Training Details from `tb_trainings` */
-$sql_training = "SELECT training_title, training_date, zoom_link, training_type, feature_photo1_tmb, training_agenda, agenda_url
+$sql_training = "SELECT training_title, training_date, zoom_link, training_type, feature_photo1_tmb, training_agenda, agenda_url, lead_trainer, trainer_contact_email
                  FROM tb_trainings WHERE training_id = ?";
 $stmt_training = $gobrik_conn->prepare($sql_training);
 $stmt_training->bind_param("i", $training_id);
 $stmt_training->execute();
-$stmt_training->bind_result($training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $training_agenda, $agenda_url);
+$stmt_training->bind_result($training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $training_agenda, $agenda_url, $lead_trainer, $trainer_contact_email);
 $stmt_training->fetch();
 $stmt_training->close();
 
@@ -68,7 +68,7 @@ if ($stmt_insert->execute()) {
     $stmt_insert->close();
 
     // ✅ Send Confirmation Email
-    sendTrainingConfirmationEmail($first_name, $email_addr, $training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $agenda_url);
+    sendTrainingConfirmationEmail($first_name, $email_addr, $training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $agenda_url, $lead_trainer, $trainer_contact_email);
 
     // ✅ Redirect User Back to the Registration Page with Success Message
     header("Location: register.php?training_id=$training_id&registered=1");
@@ -82,7 +82,7 @@ exit();
 $gobrik_conn->close();
 
 /* ✅ Function to Send Training Registration Confirmation Email */
-function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $agenda_url) {
+function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $agenda_url, $lead_trainer, $trainer_contact_email) {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU Mailgun API
     $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Get API key from environment
     $mailgunDomain = 'mail.gobrik.com'; // Verified Mailgun domain
@@ -101,12 +101,16 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
             <p>The event will open 15 minutes beforehand for a meet & greet.</p>
             <p>You can view the full <strong>$training_type</strong> agenda here:</p>
             <p><a href='$agenda_url' target='_blank' style='color: #0073e6; font-weight: bold;'>📄 View Training Agenda</a></p>
+            <br>
             <p>Thank you, and see you then!</p>
+            <br><br>
+            <p><strong>$lead_trainer</strong></p>
+            <p>Contact: <a href='mailto:$trainer_contact_email'>$trainer_contact_email</a></p>
         </div>
     ";
 
     // ✅ Plain Text Fallback
-    $text_body = "Hi $first_name,\n\nYou're confirmed for our $training_type on $training_date.\n\nJoin $training_title on Zoom: $zoom_link\n\nThe event opens 15 minutes beforehand for a meet & greet.\n\nView the full agenda: $agenda_url\n\nThank you, and see you then!";
+    $text_body = "Hi $first_name,\n\nYou're confirmed for our $training_type on $training_date.\n\nJoin $training_title on Zoom: $zoom_link\n\nThe event opens 15 minutes beforehand for a meet & greet.\n\nView the full agenda: $agenda_url\n\nThank you, and see you then!\n\n$lead_trainer\nContact: $trainer_contact_email";
 
     try {
         // ✅ Send Email via Mailgun API
@@ -118,6 +122,7 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
                 'subject' => $subject,
                 'html' => $html_body,
                 'text' => $text_body,
+                'h:Reply-To' => $trainer_contact_email, // ✅ Set the trainer's email as Reply-To
             ]
         ]);
 
