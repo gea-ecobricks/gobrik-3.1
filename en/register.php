@@ -84,7 +84,7 @@ if ($result->num_rows > 0) {
     $est_plastic_packed = $row['est_plastic_packed'];
     $training_country = htmlspecialchars($row['training_country'], ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'], ENT_QUOTES, 'UTF-8');
-    $training_scope = htmlspecialchars($row['training_scope'], ENT_QUOTES, 'UTF-8');
+    $registration_scope = htmlspecialchars($row['registration_scope'], ENT_QUOTES, 'UTF-8');
     $location_full = htmlspecialchars($row['location_full'], ENT_QUOTES, 'UTF-8');
     $training_summary = nl2br(htmlspecialchars($row['training_summary'], ENT_QUOTES, 'UTF-8'));
     $training_agenda = nl2br(htmlspecialchars($row['training_agenda'], ENT_QUOTES, 'UTF-8'));
