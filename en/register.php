@@ -182,6 +182,7 @@ As you go about signing up, observe any typos, confusions, bugs, bad links, et
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
         </div>
 -->
+</div>
 
 
 
