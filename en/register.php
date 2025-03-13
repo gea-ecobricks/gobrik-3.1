@@ -296,7 +296,7 @@ function openRegistrationSuccessModal(trainingTitle) {
             <h4>${trainingTitle}</h4>
             <p>Check your email for your registration confirmation and Zoom invitation link.</p>
             <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="registered.php?id=${training_id}" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">Got it!</a>
+                <a href="registered.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">Got it!</a>
             </div>
         </div>
     `;
