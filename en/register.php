@@ -169,7 +169,7 @@ As you go about signing up, observe any typos, confusions, bugs, bad links, et
 
 
 
-
+-->
 
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;">
             <h4>Community Event Details</h4>
@@ -181,7 +181,7 @@ As you go about signing up, observe any typos, confusions, bugs, bad links, et
             <p><strong>Country:</strong> <?php echo $training_country; ?></p>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
         </div>
--->
+
 </div>
 
 
