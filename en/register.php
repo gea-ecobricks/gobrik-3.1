@@ -131,15 +131,6 @@ echo '<!DOCTYPE html>
    <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
 
-            Your mission, should you choose to accept it is...
-1. Set up a test account...
-2. Use your first name + the word test for your first name. Eg. Fran
-3. Use a fake email address with that name with the test.com domain:  i.e.  fran@test.com
-4. Pick a simple 6 character password.  i.e. 111111
-5. When prompted to enter the pin confirm code simply use:  AYYEW
-
-As you go about signing up, observe any typos, confusions, bugs, bad links, et
-  <!--
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
 
                 <?php if ($is_registered): ?>
@@ -169,7 +160,7 @@ As you go about signing up, observe any typos, confusions, bugs, bad links, et
 
 
 
--->
+
 
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;">
             <h4>Community Event Details</h4>
