@@ -188,6 +188,8 @@ As you go about signing up, observe any typos, confusions, bugs, bad links, et
 
     </div>
 
+</div>
+
 
 
 
