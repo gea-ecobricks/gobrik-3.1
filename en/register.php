@@ -159,6 +159,8 @@ echo '<!DOCTYPE html>
 </div>
 
 
+ <!--
+
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;">
             <h4>Community Event Details</h4>
             <hr>
@@ -169,7 +171,10 @@ echo '<!DOCTYPE html>
             <p><strong>Country:</strong> <?php echo $training_country; ?></p>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
         </div>
+
+    -->
     </div>
+
 
 
 

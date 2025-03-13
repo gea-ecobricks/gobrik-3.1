@@ -20,7 +20,7 @@
 
 
     #main {
-        height: 2000pxt;
+        height: fit-content !important;
     }
 
     .preview-text {
