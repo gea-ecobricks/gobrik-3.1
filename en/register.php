@@ -84,7 +84,7 @@ if ($result->num_rows > 0) {
     $est_plastic_packed = $row['est_plastic_packed'];
     $training_country = htmlspecialchars($row['training_country'], ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'], ENT_QUOTES, 'UTF-8');
-    $training_scope = htmlspecialchars($row['training_scope'], ENT_QUOTES, 'UTF-8'); // ✅ Add this
+    $registration_scope = htmlspecialchars($row['registration_scope'], ENT_QUOTES, 'UTF-8'); // ✅ Add this
     $location_full = htmlspecialchars($row['location_full'], ENT_QUOTES, 'UTF-8');
     $training_summary = nl2br(htmlspecialchars($row['training_summary'], ENT_QUOTES, 'UTF-8'));
     $training_agenda = nl2br(htmlspecialchars($row['training_agenda'], ENT_QUOTES, 'UTF-8'));
@@ -173,7 +173,7 @@ echo '<!DOCTYPE html>
             <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
             <p><strong>Country:</strong> <?php echo $training_country; ?></p>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
-            <p><strong>Scope:</strong> <?php echo $training_scope; ?></p> <!-- ✅ Add this -->
+            <p><strong>Scope:</strong> <?php echo $registration_scope; ?></p> <!-- ✅ Add this -->
         </div>
 
 </div>
@@ -181,6 +181,8 @@ echo '<!DOCTYPE html>
 
 
     </div>
+
+</div>
 
 </div>
 
