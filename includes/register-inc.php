@@ -19,8 +19,9 @@
 
 
 
-    #main {
+      #main {
         height: fit-content !important;
+        padding-bottom: 100px;
     }
 
     .preview-text {
