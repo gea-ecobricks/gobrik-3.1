@@ -128,7 +128,7 @@ echo '<!DOCTYPE html>
     <div id="top-page-image" class="gea-logo top-page-image"></div>
 
 
-    <div id="form-submission-box" class="landing-page-form">
+     <!--<div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
 
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
@@ -152,14 +152,14 @@ echo '<!DOCTYPE html>
 
                 <p><?php echo $training_agenda; ?></p>
 
- <!-- RSVP Button -->
+
     <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
         <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
     </button>
 </div>
 
 
- <!--
+
 
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;">
             <h4>Community Event Details</h4>
@@ -173,6 +173,10 @@ echo '<!DOCTYPE html>
         </div>
 
     -->
+
+Testing!
+
+
     </div>
 
 
