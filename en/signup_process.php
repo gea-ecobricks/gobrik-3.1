@@ -135,7 +135,8 @@ if ($stmt_update_user) {
             exit();
         }
 
-// PART 4.  Now create the Ecobricker account in GoBrik
+
+            // PART 4.  Now create the Ecobricker account in GoBrik
 $sql_create_ecobricker = "INSERT INTO tb_ecobrickers
 (first_name, full_name, buwana_id, email_addr, date_registered, maker_id, buwana_activated, buwana_activation_dt, account_notes)
 VALUES (?, ?, ?, ?, NOW(), ?, 1, NOW(), ?)";
@@ -163,6 +164,15 @@ if ($stmt_create_ecobricker->execute()) {
 }
 
 $stmt_create_ecobricker->close(); // Closing the prepared statement
+
+        } else {
+            sendJsonError('db_error_user_update');
+        }
+        $stmt_update_user->close(); // Closing the update statement
+    } else {
+        sendJsonError('invalid_request');
+    }
+}
 
 ob_end_clean(); // Clear any previous output
 
