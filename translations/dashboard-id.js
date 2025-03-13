@@ -21,7 +21,7 @@ const id_Page_Translations = {
     "1107-serial": "Seri",
     "003-no-ecobricks-yet": "Sepertinya Anda belum mencatat ecobrick apapun! Setelah Anda melakukannya, ecobrick akan muncul di sini untuk Anda kelola.",
     "005-newest-ecobricks": "📅 Ecobrick Terbaru",
-    "welcomeBeta": `Selamat datang di GoBrik 3.0 baru! Terima kasih telah membantu dengan pengujian beta. Tidak perlu menguji fitur lain karena kami masih mengerjakan semuanya. Silakan catat pengalaman Anda dan setiap bug di <a href="https://forms.gle/4tYxvrMYYk5iohyN7" target="_blank">formulir ulasan Google kami</a>.`,
+    "welcomeBeta": `Selamat datang di GoBrik 3.0 baru! Mulailah dengan menebang ecobrick atau mengikuti tur.`,
     "loggedEcobricks": `Sejauh ini Anda telah mencatat {ecobricksMade} ecobrick di {locationFullTxt}! Secara total Anda telah mencatat {totalWeight} gram dengan kepadatan bersih {netDensity} g/ml.`
 };
 

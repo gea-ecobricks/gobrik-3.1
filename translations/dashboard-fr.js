@@ -21,6 +21,6 @@ const fr_Page_Translations = {
     "1107-serial": "Série",
     "003-no-ecobricks-yet": "Il semble que vous n'ayez pas encore enregistré d'écobriques! Lorsque vous le ferez, elles apparaîtront ici pour que vous puissiez les gérer.",
     "005-newest-ecobricks": "📅 Écobriques les plus récentes",
-    "welcomeBeta": `Bienvenue sur le nouveau GoBrik 3.0! Merci de nous aider avec le test bêta. Pas besoin de tester d'autres fonctionnalités car nous travaillons encore sur tout. Veuillez enregistrer votre expérience et tout bug sur notre <a href="https://forms.gle/4tYxvrMYYk5iohyN7" target="_blank">formulaire de revue Google</a>.`,
+    "welcomeBeta": `Bienvenue sur le nouveau GoBrik 3.0! Commencez par enregistrer une brique écologique ou par faire la visite.`,
     "loggedEcobricks": `Jusqu'à présent, vous avez enregistré {ecobricksMade} écobriques à {locationFullTxt}! Au total, vous avez enregistré {totalWeight} grammes avec une densité nette de {netDensity} g/ml.`
 };

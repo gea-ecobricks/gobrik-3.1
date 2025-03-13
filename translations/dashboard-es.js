@@ -21,7 +21,7 @@ const es_Page_Translations = {
     "1107-serial": "Serial",
     "003-no-ecobricks-yet": "¡Parece que aún no has registrado ningún ecoladrillo! Cuando lo hagas, aparecerán aquí para que los administres.",
     "005-newest-ecobricks": "📅 Ecoladrillos más nuevos",
-    "welcomeBeta": `¡Bienvenido al nuevo GoBrik 3.0! Gracias por ayudar con las pruebas beta. No es necesario probar ninguna otra función ya que todavía estamos trabajando en todo. Por favor, registre su experiencia y cualquier error en nuestro <a href="https://forms.gle/4tYxvrMYYk5iohyN7" target="_blank">formulario de revisión de Google</a>.`,
+    "welcomeBeta": `¡Bienvenido al nuevo GoBrik 3.0! Comience registrando un ecoladrillo o realizando el recorrido.`,
     "loggedEcobricks": `Hasta ahora has registrado {ecobricksMade} ecoladrillos en {locationFullTxt}! En total has registrado {totalWeight} gramos con una densidad neta de {netDensity} g/ml.`
 };
 
