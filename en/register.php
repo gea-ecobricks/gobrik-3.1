@@ -154,7 +154,7 @@ echo '<!DOCTYPE html>
    <div id="form-submission-box">
         <div class="form-container">
 
-            <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+            <div style="text-align:center;width:100%;margin:auto;margin-top:65px;">
 
                 <?php if ($is_registered): ?>
         <div id="registered-notice" style="background-color:#4CAF50; color:white; padding:10px 15px; border-radius:8px; display:block; width:fit-content; margin:auto; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
@@ -313,7 +313,7 @@ function openRegistrationSuccessModal(trainingTitle) {
 
     let content = `
         <div class="preview-title">Registered!</div>
-        <div style="text-align:center;width:100%;margin:auto;margin-top:65px;margin-bottom:10px;">
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
             <img src="../svgs/registration-confirmed.svg" style="width:50%">
             <h1>You're registered!</h1>
             <h4>See you at <i>${trainingTitle}</i></h4>
