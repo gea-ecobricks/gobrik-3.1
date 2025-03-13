@@ -166,7 +166,7 @@ As you go about signing up, observe any typos, confusions, bugs, bad links, et
         <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
     </button>
 </div>
--->
+
 
 
 
@@ -181,7 +181,7 @@ As you go about signing up, observe any typos, confusions, bugs, bad links, et
             <p><strong>Country:</strong> <?php echo $training_country; ?></p>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
         </div>
-
+-->
 
 
 
