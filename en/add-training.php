@@ -2,7 +2,7 @@
 
 require_once '../earthenAuth_helper.php'; // Authentication helper
 
-// Set page variables
+// PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.51';
 $page = 'add-training';
@@ -10,7 +10,7 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 ob_start(); // Prevent output before headers
 
-// ✅ LOGIN & ROLE CHECK
+// PART 2: ✅ LOGIN & ROLE CHECK
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
@@ -33,7 +33,7 @@ if (!$user_roles || stripos($user_roles, 'admin') === false) {
     exit();
 }
 
-// ✅ Fetch User Details
+// PART 3: ✅ Fetch User Details
 require_once '../buwanaconn_env.php';
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
 $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
@@ -46,6 +46,27 @@ $buwana_conn->close(); // Close the database connection
 
 require_once '../gobrikconn_env.php';
 
+// ✅ Get `training_id` from URL (for editing existing report)
+$training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
+$editing = ($training_id > 0);
+
+// ✅ Fetch existing training details if editing
+if ($editing) {
+    $sql_fetch = "SELECT training_title, lead_trainer, training_country, training_date, no_participants, trained_community,
+                  training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full, training_summary,
+                  training_agenda, training_success, training_challenges, training_lessons_learned
+                  FROM tb_trainings WHERE training_id = ?";
+    $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
+    $stmt_fetch->bind_param("i", $training_id);
+    $stmt_fetch->execute();
+    $stmt_fetch->bind_result($training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community,
+                            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+                            $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned);
+    $stmt_fetch->fetch();
+    $stmt_fetch->close();
+}
+
+// ✅ If form is submitted, insert/update the training report
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include '../project-photo-functions.php';
 
@@ -55,10 +76,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lead_trainer = trim($_POST['lead_trainer']);
     $training_country = trim($_POST['training_country']);
     $training_date = trim($_POST['training_date']);
-    $no_participants = (int) $_POST['no_participants'] ?? 0;
+    $no_participants = (int) ($_POST['no_participants'] ?? 0);
     $trained_community = trim($_POST['trained_community'] ?? '');
     $training_type = trim($_POST['training_type']);
-    $briks_made = (int) $_POST['briks_made'];
+    $briks_made = (int) ($_POST['briks_made'] ?? 0);
     $avg_brik_weight = isset($_POST['avg_brik_weight']) ? (int)$_POST['avg_brik_weight'] : NULL;
     $latitude = isset($_POST['latitude']) ? (double)$_POST['latitude'] : NULL;
     $longitude = isset($_POST['longitude']) ? (double)$_POST['longitude'] : NULL;
@@ -68,41 +89,83 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $training_challenges = trim($_POST['training_challenges']);
     $training_lessons_learned = trim($_POST['training_lessons_learned']);
 
-    // ✅ Insert Training Record
-    $sql = "INSERT INTO tb_trainings
-            (training_title, lead_trainer, training_country, training_date, no_participants, trained_community, training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full, training_summary, training_agenda, training_success, training_challenges, training_lessons_learned)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    $stmt = $gobrik_conn->prepare($sql);
-    if (!$stmt) {
-        die("Prepare failed: " . $gobrik_conn->error);
+    if ($editing) {
+        // ✅ Update existing training report
+        $sql = "UPDATE tb_trainings SET training_title=?, lead_trainer=?, training_country=?, training_date=?,
+                no_participants=?, trained_community=?, training_type=?, briks_made=?, avg_brik_weight=?,
+                location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
+                training_success=?, training_challenges=?, training_lessons_learned=?
+                WHERE training_id=?";
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("sssisiiiddssssssi",
+            $training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community,
+            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+            $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
+            $training_id
+        );
+    } else {
+        // ✅ Insert new training report
+        $sql = "INSERT INTO tb_trainings (training_title, lead_trainer, training_country, training_date, no_participants,
+                trained_community, training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full,
+                training_summary, training_agenda, training_success, training_challenges, training_lessons_learned)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("sssisiiiddssssss",
+            $training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community,
+            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+            $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned
+        );
     }
 
-    $stmt->bind_param("ssssisdiiddssss",
-        $training_title, $lead_trainer, $training_country, $training_date,
-        $no_participants, $trained_community, $training_type,
-        $briks_made, $avg_brik_weight, $latitude, $longitude,
-        $location_full, $training_summary, $training_agenda,
-        $training_success, $training_challenges, $training_lessons_learned
-    );
-
     $stmt->execute();
-    $training_id = $stmt->insert_id;
     $stmt->close();
-
-    // ✅ Redirect User
     header("Location: add-training-images.php?training_id=" . $training_id);
     exit();
 }
 ?>
 
 
+<!--PART 4 GENERATE META TAGS-->
 
 <!DOCTYPE html>
 <HTML lang="en">
 <HEAD>
     <META charset="UTF-8">
 
+
+<title><?php echo !empty($training_title) ? $training_title : 'Log your Training Report'; ?></title>
+<meta name="keywords" content="GEA Registration, Community, Event, Webinar, Course">
+<meta name="description" content="<?php echo !empty($training_type) && !empty($lead_trainer) && !empty($training_date)
+    ? "Log the $training_type led by $lead_trainer on $training_date on the GEA reporting system. Reports will be shared on the front page of Ecobricks.org."
+    : "Log your GEA workshop. Reports will be featured on the front page of Ecobricks.org and shareable on social media."; ?>">
+
+<!-- Facebook Open Graph Tags for social sharing -->
+<meta property="og:url" content="https://www.gobrik.com/<?php echo $lang; ?>/add-report.php">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<?php echo !empty($training_title) ? $training_title : 'Log your Training Report'; ?>">
+<meta property="og:description" content="<?php echo !empty($training_type) && !empty($lead_trainer) && !empty($training_date)
+    ? "Log the $training_type led by $lead_trainer on $training_date on the GEA reporting system. Reports will be shared on the front page of Ecobricks.org."
+    : "Log your GEA workshop. Reports will be featured on the front page of Ecobricks.org and shareable on social media."; ?>">
+
+<!-- Default image in case no feature image is available -->
+<?php
+$og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobrik.com/svgs/shanti.svg";
+?>
+<meta property="og:image" content="<?php echo $og_image; ?>">
+<meta property="fb:app_id" content="1781710898523821">
+<meta property="og:image:width" content="1000">
+<meta property="og:image:height" content="1000">
+<meta property="og:image:alt" content="<?php echo !empty($training_title) ? $training_title : 'GEA Trainer in action'; ?>">
+<meta property="og:locale" content="en_GB">
+
+<meta property="article:modified_time" content="<?php echo date("c"); ?>">
+
+<meta name="author" content="GoBrik.com">
+<meta property="og:type" content="page">
+<meta property="og:site_name" content="GoBrik.com">
+<meta property="article:publisher" content="https://web.facebook.com/ecobricks.org">
+<meta property="og:image:type" content="image/png">
+<meta name="author" content="GoBrik.com">
 
 
     <?php require_once ("../includes/add-training-inc.php");?>
