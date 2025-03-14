@@ -1,97 +1,100 @@
 <?php
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+require_once '../earthenAuth_helper.php'; // Authentication helper
 
-include '../gobrikconn_env.php';
-$gobrik_conn>set_charset("utf8mb4");
+// Set page variables
+$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
+$version = '0.51';
+$page = 'add-training';
+$lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
+
+ob_start(); // Prevent output before headers
+
+// ✅ LOGIN & ROLE CHECK
+if (!isLoggedIn()) {
+    header("Location: login.php");
+    exit();
+}
+
+$buwana_id = $_SESSION['buwana_id'];
+require_once '../gobrikconn_env.php';
+
+// ✅ Fetch User Role
+$query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
+$stmt = $gobrik_conn->prepare($query);
+$stmt->bind_param("i", $buwana_id);
+$stmt->execute();
+$stmt->bind_result($user_roles);
+$stmt->fetch();
+$stmt->close();
+
+if (!$user_roles || stripos($user_roles, 'admin') === false) {
+    header("Location: dashboard.php?error=unauthorized");
+    exit();
+}
+
+// ✅ Fetch User Details
+require_once '../buwanaconn_env.php';
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+$first_name = getFirstName($buwana_conn, $buwana_id);
+
+$buwana_conn->close(); // Close the database connection
+
+require_once '../gobrikconn_env.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    include '../project-photo-functions.php'; // Ensure this path is correct
+    include '../project-photo-functions.php';
 
+    // ✅ Sanitize Input
     $location_full = trim($_POST['location_address'] ?? 'Default Location');
     $training_title = trim($_POST['training_title']);
     $lead_trainer = trim($_POST['lead_trainer']);
     $training_country = trim($_POST['training_country']);
     $training_date = trim($_POST['training_date']);
-    $no_participants = trim($_POST['no_participants']);
+    $no_participants = (int) $_POST['no_participants'] ?? 0;
     $trained_community = trim($_POST['trained_community'] ?? '');
     $training_type = trim($_POST['training_type']);
-    $briks_made = trim($_POST['briks_made']);
-    $avg_brik_weight = (int)$_POST['avg_brik_weight'] ?? NULL;
-    $latitude = (double)$_POST['latitude'];
-    $longitude = (double)$_POST['longitude'];
-    // $connected_ecobricks = $_POST['connected_ecobricks'] ?? ''; // Commented out
-    // $training_location = $_POST['training_location']; // Removed
+    $briks_made = (int) $_POST['briks_made'];
+    $avg_brik_weight = isset($_POST['avg_brik_weight']) ? (int)$_POST['avg_brik_weight'] : NULL;
+    $latitude = isset($_POST['latitude']) ? (double)$_POST['latitude'] : NULL;
+    $longitude = isset($_POST['longitude']) ? (double)$_POST['longitude'] : NULL;
     $training_summary = trim($_POST['training_summary']);
     $training_agenda = trim($_POST['training_agenda']);
     $training_success = trim($_POST['training_success']);
     $training_challenges = trim($_POST['training_challenges']);
     $training_lessons_learned = trim($_POST['training_lessons_learned']);
 
-    // Debugging: Print out variables
-    error_log("Training Title: $training_title");
-    error_log("Lead Trainer: $lead_trainer");
-    error_log("Training Country: $training_country");
-    error_log("Training Date: $training_date");
+    // ✅ Insert Training Record
+    $sql = "INSERT INTO tb_trainings
+            (training_title, lead_trainer, training_country, training_date, no_participants, trained_community, training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full, training_summary, training_agenda, training_success, training_challenges, training_lessons_learned)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    $sql = "INSERT INTO tb_trainings (training_title, lead_trainer, training_country, training_date, no_participants, trained_community, training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full, training_summary, training_agenda, training_success, training_challenges, training_lessons_learned) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    if ($stmt = $gobrik_conn>prepare($sql)) {
-        error_log("Statement prepared successfully.");
-
-        $stmt->bind_param("sssssissiiiddssss", $training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community, $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full, $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned);
-
-        if ($stmt->execute()) {
-            error_log("Statement executed successfully.");
-
-            $training_id = $gobrik_conn>insert_id;
-
-
-
-            $training_url = "https://ecobricks.org/en/training.php?id=" . $training_id;
-            $update_url_sql = "UPDATE tb_trainings SET training_url = ? WHERE training_id = ?";
-
-            if ($update_url_stmt = $gobrik_conn>prepare($update_url_sql)) {
-                error_log("Update URL statement prepared successfully.");
-
-                $update_url_stmt->bind_param("si", $training_url, $training_id);
-
-                if ($update_url_stmt->execute()) {
-                    error_log("Update URL statement executed successfully.");
-                } else {
-                    error_log("Error executing update URL statement: " . $update_url_stmt->error);
-                }
-
-                $update_url_stmt->close();
-            } else {
-                error_log("Error preparing update URL statement: " . $gobrik_conn>error);
-            }
-
-
-            $stmt->close();
-            $gobrik_conn>close();
-
-            echo "<script>window.location.href = 'add-training-images.php?training_id=" . $training_id . "';</script>";
-        } else {
-            error_log("Error executing statement: " . $stmt->error);
-            echo "Error: " . $stmt->error . "<br>";
-        }
-
-        if ($stmt) $stmt->close();
-    } else {
-        error_log("Prepare failed: " . $gobrik_conn>error);
-        echo "Prepare failed: " . $gobrik_conn>error;
+    $stmt = $gobrik_conn->prepare($sql);
+    if (!$stmt) {
+        die("Prepare failed: " . $gobrik_conn->error);
     }
 
-    if ($conn) $gobrik_conn>close();
+    $stmt->bind_param("ssssisdiiddssss",
+        $training_title, $lead_trainer, $training_country, $training_date,
+        $no_participants, $trained_community, $training_type,
+        $briks_made, $avg_brik_weight, $latitude, $longitude,
+        $location_full, $training_summary, $training_agenda,
+        $training_success, $training_challenges, $training_lessons_learned
+    );
+
+    $stmt->execute();
+    $training_id = $stmt->insert_id;
+    $stmt->close();
+
+    // ✅ Redirect User
+    header("Location: add-training-images.php?training_id=" . $training_id);
+    exit();
 }
 ?>
-
-
-
-
 
 
 
