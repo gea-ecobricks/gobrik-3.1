@@ -169,7 +169,7 @@ echo '<!DOCTYPE html>
 
                 <h2><?php echo $training_title; ?></h2>
                 <h4 >Lead by <?php echo $lead_trainer; ?></h4>
-                <p><?php echo $training_summary; ?></p>
+               <p><?php echo nl2br($training_summary); ?></p>
 
                 <img src="../photos/events/r-a-tractatus.webp" style="width:100%;" id="event-lead-photo">
 
