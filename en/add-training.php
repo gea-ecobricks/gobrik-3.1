@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 include '../gobrikconn_env.php';
-$conn->set_charset("utf8mb4");
+$gobrik_conn>set_charset("utf8mb4");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include '../project-photo-functions.php'; // Ensure this path is correct
@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO tb_trainings (training_title, lead_trainer, training_country, training_date, no_participants, trained_community, training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full, training_summary, training_agenda, training_success, training_challenges, training_lessons_learned) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    if ($stmt = $conn->prepare($sql)) {
+    if ($stmt = $gobrik_conn>prepare($sql)) {
         error_log("Statement prepared successfully.");
 
         $stmt->bind_param("sssssissiiiddssss", $training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community, $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full, $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned);
@@ -46,14 +46,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             error_log("Statement executed successfully.");
 
-            $training_id = $conn->insert_id;
+            $training_id = $gobrik_conn>insert_id;
 
 
 
             $training_url = "https://ecobricks.org/en/training.php?id=" . $training_id;
             $update_url_sql = "UPDATE tb_trainings SET training_url = ? WHERE training_id = ?";
 
-            if ($update_url_stmt = $conn->prepare($update_url_sql)) {
+            if ($update_url_stmt = $gobrik_conn>prepare($update_url_sql)) {
                 error_log("Update URL statement prepared successfully.");
 
                 $update_url_stmt->bind_param("si", $training_url, $training_id);
@@ -66,12 +66,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $update_url_stmt->close();
             } else {
-                error_log("Error preparing update URL statement: " . $conn->error);
+                error_log("Error preparing update URL statement: " . $gobrik_conn>error);
             }
 
 
             $stmt->close();
-            $conn->close();
+            $gobrik_conn>close();
 
             echo "<script>window.location.href = 'add-training-images.php?training_id=" . $training_id . "';</script>";
         } else {
@@ -81,11 +81,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt) $stmt->close();
     } else {
-        error_log("Prepare failed: " . $conn->error);
-        echo "Prepare failed: " . $conn->error;
+        error_log("Prepare failed: " . $gobrik_conn>error);
+        echo "Prepare failed: " . $gobrik_conn>error;
     }
 
-    if ($conn) $conn->close();
+    if ($conn) $gobrik_conn>close();
 }
 ?>
 
