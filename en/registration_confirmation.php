@@ -34,12 +34,12 @@ $stmt_user->fetch();
 $stmt_user->close();
 
 /* ✅ Fetch Training Details from `tb_trainings` */
-$sql_training = "SELECT training_title, training_date, zoom_link, training_type, feature_photo1_tmb, training_agenda, agenda_url, lead_trainer, trainer_contact_email
+$sql_training = "SELECT training_title, training_date, zoom_link, training_type, feature_photo1_tmb, training_agenda, agenda_url, lead_trainer, trainer_contact_email, zoom_link_full
                  FROM tb_trainings WHERE training_id = ?";
 $stmt_training = $gobrik_conn->prepare($sql_training);
 $stmt_training->bind_param("i", $training_id);
 $stmt_training->execute();
-$stmt_training->bind_result($training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $training_agenda, $agenda_url, $lead_trainer, $trainer_contact_email);
+$stmt_training->bind_result($training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $training_agenda, $agenda_url, $lead_trainer, $trainer_contact_email, $zoom_link_full);
 $stmt_training->fetch();
 $stmt_training->close();
 
@@ -106,6 +106,9 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
             <br><br>
             <p><strong>$lead_trainer</strong></p>
             <p>Contact: <a href='mailto:$trainer_contact_email'>$trainer_contact_email</a></p>
+            <br><br><br>
+            <hr>
+            <p style="font-size:0.9em">$zoom_link_full</p>
         </div>
     ";
 
