@@ -1,6 +1,5 @@
 
 
-<?php require_once ("../meta/add-training-$lang.php");?>
 
   
 <STYLE>

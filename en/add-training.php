@@ -102,9 +102,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <HTML lang="en">
 <HEAD>
     <META charset="UTF-8">
-    <?php $lang='en';?>
-    <?php $version='2.04';?>
-    <?php $page='add-training';?>
+
+
 
     <?php require_once ("../includes/add-training-inc.php");?>
 
