@@ -160,7 +160,7 @@ echo '<!DOCTYPE html>
 
                 <?php if ($is_registered): ?>
         <div id="registered-notice" style="background-color:#4CAF50; color:white; padding:10px 15px; border-radius:8px; display:block; width:fit-content; margin:auto; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
-            <span style="margin-right:10px;">👍</span> You're registered for this <?php echo $training_type; ?>!
+            <span style="margin-right:10px;">👍</span> You're registered for this <?php echo $training_type; ?>!.  Check your email or dashboard for full details and Zoom link.
         </div>
     <?php endif; ?>
 
