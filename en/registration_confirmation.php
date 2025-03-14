@@ -92,25 +92,26 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
 
     // ✅ Email Body (HTML)
     $html_body = "
-        <div style='text-align: center; font-family: Arial, sans-serif;'>
-            <img src='$feature_photo1_tmb' style='max-width: 100%; border-radius: 8px; margin-bottom: 15px;'>
-            <h2>Hi there, $first_name!</h2>
-            <p>Alright! 🎉 You're confirmed for our <strong>$training_type</strong> on <strong>$training_date</strong>.</p>
-            <p>You can join <strong>$training_title</strong> on Zoom using the following link:</p>
-            <p style='font-size: 1.2em;'><a href='$zoom_link' target='_blank' style='color: #0073e6; font-weight: bold;'>🔗 Join Zoom Meeting</a></p>
-            <p>The event will open 15 minutes beforehand for a meet & greet.</p>
-            <p>You can view the full <strong>$training_type</strong> agenda here:</p>
-            <p><a href='$agenda_url' target='_blank' style='color: #0073e6; font-weight: bold;'>📄 View Training Agenda</a></p>
-            <br>
-            <p>Thank you, and see you then!</p>
-            <br><br>
-            <p><strong>$lead_trainer</strong></p>
-            <p>Contact: <a href='mailto:$trainer_contact_email'>$trainer_contact_email</a></p>
-            <br><br><br>
-            <hr>
-            <p style="font-size:0.9em">$zoom_link_full</p>
-        </div>
-    ";
+    <div style='text-align: center; font-family: Arial, sans-serif;'>
+        <img src='$feature_photo1_tmb' style='max-width: 100%; border-radius: 8px; margin-bottom: 15px;'>
+        <h2>Hi there, $first_name!</h2>
+        <p>Alright! 🎉 You're confirmed for our <strong>$training_type</strong> on <strong>$training_date</strong>.</p>
+        <p>You can join <strong>$training_title</strong> on Zoom using the following link:</p>
+        <p style='font-size: 1.2em;'><a href='$zoom_link' target='_blank' style='color: #0073e6; font-weight: bold;'>🔗 Join Zoom Meeting</a></p>
+        <p>The event will open 15 minutes beforehand for a meet & greet.</p>
+        <p>You can view the full <strong>$training_type</strong> agenda here:</p>
+        <p><a href='$agenda_url' target='_blank' style='color: #0073e6; font-weight: bold;'>📄 View Training Agenda</a></p>
+        <br>
+        <p>Thank you, and see you then!</p>
+        <br><br>
+        <p><strong>$lead_trainer</strong></p>
+        <p>Contact: <a href='mailto:$trainer_contact_email'>$trainer_contact_email</a></p>
+        <br><br><br>
+        <hr>
+        <p style='font-size:0.9em;'>$zoom_link_full</p> <!-- ✅ FIXED: Using single quotes -->
+    </div>
+";
+
 
     // ✅ Plain Text Fallback
     $text_body = "Hi $first_name,\n\nYou're confirmed for our $training_type on $training_date.\n\nJoin $training_title on Zoom: $zoom_link\n\nThe event opens 15 minutes beforehand for a meet & greet.\n\nView the full agenda: $agenda_url\n\nThank you, and see you then!\n\n$lead_trainer\nContact: $trainer_contact_email";
