@@ -75,8 +75,6 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $allowed_tags = '<b><i><u><strong><em><p><br><ul><li><ol>';
     $training_summary = strip_tags($row['training_summary'] ?? '', $allowed_tags); // ✅ Fix: Use $row['training_summary']
-
-    $training_summary = strip_tags($_POST['training_summary'], $allowed_tags);
     $training_title = htmlspecialchars($row['training_title'], ENT_QUOTES, 'UTF-8');
     $training_date = htmlspecialchars($row['training_date'], ENT_QUOTES, 'UTF-8');
     $training_logged = htmlspecialchars($row['training_logged'], ENT_QUOTES, 'UTF-8');
