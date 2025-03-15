@@ -22,7 +22,7 @@ require_once '../gobrikconn_env.php';
 // ✅ Fetch User Role
 $gea_status = getGEA_status($buwana_id);
 
-if (!$gea_status || stripos($gea_status, 'blah') === false) {
+if (!$gea_status || stripos($gea_status, 'trainer') === false) {
     header("Location: dashboard.php?error=unauthorized");
     exit();
 }
