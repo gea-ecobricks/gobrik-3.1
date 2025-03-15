@@ -115,7 +115,7 @@ $stmt->bind_param("sssisiiiddsssssss",
     $location_full, $training_summary, $training_agenda, $training_success,
     $training_challenges, $training_lessons_learned
 );
-
+}
 $stmt->execute();
 $stmt->close();
 
