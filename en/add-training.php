@@ -270,16 +270,10 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 
 <div class="form-item">
-    <label for="community_id">Trained Community:</label><br>
-    <select id="community_id" name="community_id" required>
-        <option value="" disabled selected>Select a community...</option>
-        <?php foreach ($communities as $community): ?>
-            <option value="<?php echo $community['com_id']; ?>"
-                <?php echo (!empty($community_id) && $community_id == $community['com_id']) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($community['com_name'], ENT_QUOTES, 'UTF-8'); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+    <label for="community_search">Trained Community:</label><br>
+    <input type="text" id="community_search" name="community_search" placeholder="Start typing..." autocomplete="off">
+    <input type="hidden" id="community_id" name="community_id"> <!-- Stores the selected community ID -->
+    <div id="community_results" class="autocomplete-results"></div>
 </div>
 
 
@@ -404,13 +398,45 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 -->
 
 <script>
-    $(document).ready(function() {
-        $('#community_id').select2({
-            placeholder: "Start typing to search for a community...",
-            allowClear: true
+$(document).ready(function() {
+    $("#community_search").on("input", function() {
+        let query = $(this).val();
+
+        if (query.length < 3) {
+            $("#community_results").empty(); // Clear results if less than 3 chars
+            return;
+        }
+
+        $.ajax({
+            url: "fetch_communities.php",
+            type: "GET",
+            data: { search: query },
+            success: function(response) {
+                $("#community_results").html(response);
+            }
         });
     });
+
+    // Handle selecting a community from the search results
+    $(document).on("click", ".community-option", function() {
+        let communityId = $(this).data("id");
+        let communityName = $(this).text();
+
+        $("#community_search").val(communityName);
+        $("#community_id").val(communityId); // Store the selected community ID
+        $("#community_results").empty(); // Hide the dropdown
+    });
+
+    // Close results when clicking outside
+    $(document).on("click", function(event) {
+        if (!$(event.target).closest("#community_search, #community_results").length) {
+            $("#community_results").empty();
+        }
+    });
+});
 </script>
+
+
 
     <script>
 
