@@ -36,6 +36,17 @@ $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 $first_name = getFirstName($buwana_conn, $buwana_id);
 
+// Fetch all languages
+$languages = [];
+$sql_languages = "SELECT language_id, languages_native_name FROM languages_tb ORDER BY languages_native_name ASC";
+$result_languages = $buwana_conn->query($sql_languages);
+
+if ($result_languages && $result_languages->num_rows > 0) {
+    while ($row = $result_languages->fetch_assoc()) {
+        $languages[] = $row;
+    }
+}
+
 $buwana_conn->close(); // Close the database connection
 
 require_once '../gobrikconn_env.php';
@@ -92,17 +103,6 @@ while ($row = $result->fetch_assoc()) {
     $communities[] = $row; // Store results in an array
 }
 
-
-// Fetch all languages
-$languages = [];
-$sql_languages = "SELECT language_id, languages_native_name FROM languages_tb ORDER BY languages_native_name ASC";
-$result_languages = $buwana_conn->query($sql_languages);
-
-if ($result_languages && $result_languages->num_rows > 0) {
-    while ($row = $result_languages->fetch_assoc()) {
-        $languages[] = $row;
-    }
-}
 
 
 // ✅ If form is submitted, insert/update the training report
