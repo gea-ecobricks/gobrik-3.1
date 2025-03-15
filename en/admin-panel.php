@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.51';
+$version = '0.52';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -114,12 +114,13 @@ $gobrik_conn->close();
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-            <h2 data-lang-id="001-main-title">Admin Panel</h2>
+            <h2 data-lang-id="001-main-title">User Management</h2>
 
             <p id="admin-welcome-stats">
-    So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik.
+    This is an admin panel for managing GoBrik users.  So far we have <?php echo number_format($total_ecobrickers); ?> ecobrickers on GoBrik.
     <?php echo $percent_with_buwana; ?>% have an active Buwana account.
-    Of these, <?php echo number_format($unsent); ?> have not received the test email,
+    </p>
+<!--<p>Of these, <?php echo number_format($unsent); ?> have not received the test email,
     <?php echo number_format($delivered); ?> have received it, and
     <?php echo number_format($failed); ?> account emails failed to receive it.</p>
 
@@ -129,7 +130,7 @@ $gobrik_conn->close();
   margin-bottom: 30px;">
         <p>Would you like to prune the failed accounts from the database?</p>
 <button class="confirm-button enabled" onclick="pruneFailedAccounts()" data-land-id="002-prune-button">Prune Accounts</button>
-</div>
+</div>-->
 
 
 
