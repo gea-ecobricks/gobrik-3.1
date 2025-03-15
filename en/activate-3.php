@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.44';
+$version = '0.43';
 $page = 'signup';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -64,32 +64,29 @@ if (empty($first_name)) {
 // PART 4: Fetch Ecobricker's community from GoBrik database
 require_once("../gobrikconn_env.php");
 
-$sql_ecobricker_community = "SELECT community_id FROM tb_ecobrickers WHERE buwana_id = ?";
+$sql_ecobricker_community = "SELECT community FROM tb_ecobrickers WHERE buwana_id = ?";
 $stmt_ecobricker_community = $gobrik_conn->prepare($sql_ecobricker_community);
 
 if ($stmt_ecobricker_community) {
     $stmt_ecobricker_community->bind_param('i', $buwana_id);
     $stmt_ecobricker_community->execute();
-    $stmt_ecobricker_community->bind_result($pre_community_id);
+    $stmt_ecobricker_community->bind_result($pre_community);
     $stmt_ecobricker_community->fetch();
     $stmt_ecobricker_community->close();
 } else {
     die('Error preparing statement for fetching ecobricker community: ' . $gobrik_conn->error);
 }
 
-// Fetch the community name (if the user already belongs to one)
-$pre_community_name = "";
-if (!empty($pre_community_id)) {
-    $sql_community_name = "SELECT com_name FROM communities_tb WHERE com_id = ?";
-    $stmt_community_name = $gobrik_conn->prepare($sql_community_name);
-    $stmt_community_name->bind_param("i", $pre_community_id);
-    $stmt_community_name->execute();
-    $stmt_community_name->bind_result($pre_community_name);
-    $stmt_community_name->fetch();
-    $stmt_community_name->close();
+// PART 5: Fetch all communities from the communities_tb table in Buwana database
+$communities = [];
+$sql_communities = "SELECT com_name FROM communities_tb";
+$result_communities = $buwana_conn->query($sql_communities);
+
+if ($result_communities && $result_communities->num_rows > 0) {
+    while ($row = $result_communities->fetch_assoc()) {
+        $communities[] = $row['com_name'];
+    }
 }
-
-
 
 
 // Fetch all countries
@@ -286,16 +283,22 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
   <!-- COMMUNITY FIELD -->
 <div class="form-item" id="community-section" style="display: none; margin-top:20px;">
-    <label for="community_search">Select and confirm your GoBrik community:</label><br>
-    <input type="text" id="community_search" name="community_search" placeholder="Start typing..." autocomplete="off"
-           value="<?php echo htmlspecialchars($pre_community_name ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <input type="hidden" id="community_id" name="community_id" value="<?php echo htmlspecialchars($pre_community_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <div id="community_results" class="autocomplete-results"></div>
+    <label for="community_name" data-lang-id="012-community-name">Select and confirm your GoBrik community:</label><br>
+    <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
+           placeholder="Type your community" style="width: 100%; padding: 10px;"
+           value="<?php echo htmlspecialchars($pre_community ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <datalist id="community_list">
+        <?php foreach ($communities as $community) : ?>
+            <option value="<?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>" <?php echo (isset($pre_community) && $community === $pre_community) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+        <?php endforeach; ?>
+        <option value="+Add a new community..." onclick="openAddCommunityModal()">+ Add a new community...</option>
+    </datalist>
 
     <!-- "Add a new community" text link -->
-    <p class="form-caption">
-        Start typing to see and select a community.
-        <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
+    <p class="form-caption" data-lang-id="012-community-caption-xx">
+        Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
             Don't see your community? Add it.
         </a>
     </p>
@@ -645,44 +648,6 @@ function fetchNearbyRivers(lat, lon) {
 
 
 
-<script>
-$(document).ready(function() {
-    $("#community_search").on("input", function() {
-        let query = $(this).val();
-
-        if (query.length < 3) {
-            $("#community_results").empty(); // Clear results if less than 3 chars
-            return;
-        }
-
-        $.ajax({
-            url: "../api/fetch_communities.php",
-            type: "GET",
-            data: { search: query },
-            success: function(response) {
-                $("#community_results").html(response);
-            }
-        });
-    });
-
-    // Handle selecting a community from the search results
-    $(document).on("click", ".community-option", function() {
-        let communityId = $(this).data("id");
-        let communityName = $(this).text();
-
-        $("#community_search").val(communityName);
-        $("#community_id").val(communityId); // Store the selected community ID
-        $("#community_results").empty(); // Hide the dropdown
-    });
-
-    // Close results when clicking outside
-    $(document).on("click", function(event) {
-        if (!$(event.target).closest("#community_search, #community_results").length) {
-            $("#community_results").empty();
-        }
-    });
-});
-</script>
 
 
 </body>
