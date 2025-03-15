@@ -28,7 +28,7 @@ $stmt->bind_result($user_roles);
 $stmt->fetch();
 $stmt->close();
 
-if (!$user_roles || stripos($user_roles, 'admin') === false) {
+if (!$user_roles || stripos($user_roles, 'trainer') === false) {
     header("Location: dashboard.php?error=unauthorized");
     exit();
 }
@@ -194,7 +194,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </div>
 
             <div class="lead-page-paragraph">
-                <p data-lang-id="004-form-description">Share your ecobrick training with the world. Use this form to post your completed workshop onto ecobricks.org. Trainings will be featured on our main page and archived in our trainings database.</p>
+                <p data-lang-id="004-form-description">Is your workshop complete?  Share your social success with the world! Use this form to file and post your completed event or training report. Trainings will be featured on our main page and archived in our trainings database.</p>
             </div>
 
     <!-- PART 6 THE FORM -->
