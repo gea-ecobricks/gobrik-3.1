@@ -92,14 +92,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 training_success=?, training_challenges=?, training_lessons_learned=?
                 WHERE training_id=?";
         $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("sssisiiiddssssssi",
+        $stmt->bind_param("sssisiiiddssssss",
             $training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community,
             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-            $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
-            $training_id
+            $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned
         );
     } else {
         // ✅ Insert new training report
+// ✅ Insert new training report
 $sql = "INSERT INTO tb_trainings
         (training_title, lead_trainer, training_country, training_date, no_participants,
         trained_community, training_type, briks_made, avg_brik_weight, location_lat, location_long,
@@ -115,6 +115,7 @@ $stmt->bind_param("sssisiiiddsssssss",
     $location_full, $training_summary, $training_agenda, $training_success,
     $training_challenges, $training_lessons_learned
 );
+
 }
 $stmt->execute();
 $stmt->close();
