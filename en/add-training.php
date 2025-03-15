@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $location_full, $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $training_id  // ✅ Added `training_id`
     );
-}
+
 
     } else {
         // ✅ Insert new training report
