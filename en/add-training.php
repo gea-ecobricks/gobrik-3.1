@@ -62,7 +62,7 @@ if ($editing) {
 
 // ✅ If form is submitted, insert/update the training report
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    include '../project-photo-functions.php';
+    include '../scripts/photo-functions.php';
 
     // ✅ Sanitize Input
     $location_full = trim($_POST['location_address'] ?? 'Default Location');
@@ -291,6 +291,30 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="text" id="location_address" name="location_address" placeholder="Start typing your town..." required
             value="<?php echo htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     </div>
+
+<!--                <div class="form-item">-->
+<!--                    <label for="connected_ecobricks">The serials of ecobricks used in your project:</label><br>-->
+<!--                    <input type="text" id="connected_ecobricks" name="connected_ecobricks" aria-label="Connected Ecobricks" placeholder="Enter serials...">-->
+<!--                    <div id="serial-select"><ul id="autocomplete-results" ></ul></div>-->
+<!--                    <p class="form-caption">Optional: Enter the serial numbers of ecobricks connected to this project. Separate multiple serial numbers with commas.</p>-->
+<!--                </div>-->
+
+<!--                <div class="form-item">-->
+<!--                    <label for="training_location" data-lang-id="015-location">Training Location:</label><br>-->
+<!--                    <input type="text" id="training_location" name="training_location" aria-label="Training Location" required>-->
+<!--                    <p class="form-caption" data-lang-id="015-location-caption">Please provide the general location where the training was conducted.</p>-->
+<!--
+                   <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.  For online workshops, specify the country of the lead trainer.</div>-->
+<!--                </div>-->
+
+<!--ERRORS-->
+<!--                    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
+
+<!--                <div class="form-item">-->
+<!--                    <label for="ready_to_show" data-lang-id="017-ready-to-show">Publish this training publically on ecobricks.org?</label><br>-->
+<!--                    <input type="checkbox" id="ready_to_show" name="ready_to_show" aria-label="Ready to Show">-->
+<!--                    <p class="form-caption" data-lang-id="017-ready-to-show-caption">Check if this training is ready to be shown to the public.  If so it will be posted on the training feed on ecobricks.org and in our archive of completed trainings.</p>-->
+<!--                </div>-->
 
     <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
