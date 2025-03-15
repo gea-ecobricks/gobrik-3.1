@@ -2,27 +2,7 @@
 
 
   
-<style>
-/* Simple styling for the dropdown results */
-.autocomplete-results {
-    position: absolute;
-    width: 100%;
-    background: white;
-    border: 1px solid #ccc;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-}
-
-.autocomplete-results div {
-    padding: 10px;
-    cursor: pointer;
-}
-
-.autocomplete-results div:hover {
-    background: #f0f0f0;
-}
-
+<STYLE>
 
 
 
