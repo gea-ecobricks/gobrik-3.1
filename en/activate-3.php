@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
     }
-}
+
 
 } else {
     error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
