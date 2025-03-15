@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.51';
+$version = '0.52';
 $page = 'add-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -22,7 +22,7 @@ require_once '../gobrikconn_env.php';
 // ✅ Fetch User Role
 $gea_status = getGEA_status($buwana_id);
 
-if (!$gea_status || stripos($gea_status, 'trainer') === false) {
+if (!$gea_status || stripos($gea_status, 'blah') === false) {
     header("Location: dashboard.php?error=unauthorized");
     exit();
 }
