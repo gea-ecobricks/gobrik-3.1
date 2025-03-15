@@ -64,29 +64,44 @@ if (empty($first_name)) {
 // PART 4: Fetch Ecobricker's community from GoBrik database
 require_once("../gobrikconn_env.php");
 
-$sql_ecobricker_community = "SELECT community FROM tb_ecobrickers WHERE buwana_id = ?";
+$sql_ecobricker_community = "SELECT community_id FROM tb_ecobrickers WHERE buwana_id = ?";
 $stmt_ecobricker_community = $gobrik_conn->prepare($sql_ecobricker_community);
 
 if ($stmt_ecobricker_community) {
     $stmt_ecobricker_community->bind_param('i', $buwana_id);
     $stmt_ecobricker_community->execute();
-    $stmt_ecobricker_community->bind_result($pre_community);
+    $stmt_ecobricker_community->bind_result($pre_community_id);
     $stmt_ecobricker_community->fetch();
     $stmt_ecobricker_community->close();
 } else {
     die('Error preparing statement for fetching ecobricker community: ' . $gobrik_conn->error);
 }
 
-// PART 5: Fetch all communities from the communities_tb table in Buwana database
-$communities = [];
-$sql_communities = "SELECT com_name FROM communities_tb";
-$result_communities = $buwana_conn->query($sql_communities);
-
-if ($result_communities && $result_communities->num_rows > 0) {
-    while ($row = $result_communities->fetch_assoc()) {
-        $communities[] = $row['com_name'];
-    }
+// Fetch the community name (if the user already belongs to one)
+$pre_community_name = "";
+if (!empty($pre_community_id)) {
+    $sql_community_name = "SELECT com_name FROM communities_tb WHERE com_id = ?";
+    $stmt_community_name = $gobrik_conn->prepare($sql_community_name);
+    $stmt_community_name->bind_param("i", $pre_community_id);
+    $stmt_community_name->execute();
+    $stmt_community_name->bind_result($pre_community_name);
+    $stmt_community_name->fetch();
+    $stmt_community_name->close();
 }
+
+
+
+
+// PART 5: Fetch all communities from the communities_tb table in Buwana database
+// $communities = [];
+// $sql_communities = "SELECT com_name FROM communities_tb";
+// $result_communities = $buwana_conn->query($sql_communities);
+//
+// if ($result_communities && $result_communities->num_rows > 0) {
+//     while ($row = $result_communities->fetch_assoc()) {
+//         $communities[] = $row['com_name'];
+//     }
+// }
 
 
 // Fetch all countries
@@ -199,8 +214,8 @@ if ($stmt_update_gobrik) {
 $gobrik_conn->close();
 
 // Redirect to the next step
-header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
-exit();
+//header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
+//exit();
 
 
 }
