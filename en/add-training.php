@@ -60,6 +60,19 @@ if ($editing) {
     $stmt_fetch->close();
 }
 
+// Fetch unique training types from the database
+$training_types = [];
+
+$query = "SELECT DISTINCT training_type FROM tb_trainings ORDER BY training_type ASC";
+$result = $gobrik_conn->query($query);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $training_types[] = $row['training_type'];
+    }
+}
+
+
 
 // ✅ If form is submitted, insert/update the training report
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -243,19 +256,19 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </div>
 
     <div class="form-item">
-        <label for="training_type">What type of training was this?</label><br>
-        <select id="training_type" name="training_type" required>
-            <option value="" disabled selected>Select training type...</option>
-            <option value="Online Starter Workshop"
-                <?php echo ($training_type === 'Online Starter Workshop') ? 'selected' : ''; ?>>Online Starter Workshop</option>
-            <option value="Local Starter Workshop"
-                <?php echo ($training_type === 'Local Starter Workshop') ? 'selected' : ''; ?>>Local Starter Workshop</option>
-            <option value="Online Training of Trainers"
-                <?php echo ($training_type === 'Online Training of Trainers') ? 'selected' : ''; ?>>Online Training of Trainers</option>
-            <option value="Local Training of Trainers"
-                <?php echo ($training_type === 'Local Training of Trainers') ? 'selected' : ''; ?>>Local Training of Trainers</option>
-        </select>
-    </div>
+    <label for="training_type">What type of training was this?</label><br>
+    <select id="training_type" name="training_type" required>
+        <option value="" disabled selected>Select training type...</option>
+
+        <?php foreach ($training_types as $type): ?>
+            <option value="<?php echo htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?>"
+                <?php echo (isset($training_type) && $training_type === $type) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
 
     <div class="form-item">
         <label for="briks_made">How many ecobricks were made?</label><br>
