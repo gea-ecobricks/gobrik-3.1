@@ -274,6 +274,12 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <input type="text" id="community_search" name="community_search" placeholder="Start typing..." autocomplete="off">
     <input type="hidden" id="community_id" name="community_id"> <!-- Stores the selected community ID -->
     <div id="community_results" class="autocomplete-results"></div>
+    <!-- "Add a new community" text link -->
+    <p class="form-caption" data-lang-id="012-community-caption-xx">
+        Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
+            Don't see your community? Add it.
+        </a>
+    </p>
 </div>
 
 
@@ -716,6 +722,108 @@ document.getElementById('submit-form').addEventListener('submit', function(event
                 }, 200);
             });
         });
+
+
+
+
+
+
+
+ function openAddCommunityModal() {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    modalBox.style.maxHeight = '80vh';
+    modalBox.style.overflowY = 'auto';
+
+    modalBox.innerHTML = `
+        <h2 style="text-align:center;">Add Your Community</h2>
+        <p>Add your community to GoBrik so you can manage local projects and ecobricks.</p>
+
+        <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
+            <label for="newCommunityName">Name of Community:</label>
+            <input type="text" id="newCommunityName" name="newCommunityName" required>
+
+            <label for="newCommunityType">Type of Community:</label>
+            <select id="newCommunityType" name="newCommunityType" required>
+                <option value="">Select Type</option>
+                <option value="neighborhood">Neighborhood</option>
+                <option value="city">City</option>
+                <option value="school">School</option>
+                <option value="organization">Organization</option>
+            </select>
+
+            <label for="communityCountry">Country:</label>
+            <select id="communityCountry" name="communityCountry" required>
+                <option value="">Select Country</option>
+                <?php foreach ($countries as $country) : ?>
+                    <option value="<?php echo $country['country_id']; ?>">
+                        <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <label for="communityLanguage">Preferred Language:</label>
+            <select id="communityLanguage" name="communityLanguage" required>
+                <option value="">Select Language</option>
+                <?php foreach ($languages as $language) : ?>
+                    <option value="<?php echo $language['language_id']; ?>">
+                        <?php echo htmlspecialchars($language['languages_native_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <button type="submit" style="margin-top:10px;width:100%;" class="submit-button enabled">Submit</button>
+        </form>
+    `;
+}
+
+
+function addCommunity2Buwana(event) {
+    event.preventDefault(); // Prevent normal form submission
+
+    const form = document.getElementById('addCommunityForm');
+    const formData = new FormData(form);
+
+    fetch('../scripts/add_community.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message); // Show success or error message
+
+        if (data.success) {
+            // Close modal
+            closeInfoModal();
+
+            // Add the new community to the dropdown
+            const communityInput = document.getElementById('community_name');
+            const communityList = document.getElementById('community_list');
+
+            // Create new option
+            const newOption = document.createElement('option');
+            newOption.value = data.community_name;
+            newOption.textContent = data.community_name;
+            communityList.appendChild(newOption);
+
+            // Set selected value
+            communityInput.value = data.community_name;
+        }
+    })
+    .catch(error => {
+        alert('Error adding community. Please try again.');
+        console.error('Error:', error);
+    });
+}
+
+
 
     </script>
 
