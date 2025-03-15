@@ -89,32 +89,6 @@ if (!empty($pre_community_id)) {
     $stmt_community_name->close();
 }
 
-
-
-
-// Fetch all countries
-$countries = [];
-$sql_countries = "SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC";
-$result_countries = $buwana_conn->query($sql_countries);
-
-if ($result_countries && $result_countries->num_rows > 0) {
-    while ($row = $result_countries->fetch_assoc()) {
-        $countries[] = $row;
-    }
-}
-
-// Fetch all languages
-$languages = [];
-$sql_languages = "SELECT language_id, languages_native_name FROM languages_tb ORDER BY languages_native_name ASC";
-$result_languages = $buwana_conn->query($sql_languages);
-
-if ($result_languages && $result_languages->num_rows > 0) {
-    while ($row = $result_languages->fetch_assoc()) {
-        $languages[] = $row;
-    }
-}
-
-
 // PART 6: Handle form submission (if needed)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_location_full = $_POST['location_full'];
@@ -143,7 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // ✅ Step 1: Fetch the community_id from communities_tb based on selected community name
     $community_id = null; // Default to NULL if no match is found
-    require_once("../gobrikconn_env.php");
 
     if (!empty($selected_community_name)) {
         $sql_get_community = "SELECT com_id FROM communities_tb WHERE com_name = ?";
@@ -160,16 +133,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // ✅ Step 2: Ensure NULL values for missing IDs to prevent database errors
-    $set_country_id = !empty($set_country_id) ? $set_country_id : null;
-    $set_continent_code = !empty($set_continent_code) ? $set_continent_code : null;
-    $community_id = !empty($community_id) ? $community_id : null;
+    $set_country_id = $set_country_id ?: null;
+    $set_continent_code = $set_continent_code ?: null;
+    $community_id = $community_id ?: null;
 
-    // ✅ Step 3: Update users_tb in Buwana with the new location & community info
-    $sql_update_buwana = "UPDATE users_tb
-        SET continent_code = ?, country_id = ?, location_full = ?,
-            location_lat = ?, location_long = ?, location_watershed = ?,
-            community_id = ?
-        WHERE buwana_id = ?";
+    // ✅ Step 3: Update users_tb in Buwana
+    $sql_update_buwana = "UPDATE users_tb SET continent_code = ?, country_id = ?, location_full = ?,
+            location_lat = ?, location_long = ?, location_watershed = ?, community_id = ? WHERE buwana_id = ?";
     $stmt_update_buwana = $buwana_conn->prepare($sql_update_buwana);
     if ($stmt_update_buwana) {
         $stmt_update_buwana->bind_param(
@@ -180,50 +150,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         $stmt_update_buwana->execute();
         $stmt_update_buwana->close();
-    } else {
-        die('Error updating users_tb in Buwana: ' . $buwana_conn->error);
     }
 
-    // ✅ Step 4: Update tb_ecobrickers in GoBrik with the new location & community info
-    $sql_update_gobrik = "UPDATE tb_ecobrickers
-        SET buwana_activated = 1,
-            account_notes = CONCAT(account_notes, ' Location set.'),
-            location_full_txt = ?, country_txt = ?, location_full = ?,
-            location_lat = ?, location_long = ?,
-            country_id = ?, community_id = ?
-        WHERE buwana_id = ?";
+    // ✅ Step 4: Update tb_ecobrickers in GoBrik
+    $sql_update_gobrik = "UPDATE tb_ecobrickers SET buwana_activated = 1, account_notes = CONCAT(account_notes, ' Location set.'),
+            location_full_txt = ?, country_txt = ?, location_full = ?, location_lat = ?, location_long = ?, country_id = ?, community_id = ? WHERE buwana_id = ?";
     $stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
     if ($stmt_update_gobrik) {
-        $stmt_update_gobrik->bind_param(
-            'sssddiii',
-            $user_location_full, $selected_country, $user_location_full,
-            $user_lat, $user_lon,
-            $set_country_id, $community_id, $buwana_id
-        );
-
-        if ($stmt_update_gobrik->execute()) {
-            $stmt_update_gobrik->close();
-        } else {
-            error_log('Error executing update on tb_ecobrickers: ' . $stmt_update_gobrik->error);
-            echo "Failed to update GoBrik record.";
-        }
-    } else {
-        die('Error preparing statement for updating tb_ecobrickers: ' . $gobrik_conn->error);
+        $stmt_update_gobrik->bind_param('sssddiii', $user_location_full, $selected_country, $user_location_full, $user_lat, $user_lon, $set_country_id, $community_id, $buwana_id);
+        $stmt_update_gobrik->execute();
+        $stmt_update_gobrik->close();
     }
-
-
-} else {
-    error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
-    echo "Failed to prepare GoBrik update statement.";
 }
 
-// Close the GoBrik connection
-$gobrik_conn->close();
-
-// Redirect to the next step
+// ✅ Redirect
 header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
 exit();
-
 
 
 ?>
