@@ -408,7 +408,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: "fetch_communities.php",
+            url: "../api/fetch_communities.php",
             type: "GET",
             data: { search: query },
             success: function(response) {
