@@ -225,8 +225,6 @@ header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
 exit();
 
 
-}
-
 
 }
 ?>
