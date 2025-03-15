@@ -639,7 +639,12 @@ function fetchNearbyRivers(lat, lon) {
 });
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+</script>
+
+
+
 <script>
 $(document).ready(function() {
     $("#community_search").on("input", function() {
@@ -678,12 +683,6 @@ $(document).ready(function() {
     });
 });
 </script>
-
-
-</script>
-
-
-
 
 
 </body>
