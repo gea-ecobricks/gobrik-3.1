@@ -385,114 +385,94 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         //         header.addEventListener('click', toggleAdvancedBox);
         //     });
         // });
+document.getElementById('submit-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission until validation passes
+    var isValid = true;
 
-        document.getElementById('submit-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the form from submitting until validation is complete
-            var isValid = true; // Flag to determine if the form should be submitted
+    function displayError(elementId, showError) {
+        var errorDiv = document.getElementById(elementId);
+        if (errorDiv) {
+            errorDiv.style.display = showError ? 'block' : 'none';
+            if (showError) isValid = false;
+        }
+    }
 
-            // Helper function to display error messages
-            function displayError(elementId, showError) {
-                var errorDiv = document.getElementById(elementId);
-                if (showError) {
-                    errorDiv.style.display = 'block'; // Show the error message
-                    isValid = false; // Set form validity flag
-                } else {
-                    errorDiv.style.display = 'none'; // Hide the error message
-                }
-            }
+    function hasInvalidChars(value) {
+        const invalidChars = /[<>]/; // Only block `<` and `>` to prevent XSS
+        return invalidChars.test(value);
+    }
 
-            // Helper function to check for invalid characters
-            function hasInvalidChars(value) {
-                const invalidChars = /[\'\"><]/; // Regex for invalid characters
-                return invalidChars.test(value);
-            }
+    // 1. Training Title
+    var trainingTitle = document.getElementById('training_title').value.trim();
+    displayError('title-error-required', trainingTitle === '');
+    displayError('title-error-long', trainingTitle.length > 50);
+    displayError('title-error-invalid', hasInvalidChars(trainingTitle));
 
-            // 1. Training Title Validation
-            var trainingTitle = document.getElementById('training_title').value.trim();
-            displayError('title-error-required', trainingTitle === '');
-            displayError('title-error-long', trainingTitle.length > 50);
-            displayError('title-error-invalid', hasInvalidChars(trainingTitle));
+    // 2. Training Date
+    var trainingDate = document.getElementById('training_date').value.trim();
+    displayError('date-error-required', trainingDate === '');
 
-            // 2. Training Date Validation
-            var trainingDate = document.getElementById('training_date').value.trim();
-            displayError('date-error-required', trainingDate === '');
+    // 3. Number of Participants
+    var noParticipants = parseInt(document.getElementById('no_participants').value, 10);
+    displayError('participants-error-range', isNaN(noParticipants) || noParticipants < 1 || noParticipants > 5000);
 
-            // // 3. Training Logged Validation
-            // var trainingLogged = document.getElementById('training_logged').value.trim();
-            // displayError('logged-error-required', trainingLogged === '');
+    // 4. Lead Trainer
+    var leadTrainer = document.getElementById('lead_trainer').value.trim();
+    displayError('trainer-error-required', leadTrainer === '');
 
-            // 4. Number of Participants Validation
-            var noParticipants = parseInt(document.getElementById('no_participants').value, 10);
-            displayError('participants-error-range', isNaN(noParticipants) || noParticipants < 1 || noParticipants > 5000);
+    // 5. Training Type (Fix)
+    var trainingType = document.getElementById('training_type').value;
+    displayError('type-error-required', trainingType === "" || trainingType === "disabled");
 
-            // 5. Lead Trainer Validation
-            var leadTrainer = document.getElementById('lead_trainer').value.trim();
-            displayError('trainer-error-required', leadTrainer === '');
+    // 6. Bricks Made
+    var briksMade = parseInt(document.getElementById('briks_made').value, 10);
+    displayError('briks-error-range', isNaN(briksMade) || briksMade < 1 || briksMade > 5000);
 
-            // 6. Trained Community Validation (just check length)
-            var trainedCommunity = document.getElementById('trained_community').value.trim();
-            displayError('community-error-long', trainedCommunity.length > 255);
+    // 7. Average Weight
+    var estimatedWeight = parseInt(document.getElementById('avg_brik_weight').value, 10);
+    displayError('weight-error-range', isNaN(estimatedWeight) || estimatedWeight < 100 || estimatedWeight > 2000);
 
-            // 7. Training Type Validation
-            var trainingType = document.getElementById('training_type').value;
-            displayError('type-error-required', trainingType === '');
+    // 8. Training Country
+    var trainingCountry = document.getElementById('training_country').value.trim();
+    displayError('country-error-required', trainingCountry === '');
 
-            // 8. Bricks Made Validation
-            var briksMade = parseInt(document.getElementById('briks_made').value, 10);
-            displayError('briks-error-range', isNaN(briksMade) || briksMade < 1 || briksMade > 5000);
+    // 9. Training Summary (Fix)
+    var trainingSummary = document.getElementById('training_summary').value.trim();
+    displayError('summary-error-long', trainingSummary.length > 2000);
+    displayError('summary-error-invalid', hasInvalidChars(trainingSummary));
 
-            // 9. Estimated Weight Validation
-            var estimatedWeight = parseInt(document.getElementById('avg_brik_weight').value, 10);
-            displayError('weight-error-range', isNaN(estimatedWeight) || estimatedWeight < 100 || estimatedWeight > 2000);
+    // 10. Training Agenda
+    var trainingAgenda = document.getElementById('training_agenda').value.trim();
+    displayError('agenda-error-long', trainingAgenda.length > 2000);
 
-            // 10. Training Country Validation
-            var trainingCountry = document.getElementById('training_country').value.trim();
-            displayError('country-error-required', trainingCountry === '');
+    // 11. Training Success
+    var trainingSuccess = document.getElementById('training_success').value.trim();
+    displayError('success-error-long', trainingSuccess.length > 2000);
+    displayError('success-error-invalid', hasInvalidChars(trainingSuccess));
 
-            // // 11. Training Location Validation
-            // var trainingLocation = document.getElementById('training_location').value.trim();
-            // displayError('location-error-required', trainingLocation === '');
+    // 12. Training Challenges
+    var trainingChallenges = document.getElementById('training_challenges').value.trim();
+    displayError('challenges-error-long', trainingChallenges.length > 2000);
+    displayError('challenges-error-invalid', hasInvalidChars(trainingChallenges));
 
-            // 12. Training Summary Validation
-            var trainingSummary = document.getElementById('training_summary').value.trim();
-            displayError('summary-error-long', trainingSummary.length > 2000);
-            displayError('summary-error-invalid', hasInvalidChars(trainingSummary));
+    // 13. Lessons Learned
+    var trainingLessonsLearned = document.getElementById('training_lessons_learned').value.trim();
+    displayError('lessons-error-long', trainingLessonsLearned.length > 2000);
+    displayError('lessons-error-invalid', hasInvalidChars(trainingLessonsLearned));
 
-            // 13. Training Agenda Validation
-            var trainingAgenda = document.getElementById('training_agenda').value.trim();
-            displayError('agenda-error-long', trainingAgenda.length > 2000);
+    // ✅ Scroll to First Error
+    if (!isValid) {
+        var firstError = document.querySelector('.form-field-error:not([style*="display: none"])');
+        if (firstError) {
+            firstError.scrollIntoView({behavior: "smooth", block: "center"});
+            var relatedInput = firstError.closest('.form-item').querySelector('input, select, textarea');
+            if (relatedInput) relatedInput.focus();
+        }
+    } else {
+        this.submit(); // ✅ If valid, submit the form
+    }
+});
 
-            // 14. Training Success Validation
-            var trainingSuccess = document.getElementById('training_success').value.trim();
-            displayError('success-error-long', trainingSuccess.length > 2000);
-            displayError('success-error-invalid', hasInvalidChars(trainingSuccess));
-
-            // 15. Training Challenges Validation
-            var trainingChallenges = document.getElementById('training_challenges').value.trim();
-            displayError('challenges-error-long', trainingChallenges.length > 2000);
-            displayError('challenges-error-invalid', hasInvalidChars(trainingChallenges));
-
-            // 16. Lessons Learned Validation
-            var trainingLessonsLearned = document.getElementById('training_lessons_learned').value.trim();
-            displayError('lessons-error-long', trainingLessonsLearned.length > 2000);
-            displayError('lessons-error-invalid', hasInvalidChars(trainingLessonsLearned));
-
-            // If all validations pass, submit the form
-            if (isValid) {
-                this.submit();
-            } else {
-                // Scroll to the first error message and center it in the viewport
-                var firstError = document.querySelector('.form-field-error[style="display: block;"]');
-                if (firstError) {
-                    firstError.scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"});
-                    // Optionally, find the related input and focus it
-                    var relatedInput = firstError.closest('.form-item').querySelector('input, select, textarea');
-                    if (relatedInput) {
-                        relatedInput.focus();
-                    }
-                }
-            }
-        });
 
         $(function() {
             let debounceTimer;
