@@ -20,7 +20,7 @@ $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
 
 // ✅ Fetch User Role
-$query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
+$query = "SELECT gea_status FROM tb_ecobrickers WHERE buwana_id = ?";
 $stmt = $gobrik_conn->prepare($query);
 $stmt->bind_param("i", $buwana_id);
 $stmt->execute();
@@ -28,7 +28,7 @@ $stmt->bind_result($user_roles);
 $stmt->fetch();
 $stmt->close();
 
-if (!$user_roles || stripos($user_roles, 'trainer') === false) {
+if (!$user_roles || stripos($gea_status, 'trainer') === false) {
     header("Location: dashboard.php?error=unauthorized");
     exit();
 }
