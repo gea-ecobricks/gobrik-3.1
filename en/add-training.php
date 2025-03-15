@@ -84,19 +84,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $training_challenges = trim($_POST['training_challenges']);
     $training_lessons_learned = trim($_POST['training_lessons_learned']);
 
-    if ($editing) {
-        // ✅ Update existing training report
-        $sql = "UPDATE tb_trainings SET training_title=?, lead_trainer=?, training_country=?, training_date=?,
-                no_participants=?, trained_community=?, training_type=?, briks_made=?, avg_brik_weight=?,
-                location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
-                training_success=?, training_challenges=?, training_lessons_learned=?
-                WHERE training_id=?";
-        $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("sssisiiiddssssss",
-            $training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community,
-            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-            $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned
-        );
+   if ($editing) {
+    // ✅ Update existing training report
+    $sql = "UPDATE tb_trainings SET
+            training_title=?, lead_trainer=?, training_country=?, training_date=?,
+            no_participants=?, trained_community=?, training_type=?, briks_made=?, avg_brik_weight=?,
+            location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
+            training_success=?, training_challenges=?, training_lessons_learned=?
+            WHERE training_id=?";
+
+    $stmt = $gobrik_conn->prepare($sql);
+
+    // ✅ Fix: Added `training_id` as the last variable in `bind_param`
+    $stmt->bind_param("sssisiiiddssssssi",
+        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+        $trained_community, $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude,
+        $location_full, $training_summary, $training_agenda, $training_success, $training_challenges,
+        $training_lessons_learned, $training_id  // ✅ Added `training_id`
+    );
+}
+
     } else {
         // ✅ Insert new training report
 // ✅ Insert new training report
