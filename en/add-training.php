@@ -72,6 +72,18 @@ if ($result) {
     }
 }
 
+// Fetch list of countries
+$countries = [];
+
+$query = "SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC";
+$result = $gobrik_conn->query($query);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $countries[] = $row;
+    }
+}
+
 
 
 // ✅ If form is submitted, insert/update the training report
@@ -283,10 +295,19 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </div>
 
     <div class="form-item">
-        <label for="training_country">Country:</label><br>
-        <input type="text" id="training_country" name="training_country" required
-            value="<?php echo htmlspecialchars($training_country ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    </div>
+    <label for="country_id">Country:</label><br>
+    <select id="country_id" name="country_id" required>
+        <option value="" disabled selected>Select a country...</option>
+
+        <?php foreach ($countries as $country): ?>
+            <option value="<?php echo $country['country_id']; ?>"
+                <?php echo (isset($country_id) && $country_id == $country['country_id']) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
 
     <div class="form-item">
         <label for="training_summary">Training Summary:</label><br>
