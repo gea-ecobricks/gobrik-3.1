@@ -84,6 +84,14 @@ if ($result) {
     }
 }
 
+$sql = "SELECT com_id, com_name FROM communities_tb ORDER BY com_name ASC";
+$result = $gobrik_conn->query($sql);
+$communities = [];
+
+while ($row = $result->fetch_assoc()) {
+    $communities[] = $row; // Store results in an array
+}
+
 
 
 // ✅ If form is submitted, insert/update the training report
@@ -260,12 +268,20 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             aria-label="Lead Trainer" required>
     </div>
 
-    <div class="form-item">
-        <label for="trained_community">Trained Community:</label><br>
-        <input type="text" id="trained_community" name="trained_community"
-            value="<?php echo htmlspecialchars($trained_community ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            aria-label="Trained Community">
-    </div>
+
+<div class="form-item">
+    <label for="community_id">Trained Community:</label><br>
+    <select id="community_id" name="community_id" required>
+        <option value="" disabled selected>Select a community...</option>
+        <?php foreach ($communities as $community): ?>
+            <option value="<?php echo $community['com_id']; ?>"
+                <?php echo (!empty($community_id) && $community_id == $community['com_id']) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($community['com_name'], ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
 
     <div class="form-item">
     <label for="training_type">What type of training was this?</label><br>
@@ -376,10 +392,25 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         </div>
     </div>
 
+<!-- Load jQuery and Select2 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
+<!--
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+-->
+
+<script>
+    $(document).ready(function() {
+        $('#community_id').select2({
+            placeholder: "Start typing to search for a community...",
+            allowClear: true
+        });
+    });
+</script>
 
     <script>
 
