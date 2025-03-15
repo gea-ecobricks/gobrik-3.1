@@ -80,7 +80,6 @@ if ($result->num_rows > 0) {
     $training_date = htmlspecialchars($row['training_date'], ENT_QUOTES, 'UTF-8');
     $training_logged = htmlspecialchars($row['training_logged'], ENT_QUOTES, 'UTF-8');
     $lead_trainer = htmlspecialchars($row['lead_trainer'], ENT_QUOTES, 'UTF-8');
-    $trained_community = htmlspecialchars($row['trained_community'], ENT_QUOTES, 'UTF-8');
     $training_type = htmlspecialchars($row['training_type'], ENT_QUOTES, 'UTF-8');
     $briks_made = $row['briks_made'];
     $avg_brik_weight = $row['avg_brik_weight'];
