@@ -180,7 +180,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <h4 class="panel-title">Admin Email Subscriptions Manager</h4>
         <div class="menu-buttons-row">
             <a href="admin-emailer.php" class="page-button">📨 GoBrik Intro Emailer</a>
-            <a href="admin-panel.php" class="page-button">🔎 User Review & Purge</a>
+            <a href="admin-panel.php" class="page-button">🔎 User Management</a>
             <a href="test-ghost-emailer.php" class="page-button">📨 Earthen Manual Mailer</a>
             <a href="../scripts/process_email_failures.php" class="page-button">❌ Purge Failed Earthen Accounts</a>
             <a href="https://earthen.io/ghost" class="page-button">👻 Earthen Ghost Login</a>
