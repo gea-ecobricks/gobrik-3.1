@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $gobrik_conn->prepare($sql);
 
     // ✅ Fix: Added `training_id` as the last variable in `bind_param`
-    $stmt->bind_param("sssisiiiddssssssi",
+    $stmt->bind_param("sssssiiiddssssssi",
         $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
         $trained_community, $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude,
         $location_full, $training_summary, $training_agenda, $training_success, $training_challenges,
