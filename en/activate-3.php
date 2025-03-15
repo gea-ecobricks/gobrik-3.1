@@ -62,31 +62,31 @@ if (empty($first_name)) {
 }
 
 // PART 4: Fetch Ecobricker's community from GoBrik database
-// require_once("../gobrikconn_env.php");
-//
-// $sql_ecobricker_community = "SELECT community FROM tb_ecobrickers WHERE buwana_id = ?";
-// $stmt_ecobricker_community = $gobrik_conn->prepare($sql_ecobricker_community);
-//
-// if ($stmt_ecobricker_community) {
-//     $stmt_ecobricker_community->bind_param('i', $buwana_id);
-//     $stmt_ecobricker_community->execute();
-//     $stmt_ecobricker_community->bind_result($pre_community);
-//     $stmt_ecobricker_community->fetch();
-//     $stmt_ecobricker_community->close();
-// } else {
-//     die('Error preparing statement for fetching ecobricker community: ' . $gobrik_conn->error);
-// }
-//
-// // PART 5: Fetch all communities from the communities_tb table in Buwana database
-// $communities = [];
-// $sql_communities = "SELECT com_name FROM communities_tb";
-// $result_communities = $buwana_conn->query($sql_communities);
-//
-// if ($result_communities && $result_communities->num_rows > 0) {
-//     while ($row = $result_communities->fetch_assoc()) {
-//         $communities[] = $row['com_name'];
-//     }
-// }
+require_once("../gobrikconn_env.php");
+
+$sql_ecobricker_community = "SELECT community FROM tb_ecobrickers WHERE buwana_id = ?";
+$stmt_ecobricker_community = $gobrik_conn->prepare($sql_ecobricker_community);
+
+if ($stmt_ecobricker_community) {
+    $stmt_ecobricker_community->bind_param('i', $buwana_id);
+    $stmt_ecobricker_community->execute();
+    $stmt_ecobricker_community->bind_result($pre_community);
+    $stmt_ecobricker_community->fetch();
+    $stmt_ecobricker_community->close();
+} else {
+    die('Error preparing statement for fetching ecobricker community: ' . $gobrik_conn->error);
+}
+
+// PART 5: Fetch all communities from the communities_tb table in Buwana database
+$communities = [];
+$sql_communities = "SELECT com_name FROM communities_tb";
+$result_communities = $buwana_conn->query($sql_communities);
+
+if ($result_communities && $result_communities->num_rows > 0) {
+    while ($row = $result_communities->fetch_assoc()) {
+        $communities[] = $row['com_name'];
+    }
+}
 
 
 // Fetch all countries
@@ -112,12 +112,14 @@ if ($result_languages && $result_languages->num_rows > 0) {
 }
 
 
+
 // PART 6: Handle form submission (if needed)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_location_full = $_POST['location_full'];
     $user_lat = $_POST['latitude'];
     $user_lon = $_POST['longitude'];
     $location_watershed = $_POST['watershed_select']; // Capture the selected watershed
+    $selected_community_name = $_POST['community_name']; // Get the selected community name from the form
 
     // Extract country from the last term in the location string (after the last comma)
     $location_parts = explode(',', $user_location_full);
@@ -137,68 +139,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die('Error preparing statement for fetching country info: ' . $buwana_conn->error);
     }
 
-    // Ensure NULL values for missing data to prevent database errors
-    $set_country_id = $set_country_id ?: null;
-    $set_continent_code = $set_continent_code ?: null;
+    // Check if the country, continent, or community were found in the database and set to null if not
+$set_country_id = !empty($set_country_id) ? $set_country_id : null;
+$set_continent_code = !empty($set_continent_code) ? $set_continent_code : null;
+$community_id = !empty($community_id) ? $community_id : null;
 
-    // Update the Buwana user's continent, country, location, and watershed using buwana_id
-    $sql_update_buwana = "UPDATE users_tb
-        SET continent_code = ?, country_id = ?, location_full = ?,
-            location_lat = ?, location_long = ?, location_watershed = ?
-        WHERE buwana_id = ?";
-    $stmt_update_buwana = $buwana_conn->prepare($sql_update_buwana);
-
-    if ($stmt_update_buwana) {
-        $stmt_update_buwana->bind_param(
-            'sissdsi',
-            $set_continent_code, $set_country_id, $user_location_full,
-            $user_lat, $user_lon, $location_watershed, $buwana_id
-        );
-        $stmt_update_buwana->execute();
-        $stmt_update_buwana->close();
-    } else {
-        die('Error updating users_tb in Buwana: ' . $buwana_conn->error);
-    }
+// Update the Buwana user's continent, country, location, watershed, and community using buwana_id
+$sql_update_buwana = "UPDATE users_tb SET continent_code = ?, country_id = ?, location_full = ?, location_lat = ?, location_long = ?, location_watershed = ?, community_id = ? WHERE buwana_id = ?";
+$stmt_update_buwana = $buwana_conn->prepare($sql_update_buwana);
+if ($stmt_update_buwana) {
+    $stmt_update_buwana->bind_param('sissdsii', $set_continent_code, $set_country_id, $user_location_full, $user_lat, $user_lon, $location_watershed, $community_id, $buwana_id);
+    $stmt_update_buwana->execute();
+    $stmt_update_buwana->close();
 
     // PART 7: Open GoBrik connection and update tb_ecobrickers
-    require_once("../gobrikconn_env.php");
+require_once("../gobrikconn_env.php");
 
-    $sql_update_gobrik = "UPDATE tb_ecobrickers
-        SET buwana_activated = 1,
-            account_notes = CONCAT(account_notes, ' Location set.'),
-            location_full_txt = ?, country_txt = ?, location_full = ?,
-            location_lat = ?, location_long = ?, country_id = ?
-        WHERE buwana_id = ?";
-    $stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
+$sql_update_gobrik = "UPDATE tb_ecobrickers
+    SET buwana_activated = 1,
+        account_notes = CONCAT(account_notes, ' Location set.'),
+        location_full_txt = ?,
+        country_txt = ?,
+        location_full = ?,
+        location_lat = ?,
+        location_long = ?,
+        country_id = ?,
+        community_id = ?
+    WHERE buwana_id = ?";
 
-    if ($stmt_update_gobrik) {
-        $stmt_update_gobrik->bind_param(
-            'sssddii',
-            $user_location_full, $selected_country, $user_location_full,
-            $user_lat, $user_lon, $set_country_id, $buwana_id
-        );
+$stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
 
-        if ($stmt_update_gobrik->execute()) {
-            $stmt_update_gobrik->close();
-        } else {
-            error_log('Error executing update on tb_ecobrickers: ' . $stmt_update_gobrik->error);
-            echo "Failed to update GoBrik record.";
-        }
+if ($stmt_update_gobrik) {
+    // Bind parameters for the update
+    $stmt_update_gobrik->bind_param(
+        'sssddiii',
+        $user_location_full,   // Location full text
+        $selected_country,     // Country text derived from earlier
+        $user_location_full,   // Full location for GoBrik
+        $user_lat,             // Latitude
+        $user_lon,             // Longitude
+        $set_country_id,       // Country ID derived earlier
+        $community_id,         // Community ID derived earlier
+        $buwana_id             // Buwana ID to match
+    );
+
+    // Execute the query and handle potential errors
+    if ($stmt_update_gobrik->execute()) {
+        $stmt_update_gobrik->close();
     } else {
-        error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
-        echo "Failed to prepare GoBrik update statement.";
+        error_log('Error executing update on tb_ecobrickers: ' . $stmt_update_gobrik->error);
+        echo "Failed to update GoBrik record.";
     }
+} else {
+    error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
+    echo "Failed to prepare GoBrik update statement.";
+}
 
-    // Close the GoBrik connection
-    $gobrik_conn->close();
+// Close the GoBrik connection
+$gobrik_conn->close();
 
-    // Redirect to the next step
-    header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
-    exit();
+// Redirect to the next step
+header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
+exit();
+
+
 }
 
 
-
+}
 ?>
 
 
@@ -210,12 +218,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
 <!--
 GoBrik.com site version 3.0
 Developed and made open source by the Global Ecobrick Alliance
@@ -270,7 +279,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     </div>
 
-  <!-- COMMUNITY FIELD
+  <!-- COMMUNITY FIELD -->
 <div class="form-item" id="community-section" style="display: none; margin-top:20px;">
     <label for="community_name" data-lang-id="012-community-name">Select and confirm your GoBrik community:</label><br>
     <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
@@ -283,15 +292,15 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </option>
         <?php endforeach; ?>
         <option value="+Add a new community..." onclick="openAddCommunityModal()">+ Add a new community...</option>
-    </datalist>-->
+    </datalist>
 
-    <!-- "Add a new community" text link
+    <!-- "Add a new community" text link -->
     <p class="form-caption" data-lang-id="012-community-caption-xx">
         Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
             Don't see your community? Add it.
         </a>
     </p>
-</div>-->
+</div>
 
 
 
@@ -307,7 +316,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
 
-
     </div>
 </div>
 </div>
@@ -316,11 +324,101 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
 
-
-
-
 <script>
 
+ function openAddCommunityModal() {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    modalBox.style.maxHeight = '80vh';
+    modalBox.style.overflowY = 'auto';
+
+    modalBox.innerHTML = `
+        <h2 style="text-align:center;">Add Your Community</h2>
+        <p>Add your community to GoBrik so you can manage local projects and ecobricks.</p>
+
+        <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
+            <label for="newCommunityName">Name of Community:</label>
+            <input type="text" id="newCommunityName" name="newCommunityName" required>
+
+            <label for="newCommunityType">Type of Community:</label>
+            <select id="newCommunityType" name="newCommunityType" required>
+                <option value="">Select Type</option>
+                <option value="neighborhood">Neighborhood</option>
+                <option value="city">City</option>
+                <option value="school">School</option>
+                <option value="organization">Organization</option>
+            </select>
+
+            <label for="communityCountry">Country:</label>
+            <select id="communityCountry" name="communityCountry" required>
+                <option value="">Select Country</option>
+                <?php foreach ($countries as $country) : ?>
+                    <option value="<?php echo $country['country_id']; ?>">
+                        <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <label for="communityLanguage">Preferred Language:</label>
+            <select id="communityLanguage" name="communityLanguage" required>
+                <option value="">Select Language</option>
+                <?php foreach ($languages as $language) : ?>
+                    <option value="<?php echo $language['language_id']; ?>">
+                        <?php echo htmlspecialchars($language['languages_native_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <button type="submit" style="margin-top:10px;width:100%;" class="submit-button enabled">Submit</button>
+        </form>
+    `;
+}
+
+
+function addCommunity2Buwana(event) {
+    event.preventDefault(); // Prevent normal form submission
+
+    const form = document.getElementById('addCommunityForm');
+    const formData = new FormData(form);
+
+    fetch('../scripts/add_community.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message); // Show success or error message
+
+        if (data.success) {
+            // Close modal
+            closeInfoModal();
+
+            // Add the new community to the dropdown
+            const communityInput = document.getElementById('community_name');
+            const communityList = document.getElementById('community_list');
+
+            // Create new option
+            const newOption = document.createElement('option');
+            newOption.value = data.community_name;
+            newOption.textContent = data.community_name;
+            communityList.appendChild(newOption);
+
+            // Set selected value
+            communityInput.value = data.community_name;
+        }
+    })
+    .catch(error => {
+        alert('Error adding community. Please try again.');
+        console.error('Error:', error);
+    });
+}
 
 
 
