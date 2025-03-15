@@ -253,6 +253,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 </table>
 </div>
 
+
+
+<?php endif; ?>
+
+
+
 <!-- MY REGISTERED TRAININGS-->
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
     <h3 data-lang-id="002-my-registrations">My Training Registrations</h3>
@@ -280,9 +286,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </tbody>
     </table>
 </div>
-
-
-<?php endif; ?>
 
 
 
