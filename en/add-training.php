@@ -20,15 +20,9 @@ $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
 
 // ✅ Fetch User Role
-$query = "SELECT gea_status FROM tb_ecobrickers WHERE buwana_id = ?";
-$stmt = $gobrik_conn->prepare($query);
-$stmt->bind_param("i", $buwana_id);
-$stmt->execute();
-$stmt->bind_result($user_roles);
-$stmt->fetch();
-$stmt->close();
+$gea_status = getGEA_status($buwana_id);
 
-if (!$user_roles || stripos($gea_status, 'trainer') === false) {
+if (!$gea_status || stripos($gea_status, 'trainer') === false) {
     header("Location: dashboard.php?error=unauthorized");
     exit();
 }
@@ -38,7 +32,7 @@ require_once '../buwanaconn_env.php';
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
 $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
 $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-$gea_status = getGEA_status($buwana_id);
+
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 $first_name = getFirstName($buwana_conn, $buwana_id);
 
