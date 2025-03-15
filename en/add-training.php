@@ -106,10 +106,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $location_full, $training_summary, $training_agenda, $training_success,
     $training_challenges, $training_lessons_learned
 );
-
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("sssisiiiddssssss",
+        $stmt->bind_param("sssisiiiddsssssss",
             $training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community,
             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
             $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned
