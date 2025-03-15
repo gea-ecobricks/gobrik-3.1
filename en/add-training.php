@@ -93,6 +93,17 @@ while ($row = $result->fetch_assoc()) {
 }
 
 
+// Fetch all languages
+$languages = [];
+$sql_languages = "SELECT language_id, languages_native_name FROM languages_tb ORDER BY languages_native_name ASC";
+$result_languages = $buwana_conn->query($sql_languages);
+
+if ($result_languages && $result_languages->num_rows > 0) {
+    while ($row = $result_languages->fetch_assoc()) {
+        $languages[] = $row;
+    }
+}
+
 
 // ✅ If form is submitted, insert/update the training report
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

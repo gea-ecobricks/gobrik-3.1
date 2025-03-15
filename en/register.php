@@ -248,25 +248,25 @@ function openInfoModal(lang) {
     switch (lang) {
         case 'fr':
             title = "Connexion requise";
-            message = "Pour vous inscrire à l'événement communautaire, veuillez vous connecter avec votre compte GoBrik Buwana.";
+            message = "Pour vous inscrire à l'événement communautaire, veuillez vous connecter avec votre compte GoBrik.";
             loginButton = "🔑 Se connecter";
             signupButton = "📝 S'inscrire";
             break;
         case 'es':
             title = "Inicio de sesión requerido";
-            message = "Para inscribirse en el evento comunitario, inicie sesión con su cuenta de GoBrik Buwana.";
+            message = "Para inscribirse en el evento comunitario, inicie sesión con su cuenta de GoBrik.";
             loginButton = "🔑 Iniciar sesión";
             signupButton = "📝 Registrarse";
             break;
         case 'id':
             title = "Diperlukan Login";
-            message = "Untuk mendaftar acara komunitas, silakan masuk dengan akun GoBrik Buwana Anda.";
+            message = "Untuk mendaftar acara komunitas, silakan masuk dengan akun GoBrik Anda.";
             loginButton = "🔑 Masuk";
             signupButton = "📝 Daftar";
             break;
         default: // English (en)
             title = "Login Required";
-            message = "To RSVP for the Community Event, please log in with your GoBrik Buwana account.";
+            message = "To RSVP for the Community Event, please log in with your GoBrik account.";
             loginButton = "🔑 Log In";
             signupButton = "📝 Sign Up";
             break;
