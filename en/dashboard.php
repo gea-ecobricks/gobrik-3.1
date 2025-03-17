@@ -208,7 +208,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
     </div>
 
-
 <!-- TRAINER TRAININGS -->
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
     <h3 data-lang-id="002-my-trainings">My Trainings</h3>
@@ -221,22 +220,22 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <th>Date</th>
                 <th>Location</th>
                 <th>Type</th>
-                <th>🔎Registered</th> <!-- New Column -->
+                <th>Registered</th> <!-- Updated column title -->
             </tr>
         </thead>
         <tbody>
             <?php foreach ($trainings as $training): ?>
-                <tr>
+                <tr class="clickable-row"
+                    data-training-id="<?php echo $training['training_id']; ?>"
+                    data-training-title="<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>">
+
                     <td><?php echo htmlspecialchars($training['training_title']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_date']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_location']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_type']); ?></td>
                     <td style="text-align:center;">
-                        <a href="javascript:void(0);"
-                           style="text-decoration:underline; font-weight:bold;"
-                           onclick="openTraineesModal(<?php echo $training['training_id']; ?>,
-                                                      '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
-                            <?php echo (int) $training['trainee_count']; ?>
+                        <a href="javascript:void(0);" class="trainee-count">
+                            <?php echo (int) $training['trainee_count']; ?> 🔎
                         </a>
                     </td>
                 </tr>
@@ -423,9 +422,8 @@ $(document).ready(function() {
 
 
 //MY TRAININGS
-
 $(document).ready(function() {
-    $("#trainer-trainings").DataTable({
+    let table = $("#trainer-trainings").DataTable({
         "pageLength": 10,
         "searching": false,
         "lengthChange": false,
@@ -444,8 +442,26 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [4] } // Disable sorting on "🔎Registered" column
+            { "orderable": false, "targets": [4] }, // Disable sorting on "Registered" column
+            { "targets": [1, 2, 3], "visible": true }, // Show all columns by default
+            {
+                "targets": [1, 2, 3], // Hide date, location, type on small screens
+                "visible": false,
+                "responsivePriority": 2
+            }
         ]
+    });
+
+    // Make the entire row clickable
+    $("#trainer-trainings tbody").on("click", "tr.clickable-row", function() {
+        let trainingId = $(this).data("training-id");
+        let trainingTitle = $(this).data("training-title");
+        openTraineesModal(trainingId, trainingTitle);
+    });
+
+    // Prevent row click event from firing when clicking on the trainee count link
+    $("#trainer-trainings tbody").on("click", "a.trainee-count", function(event) {
+        event.stopPropagation(); // Stops event from triggering row click
     });
 });
 
