@@ -1,4 +1,7 @@
 <?php
+
+//HELLO WORL
+
 require_once '../gobrikconn_env.php';
 
 header('Content-Type: application/json'); // Ensure correct JSON response header
