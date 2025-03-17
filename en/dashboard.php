@@ -93,10 +93,10 @@ if ($stmt_trainings) {
     die("Error preparing statement for trainer trainings: " . $gobrik_conn->error);
 }
 
-
 // Fetch trainings where the user is a registered trainee
 $registered_trainings = [];
-$sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_country, t.training_type, t.training_url
+$sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location,
+                                    t.training_country, t.training_type, t.zoom_link, t.zoom_link_full
                              FROM tb_trainings t
                              INNER JOIN tb_training_trainees tt ON t.training_id = tt.training_id
                              WHERE tt.ecobricker_id = ?";
@@ -114,6 +114,7 @@ if ($stmt_registered_trainings) {
 } else {
     die("Error preparing statement for registered trainings: " . $gobrik_conn->error);
 }
+
 
 
     // Close the database connections
@@ -208,7 +209,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
     </div>
 
-<!-- TRAINER TRAININGS -->
+
 <!-- TRAINER TRAININGS -->
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
     <h3 data-lang-id="002-my-trainings">My Trainings</h3>
@@ -253,14 +254,15 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
 
-<!-- MY REGISTRATIONS-->
+<!-- MY REGISTRATIONS -->
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
     <h3 data-lang-id="002-my-registrations">My Registrations</h3>
     <p>Trainings that you've registered for.</p>
-    <table id="trainee-trainings" class="display responsive nowrap" style="width:100%">
+
+    <table id="trainee-trainings" class="display responsive nowrap" style="width:100%;">
         <thead>
             <tr>
-                <th>Training Title</th>
+                <th>Training</th>
                 <th>Date</th>
                 <th>Location</th>
                 <th>Country</th>
@@ -272,7 +274,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <tr>
                     <td><?php echo htmlspecialchars($training['training_title']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_date']); ?></td>
-                    <td><?php echo htmlspecialchars($training['training_location']); ?></td>
+                    <td style="text-align:center;">
+                        <a href="javascript:void(0);"
+                           style="text-decoration:underline; font-weight:bold;"
+                           onclick="openRegisteredTrainingsModal(<?php echo $training['training_id']; ?>,
+                                                                  '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
+                            <?php echo htmlspecialchars($training['training_location']); ?> 🔎
+                        </a>
+                    </td>
                     <td><?php echo htmlspecialchars($training['training_country']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_type']); ?></td>
                 </tr>
@@ -280,6 +289,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </tbody>
     </table>
 </div>
+
 
 
 
@@ -398,13 +408,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
 // REGISTRATION (TRAININGS)
-
 $(document).ready(function() {
-    $("#trainee-trainings").DataTable({
-        "responsive": true,
-        "pageLength": 10,  // Set default number of rows per page to 10
-        "searching": false, // Disable search function
-        "lengthChange": false, // Disable ability to change number of rows displayed
+    let table = $("#trainee-trainings").DataTable({
+        "pageLength": 10,
+        "searching": false,
+        "lengthChange": false,
         "language": {
             "emptyTable": "You haven't registered for any trainings yet.",
             "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
@@ -417,9 +425,34 @@ $(document).ready(function() {
                 "next": "Next",
                 "previous": "Previous"
             }
+        },
+        "columnDefs": [
+            { "orderable": false, "targets": [2] }, // Disable sorting on "Location"
+            { "targets": [3, 4], "visible": true }, // Default: show Country, Type
+            { "targets": [3, 4], "visible": false, "responsivePriority": 1 } // Hide on small screens
+        ]
+    });
+
+    // Adjust visibility based on screen size
+    function adjustTableColumns() {
+        if (window.innerWidth < 769) {
+            table.column(3).visible(false); // Hide Country
+            table.column(4).visible(false); // Hide Type
+        } else {
+            table.column(3).visible(true);
+            table.column(4).visible(true);
         }
+    }
+
+    // Run on page load
+    adjustTableColumns();
+
+    // Run on window resize
+    $(window).resize(function() {
+        adjustTableColumns();
     });
 });
+
 
 
 $(document).ready(function() {
@@ -495,7 +528,7 @@ function openTraineesModal(trainingId, trainingTitle) {
     // Set up modal structure
     modalBox.innerHTML = `
         <h4 style="text-align:center;">Registered Trainees for <br> ${escapeHTML(trainingTitle)}</h4>
-        <div id="trainee-table-container" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
+        <div id="trainee-table-container" style="max-height: 100%; overflow-y: auto; margin-bottom: 20px;"></div>
     `;
 
     // Fetch trainees via AJAX
