@@ -14,6 +14,14 @@
 
 <STYLE>
 
+    .user_lastname {
+        position: absolute;
+    left: -9999px;
+    top: -9999px;
+    opacity: 0; /* Invisible but exists */
+    pointer-events: none; /* Prevent interaction */
+}
+
 #main {
     height: fit-content;
 }
