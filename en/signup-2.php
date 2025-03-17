@@ -100,8 +100,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
             <!--SIGNUP FORM-->
             <form id="password-confirm-form" method="post" action="signup_process.php?id=<?php echo htmlspecialchars($buwana_id); ?>">
+                <div class="form-item" id="credential-section">
 
-               <!-- <div class="form-item" id="last-name" class="user_lastname" style="display:none!important;">
+                    <!-- <div class="form-item" id="last-name" class="user_lastname" style="display:none!important;">
                     <label for="last_name" data-lang-id="011b-last-name">Now what is your last name?</label><br>
                     <input type="text" id="human_check" class="required" placeholder="Your last name...">
                     <p class="form-caption" data-lang-id="011b-required" style="color:red">*This field is required.</p>
@@ -128,7 +129,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <p class="form-caption" data-lang-id="008-password-advice">🔑 Your password must be at least 6 characters.</p>
                 </div>
 
-
+                <div class="form-item" id="confirm-password-section" style="display: none;">
+                    <label for="confirm_password" data-lang-id="009-confirm-pass">Confirm Your Password:</label><br>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirm_password" name="confirm_password" required>
+                        <span toggle="#confirm_password" class="toggle-password" style="cursor: pointer;">🔒</span>
+                    </div>
+                    <div id="maker-error-invalid" class="form-field-error" style="margin-top:10px;" data-lang-id="010-pass-error-no-match">👉 Passwords do not match.</div>
+                </div>
 
 
                 <div class="form-item" id="human-check-section" style="display: none;">
