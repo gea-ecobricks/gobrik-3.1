@@ -23,8 +23,15 @@ while ($row = $result->fetch_assoc()) {
     $trainees[] = $row;
 }
 
+// Count total trainees
+$total_trainees = count($trainees);
+
 $stmt->close();
 $gobrik_conn->close();
 
-echo json_encode($trainees);
+// Return trainees and total count
+echo json_encode([
+    "total_trainees" => $total_trainees,
+    "trainees" => $trainees
+]);
 ?>

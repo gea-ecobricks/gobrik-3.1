@@ -71,9 +71,10 @@ $location_last = $location_parts[count($location_parts) - 1] ?? '';
 $location_third_last = $location_parts[count($location_parts) - 3] ?? '';
 $locationFullTxt = $location_third_last . ', ' . $location_last;
 
-// Fetch trainings where the user is a trainer
+// Fetch trainings where the user is a trainer, including trainee count
 $trainings = [];
-$sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_country, t.training_type
+$sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type,
+                         (SELECT COUNT(*) FROM tb_training_trainees WHERE training_id = t.training_id) AS trainee_count
                   FROM tb_trainings t
                   INNER JOIN tb_training_trainers tt ON t.training_id = tt.training_id
                   WHERE tt.ecobricker_id = ?";
@@ -91,6 +92,7 @@ if ($stmt_trainings) {
 } else {
     die("Error preparing statement for trainer trainings: " . $gobrik_conn->error);
 }
+
 
 // Fetch trainings where the user is a registered trainee
 $registered_trainings = [];
@@ -209,49 +211,40 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <!-- TRAINER TRAININGS -->
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-     <h3 data-lang-id="002-my-trainings">My Trainings</h3>
+    <h3 data-lang-id="002-my-trainings">My Trainings</h3>
     <p>Trainings that you are managing.</p>
-<table id="trainer-trainings" class="display responsive nowrap" style="width:100%;">
 
-    <thead>
-        <tr>
-            <th>Training Title</th>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Country</th>
-            <th>Type</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($trainings as $training): ?>
+    <table id="trainer-trainings" class="display responsive nowrap" style="width:100%;">
+        <thead>
             <tr>
-                <td><?php echo htmlspecialchars($training['training_title']); ?></td>
-                <td><?php echo htmlspecialchars($training['training_date']); ?></td>
-                <td><?php echo htmlspecialchars($training['training_location']); ?></td>
-                <td><?php echo htmlspecialchars($training['training_country']); ?></td>
-                <td><?php echo htmlspecialchars($training['training_type']); ?></td>
-                <td>
-                    <button class="page-button" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
-                        📋 View Trainees
-                    </button>
-                    <a href="<?php echo htmlspecialchars($training['training_url'] ?? 'https://gobrik.com/en/register.php', ENT_QUOTES, 'UTF-8'); ?>"
-                       target="_blank" class="page-button">
-                       🔗 View Registration Page
-                    </a>
-                    <!--<a href="add-training.php?training_id=<?php echo $training['training_id']; ?>" class="confirm-button enabled">
-                        📝 Submit Training Report
-                    </a>
-                    <a href="training.php?training_id=<?php echo $training['training_id']; ?>" class="confirm-button enabled">
-                        📄 View Training Report
-                    </a>-->
-                </td>
-
+                <th>Training Title</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Type</th>
+                <th>🔎Registered</th> <!-- New Column -->
             </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php foreach ($trainings as $training): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($training['training_title']); ?></td>
+                    <td><?php echo htmlspecialchars($training['training_date']); ?></td>
+                    <td><?php echo htmlspecialchars($training['training_location']); ?></td>
+                    <td><?php echo htmlspecialchars($training['training_type']); ?></td>
+                    <td style="text-align:center;">
+                        <a href="javascript:void(0);"
+                           style="text-decoration:underline; font-weight:bold;"
+                           onclick="openTraineesModal(<?php echo $training['training_id']; ?>,
+                                                      '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
+                            <?php echo (int) $training['trainee_count']; ?>
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 </div>
+
 
 
 
@@ -259,9 +252,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
 
-<!-- MY REGISTERED TRAININGS-->
+<!-- MY REGISTRATIONS-->
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-    <h3 data-lang-id="002-my-registrations">My Training Registrations</h3>
+    <h3 data-lang-id="002-my-registrations">My Registrations</h3>
     <p>Trainings that you've registered for.</p>
     <table id="trainee-trainings" class="display responsive nowrap" style="width:100%">
         <thead>
@@ -401,7 +394,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
 
-// REGISTERED TRAININGS
+
+
+// REGISTRATION (TRAININGS)
 
 $(document).ready(function() {
     $("#trainee-trainings").DataTable({
@@ -426,17 +421,17 @@ $(document).ready(function() {
 });
 
 
-//TRAININGS
+
+//MY TRAININGS
 
 $(document).ready(function() {
     $("#trainer-trainings").DataTable({
-         "pageLength": 10,  // Set default number of rows per page to 10
-        "searching": false, // Disable search function
-        "lengthChange": false, // Disable ability to change number of rows displayed
+        "pageLength": 10,
+        "searching": false,
+        "lengthChange": false,
         "language": {
             "emptyTable": "You are not a trainer for any trainings yet.",
             "lengthMenu": "Show _MENU_ trainings",
-            "search": "Search:",
             "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
             "infoEmpty": "No trainings available",
             "loadingRecords": "Loading trainings...",
@@ -447,9 +442,63 @@ $(document).ready(function() {
                 "next": "Next",
                 "previous": "Previous"
             }
-        }
+        },
+        "columnDefs": [
+            { "orderable": false, "targets": [4] } // Disable sorting on "🔎Registered" column
+        ]
     });
 });
+
+
+// Function to open trainees modal and fetch trainee count
+function openTraineesModal(trainingId, trainingTitle) {
+    $("#trainee-modal-title").text(trainingTitle);
+
+    $.ajax({
+        url: "trainer_trainees_api.php",
+        type: "GET",
+        data: { training_id: trainingId },
+        dataType: "json",
+        success: function(response) {
+            if (response.error) {
+                alert(response.error);
+                return;
+            }
+
+            let traineeList = response.trainees;
+            let traineeCount = response.total_trainees;
+
+            let tableBody = $("#trainee-table-body");
+            tableBody.empty();
+
+            traineeList.forEach(function(trainee) {
+                tableBody.append(`
+                    <tr>
+                        <td>${trainee.first_name}</td>
+                        <td>${trainee.email_addr}</td>
+                        <td>${trainee.gea_status}</td>
+                        <td>${trainee.rsvp_status}</td>
+                        <td>${trainee.date_registered}</td>
+                    </tr>
+                `);
+            });
+
+            $("#trainee-modal").show();
+        },
+        error: function() {
+            alert("Failed to fetch trainee data.");
+        }
+    });
+}
+
+// Make the trainees modal scrollable
+$(document).ready(function() {
+    $("#trainee-modal-content").css({
+        "max-height": "80vh",
+        "overflow-y": "auto"
+    });
+});
+
 
 
 function openTraineesModal(trainingId, trainingTitle) {
