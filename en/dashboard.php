@@ -550,7 +550,7 @@ function openTraineesModal(trainingId, trainingTitle) {
                 searching: true,
                 info: true,
                 scrollX: true,
-                scrollY: "300px", // Makes it scrollable within the modal
+                scrollY: "100%", // Makes it scrollable within the modal
                 scrollCollapse: true
             });
         })
