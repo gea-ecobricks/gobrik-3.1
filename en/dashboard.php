@@ -209,6 +209,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </div>
 
 <!-- TRAINER TRAININGS -->
+<!-- TRAINER TRAININGS -->
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
     <h3 data-lang-id="002-my-trainings">My Trainings</h3>
     <p>Trainings that you are managing.</p>
@@ -216,25 +217,25 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <table id="trainer-trainings" class="display responsive nowrap" style="width:100%;">
         <thead>
             <tr>
-                <th>Training Title</th>
+                <th>Training</th>
                 <th>Date</th>
                 <th>Location</th>
                 <th>Type</th>
-                <th>Registered</th> <!-- Updated column title -->
+                <th>Registered</th> <!-- Updated Column Name -->
             </tr>
         </thead>
         <tbody>
             <?php foreach ($trainings as $training): ?>
-                <tr class="clickable-row"
-                    data-training-id="<?php echo $training['training_id']; ?>"
-                    data-training-title="<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>">
-
+                <tr>
                     <td><?php echo htmlspecialchars($training['training_title']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_date']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_location']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_type']); ?></td>
                     <td style="text-align:center;">
-                        <a href="javascript:void(0);" class="trainee-count">
+                        <a href="javascript:void(0);"
+                           style="text-decoration:underline; font-weight:bold;"
+                           onclick="openTraineesModal(<?php echo $training['training_id']; ?>,
+                                                      '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
                             <?php echo (int) $training['trainee_count']; ?> 🔎
                         </a>
                     </td>
@@ -243,6 +244,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </tbody>
     </table>
 </div>
+
 
 
 
@@ -420,8 +422,6 @@ $(document).ready(function() {
 });
 
 
-
-//MY TRAININGS
 $(document).ready(function() {
     let table = $("#trainer-trainings").DataTable({
         "pageLength": 10,
@@ -443,27 +443,33 @@ $(document).ready(function() {
         },
         "columnDefs": [
             { "orderable": false, "targets": [4] }, // Disable sorting on "Registered" column
-            { "targets": [1, 2, 3], "visible": true }, // Show all columns by default
-            {
-                "targets": [1, 2, 3], // Hide date, location, type on small screens
-                "visible": false,
-                "responsivePriority": 2
-            }
+            { "targets": [1, 2, 3], "visible": true }, // Default: show Date, Location, Type
+            { "targets": [1, 2, 3], "visible": false, "responsivePriority": 1 } // Hide on small screens
         ]
     });
 
-    // Make the entire row clickable
-    $("#trainer-trainings tbody").on("click", "tr.clickable-row", function() {
-        let trainingId = $(this).data("training-id");
-        let trainingTitle = $(this).data("training-title");
-        openTraineesModal(trainingId, trainingTitle);
-    });
+    // Adjust visibility based on screen size
+    function adjustTableColumns() {
+        if (window.innerWidth < 769) {
+            table.column(1).visible(false); // Hide Date
+            table.column(2).visible(false); // Hide Location
+            table.column(3).visible(false); // Hide Type
+        } else {
+            table.column(1).visible(true);
+            table.column(2).visible(true);
+            table.column(3).visible(true);
+        }
+    }
 
-    // Prevent row click event from firing when clicking on the trainee count link
-    $("#trainer-trainings tbody").on("click", "a.trainee-count", function(event) {
-        event.stopPropagation(); // Stops event from triggering row click
+    // Run on page load
+    adjustTableColumns();
+
+    // Run on window resize
+    $(window).resize(function() {
+        adjustTableColumns();
     });
 });
+
 
 
 
