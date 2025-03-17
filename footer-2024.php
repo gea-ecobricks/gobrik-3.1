@@ -1,6 +1,4 @@
 <!--FOOTER STARTS-->
-
-
 <div id="footer-full" style="margin-top:0px">
 
     <div class="vision-landscape">
