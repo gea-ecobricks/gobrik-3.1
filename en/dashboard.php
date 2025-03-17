@@ -450,54 +450,6 @@ $(document).ready(function() {
 });
 
 
-// Function to open trainees modal and fetch trainee count
-function openTraineesModal(trainingId, trainingTitle) {
-    $("#trainee-modal-title").text(trainingTitle);
-
-    $.ajax({
-        url: "trainer_trainees_api.php",
-        type: "GET",
-        data: { training_id: trainingId },
-        dataType: "json",
-        success: function(response) {
-            if (response.error) {
-                alert(response.error);
-                return;
-            }
-
-            let traineeList = response.trainees;
-            let traineeCount = response.total_trainees;
-
-            let tableBody = $("#trainee-table-body");
-            tableBody.empty();
-
-            traineeList.forEach(function(trainee) {
-                tableBody.append(`
-                    <tr>
-                        <td>${trainee.first_name}</td>
-                        <td>${trainee.email_addr}</td>
-                        <td>${trainee.gea_status}</td>
-                        <td>${trainee.rsvp_status}</td>
-                        <td>${trainee.date_registered}</td>
-                    </tr>
-                `);
-            });
-
-            $("#trainee-modal").show();
-        },
-        error: function() {
-            alert("Failed to fetch trainee data.");
-        }
-    });
-}
-
-// Make the trainees modal scrollable
-$(document).ready(function() {
-    $("#trainee-modal-content").css({
-        "max-height": "80vh",
-        "overflow-y": "auto"
-    });
-});
 
 
 
