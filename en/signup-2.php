@@ -128,11 +128,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <p class="form-caption" data-lang-id="008-password-advice">🔑 Your password must be at least 6 characters.</p>
                 </div>
 
-                <div class="form-item honeypot">
-                    <label for="last_name" data-lang-id="011b-last-name">Now what is your last name?</label><br>
-                    <input type="text" id="last-name-field" name="last_name" class="honeypot-field" placeholder="Your last name..." autocomplete="off">
-                    <p class="form-caption" data-lang-id="011b-required" style="color:red">*This field is required.</p>
-                </div>
+
 
 
                 <div class="form-item" id="human-check-section" style="display: none;">
