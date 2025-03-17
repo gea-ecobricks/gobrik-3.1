@@ -452,7 +452,6 @@ $(document).ready(function() {
 
 
 
-
 function openTraineesModal(trainingId, trainingTitle) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -466,44 +465,54 @@ function openTraineesModal(trainingId, trainingTitle) {
     document.getElementById('footer-full')?.classList.add('blurred');
     document.body.classList.add('modal-open');
 
+    // Escape function to prevent XSS
+    function escapeHTML(str) {
+        return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
     // Set up modal structure
     modalBox.innerHTML = `
-        <h4 style="text-align:center;">Registered Trainees for <br> ${trainingTitle}</h4>
-        <div id="trainee-table-container" style="margin-bottom: 20px;"></div>
+        <h4 style="text-align:center;">Registered Trainees for <br> ${escapeHTML(trainingTitle)}</h4>
+        <div id="trainee-table-container" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
     `;
 
     // Fetch trainees via AJAX
     fetch(`../api/fetch_training_trainees.php?training_id=${trainingId}`)
         .then(response => response.json())
         .then(data => {
+            if (!data || data.length === 0) {
+                document.getElementById('trainee-table-container').innerHTML = `<p style="text-align:center;">No trainees registered yet.</p>`;
+                return;
+            }
+
             if (data.error) {
-                modalBox.innerHTML += `<p>${data.error}</p>`;
+                document.getElementById('trainee-table-container').innerHTML = `<p style="text-align:center; color: red;">${escapeHTML(data.error)}</p>`;
                 return;
             }
 
             // Build the DataTable HTML
-            let tableHTML = '<table id="trainees-table" class="display" style="width:100%">';
-            tableHTML += `
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Email</th>
-                        <th>GEA Status</th>
-                        <th>RSVP Status</th>
-                        <th>Date Registered</th>
-                    </tr>
-                </thead>
-                <tbody>
+            let tableHTML = `
+                <table id="trainees-table" class="display" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Email</th>
+                            <th>GEA Status</th>
+                            <th>RSVP Status</th>
+                            <th>Date Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
 
             data.forEach(trainee => {
                 tableHTML += `
                     <tr>
-                        <td>${trainee.first_name || '-'}</td>
-                        <td>${trainee.email_addr || '-'}</td>
-                        <td>${trainee.gea_status || '-'}</td>
-                        <td>${trainee.rsvp_status || '-'}</td>
-                        <td>${trainee.date_registered || '-'}</td>
+                        <td>${escapeHTML(trainee.first_name || '-')}</td>
+                        <td>${escapeHTML(trainee.email_addr || '-')}</td>
+                        <td>${escapeHTML(trainee.gea_status || '-')}</td>
+                        <td>${escapeHTML(trainee.rsvp_status || '-')}</td>
+                        <td>${escapeHTML(trainee.date_registered || '-')}</td>
                     </tr>
                 `;
             });
@@ -513,21 +522,24 @@ function openTraineesModal(trainingId, trainingTitle) {
             // Insert the table into the modal
             document.getElementById('trainee-table-container').innerHTML = tableHTML;
 
-            // Initialize the DataTable
+            // Initialize the DataTable with scrollability
             $('#trainees-table').DataTable({
                 paging: true,
                 searching: true,
                 info: true,
-                scrollX: true
+                scrollX: true,
+                scrollY: "300px", // Makes it scrollable within the modal
+                scrollCollapse: true
             });
         })
         .catch(error => {
-            modalBox.innerHTML += `<p>Error loading trainees: ${error.message}</p>`;
+            document.getElementById('trainee-table-container').innerHTML = `<p style="text-align:center; color: red;">Error loading trainees: ${escapeHTML(error.message)}</p>`;
         });
 
     // Show the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 </script>
