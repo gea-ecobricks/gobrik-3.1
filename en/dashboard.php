@@ -454,6 +454,58 @@ $(document).ready(function() {
 });
 
 
+function openRegisteredTrainingsModal(trainingId, trainingLocation) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    // Lock scrolling for the body and blur background
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    // Escape function to prevent XSS
+    function escapeHTML(str) {
+        return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Set up modal structure
+    modalBox.innerHTML = `
+        <h4 style="text-align:center;">Training Location: <br> ${escapeHTML(trainingLocation)}</h4>
+        <div id="training-links-container" style="text-align:center; margin-bottom: 20px;">
+            <p>Loading...</p>
+        </div>
+    `;
+
+    // Fetch training details via AJAX
+    fetch(`../api/fetch_registered_training.php?training_id=${trainingId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('training-links-container').innerHTML = `<p style="color:red;">${escapeHTML(data.error)}</p>`;
+                return;
+            }
+
+            // Show Zoom links
+            document.getElementById('training-links-container').innerHTML = `
+                <p><strong>Zoom Link:</strong> <a href="${escapeHTML(data.zoom_link)}" target="_blank">${escapeHTML(data.zoom_link)}</a></p>
+                <p><strong>Zoom Full Link:</strong> <a href="${escapeHTML(data.zoom_link_full)}" target="_blank">${escapeHTML(data.zoom_link_full)}</a></p>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('training-links-container').innerHTML = `<p style="color:red;">Error loading training details: ${escapeHTML(error.message)}</p>`;
+        });
+
+    // Show the modal
+    modal.classList.remove('modal-hidden');
+}
+
+
+
+
 
 $(document).ready(function() {
     let table = $("#trainer-trainings").DataTable({
