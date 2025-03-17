@@ -104,7 +104,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <div class="form-item" id="last-name" style="display: block;">
                     <label for="last_name" data-lang-id="011b-last-name">Now what is your last name?</label><br>
                     <input type="text" id="human_check" class="required" placeholder="Your last name...">
-                    <p class="form-caption"><span data-lang-id="011b-required">*This field is required.</p>
+                    <p class="form-caption" data-lang-id="011b-required" style="color:red">*This field is required.</p>
                 </div>
 
                     <label for="credential_value"><span data-lang-id="004-your">Your</span> <?php echo $credential_type; ?><span data-lang-id="004b-please"> please:</span></label><br>
