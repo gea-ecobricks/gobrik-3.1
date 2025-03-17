@@ -100,7 +100,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
             <!--SIGNUP FORM-->
             <form id="password-confirm-form" method="post" action="signup_process.php?id=<?php echo htmlspecialchars($buwana_id); ?>">
-                <div class="form-item" id="credential-section">
+
+                <div class="form-item" id="last-name" style="display: block;">
+                    <label for="last_name" data-lang-id="011b-last-name">Now what is your last name?</label><br>
+                    <input type="text" id="human_check" class="required">
+                    <p class="form-caption"><span data-lang-id="012-fun-fact">This field is required.</p>
+                </div>
+
                     <label for="credential_value"><span data-lang-id="004-your">Your</span> <?php echo $credential_type; ?><span data-lang-id="004b-please"> please:</span></label><br>
                     <div id="duplicate-email-error" class="form-field-error" style="margin-top:10px;margin-bottom:-13px;" data-lang-id="010-duplicate-email">🚧 Whoops! Looks like that e-mail address is already being used by a Buwana Account. Please choose another.</div>
                     <div id="duplicate-gobrik-email" class="form-warning" style="margin-top:10px;margin-bottom:-13px;" ><span data-lang-id="010-gobrik-duplicate">🌏 It looks like this email is already being used with a legacy GoBrik account. Please <a href="login.php" class="underline-link">login with this email to upgrade your account.</a></div>
