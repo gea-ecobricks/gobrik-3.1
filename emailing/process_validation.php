@@ -31,23 +31,29 @@ if (!$validation['valid']) {
 
 // Insert failed email into failed_emails_tb (if invalid)
 if ($failed_reason) {
-    $stmt = $buwana_conn->prepare("INSERT INTO failed_emails_tb (email, reason) VALUES (?, ?)");
+    $stmt = $buwana_conn->prepare("INSERT INTO failed_emails_tb (email_addr, reason) VALUES (?, ?)");
     $stmt->bind_param("ss", $email, $failed_reason);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        die(json_encode(["error" => "Insert failed: " . $stmt->error]));
+    }
     $stmt->close();
 
     // Delete invalid email from ghost_test_email_tb
     $delete_sql = "DELETE FROM ghost_test_email_tb WHERE id = ?";
     $delete_stmt = $buwana_conn->prepare($delete_sql);
     $delete_stmt->bind_param("i", $email_id);
-    $delete_stmt->execute();
+    if (!$delete_stmt->execute()) {
+        die(json_encode(["error" => "Delete failed: " . $delete_stmt->error]));
+    }
     $delete_stmt->close();
 } else {
     // Mark email as validated
     $update_sql = "UPDATE ghost_test_email_tb SET validated = 1 WHERE id = ?";
     $update_stmt = $buwana_conn->prepare($update_sql);
     $update_stmt->bind_param("i", $email_id);
-    $update_stmt->execute();
+    if (!$update_stmt->execute()) {
+        die(json_encode(["error" => "Update failed: " . $update_stmt->error]));
+    }
     $update_stmt->close();
 }
 
