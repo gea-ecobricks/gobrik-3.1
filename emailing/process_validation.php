@@ -31,7 +31,7 @@ if (!$validation['valid']) {
 
 // Insert failed email into failed_emails_tb (if invalid)
 if ($failed_reason) {
-    $stmt = $buwana_conn->prepare("INSERT INTO failed_emails_tb (email_addr, reason) VALUES (?, ?)");
+    $stmt = $buwana_conn->prepare("INSERT INTO failed_emails_tb (email_addr, fail_reason) VALUES (?, ?)");
     $stmt->bind_param("ss", $email, $failed_reason);
     if (!$stmt->execute()) {
         die(json_encode(["error" => "Insert failed: " . $stmt->error]));
