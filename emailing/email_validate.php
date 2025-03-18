@@ -1,31 +1,24 @@
 <?php
 require_once '../buwanaconn_env.php'; // Load database credentials
 
-// Function to connect to the database
-function connect_db() {
-    global $buwana_conn;
-
-    // Ensure the database connection exists
-    if (!$buwana_conn) {
-        die("Database connection failed: " . mysqli_connect_error());
-    }
-
-    return $buwana_conn;
+// Ensure database connection exists
+if (!isset($buwana_conn)) {
+    die("Database connection failed: " . mysqli_connect_error());
 }
 
 // Function to get the total email count
 function get_total_email_count() {
-    $conn = connect_db();
+    global $buwana_conn;
 
     $sql = "SELECT COUNT(*) AS total FROM ghost_test_email_tb";
-    $result = $conn->query($sql);
+    $result = $buwana_conn->query($sql);
 
     if (!$result) {
-        die("Query failed: " . $conn->error); // Error handling for query failure
+        die("Query failed: " . $buwana_conn->error);
     }
 
     $row = $result->fetch_assoc();
-    return $row['total'] ?? 0; // Return 0 if no result
+    return $row['total'] ?? 0; // Return 0 if empty
 }
 
 $total_emails = get_total_email_count();
@@ -37,24 +30,57 @@ $total_emails = get_total_email_count();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Validator</title>
+    <style>
+        #email-log {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+    </style>
     <script>
+        let processing = false;
+
         function validateEmails() {
+            if (processing) return;
+            processing = true;
+
             let progressDiv = document.getElementById("progress");
             let failedCountDiv = document.getElementById("failed-count");
-            
-            progressDiv.innerHTML = "Validating emails... Please wait.";
-            failedCountDiv.innerHTML = "";
+            let emailLogDiv = document.getElementById("email-log");
 
-            fetch("process_validation.php")
-            .then(response => response.json())
-            .then(data => {
-                progressDiv.innerHTML = "Validation Completed!";
-                failedCountDiv.innerHTML = "Failed Emails: " + (data.failed_count || 0);
-            })
-            .catch(error => {
-                progressDiv.innerHTML = "Error occurred during validation!";
-                console.error("Fetch error:", error);
-            });
+            progressDiv.innerHTML = "Starting validation...";
+            failedCountDiv.innerHTML = "";
+            emailLogDiv.innerHTML = "<strong>Processing emails...</strong>";
+
+            function processNextEmail() {
+                fetch("process_validation.php")
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "done") {
+                            progressDiv.innerHTML = "Validation Completed!";
+                            processing = false;
+                            return;
+                        }
+
+                        // Display each processed email
+                        let emailEntry = document.createElement("p");
+                        emailEntry.textContent = `Processed: ${data.email} - ${data.status}`;
+                        emailLogDiv.appendChild(emailEntry);
+
+                        // Process next email
+                        processNextEmail();
+                    })
+                    .catch(error => {
+                        progressDiv.innerHTML = "Error occurred during validation!";
+                        console.error("Validation Error:", error);
+                        processing = false;
+                    });
+            }
+
+            processNextEmail();
         }
     </script>
 </head>
@@ -66,5 +92,6 @@ $total_emails = get_total_email_count();
 
     <p id="progress"></p>
     <p id="failed-count"></p>
+    <div id="email-log"></div>
 </body>
 </html>
