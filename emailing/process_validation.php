@@ -2,17 +2,21 @@
 require_once '../buwanaconn_env.php'; // Load database credentials
 require_once 'validate_functions.php'; // Include validation functions
 
-$buwana_conn = connect_db();
+// Ensure $buwana_conn exists
+if (!isset($buwana_conn)) {
+    die(json_encode(["error" => "Database connection not established"]));
+}
+
 $failed_emails = [];
 $invalid_email_ids = [];
 
 // Fetch emails from ghost_test_email_tb
-$sql = "SELECT id, email FROM ghost_test_email_tb";  // Assuming 'id' is the primary key
+$sql = "SELECT id, email FROM ghost_test_email_tb";
 $result = $buwana_conn->query($sql);
 
 while ($row = $result->fetch_assoc()) {
     $email = $row['email'];
-    $email_id = $row['id'];  // Store ID for deletion
+    $email_id = $row['id'];
     $validation = is_valid_email($email);
 
     if (!$validation['valid']) {
