@@ -6,7 +6,7 @@ if (!isset($buwana_conn)) {
     die("Database connection failed: " . mysqli_connect_error());
 }
 
-// Function to get the total email count
+// Function to get the total pending email count
 function get_total_email_count() {
     global $buwana_conn;
 
@@ -43,6 +43,15 @@ $total_emails = get_total_email_count();
     <script>
         let processing = false;
 
+        function updateEmailCount() {
+            fetch("get_email_count.php")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("email-count").innerText = data.total;
+                })
+                .catch(error => console.error("Error fetching email count:", error));
+        }
+
         function validateEmails() {
             if (processing) return;
             processing = true;
@@ -73,6 +82,9 @@ $total_emails = get_total_email_count();
                         // Scroll to the latest entry
                         emailLogDiv.scrollTop = emailLogDiv.scrollHeight;
 
+                        // Update email count
+                        updateEmailCount();
+
                         // Process next email
                         processNextEmail();
                     })
@@ -89,7 +101,7 @@ $total_emails = get_total_email_count();
 </head>
 <body>
     <h2>Email Validator</h2>
-    <p>Total Emails Pending Validation: <strong><?php echo htmlspecialchars($total_emails, ENT_QUOTES, 'UTF-8'); ?></strong></p>
+    <p>Total Emails Pending Validation: <strong id="email-count"><?php echo htmlspecialchars($total_emails, ENT_QUOTES, 'UTF-8'); ?></strong></p>
 
     <button onclick="validateEmails()">Validate Emails</button>
 
