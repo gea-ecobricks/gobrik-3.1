@@ -238,11 +238,11 @@ $email_template = <<<HTML
         <!-- Email Content -->
         <div class="content">
             <p>Today, we're announcing our transition from US dollars in our finances and accounting.</p>
-            <p>Over the last year, we've been appalled by the dramatic escalation of ecocide and genocide in Palestine. With thousands of American-made and funded bombs having been dropped on Gaza and the calls for ethnic cleansing only growing louder, the correlation between our own finances and the occupation became all too clear.</p>
+            <p>Over the last year, we've been appalled by the continuation of ecocide and genocide in occupied Palestine despite overwhelming international condemnation. With thousands of American-made and funded bombs having been dropped on Gaza and the calls for ethnic cleansing only growing louder, the correlation between our own finances and the occupation became all too clear.</p>
             <p>As a global organization, we receive funds and pay bills in various countries and currencies. We also have a principle of making our books publicly available. Seven years ago, when we set up our Open Books system on ecobricks.org, choosing USD seemed like a harmless and universal way to present our finances in a way that could be well understood by folks around the world.</p>
             <p><strong>No more.</strong></p>
-            <p>Gaza has been a shocking reminder of the correlation between Global North Currency and global oppression. US dollars are the currency by which both global petroleum is bought and the bombs in Gaza have been funded-- not to mention other wars and exploitations around the world.</p>
-            <p>It may be a drop in the ocean given the meager size of our accounts. However, there is no other way to stay true to our regenerative principles than to stop using the Global North currency most connected with the military-industrial complex and petro-capital economy behind the onslaught of Gaza and other societies and ecosystems around the world.</p>
+            <p>Gaza, the West Bank and other ongoing conflicts, have been a shocking reminder of the correlation between Global North Currency and global oppression. US dollars are the currency by which both global petroleum is bought and the bombs in Palestine have been funded-- not to mention other wars and exploitations around the world.</p>
+            <p>It may be a drop in the ocean given the meager size of our accounts. However, there is no other way to stay true to our regenerative principles than to stop using the Global North currency most connected with the military-industrial complex and petro-capital economy behind the onslaught against the humans and ecosystems in Gaza.</p>
             <p>After all, when we use a currency, we play a part in validating and energizing the system behind it.</p>
 
             <p>It hasn't been easy. It has taken us a year of extricating ourselves from various accounts, systems, and services (and revamping our in-house accounting database!). However, as of now, we have ceased using any US-based financial platforms and accounts.</p>
@@ -254,7 +254,7 @@ $email_template = <<<HTML
             <p>GEA Center Circle</p>
             <p><a href="https://ecobricks.org/en/open-books.php">Ecobricks.org/openbooks</a></p>
 
-            <p>P.S. And also... Directly connected to this, in 2024 <a href="https://earthen.io/gobrik-3-launch/">we let go of our use of corporate digital services based in the Global North.</a></p>
+            <p>P.S. And also... Directly connected to this, in 2025 <a href="https://earthen.io/gobrik-3-launch/">we let go of our use of corporate digital services based in the Global North.</a></p>
         </div>
         <br><br>
 
