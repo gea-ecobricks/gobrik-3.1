@@ -305,26 +305,42 @@ function handleFormSuccess(response) {
         // Utility functions for gathering user and browser info
         function getBrowserInfo() {
             const userAgent = navigator.userAgent;
-            const platform = navigator.platform;
-            const appVersion = navigator.appVersion;
-            const appName = navigator.appName;
-            const appCodeName = navigator.appCodeName;
-            const screenWidth = window.screen.width;
-            const screenHeight = window.screen.height;
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const language = navigator.language || navigator.userLanguage;
+    const platform = navigator.platform;
+    const language = navigator.language || navigator.userLanguage;
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
-            return `Browser Info:
-- App Name: ${appName}
-- App Version: ${appVersion}
-- App Code Name: ${appCodeName}
+    // Detect browser name from userAgent
+    let browserName = "Unknown Browser";
+    if (userAgent.includes("Firefox")) {
+        browserName = "Firefox";
+    } else if (userAgent.includes("Edg")) {
+        browserName = "Microsoft Edge";
+    } else if (userAgent.includes("Chrome")) {
+        browserName = "Google Chrome";
+    } else if (userAgent.includes("Safari")) {
+        browserName = "Safari";
+    } else if (userAgent.includes("Opera") || userAgent.includes("OPR")) {
+        browserName = "Opera";
+    }
+
+    // Detect device type
+    let deviceType = "Desktop";
+    if (/Mobi|Android|iPhone|iPad|iPod/.test(userAgent)) {
+        deviceType = "Mobile";
+    }
+
+    return `Browser Info:
+- Browser: ${browserName}
 - User Agent: ${userAgent}
 - Platform: ${platform}
 - Language: ${language}
+- Device Type: ${deviceType}
 - Screen Size: ${screenWidth}x${screenHeight}
 - Viewport Size: ${viewportWidth}x${viewportHeight}`;
-        }
+}
 
         function getUserData() {
             return `User Info:
