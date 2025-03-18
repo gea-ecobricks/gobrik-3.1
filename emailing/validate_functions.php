@@ -1,52 +1,35 @@
 <?php
-require_once '../buwanaconn_env.php'; // Load database credentials
-require_once 'validate_functions.php'; // Include validation functions
 
-$conn = connect_db();
-$failed_emails = [];
-$invalid_email_ids = [];
+// Function to validate email format
+function is_valid_email($email) {
+    $email_regex = "/^(?!.*\.\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/";
 
-// Fetch emails from ghost_test_email_tb
-$sql = "SELECT id, email FROM ghost_test_email_tb";  // Assuming 'id' is the primary key
-$result = $conn->query($sql);
-
-while ($row = $result->fetch_assoc()) {
-    $email = $row['email'];
-    $email_id = $row['id'];  // Store ID for deletion
-    $validation = is_valid_email($email);
-
-    if (!$validation['valid']) {
-        $failed_emails[] = [$email, $validation['reason']];
-        $invalid_email_ids[] = $email_id;
-        continue;
+    if (!preg_match($email_regex, $email)) {
+        return ["valid" => false, "reason" => "Invalid format"];
     }
 
-    if (!domain_exists($email)) {
-        $failed_emails[] = [$email, "Nonexistent domain"];
-        $invalid_email_ids[] = $email_id;
+    $common_typos = [
+        "gmail.com" => ["gmal.com", "gmial.com", "gmaill.com", "gmail.cm", "gmail.con", "gmail.om"],
+        "hotmail.com" => ["hotmil.com", "hotmial.com", "hotmail.cm", "hotmail.con", "hotmail.om"],
+        "outlook.com" => ["otlook.com", "outlok.com", "outloo.com", "outlook.cm", "outlook.con"]
+    ];
+
+    $parts = explode("@", $email);
+    $domain = strtolower($parts[1]);
+
+    foreach ($common_typos as $correct => $typos) {
+        if (in_array($domain, $typos)) {
+            return ["valid" => false, "reason" => "Typo in domain ($domain)"];
+        }
     }
+
+    return ["valid" => true, "reason" => ""];
 }
 
-// Insert failed emails into failed_emails_tb
-$failed_count = count($failed_emails);
-if ($failed_count > 0) {
-    $stmt = $conn->prepare("INSERT INTO failed_emails_tb (email, reason) VALUES (?, ?)");
-    foreach ($failed_emails as $failed) {
-        $stmt->bind_param("ss", $failed[0], $failed[1]);
-        $stmt->execute();
-    }
-    $stmt->close();
+// Function to check if domain exists using DNS MX lookup
+function domain_exists($email) {
+    $domain = substr(strrchr($email, "@"), 1);
+    return checkdnsrr($domain, "MX");
 }
 
-// Delete invalid emails from ghost_test_email_tb
-if (!empty($invalid_email_ids)) {
-    $ids_to_delete = implode(",", $invalid_email_ids);
-    $delete_sql = "DELETE FROM ghost_test_email_tb WHERE id IN ($ids_to_delete)";
-    $conn->query($delete_sql);
-}
-
-$conn->close();
-
-// Return JSON response
-echo json_encode(["failed_count" => $failed_count, "deleted_count" => count($invalid_email_ids)]);
 ?>
