@@ -24,7 +24,7 @@ if ($created_by > 0 && !empty($message)) {
         $stmt->close();
 
         // Add participants to the conversation
-        $dev_team_ids = [1, 150];
+        $dev_team_ids = [1, 150, 145, 144];
         $stmt = $buwana_conn->prepare("INSERT INTO participants_tb (conversation_id, buwana_id) VALUES (?, ?)");
         foreach ($dev_team_ids as $dev_id) {
             $stmt->bind_param("ii", $conversation_id, $dev_id);
