@@ -2,13 +2,13 @@
 require_once '../buwanaconn_env.php'; // Load database credentials
 require_once 'validate_functions.php'; // Include validation functions
 
-// Ensure $buwana_conn exists
+// Ensure database connection exists
 if (!isset($buwana_conn)) {
     die(json_encode(["error" => "Database connection not established"]));
 }
 
-// Check if there are remaining emails to validate
-$sql = "SELECT id, email FROM ghost_test_email_tb LIMIT 1"; // Process only 1 email at a time
+// Fetch the next unvalidated email
+$sql = "SELECT id, email FROM ghost_test_email_tb WHERE validated = 0 LIMIT 1";
 $result = $buwana_conn->query($sql);
 
 if ($result->num_rows === 0) {
@@ -42,6 +42,13 @@ if ($failed_reason) {
     $delete_stmt->bind_param("i", $email_id);
     $delete_stmt->execute();
     $delete_stmt->close();
+} else {
+    // Mark email as validated
+    $update_sql = "UPDATE ghost_test_email_tb SET validated = 1 WHERE id = ?";
+    $update_stmt = $buwana_conn->prepare($update_sql);
+    $update_stmt->bind_param("i", $email_id);
+    $update_stmt->execute();
+    $update_stmt->close();
 }
 
 $buwana_conn->close();

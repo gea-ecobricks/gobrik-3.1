@@ -10,7 +10,7 @@ if (!isset($buwana_conn)) {
 function get_total_email_count() {
     global $buwana_conn;
 
-    $sql = "SELECT COUNT(*) AS total FROM ghost_test_email_tb";
+    $sql = "SELECT COUNT(*) AS total FROM ghost_test_email_tb WHERE validated = 0";
     $result = $buwana_conn->query($sql);
 
     if (!$result) {
@@ -70,6 +70,9 @@ $total_emails = get_total_email_count();
                         emailEntry.textContent = `Processed: ${data.email} - ${data.status}`;
                         emailLogDiv.appendChild(emailEntry);
 
+                        // Scroll to the latest entry
+                        emailLogDiv.scrollTop = emailLogDiv.scrollHeight;
+
                         // Process next email
                         processNextEmail();
                     })
@@ -86,7 +89,7 @@ $total_emails = get_total_email_count();
 </head>
 <body>
     <h2>Email Validator</h2>
-    <p>Total Emails in Database: <strong><?php echo htmlspecialchars($total_emails, ENT_QUOTES, 'UTF-8'); ?></strong></p>
+    <p>Total Emails Pending Validation: <strong><?php echo htmlspecialchars($total_emails, ENT_QUOTES, 'UTF-8'); ?></strong></p>
 
     <button onclick="validateEmails()">Validate Emails</button>
 
