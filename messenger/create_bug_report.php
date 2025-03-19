@@ -25,7 +25,7 @@ if ($created_by > 0 && !empty($message)) {
         $stmt->close();
 
         // Add participants to the conversation
-        $dev_team_ids = [1, 150];
+        $dev_team_ids = [1, 150,];
         $stmt = $buwana_conn->prepare("INSERT INTO participants_tb (conversation_id, buwana_id) VALUES (?, ?)");
         foreach ($dev_team_ids as $dev_id) {
             $stmt->bind_param("ii", $conversation_id, $dev_id);
@@ -121,7 +121,7 @@ function sendBugReportEmail($message_id, $created_by, $date_sent, $message, $sen
             'form_params' => [
                 'from' => 'GoBrik Support <support@ecobricks.org>',
                 'to' => 'support@ecobricks.org',
-                'bcc' => 'russ@ecobricks.org, franoflanagan@ecobricks.org',
+                'bcc' => 'russ@ecobricks.org, franoflanagan@ecobricks.org, mikejpof@gmail.com',
                 'subject' => $subject,
                 'html' => $html_body,
                 'text' => $text_body,
