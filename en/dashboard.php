@@ -496,20 +496,20 @@ function openRegisteredTrainingsModal(trainingId, trainingLocation) {
                 <h3>${escapeHTML(data.training_title)}</h3>
 
                 <p>${escapeHTML(data.training_type)} is being led by ${escapeHTML(data.lead_trainer)}
-                   on ${escapeHTML(data.training_date)} at ${escapeHTML(data.training_location)}.</p>
+                   on ${escapeHTML(data.training_date)} at ${escapeHTML(data.training_location)} at ${escapeHTML(data.training_time_txt)}.</p>
 
                 <button onclick="window.open('${escapeHTML(data.zoom_link)}', '_blank')"
                     style="margin: 10px; padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
                     Launch Zoom
                 </button>
 
-                <button onclick="window.open('${escapeHTML(data.agenda_url)}', '_blank')"
+                <button onclick="window.open('${escapeHTML(data.moodle_url)}', '_blank')"
                     style="margin: 10px; padding: 10px 20px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
                     Launch Moodle Agenda
                 </button>
 
                 <br><br>
-                <p><strong>Zoom Full Link:</strong> <a href="${escapeHTML(data.zoom_link_full)}" target="_blank">${escapeHTML(data.zoom_link_full)}</a></p>
+                <p><strong>Full Zoom Link:</strong> <br><a href="${escapeHTML(data.zoom_link_full)}" target="_blank">${escapeHTML(data.zoom_link_full)}</a></p>
             `;
         })
         .catch(error => {
