@@ -10,8 +10,12 @@ if ($training_id <= 0) {
     exit();
 }
 
-// Fetch training zoom links
-$sql = "SELECT zoom_link, zoom_link_full FROM tb_trainings WHERE training_id = ?";
+// Fetch training details
+$sql = "SELECT training_title, lead_trainer, training_date, training_type, training_summary, training_location,
+               zoom_link, zoom_link_full, agenda_url, feature_photo1_tmb
+        FROM tb_trainings
+        WHERE training_id = ?";
+
 $stmt = $gobrik_conn->prepare($sql);
 $stmt->bind_param("i", $training_id);
 $stmt->execute();

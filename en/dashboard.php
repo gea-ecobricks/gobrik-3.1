@@ -461,6 +461,8 @@ function openRegisteredTrainingsModal(trainingId, trainingLocation) {
     // Show the modal
     modal.style.display = 'flex';
     modalBox.style.flexFlow = 'column';
+    modalBox.style.alignItems = 'center'; // Center content
+    modalBox.style.textAlign = 'center';
 
     // Lock scrolling for the body and blur background
     document.getElementById('page-content')?.classList.add('blurred');
@@ -472,12 +474,9 @@ function openRegisteredTrainingsModal(trainingId, trainingLocation) {
         return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // Set up modal structure
+    // Set up initial loading structure
     modalBox.innerHTML = `
-        <h4 style="text-align:center;">Training Location: <br> ${escapeHTML(trainingLocation)}</h4>
-        <div id="training-links-container" style="text-align:center; margin-bottom: 20px;">
-            <p>Loading...</p>
-        </div>
+        <p>Loading training details...</p>
     `;
 
     // Fetch training details via AJAX
@@ -485,23 +484,42 @@ function openRegisteredTrainingsModal(trainingId, trainingLocation) {
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                document.getElementById('training-links-container').innerHTML = `<p style="color:red;">${escapeHTML(data.error)}</p>`;
+                modalBox.innerHTML = `<p style="color:red;">${escapeHTML(data.error)}</p>`;
                 return;
             }
 
-            // Show Zoom links
-            document.getElementById('training-links-container').innerHTML = `
-                <p><strong>Zoom Link:</strong> <a href="${escapeHTML(data.zoom_link)}" target="_blank">${escapeHTML(data.zoom_link)}</a></p>
+            // Build modal content
+            modalBox.innerHTML = `
+                <img src="${escapeHTML(data.feature_photo1_tmb)}" alt="Training Image"
+                    style="width: 500px; max-width: 100%; border-radius: 8px; margin-bottom: 20px;">
+
+                <h3>${escapeHTML(data.training_title)}</h3>
+
+                <p>${escapeHTML(data.training_type)} is being led by ${escapeHTML(data.lead_trainer)}
+                   on ${escapeHTML(data.training_date)} at ${escapeHTML(data.training_location)}.</p>
+
+                <button onclick="window.open('${escapeHTML(data.zoom_link)}', '_blank')"
+                    style="margin: 10px; padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Launch Zoom
+                </button>
+
+                <button onclick="window.open('${escapeHTML(data.agenda_url)}', '_blank')"
+                    style="margin: 10px; padding: 10px 20px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Launch Moodle Agenda
+                </button>
+
+                <br><br>
                 <p><strong>Zoom Full Link:</strong> <a href="${escapeHTML(data.zoom_link_full)}" target="_blank">${escapeHTML(data.zoom_link_full)}</a></p>
             `;
         })
         .catch(error => {
-            document.getElementById('training-links-container').innerHTML = `<p style="color:red;">Error loading training details: ${escapeHTML(error.message)}</p>`;
+            modalBox.innerHTML = `<p style="color:red;">Error loading training details: ${escapeHTML(error.message)}</p>`;
         });
 
     // Show the modal
     modal.classList.remove('modal-hidden');
 }
+
 
 
 
