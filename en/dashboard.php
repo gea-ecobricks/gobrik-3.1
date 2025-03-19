@@ -509,7 +509,7 @@ function openRegisteredTrainingsModal(trainingId, trainingLocation) {
                 </button>
 
                 <br><br>
-                <p><strong>Full Zoom Link:</strong> <br><a href="${escapeHTML(data.zoom_link_full)}" target="_blank">${escapeHTML(data.zoom_link_full)}</a></p>
+                <p style="font-size:0.9em">${escapeHTML(data.zoom_link_full)}</p>
             `;
         })
         .catch(error => {
