@@ -111,7 +111,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0; // Convert checkbox to 0 or 1
     $featured_description = trim($_POST['featured_description'] ?? '');
 
-    if ($editing) {
+    // ✅ Convert `datetime-local` format to MySQL `DATETIME`
+$training_date = !empty($_POST['training_date'])
+    ? date("Y-m-d H:i:s", strtotime($_POST['training_date']))
+    : NULL;
+
+if ($editing) {
     // ✅ UPDATE existing training report
     $sql = "UPDATE tb_trainings SET
         training_title=?, lead_trainer=?, training_country=?, training_date=?,
@@ -122,8 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         WHERE training_id=?";
 
     $stmt = $gobrik_conn->prepare($sql);
-
-    $stmt->bind_param("sssssiiiddssssssssiss",
+    $stmt->bind_param("sssisiiiddssssssssis",
         $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
         $training_summary, $training_agenda, $training_success, $training_challenges,
@@ -140,14 +144,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $gobrik_conn->prepare($sql);
-
-    $stmt->bind_param("sssssiiiddssssssssis",
+    $stmt->bind_param("sssisiiiddssssssssis",
         $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description
     );
 }
+
+// ✅ Execute statement & error checking
+if (!$stmt->execute()) {
+    die("Database update failed: " . $stmt->error);
+}
+
+
+
 
 
     $stmt->execute();
