@@ -27,34 +27,6 @@ if (!$gea_status || stripos($gea_status, 'trainer') === false) {
     exit();
 }
 
-<?php
-
-require_once '../earthenAuth_helper.php'; // Authentication helper
-
-// PART 1: Set page variables
-$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.54';
-$page = 'add-training';
-$lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
-
-ob_start(); // Prevent output before headers
-
-// PART 2: ✅ LOGIN & ROLE CHECK
-if (!isLoggedIn()) {
-    header("Location: login.php");
-    exit();
-}
-
-$buwana_id = $_SESSION['buwana_id'];
-require_once '../gobrikconn_env.php';
-
-// ✅ Fetch User Role
-$gea_status = getGEA_status($buwana_id);
-
-if (!$gea_status || stripos($gea_status, 'trainer') === false) {
-    header("Location: dashboard.php?error=unauthorized");
-    exit();
-}
 
 // PART 3: ✅ Fetch User Details
 require_once '../buwanaconn_env.php';
