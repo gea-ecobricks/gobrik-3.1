@@ -5,11 +5,12 @@ header('Content-Type: application/json'); // Set content type to JSON
 
 $communities = []; // Initialize an empty array for communities
 
-if (isset($_POST['query'])) {
-    $query = '%' . trim($_POST['query']) . '%';  // Search with wildcards
+// ✅ Change from `$_POST` to `$_GET` for compatibility with the fetch request
+if (isset($_GET['query'])) {
+    $query = '%' . trim($_GET['query']) . '%';  // Search with wildcards
 
     // Prepare the SQL query to search for communities by name
-    $sql_search = "SELECT com_id, com_name FROM communities_tb WHERE com_name LIKE ?";
+    $sql_search = "SELECT com_id, com_name FROM communities_tb WHERE com_name LIKE ? LIMIT 10"; // Limit results for efficiency
     $stmt_search = $buwana_conn->prepare($sql_search);
 
     if ($stmt_search) {
