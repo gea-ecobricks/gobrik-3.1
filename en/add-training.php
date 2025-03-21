@@ -116,6 +116,11 @@ $training_date = !empty($_POST['training_date'])
     ? date("Y-m-d H:i:s", strtotime($_POST['training_date']))
     : NULL;
 
+    $no_participants = isset($_POST['no_participants']) && is_numeric($_POST['no_participants'])
+    ? (int) $_POST['no_participants']
+    : 444; // Default to 0 if empty or not numeric
+
+
 if ($editing) {
     // ✅ UPDATE existing training report
     $sql = "UPDATE tb_trainings SET
