@@ -60,7 +60,7 @@ if ($editing) {
     $sql_fetch = "SELECT training_title, lead_trainer, training_country, training_date, no_participants,
                   training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
-                  youtube_result_video, moodle_url, ready_to_show
+                  youtube_result_video, moodle_url, ready_to_show, featured_description
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -69,10 +69,11 @@ if ($editing) {
     $stmt_fetch->bind_result($training_title, $lead_trainer, $training_country, $training_date, $no_participants,
                             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
-                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show);
+                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
+
 
 
 // Fetch unique training types from the database
@@ -116,18 +117,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
     $moodle_url = trim($_POST['moodle_url'] ?? '');
     $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0; // Convert checkbox to 0 or 1
+      $featured_description = trim($_POST['featured_description'] ?? '');
 
     if ($editing) {
         // ✅ Update existing training report
         $sql = "UPDATE tb_trainings SET
-                training_title=?, lead_trainer=?, training_country=?, training_date=?,
-                no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
-                location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
-                training_success=?, training_challenges=?, training_lessons_learned=?,
-                youtube_result_video=?, moodle_url=?, ready_to_show=?
-                WHERE training_id=?";
+        training_title=?, lead_trainer=?, training_country=?, training_date=?,
+        no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
+        location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
+        training_success=?, training_challenges=?, training_lessons_learned=?,
+        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?
+        WHERE training_id=?";
 
-        $stmt = $gobrik_conn->prepare($sql);
+$stmt = $gobrik_conn->prepare($sql);
+$stmt->bind_param("sssiiidddssssssssssi",
+    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+    $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+    $training_summary, $training_agenda, $training_success, $training_challenges,
+    $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
+    $featured_description, $training_id);
+
+
+
         $stmt->bind_param("sssiiidddsssssssssi",
             $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
@@ -136,12 +147,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $training_id);
     } else {
         // ✅ Insert new training report
-        $sql = "INSERT INTO tb_trainings
-                (training_title, lead_trainer, training_country, training_date, no_participants,
-                training_type, briks_made, avg_brik_weight, location_lat, location_long,
-                location_full, training_summary, training_agenda, training_success, training_challenges,
-                training_lessons_learned, youtube_result_video, moodle_url, ready_to_show)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+       $sql = "INSERT INTO tb_trainings
+        (training_title, lead_trainer, training_country, training_date, no_participants,
+        training_type, briks_made, avg_brik_weight, location_lat, location_long,
+        location_full, training_summary, training_agenda, training_success, training_challenges,
+        training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+$stmt = $gobrik_conn->prepare($sql);
+$stmt->bind_param("sssiiidddsssssssssi",
+    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+    $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+    $training_summary, $training_agenda, $training_success, $training_challenges,
+    $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description);
+
 
         $stmt = $gobrik_conn->prepare($sql);
         $stmt->bind_param("sssiiidddsssssssssi",
@@ -320,17 +339,29 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </select>
 </div>
 
+<div class="form-item">
+    <label for="featured_description">Featured Description:</label><br>
+    <textarea id="featured_description" name="featured_description"
+              placeholder="Write a compelling description for this training..."
+              rows="5"><?php echo htmlspecialchars($featured_description ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+    <p class="form-caption">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
+</div>
+
+
+    <div class="form-item">
+        <label for="training_agenda">Training Agenda:</label><br>
+        <textarea id="training_agenda" name="training_agenda"><?php echo htmlspecialchars($training_agenda ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+            <p class="form-caption">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
+
+    </div>
+
+
+<h4>Training Reporting</h4>
 
     <div class="form-item">
         <label for="training_summary">Training Summary:</label><br>
         <textarea id="training_summary" name="training_summary" required><?php echo htmlspecialchars($training_summary ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
     </div>
-
-    <div class="form-item">
-        <label for="training_agenda">Training Agenda:</label><br>
-        <textarea id="training_agenda" name="training_agenda"><?php echo htmlspecialchars($training_agenda ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-    </div>
-
     <div class="form-item">
         <label for="training_success">Training Successes:</label><br>
         <textarea id="training_success" name="training_success" required><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
@@ -509,7 +540,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     displayError('weight-error-range', isNaN(estimatedWeight) || estimatedWeight < 100 || estimatedWeight > 2000);
 
     // 8. Training Country
-    var trainingCountry = document.getElementById('training_country').value.trim();
+    var trainingCountry = document.getElementById('country_id').value.trim();
     displayError('country-error-required', trainingCountry === '');
 
     // 9. Training Summary (Fix)
