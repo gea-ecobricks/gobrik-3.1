@@ -143,39 +143,37 @@ $training_date = !empty($_POST['training_date'])
 if ($editing) {
     // ✅ UPDATE existing training report
     $sql = "UPDATE tb_trainings SET
-    training_title=?, lead_trainer=?, training_country=?, training_date=?,
-    no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
-    location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
-    training_success=?, training_challenges=?, training_lessons_learned=?,
-    youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
-    WHERE training_id=?";
+        training_title=?, lead_trainer=?, training_country=?, training_date=?,
+        no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
+        location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
+        training_success=?, training_challenges=?, training_lessons_learned=?,
+        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
+        WHERE training_id=?";
 
-$stmt = $gobrik_conn->prepare($sql);
-$stmt->bind_param("sssisiiiddssssssssisi",
-    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-    $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-    $training_summary, $training_agenda, $training_success, $training_challenges,
-    $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-    $featured_description, $community_id, $training_id // ✅ Added community_id here
-);
-
+    $stmt = $gobrik_conn->prepare($sql);
+    $stmt->bind_param("ssssisiiiddssssssssisi",
+        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+        $training_summary, $training_agenda, $training_success, $training_challenges,
+        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
+        $featured_description, $community_id, $training_id,
+    );
 } else {
     // ✅ INSERT new training report
-   $sql = "INSERT INTO tb_trainings
-    (training_title, lead_trainer, training_country, training_date, no_participants,
-    training_type, briks_made, avg_brik_weight, location_lat, location_long,
-    location_full, training_summary, training_agenda, training_success, training_challenges,
-    training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO tb_trainings
+        (training_title, lead_trainer, training_country, training_date, no_participants,
+        training_type, briks_made, avg_brik_weight, location_lat, location_long,
+        location_full, training_summary, training_agenda, training_success, training_challenges,
+        training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-$stmt = $gobrik_conn->prepare($sql);
-$stmt->bind_param("sssisiiiddssssssssisi",
-    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-    $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-    $training_summary, $training_agenda, $training_success, $training_challenges,
-    $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
-);
-
+    $stmt = $gobrik_conn->prepare($sql);
+    $stmt->bind_param("ssssisiiiddssssssssisi",
+        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+        $training_summary, $training_agenda, $training_success, $training_challenges,
+        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
+    );
 }
 
 // ✅ Execute statement & error checking
