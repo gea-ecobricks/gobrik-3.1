@@ -454,42 +454,53 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 -->
 
 <script>
-$(document).ready(function() {
-    $("#community_search").on("input", function() {
-        let query = $(this).val();
+document.addEventListener("DOMContentLoaded", function() {
+    const communityInput = document.getElementById("community_search");
+    const communityIdField = document.getElementById("community_id");
+    const resultsDiv = document.getElementById("community_results");
 
-        if (query.length < 3) {
-            $("#community_results").empty(); // Clear results if less than 3 chars
-            return;
+    communityInput.addEventListener("input", function() {
+        let query = communityInput.value.trim();
+
+        if (query.length >= 3) { // Only search after 3+ characters
+            fetch(`search_communities.php?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsDiv.innerHTML = "";
+
+                    if (data.length === 0) {
+                        resultsDiv.innerHTML = "<div class='autocomplete-item' style='color: gray;'>No results found</div>";
+                    } else {
+                        data.forEach(community => {
+                            let div = document.createElement("div");
+                            div.textContent = community.com_name;
+                            div.dataset.id = community.com_id; // Store the ID
+                            div.classList.add("autocomplete-item");
+
+                            div.addEventListener("mousedown", function(event) {
+                                event.preventDefault(); // Prevent input blur before selection
+                                communityInput.value = community.com_name;
+                                communityIdField.value = community.com_id; // Set hidden field
+                                resultsDiv.innerHTML = "";
+                            });
+
+                            resultsDiv.appendChild(div);
+                        });
+                    }
+                });
+        } else {
+            resultsDiv.innerHTML = ""; // Clear results if fewer than 3 chars
         }
-
-        $.ajax({
-            url: "../api/fetch_communities.php",
-            type: "GET",
-            data: { search: query },
-            success: function(response) {
-                $("#community_results").html(response);
-            }
-        });
     });
 
-    // Handle selecting a community from the search results
-    $(document).on("click", ".community-option", function() {
-        let communityId = $(this).data("id");
-        let communityName = $(this).text();
-
-        $("#community_search").val(communityName);
-        $("#community_id").val(communityId); // Store the selected community ID
-        $("#community_results").empty(); // Hide the dropdown
-    });
-
-    // Close results when clicking outside
-    $(document).on("click", function(event) {
-        if (!$(event.target).closest("#community_search, #community_results").length) {
-            $("#community_results").empty();
+    // Hide results when clicking outside the input field
+    document.addEventListener("click", function(event) {
+        if (!communityInput.contains(event.target) && !resultsDiv.contains(event.target)) {
+            resultsDiv.innerHTML = "";
         }
     });
 });
+
 
 
 
