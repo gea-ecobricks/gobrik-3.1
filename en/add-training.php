@@ -32,7 +32,6 @@ require_once '../buwanaconn_env.php';
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
 $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
 $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 $first_name = getFirstName($buwana_conn, $buwana_id);
 
@@ -74,14 +73,10 @@ if ($editing) {
     $stmt_fetch->close();
 }
 
-
-
 // Fetch unique training types from the database
 $training_types = [];
-
 $query = "SELECT DISTINCT training_type FROM tb_trainings ORDER BY training_type ASC";
 $result = $gobrik_conn->query($query);
-
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $training_types[] = $row['training_type'];
@@ -90,25 +85,21 @@ if ($result) {
 
 // Fetch list of countries
 $countries = [];
-
 $query = "SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC";
 $result = $gobrik_conn->query($query);
-
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $countries[] = $row;
     }
 }
 
+// Fetch list of communities
+$communities = [];
 $sql = "SELECT com_id, com_name FROM communities_tb ORDER BY com_name ASC";
 $result = $gobrik_conn->query($sql);
-$communities = [];
-
 while ($row = $result->fetch_assoc()) {
-    $communities[] = $row; // Store results in an array
+    $communities[] = $row;
 }
-
-
 
 // ✅ If form is submitted, insert/update the training report
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -117,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
     $moodle_url = trim($_POST['moodle_url'] ?? '');
     $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0; // Convert checkbox to 0 or 1
-      $featured_description = trim($_POST['featured_description'] ?? '');
+    $featured_description = trim($_POST['featured_description'] ?? '');
 
     if ($editing) {
         // ✅ Update existing training report
@@ -129,56 +120,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?
         WHERE training_id=?";
 
-$stmt = $gobrik_conn->prepare($sql);
-$stmt->bind_param("sssiiidddssssssssssi",
-    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-    $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-    $training_summary, $training_agenda, $training_success, $training_challenges,
-    $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-    $featured_description, $training_id);
-
-
-
-        $stmt->bind_param("sssiiidddsssssssssi",
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("sssiiidddssssssssssi",
             $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
             $training_summary, $training_agenda, $training_success, $training_challenges,
             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-            $training_id);
+            $featured_description, $training_id);
     } else {
         // ✅ Insert new training report
-       $sql = "INSERT INTO tb_trainings
-        (training_title, lead_trainer, training_country, training_date, no_participants,
-        training_type, briks_made, avg_brik_weight, location_lat, location_long,
-        location_full, training_summary, training_agenda, training_success, training_challenges,
-        training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-$stmt = $gobrik_conn->prepare($sql);
-$stmt->bind_param("sssiiidddsssssssssi",
-    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-    $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-    $training_summary, $training_agenda, $training_success, $training_challenges,
-    $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description);
-
+        $sql = "INSERT INTO tb_trainings
+            (training_title, lead_trainer, training_country, training_date, no_participants,
+            training_type, briks_made, avg_brik_weight, location_lat, location_long,
+            location_full, training_summary, training_agenda, training_success, training_challenges,
+            training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $gobrik_conn->prepare($sql);
         $stmt->bind_param("sssiiidddsssssssssi",
             $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
             $training_summary, $training_agenda, $training_success, $training_challenges,
-            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show);
+            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description);
     }
 
     $stmt->execute();
     $stmt->close();
 
-
-
     header("Location: add-training-images.php?training_id=" . $training_id);
     exit();
 }
+
 ?>
+
 
 
 <!--PART 4 GENERATE META TAGS-->
