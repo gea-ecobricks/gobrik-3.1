@@ -60,7 +60,7 @@ if ($editing) {
     $sql_fetch = "SELECT training_title, lead_trainer, training_country, training_date, no_participants,
                   training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
-                  youtube_result_video, moodle_url, ready_to_show, featured_description
+                  youtube_result_video, moodle_url, ready_to_show, featured_description, community_id
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -69,7 +69,7 @@ if ($editing) {
     $stmt_fetch->bind_result($training_title, $lead_trainer, $training_country, $training_date, $no_participants,
                             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
-                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description);
+                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
@@ -93,6 +93,18 @@ if ($result) {
         $countries[] = $row;
     }
 }
+
+$community_name = ''; // Default empty
+if (!empty($community_id)) {
+    $sql_get_community = "SELECT com_name FROM communities_tb WHERE com_id = ?";
+    $stmt_get_community = $gobrik_conn->prepare($sql_get_community);
+    $stmt_get_community->bind_param("i", $community_id);
+    $stmt_get_community->execute();
+    $stmt_get_community->bind_result($community_name);
+    $stmt_get_community->fetch();
+    $stmt_get_community->close();
+}
+
 
 // Fetch list of communities
 $communities = [];
