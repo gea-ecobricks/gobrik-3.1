@@ -118,7 +118,13 @@ $training_date = !empty($_POST['training_date'])
 
     $no_participants = isset($_POST['no_participants']) && is_numeric($_POST['no_participants'])
     ? (int) $_POST['no_participants']
-    : 444; // Default to 0 if empty or not numeric
+    : 0; // Default to 0 if empty or not numeric
+
+    $community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id'])
+    ? (int) $_POST['community_id']
+    : null; // Default to NULL if missing
+
+
 
 
 if ($editing) {
@@ -435,8 +441,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.  For online workshops, specify the country of the lead trainer.</div>-->
 <!--                </div>-->
 
-<!--ERRORS-->
-<!--
 
 <!-- Load jQuery and Select2 -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
