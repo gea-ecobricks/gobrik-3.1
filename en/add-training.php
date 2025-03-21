@@ -302,16 +302,25 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 <div class="form-item">
     <label for="community_search">Trained Community:</label><br>
-    <input type="text" id="community_search" name="community_search" placeholder="Start typing..." autocomplete="off">
-    <input type="hidden" id="community_id" name="community_id"> <!-- Stores the selected community ID -->
+    <input type="text" id="community_search" name="community_search"
+           placeholder="Start typing..." autocomplete="off"
+           value="<?php echo htmlspecialchars($community_name ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+
+    <input type="hidden" id="community_id" name="community_id"
+           value="<?php echo htmlspecialchars($community_id ?? '', ENT_QUOTES, 'UTF-8'); ?>"> <!-- Stores the selected community ID -->
+
     <div id="community_results" class="autocomplete-results"></div>
+
     <!-- "Add a new community" text link -->
     <p class="form-caption" data-lang-id="012-community-caption-xx">
-        Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
+        Start typing to see and select a community.
+        <a href="#" onclick="openAddCommunityModal(); return false;"
+           style="color: #007BFF; text-decoration: underline;">
             Don't see your community? Add it.
         </a>
     </p>
 </div>
+
 
 
     <div class="form-item">
