@@ -127,7 +127,7 @@ if ($editing) {
         WHERE training_id=?";
 
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssssisiiiddssssssssisi",
+    $stmt->bind_param("ssssisiiiddssssssssis",
         $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
         $training_summary, $training_agenda, $training_success, $training_challenges,
@@ -144,7 +144,7 @@ if ($editing) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssssisiiiddssssssssisi",
+    $stmt->bind_param("ssssisiiiddssssssssis",
         $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
         $training_summary, $training_agenda, $training_success, $training_challenges,
