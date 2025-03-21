@@ -480,9 +480,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const communityIdField = document.getElementById("community_id");
     const resultsDiv = document.getElementById("community_results");
 
-    communityInput.addEventListener("input", function() {
-        let query = communityInput.value.trim();
-
+    // ✅ Function to fetch and show results
+    function fetchCommunities(query) {
         if (query.length >= 3) { // Only search after 3+ characters
             fetch(`search_communities.php?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
@@ -512,15 +511,26 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             resultsDiv.innerHTML = ""; // Clear results if fewer than 3 chars
         }
+    }
+
+    // ✅ Event listener for typing in the input field
+    communityInput.addEventListener("input", function() {
+        fetchCommunities(communityInput.value.trim());
     });
 
-    // Hide results when clicking outside the input field
+    // ✅ Trigger search if field is preloaded with a value
+    if (communityInput.value.trim().length >= 3) {
+        fetchCommunities(communityInput.value.trim());
+    }
+
+    // ✅ Hide results when clicking outside the input field
     document.addEventListener("click", function(event) {
         if (!communityInput.contains(event.target) && !resultsDiv.contains(event.target)) {
             resultsDiv.innerHTML = "";
         }
     });
 });
+
 
 
 
