@@ -112,8 +112,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $featured_description = trim($_POST['featured_description'] ?? '');
 
     if ($editing) {
-        // ✅ Update existing training report
-        $sql = "UPDATE tb_trainings SET
+    // ✅ UPDATE existing training report
+    $sql = "UPDATE tb_trainings SET
         training_title=?, lead_trainer=?, training_country=?, training_date=?,
         no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
         location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
@@ -121,29 +121,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?
         WHERE training_id=?";
 
-        $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("sssiiidddssssssssssi",
-            $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-            $training_summary, $training_agenda, $training_success, $training_challenges,
-            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-            $featured_description, $training_id);
-    } else {
-        // ✅ Insert new training report
-        $sql = "INSERT INTO tb_trainings
-            (training_title, lead_trainer, training_country, training_date, no_participants,
-            training_type, briks_made, avg_brik_weight, location_lat, location_long,
-            location_full, training_summary, training_agenda, training_success, training_challenges,
-            training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $gobrik_conn->prepare($sql);
 
-        $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("sssiiidddsssssssssi",
-            $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-            $training_summary, $training_agenda, $training_success, $training_challenges,
-            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description);
-    }
+    $stmt->bind_param("sssisiiiddsssssssssi",
+        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+        $training_summary, $training_agenda, $training_success, $training_challenges,
+        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
+        $featured_description, $training_id
+    );
+} else {
+    // ✅ INSERT new training report
+    $sql = "INSERT INTO tb_trainings
+        (training_title, lead_trainer, training_country, training_date, no_participants,
+        training_type, briks_made, avg_brik_weight, location_lat, location_long,
+        location_full, training_summary, training_agenda, training_success, training_challenges,
+        training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $gobrik_conn->prepare($sql);
+
+    $stmt->bind_param("sssisiiiddsssssssssi",
+        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+        $training_summary, $training_agenda, $training_success, $training_challenges,
+        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description
+    );
+}
+
 
     $stmt->execute();
     $stmt->close();
