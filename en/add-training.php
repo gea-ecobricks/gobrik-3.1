@@ -132,10 +132,24 @@ $training_date = !empty($_POST['training_date'])
     ? (int) $_POST['no_participants']
     : 0; // Default to 0 if empty or not numeric
 
-    $community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id'])
-    ? (int) $_POST['community_id']
-    : NULL; // Default to NULL if empty or invalid
 
+
+$community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id']) ? (int)$_POST['community_id'] : NULL;
+
+// Check if community_id exists in communities_tb before inserting/updating
+if ($community_id !== NULL) {
+    $check_community_sql = "SELECT com_id FROM communities_tb WHERE com_id = ?";
+    $stmt_check_community = $gobrik_conn->prepare($check_community_sql);
+    $stmt_check_community->bind_param("i", $community_id);
+    $stmt_check_community->execute();
+    $stmt_check_community->store_result();
+
+    if ($stmt_check_community->num_rows === 0) {
+        // Community does not exist, set to NULL
+        $community_id = NULL;
+    }
+    $stmt_check_community->close();
+}
 
 
 
@@ -156,7 +170,7 @@ if ($editing) {
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-        $featured_description, $community_id, $training_id,
+        $featured_description, $community_id, $training_id
     );
 } else {
     // ✅ INSERT new training report
