@@ -351,8 +351,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="text" id="location_address" name="location_address" placeholder="Start typing your town..." required
             value="<?php echo htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     </div>
-
-                  <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
+    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
 
 <!-- Moodle URL -->
     <div class="form-item">
@@ -458,86 +457,10 @@ $(document).ready(function() {
         }
     });
 });
-</script>
 
 
 
-    <script>
 
-
-        //TOGGLE COMMUNITY OR PERSONAL PROJECT SORT FIELDS
-        // document.addEventListener("DOMContentLoaded", function() {
-        //     // Initially hide all additional fields
-        //     const communityField = document.getElementById("trained_community").parentNode;
-        //     const trainingTypeField = document.getElementById("training_type").parentNode;
-        //     const trainingLocationField = document.getElementById("training_location").parentNode;
-        //
-        //     communityField.style.display = 'none';
-        //     trainingTypeField.style.display = 'none';
-        //     trainingLocationField.style.display = 'none';
-
-            // Function to show or hide fields based on the dropdown selection
-        //     function toggleFields() {
-        //         var trainingSort = document.getElementById("training_sort").value;
-        //
-        //         // Reset visibility
-        //         communityField.style.display = 'none';
-        //         trainingTypeField.style.display = 'none';
-        //         trainingLocationField.style.display = 'none';
-        //
-        //         if (trainingSort === "community") {
-        //             communityField.style.display = '';
-        //         } else if (trainingSort === "personal") {
-        //             trainingTypeField.style.display = '';
-        //         }
-        //
-        //         // Show connected ecobricks and project duration fields if a project sort is selected
-        //         if (trainingSort === "community" || trainingSort === "personal") {
-        //             trainingLocationField.style.display = '';
-        //         }
-        //
-        //         // Dynamically adjust the max-height for the advanced box content
-        //         const advancedBoxContent = document.querySelector('.advanced-box-content');
-        //         advancedBoxContent.style.maxHeight = advancedBoxContent.scrollHeight + "px";
-        //     }
-        //
-        //     // Add change event listener to the training sort dropdown
-        //     document.getElementById("training_sort").addEventListener("change", toggleFields);
-        // });
-
-        // //SHOW HIDE THE ADVANCED BOX
-        // function toggleAdvancedBox(event) {
-        //     // Get the current advanced box based on the clicked header
-        //     let currentAdvancedBox = event.currentTarget.parentElement;
-        //
-        //     // Assuming the element that will have the `aria-expanded` attribute is the header itself
-        //     let header = currentAdvancedBox.querySelector('.advanced-box-header');
-        //
-        //     // Find the content and icon specific to this advanced box
-        //     let content = currentAdvancedBox.querySelector('.advanced-box-content');
-        //     let icon = currentAdvancedBox.querySelector('.advanced-open-icon');
-        //
-        //     // Check if the content is currently expanded or not
-        //     let isExpanded = header.getAttribute('aria-expanded') === 'true';
-        //
-        //     if (!isExpanded) {
-        //         content.style.maxHeight = content.scrollHeight + 'px'  //   Set to its full height
-        //         icon.textContent = '−';  // switch to minus symbol for an open state
-        //         header.setAttribute('aria-expanded', 'true'); // Update aria-expanded to true
-        //     } else {
-        //         content.style.maxHeight = '0px';  // Collapse it
-        //         icon.textContent = '+';  // Set to plus symbol
-        //         header.setAttribute('aria-expanded', 'false'); // Update aria-expanded to false
-        //     }
-        // }
-
-        // Attach the function to all header div's click events
-        // document.addEventListener("DOMContentLoaded", function() {
-        //     let headers = document.querySelectorAll('.advanced-box-header');
-        //     headers.forEach(header => {
-        //         header.addEventListener('click', toggleAdvancedBox);
-        //     });
-        // });
 document.getElementById('submit-form').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent form submission until validation passes
     var isValid = true;
@@ -627,55 +550,6 @@ document.getElementById('submit-form').addEventListener('submit', function(event
 });
 
 
-        $(function() {
-            let debounceTimer;
-            $("#location_address").autocomplete({
-                source: function(request, response) {
-                    $("#loading-spinner").show();
-                    clearTimeout(debounceTimer);
-                    debounceTimer = setTimeout(() => {
-                        $.ajax({
-                            url: "https://nominatim.openstreetmap.org/search",
-                            dataType: "json",
-                            headers: {
-                                'User-Agent': 'ecobricks.org'
-                            },
-                            data: {
-                                q: request.term,
-                                format: "json"
-                            },
-                            success: function(data) {
-                                $("#loading-spinner").hide();
-                                response($.map(data, function(item) {
-                                    return {
-                                        label: item.display_name,
-                                        value: item.display_name,
-                                        lat: item.lat,
-                                        lon: item.lon
-                                    };
-                                }));
-                            },
-                            error: function(xhr, status, error) {
-                                $("#loading-spinner").hide();
-                                console.error("Autocomplete error:", error);
-                                response([]);
-                            }
-                        });
-                    }, 300);
-                },
-                select: function(event, ui) {
-                    $('#lat').val(ui.item.lat);
-                    $('#lon').val(ui.item.lon);
-                },
-                minLength: 3
-            });
-
-            $('#submit-form').on('submit', function() {
-                // console.log('Location Full:', $('#location_address').val());
-                // alert('Location Full: ' + $('#location_address').val());
-            });
-
-        });
 
         // Autocomplete serials of ecobricks entered in form
         $(document).ready(function() {
