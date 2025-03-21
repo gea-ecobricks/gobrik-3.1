@@ -57,19 +57,23 @@ $editing = ($training_id > 0);
 
 // ✅ Fetch existing training details if editing
 if ($editing) {
-    $sql_fetch = "SELECT training_title, lead_trainer, training_country, training_date, no_participants, trained_community,
-                  training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full, training_summary,
-                  training_agenda, training_success, training_challenges, training_lessons_learned
+    $sql_fetch = "SELECT training_title, lead_trainer, training_country, training_date, no_participants,
+                  training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full,
+                  training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
+                  youtube_result_video, moodle_url, ready_to_show
                   FROM tb_trainings WHERE training_id = ?";
+
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
     $stmt_fetch->bind_param("i", $training_id);
     $stmt_fetch->execute();
-    $stmt_fetch->bind_result($training_title, $lead_trainer, $training_country, $training_date, $no_participants, $trained_community,
+    $stmt_fetch->bind_result($training_title, $lead_trainer, $training_country, $training_date, $no_participants,
                             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-                            $training_summary, $training_agenda, $training_success, $training_challenges, $training_lessons_learned);
+                            $training_summary, $training_agenda, $training_success, $training_challenges,
+                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
+
 
 // Fetch unique training types from the database
 $training_types = [];
@@ -109,67 +113,48 @@ while ($row = $result->fetch_assoc()) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include '../scripts/photo-functions.php';
 
-    // ✅ Sanitize Input
-    $location_full = trim($_POST['location_address'] ?? 'Default Location');
-    $training_title = trim($_POST['training_title']);
-    $lead_trainer = trim($_POST['lead_trainer']);
-    $training_country = trim($_POST['training_country']);
-    $training_date = trim($_POST['training_date']);
-    $no_participants = (int) ($_POST['no_participants'] ?? 0);
-    $trained_community = trim($_POST['trained_community'] ?? '');
-    $training_type = trim($_POST['training_type']);
-    $briks_made = (int) ($_POST['briks_made'] ?? 0);
-    $avg_brik_weight = isset($_POST['avg_brik_weight']) ? (int)$_POST['avg_brik_weight'] : NULL;
-    $latitude = isset($_POST['latitude']) ? (double)$_POST['latitude'] : NULL;
-    $longitude = isset($_POST['longitude']) ? (double)$_POST['longitude'] : NULL;
-    $training_summary = trim($_POST['training_summary']);
-    $training_agenda = trim($_POST['training_agenda']);
-    $training_success = trim($_POST['training_success']);
-    $training_challenges = trim($_POST['training_challenges']);
-    $training_lessons_learned = trim($_POST['training_lessons_learned']);
+    $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
+    $moodle_url = trim($_POST['moodle_url'] ?? '');
+    $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0; // Convert checkbox to 0 or 1
 
-   if ($editing) {
-    // ✅ Update existing training report
-    $sql = "UPDATE tb_trainings SET
-            training_title=?, lead_trainer=?, training_country=?, training_date=?,
-            no_participants=?, trained_community=?, training_type=?, briks_made=?, avg_brik_weight=?,
-            location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
-            training_success=?, training_challenges=?, training_lessons_learned=?
-            WHERE training_id=?";
+    if ($editing) {
+        // ✅ Update existing training report
+        $sql = "UPDATE tb_trainings SET
+                training_title=?, lead_trainer=?, training_country=?, training_date=?,
+                no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
+                location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
+                training_success=?, training_challenges=?, training_lessons_learned=?,
+                youtube_result_video=?, moodle_url=?, ready_to_show=?
+                WHERE training_id=?";
 
-    $stmt = $gobrik_conn->prepare($sql);
-
-    // ✅ Fix: Added `training_id` as the last variable in `bind_param`
-    $stmt->bind_param("sssssiiiddssssssi",
-        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-        $trained_community, $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude,
-        $location_full, $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $training_id  // ✅ Added `training_id`
-    );
-
-
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("sssiiidddsssssssssi",
+            $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+            $training_summary, $training_agenda, $training_success, $training_challenges,
+            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
+            $training_id);
     } else {
         // ✅ Insert new training report
-// ✅ Insert new training report
-$sql = "INSERT INTO tb_trainings
-        (training_title, lead_trainer, training_country, training_date, no_participants,
-        trained_community, training_type, briks_made, avg_brik_weight, location_lat, location_long,
-        location_full, training_summary, training_agenda, training_success, training_challenges,
-        training_lessons_learned)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO tb_trainings
+                (training_title, lead_trainer, training_country, training_date, no_participants,
+                training_type, briks_made, avg_brik_weight, location_lat, location_long,
+                location_full, training_summary, training_agenda, training_success, training_challenges,
+                training_lessons_learned, youtube_result_video, moodle_url, ready_to_show)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-$stmt = $gobrik_conn->prepare($sql);
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("sssiiidddsssssssssi",
+            $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+            $training_summary, $training_agenda, $training_success, $training_challenges,
+            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show);
+    }
 
-$stmt->bind_param("sssisiiiddsssssss",
-    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-    $trained_community, $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude,
-    $location_full, $training_summary, $training_agenda, $training_success,
-    $training_challenges, $training_lessons_learned
-);
+    $stmt->execute();
+    $stmt->close();
 
-}
-$stmt->execute();
-$stmt->close();
+
 
     header("Location: add-training-images.php?training_id=" . $training_id);
     exit();
@@ -367,6 +352,46 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             value="<?php echo htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     </div>
 
+                  <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
+
+<!-- Moodle URL -->
+    <div class="form-item">
+        <label for="moodle_url">Moodle Course URL:</label><br>
+        <input type="url" id="moodle_url" name="moodle_url"
+               value="<?php echo htmlspecialchars($moodle_url ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+               placeholder="Enter Moodle Course Link">
+    </div>
+
+    <!-- YouTube Result Video -->
+    <div class="form-item">
+        <label for="youtube_result_video">YouTube Video URL:</label><br>
+        <input type="url" id="youtube_result_video" name="youtube_result_video"
+               value="<?php echo htmlspecialchars($youtube_result_video ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+               placeholder="Enter YouTube Video URL">
+    </div>
+
+    <!-- Ready to Show -->
+    <div class="form-item">
+        <label for="ready_to_show">Publish this training publicly?</label><br>
+        <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
+               <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+        <p class="form-caption">Check if this training is ready to be displayed on ecobricks.org.</p>
+    </div>
+
+
+    <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+
+    <div>
+        <input type="submit" value="Next: Upload Photos ➡️">
+    </div>
+
+</form>
+
+        </div>
+    </div>
+
+
 <!--                <div class="form-item">-->
 <!--                    <label for="connected_ecobricks">The serials of ecobricks used in your project:</label><br>-->
 <!--                    <input type="text" id="connected_ecobricks" name="connected_ecobricks" aria-label="Connected Ecobricks" placeholder="Enter serials...">-->
@@ -383,25 +408,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <!--                </div>-->
 
 <!--ERRORS-->
-<!--                    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
-
-<!--                <div class="form-item">-->
-<!--                    <label for="ready_to_show" data-lang-id="017-ready-to-show">Publish this training publically on ecobricks.org?</label><br>-->
-<!--                    <input type="checkbox" id="ready_to_show" name="ready_to_show" aria-label="Ready to Show">-->
-<!--                    <p class="form-caption" data-lang-id="017-ready-to-show-caption">Check if this training is ready to be shown to the public.  If so it will be posted on the training feed on ecobricks.org and in our archive of completed trainings.</p>-->
-<!--                </div>-->
-
-    <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-
-    <div>
-        <input type="submit" value="Next: Upload Photos ➡️">
-    </div>
-
-</form>
-
-        </div>
-    </div>
+<!--
 
 <!-- Load jQuery and Select2 -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
