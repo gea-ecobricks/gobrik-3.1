@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // ✅ Function to fetch and show results
     function fetchCommunities(query) {
         if (query.length >= 3) { // Only search after 3+ characters
-            fetch(`search_communities.php?query=${encodeURIComponent(query)}`)
+            fetch(`../api/search_communities.php?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     resultsDiv.innerHTML = "";
