@@ -363,7 +363,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="text" id="location_address" name="location_address" placeholder="Start typing your town..." required
             value="<?php echo htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     </div>
-    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
+    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
 
 <!-- Moodle URL -->
     <div class="form-item">
