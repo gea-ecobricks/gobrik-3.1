@@ -1,10 +1,59 @@
 <?php
-
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 ini_set('memory_limit', '256M'); // Increase memory limit
+require_once '../earthenAuth_helper.php'; // Authentication helper
 
-include '../gobrikconn_env.php';
+// PART 1: Set page variables
+$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
+$version = '0.54';
+$page = 'add-training';
+$lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
+
+ob_start(); // Prevent output before headers
+
+// PART 2: ✅ LOGIN & ROLE CHECK
+if (!isLoggedIn()) {
+    header("Location: login.php");
+    exit();
+}
+
+$buwana_id = $_SESSION['buwana_id'];
+require_once '../gobrikconn_env.php';
+
+// ✅ Fetch User Role
+$gea_status = getGEA_status($buwana_id);
+
+if (!$gea_status || stripos($gea_status, 'trainer') === false) {
+    header("Location: dashboard.php?error=unauthorized");
+    exit();
+}
+
+
+// PART 3: ✅ Fetch User Details
+require_once '../buwanaconn_env.php';
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+$first_name = getFirstName($buwana_conn, $buwana_id);
+
+// Fetch all languages
+$languages = [];
+$sql_languages = "SELECT language_id, languages_native_name FROM languages_tb ORDER BY languages_native_name ASC";
+$result_languages = $buwana_conn->query($sql_languages);
+
+if ($result_languages && $result_languages->num_rows > 0) {
+    while ($row = $result_languages->fetch_assoc()) {
+        $languages[] = $row;
+    }
+}
+
+$buwana_conn->close(); // Close the database connection
+
+require_once '../gobrikconn_env.php';
+
+
 
 $error_message = '';
 $full_urls = [];
