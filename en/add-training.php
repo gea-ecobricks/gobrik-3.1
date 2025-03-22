@@ -454,12 +454,19 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <textarea id="training_lessons_learned" name="training_lessons_learned" required><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
     </div>
 
-        <div class="form-item">
+<!--        <div class="form-item">
             <label for="location_address">Training Location:</label><br>
             <input type="text" id="location_address" name="location_address" placeholder="Start typing your town..." required
                 value="<?php echo htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
-        <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+        <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
+<div class="form-item">
+                   <label for="training_location" data-lang-id="015-location">Training Location:</label><br>
+                   <input type="text" id="training_location" name="training_location" aria-label="Training Location" required>
+                    <p class="form-caption" data-lang-id="015-location-caption">Please provide the general location where the training was conducted.</p>
+
+                   <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.  For online workshops, specify the country of the lead trainer.</div>
+              </div>
 
 <!-- Moodle URL -->
     <div class="form-item">
@@ -506,13 +513,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <!--                    <p class="form-caption">Optional: Enter the serial numbers of ecobricks connected to this project. Separate multiple serial numbers with commas.</p>-->
 <!--                </div>-->
 
-<!--                <div class="form-item">-->
-<!--                    <label for="training_location" data-lang-id="015-location">Training Location:</label><br>-->
-<!--                    <input type="text" id="training_location" name="training_location" aria-label="Training Location" required>-->
-<!--                    <p class="form-caption" data-lang-id="015-location-caption">Please provide the general location where the training was conducted.</p>-->
-<!--
-                   <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.  For online workshops, specify the country of the lead trainer.</div>-->
-<!--                </div>-->
+
 
 
 <!-- Load jQuery and Select2 -->
