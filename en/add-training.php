@@ -57,7 +57,7 @@ $editing = ($training_id > 0);
 
 // ✅ Fetch existing training details if editing
 if ($editing) {
-    $sql_fetch = "SELECT training_title, lead_trainer, training_country, training_date, no_participants,
+    $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
                   training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, featured_description, community_id
@@ -66,7 +66,7 @@ if ($editing) {
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
     $stmt_fetch->bind_param("i", $training_id);
     $stmt_fetch->execute();
-    $stmt_fetch->bind_result($training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+    $stmt_fetch->bind_result($training_title, $lead_trainer, $country_id, $training_date, $no_participants,
                             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id);
@@ -169,10 +169,11 @@ if ($avg_brik_weight === null) {
 
 $country_id = isset($_POST['country_id']) && is_numeric($_POST['country_id']) ? (int)$_POST['country_id'] : null;
 
-// Debugging - remove later
+// Debugging (REMOVE LATER)
 if ($country_id === null) {
     die("Error: country_id is missing or invalid.");
 }
+
 
 $featured_description = isset($_POST['featured_description']) ? trim($_POST['featured_description']) : null;
 
@@ -188,7 +189,7 @@ if ($featured_description === null) {
 if ($editing) {
     // ✅ UPDATE existing training report
     $sql = "UPDATE tb_trainings SET
-        training_title=?, lead_trainer=?, training_country=?, training_date=?,
+        training_title=?, lead_trainer=?, country_id=?, training_date=?,
         no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
         location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
         training_success=?, training_challenges=?, training_lessons_learned=?,
@@ -196,8 +197,8 @@ if ($editing) {
         WHERE training_id=?";
 
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssssisiiiddssssssssisi",
-        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+    $stmt->bind_param("ssisisiiiddssssssssisi",
+        $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
@@ -206,15 +207,15 @@ if ($editing) {
 } else {
     // ✅ INSERT new training report
     $sql = "INSERT INTO tb_trainings
-        (training_title, lead_trainer, training_country, training_date, no_participants,
+        (training_title, lead_trainer, country_id, training_date, no_participants,
         training_type, briks_made, avg_brik_weight, location_lat, location_long,
         location_full, training_summary, training_agenda, training_success, training_challenges,
         training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssssisiiiddssssssssisi",
-        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+    $stmt->bind_param("ssisisiiiddssssssssisi",
+        $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
@@ -399,16 +400,17 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <div class="form-item">
     <label for="country_id">Country:</label><br>
     <select id="country_id" name="country_id" required>
-        <option value="" disabled selected>Select a country...</option>
+        <option value="" disabled>Select a country...</option>
 
         <?php foreach ($countries as $country): ?>
-            <option value="<?php echo $country['country_id']; ?>"
-                <?php echo (isset($country_id) && $country_id == $country['country_id']) ? 'selected' : ''; ?>>
+            <option value="<?php echo htmlspecialchars($country['country_id'], ENT_QUOTES, 'UTF-8'); ?>"
+                <?php echo (!empty($country_id) && $country_id == $country['country_id']) ? 'selected' : ''; ?>>
                 <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
             </option>
         <?php endforeach; ?>
     </select>
 </div>
+
 
 <div class="form-item">
     <label for="featured_description">Featured Description:</label><br>
