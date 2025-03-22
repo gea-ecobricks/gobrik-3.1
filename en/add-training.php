@@ -136,6 +136,9 @@ $training_date = !empty($_POST['training_date'])
 
 $community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id']) ? (int)$_POST['community_id'] : NULL;
 
+// Debugging: Check if community_id is actually received
+error_log("Received community_id: " . json_encode($community_id));
+
 // Check if community_id exists in communities_tb before inserting/updating
 if ($community_id !== NULL) {
     $check_community_sql = "SELECT com_id FROM communities_tb WHERE com_id = ?";
@@ -156,22 +159,24 @@ if ($community_id !== NULL) {
 
 if ($editing) {
     // ✅ UPDATE existing training report
-    $sql = "UPDATE tb_trainings SET
+   $sql = "UPDATE tb_trainings SET
         training_title=?, lead_trainer=?, training_country=?, training_date=?,
         no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
         location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
         training_success=?, training_challenges=?, training_lessons_learned=?,
-        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
+        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?,
+        community_id = IFNULL(?, community_id)  -- Only update if not NULL
         WHERE training_id=?";
 
-    $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssssisiiiddssssssssisi",
-        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-        $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-        $featured_description, $community_id, $training_id
-    );
+$stmt = $gobrik_conn->prepare($sql);
+$stmt->bind_param("sssisiiiddssssssssisi",
+    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+    $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+    $training_summary, $training_agenda, $training_success, $training_challenges,
+    $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
+    $featured_description, $community_id, $training_id
+);
+
 } else {
     // ✅ INSERT new training report
     $sql = "INSERT INTO tb_trainings
@@ -322,7 +327,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
            value="<?php echo htmlspecialchars($community_name ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
     <input type="hidden" id="community_id" name="community_id"
-           value="<?php echo htmlspecialchars($community_id ?? '', ENT_QUOTES, 'UTF-8'); ?>"> <!-- Stores the selected community ID -->
+       value="<?php echo isset($community_id) ? htmlspecialchars($community_id, ENT_QUOTES, 'UTF-8') : ''; ?>">
 
     <div id="community_results" class="autocomplete-results"></div>
 
@@ -490,19 +495,19 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 -->
 
 <script>
+
+
 document.addEventListener("DOMContentLoaded", function() {
     const communityInput = document.getElementById("community_search");
     const communityIdField = document.getElementById("community_id");
     const resultsDiv = document.getElementById("community_results");
 
-    // ✅ Function to fetch and show results
     function fetchCommunities(query) {
-        if (query.length >= 3) { // Only search after 3+ characters
+        if (query.length >= 3) {
             fetch(`../api/search_communities.php?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     resultsDiv.innerHTML = "";
-
                     if (data.length === 0) {
                         resultsDiv.innerHTML = "<div class='autocomplete-item' style='color: gray;'>No results found</div>";
                     } else {
@@ -513,10 +518,11 @@ document.addEventListener("DOMContentLoaded", function() {
                             div.classList.add("autocomplete-item");
 
                             div.addEventListener("mousedown", function(event) {
-                                event.preventDefault(); // Prevent input blur before selection
+                                event.preventDefault();
                                 communityInput.value = community.com_name;
-                                communityIdField.value = community.com_id; // Set hidden field
+                                communityIdField.value = community.com_id; // Ensure correct ID is set
                                 resultsDiv.innerHTML = "";
+                                console.log("Selected Community ID: ", community.com_id);
                             });
 
                             resultsDiv.appendChild(div);
@@ -524,27 +530,21 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 });
         } else {
-            resultsDiv.innerHTML = ""; // Clear results if fewer than 3 chars
+            resultsDiv.innerHTML = "";
         }
     }
 
-    // ✅ Event listener for typing in the input field
     communityInput.addEventListener("input", function() {
         fetchCommunities(communityInput.value.trim());
     });
 
-    // ✅ Trigger search if field is preloaded with a value
-    if (communityInput.value.trim().length >= 3) {
-        fetchCommunities(communityInput.value.trim());
-    }
-
-    // ✅ Hide results when clicking outside the input field
     document.addEventListener("click", function(event) {
         if (!communityInput.contains(event.target) && !resultsDiv.contains(event.target)) {
             resultsDiv.innerHTML = "";
         }
     });
 });
+
 
 
 
