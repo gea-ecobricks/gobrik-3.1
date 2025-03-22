@@ -156,6 +156,32 @@ if (empty($training_type)) {
     die("Error: training_type value is empty or invalid.");
 }
 
+$briks_made = isset($_POST['briks_made']) && is_numeric($_POST['briks_made']) ? (int)$_POST['briks_made'] : null;
+$avg_brik_weight = isset($_POST['avg_brik_weight']) && is_numeric($_POST['avg_brik_weight']) ? (int)$_POST['avg_brik_weight'] : null;
+
+// Debugging - remove later
+if ($briks_made === null) {
+    die("Error: briks_made value is missing or invalid.");
+}
+if ($avg_brik_weight === null) {
+    die("Error: avg_brik_weight value is missing or invalid.");
+}
+
+$country_id = isset($_POST['country_id']) && is_numeric($_POST['country_id']) ? (int)$_POST['country_id'] : null;
+
+// Debugging - remove later
+if ($country_id === null) {
+    die("Error: country_id is missing or invalid.");
+}
+
+$featured_description = isset($_POST['featured_description']) ? trim($_POST['featured_description']) : null;
+
+// Debugging - remove later
+if ($featured_description === null) {
+    die("Error: featured_description is missing.");
+}
+
+
 
 
 
