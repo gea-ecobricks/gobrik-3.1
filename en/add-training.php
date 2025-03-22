@@ -136,9 +136,6 @@ $training_date = !empty($_POST['training_date'])
 
 $community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id']) ? (int)$_POST['community_id'] : NULL;
 
-// Debugging: Check if community_id is actually received
-error_log("Received community_id: " . json_encode($community_id));
-
 // Check if community_id exists in communities_tb before inserting/updating
 if ($community_id !== NULL) {
     $check_community_sql = "SELECT com_id FROM communities_tb WHERE com_id = ?";
@@ -152,6 +149,11 @@ if ($community_id !== NULL) {
         $community_id = NULL;
     }
     $stmt_check_community->close();
+}
+
+$training_type = isset($_POST['training_type']) ? trim($_POST['training_type']) : null;
+if (empty($training_type)) {
+    die("Error: training_type value is empty or invalid.");
 }
 
 
