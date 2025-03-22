@@ -122,6 +122,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $moodle_url = trim($_POST['moodle_url'] ?? '');
     $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0; // Convert checkbox to 0 or 1
     $featured_description = trim($_POST['featured_description'] ?? '');
+    $training_success = isset($_POST['training_success']) ? trim($_POST['training_success']) : null;
+$training_challenges = isset($_POST['training_challenges']) ? trim($_POST['training_challenges']) : null;
+$training_lessons_learned = isset($_POST['training_lessons_learned']) ? trim($_POST['training_lessons_learned']) : null;
+
 
     // ✅ Convert `datetime-local` format to MySQL `DATETIME`
 $training_date = !empty($_POST['training_date'])
@@ -450,12 +454,12 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <textarea id="training_lessons_learned" name="training_lessons_learned" required><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
     </div>
 
-    <div class="form-item">
-        <label for="location_address">Training Location:</label><br>
-        <input type="text" id="location_address" name="location_address" placeholder="Start typing your town..." required
-            value="<?php echo htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    </div>
-    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+        <div class="form-item">
+            <label for="location_address">Training Location:</label><br>
+            <input type="text" id="location_address" name="location_address" placeholder="Start typing your town..." required
+                value="<?php echo htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        </div>
+        <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
 
 <!-- Moodle URL -->
     <div class="form-item">
