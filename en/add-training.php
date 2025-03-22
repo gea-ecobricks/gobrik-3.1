@@ -159,24 +159,22 @@ if ($community_id !== NULL) {
 
 if ($editing) {
     // ✅ UPDATE existing training report
-   $sql = "UPDATE tb_trainings SET
+    $sql = "UPDATE tb_trainings SET
         training_title=?, lead_trainer=?, training_country=?, training_date=?,
         no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
         location_lat=?, location_long=?, location_full=?, training_summary=?, training_agenda=?,
         training_success=?, training_challenges=?, training_lessons_learned=?,
-        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?,
-        community_id = IFNULL(?, community_id)  -- Only update if not NULL
+        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
         WHERE training_id=?";
 
-$stmt = $gobrik_conn->prepare($sql);
-$stmt->bind_param("sssisiiiddssssssssisi",
-    $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
-    $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
-    $training_summary, $training_agenda, $training_success, $training_challenges,
-    $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-    $featured_description, $community_id, $training_id
-);
-
+    $stmt = $gobrik_conn->prepare($sql);
+    $stmt->bind_param("ssssisiiiddssssssssisi",
+        $training_title, $lead_trainer, $training_country, $training_date, $no_participants,
+        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $location_full,
+        $training_summary, $training_agenda, $training_success, $training_challenges,
+        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
+        $featured_description, $community_id, $training_id
+    );
 } else {
     // ✅ INSERT new training report
     $sql = "INSERT INTO tb_trainings
