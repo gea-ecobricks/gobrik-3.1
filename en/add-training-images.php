@@ -323,7 +323,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="hidden" name="action" value="delete_training">
         <a class="confirm-button" style="background:red; cursor:pointer;" id="deleteButton" data-lang-id="014-delete-training">❌ Delete Training</a>
     </form>
-</div>
+
 
 <!-- ✅ BACK LINK -->
 <a href="#" onclick="goBack()"  aria-label="Go back to re-enter data" class="back-link" data-lang-id="015-go-back-link">↩ Back to Step 1</a>
@@ -368,57 +368,69 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 
 
-        // UPLOAD SUBMIT ACTION AND BUTTON
+        // ✅ UPLOAD SUBMIT ACTION AND BUTTON
 
-        document.querySelector('#photoform').addEventListener('submit', function(event) {
-            event.preventDefault();
+document.querySelector('#photoform').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-            var button = document.getElementById('upload-progress-button');
-            var originalButtonText = button.value; // Save the original button text
-            button.innerHTML = '<div class="spinner-photo-loading"></div>'; // Replace button text with spinner
-            button.disabled = true; // Disable button to prevent multiple submissions
+    var button = document.getElementById('upload-progress-button');
+    var originalButtonText = button.value; // Save the original button text
+    button.innerHTML = '<div class="spinner-photo-loading"></div>'; // Replace button text with spinner
+    button.disabled = true; // Disable button to prevent multiple submissions
 
-            var messages = {
-                en: "Please choose a file.",
-                es: "Por favor, elige un archivo.",
-                fr: "Veuillez choisir un fichier.",
-                id: "Silakan pilih sebuah berkas."
-            };
+    var messages = {
+        en: "Please choose a file.",
+        es: "Por favor, elige un archivo.",
+        fr: "Veuillez choisir un fichier.",
+        id: "Silakan pilih sebuah berkas."
+    };
 
-            var currentLang = window.currentLanguage || 'en';
-            var chooseFileMessage = messages[currentLang] || messages.en;
+    var currentLang = window.currentLanguage || 'en';
+    var chooseFileMessage = messages[currentLang] || messages.en;
 
-            var fileInput = document.getElementById('training_photo0_main');
-            if (fileInput.files.length === 0) {
-                showFormModal(chooseFileMessage);
-                button.innerHTML = originalButtonText; // Restore button text if no file chosen
-                button.disabled = false; // Enable button
-                return;
-            }
+    // ✅ Check if at least one file is selected
+    var fileSelected = false;
+    for (var i = 0; i <= 6; i++) {
+        var fileInput = document.getElementById(`training_photo${i}_main`);
+        if (fileInput && fileInput.files.length > 0) {
+            fileSelected = true;
+            break; // ✅ Exit loop if a file is found
+        }
+    }
 
-            var form = event.target;
-            var formData = new FormData(form);
-            var xhr = new XMLHttpRequest();
+    if (!fileSelected) {
+        showFormModal(chooseFileMessage);
+        button.innerHTML = originalButtonText; // Restore button text
+        button.disabled = false; // Enable button
+        return;
+    }
 
-            xhr.upload.onprogress = function(event) {
-                if (event.lengthComputable) {
-                    var progress = (event.loaded / event.total) * 100;
-                    document.getElementById('upload-progress-button').style.backgroundSize = progress + '%';
-                    document.getElementById('upload-progress-button').classList.add('progress-bar');
-                }
-            };
+    var form = event.target;
+    var formData = new FormData(form);
+    var xhr = new XMLHttpRequest();
 
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == XMLHttpRequest.DONE) {
-                    button.innerHTML = originalButtonText; // Restore button text after upload
-                    button.disabled = false; // Enable button
-                    handleFormResponse(xhr.responseText);
-                }
-            };
+    xhr.upload.onprogress = function(event) {
+        if (event.lengthComputable) {
+            var progress = (event.loaded / event.total) * 100;
+            document.getElementById('upload-progress-button').style.backgroundSize = progress + '%';
+            document.getElementById('upload-progress-button').classList.add('progress-bar');
+        }
+    };
 
-            xhr.open(form.method, form.action, true);
-            xhr.send(formData);
-        });
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            button.innerHTML = originalButtonText; // Restore button text
+            button.disabled = false; // Enable button
+            handleFormResponse(xhr.responseText);
+        }
+    };
+
+    xhr.open(form.method, form.action, true);
+    xhr.send(formData);
+});
+
+
+
 
         // Function to handle form submission response
         function handleFormResponse(response) {
