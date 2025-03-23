@@ -189,9 +189,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Database update failed: " . $stmt->error);
     }
 
-    // ✅ Close statement
-    $stmt->close();
-}
 
 
 
