@@ -324,7 +324,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         <a href="#" onclick="goBack()"  aria-label="Go back to re-enter data" class="back-link" data-lang-id="015-go-back-link">↩ Back to Step 1</a>
 
-    </div>
+
     </div> <!-- ✅ Closes form-container -->
 </div> <!-- ✅ Closes photos-submission-box -->
 
