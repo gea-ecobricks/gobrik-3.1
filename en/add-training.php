@@ -150,39 +150,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_check_community->close();
     }
 
-    if ($editing) {
-        // ✅ UPDATE existing training report
-        $sql = "UPDATE tb_trainings SET
-            training_title=?, lead_trainer=?, country_id=?, training_date=?, no_participants=?, training_type=?,
-            briks_made=?, avg_brik_weight=?, training_location=?, training_summary=?,
-            training_agenda=?, training_success=?, training_challenges=?, training_lessons_learned=?,
-            youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
-            WHERE training_id=?";
 
-        $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("ssisisiissssssssisi",
-            $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
-            $briks_made, $avg_brik_weight, $training_location, $training_summary,
-            $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
-            $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id, $training_id
-        );
-    } else {
-        // ✅ INSERT new training report
-        $sql = "INSERT INTO tb_trainings
-            (training_title, lead_trainer, country_id, training_date, no_participants, training_type,
-            briks_made, avg_brik_weight, location_lat, location_long, training_location, training_summary,
-            training_agenda, training_success, training_challenges, training_lessons_learned, youtube_result_video,
-            moodle_url, ready_to_show, featured_description, community_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+if ($editing) {
+    // ✅ UPDATE existing training report
+    $sql = "UPDATE tb_trainings SET
+        training_title=?, lead_trainer=?, country_id=?, training_date=?, no_participants=?, training_type=?,
+        briks_made=?, avg_brik_weight=?, training_location=?, training_summary=?,
+        training_agenda=?, training_success=?, training_challenges=?, training_lessons_learned=?,
+        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
+        WHERE training_id=?";
 
-        $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("ssisisiissssssssisi",
-            $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
-            $briks_made, $avg_brik_weight, $training_location, $training_summary,
-            $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
-            $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
-        );
-    }
+    $stmt = $gobrik_conn->prepare($sql);
+    $stmt->bind_param("ssisisiissssssssisi",
+        $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
+        $briks_made, $avg_brik_weight, $training_location, $training_summary,
+        $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
+        $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id, $training_id
+    );
+} else {
+    // ✅ INSERT new training report
+    $sql = "INSERT INTO tb_trainings
+        (training_title, lead_trainer, country_id, training_date, no_participants, training_type,
+        briks_made, avg_brik_weight, training_location, training_summary,
+        training_agenda, training_success, training_challenges, training_lessons_learned,
+        youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $gobrik_conn->prepare($sql);
+    $stmt->bind_param("ssisisiissssssssisi",
+        $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
+        $briks_made, $avg_brik_weight, $training_location, $training_summary,
+        $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
+        $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
+    );
+}
+
+
 
     // ✅ Execute statement & check for errors
     if (!$stmt->execute()) {
