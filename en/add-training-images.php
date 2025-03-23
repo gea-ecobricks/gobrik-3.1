@@ -271,47 +271,52 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <!-- PART 6 THE FORM -->
 
-        <form id="photoform" method="post" enctype="multipart/form-data">
+       <form id="photoform" method="post" enctype="multipart/form-data">
 
-            <!-- ✅ Hidden field for training_id -->
-            <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id']); ?>">
+    <!-- ✅ Hidden field for training_id -->
+    <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id']); ?>">
 
-            <?php for ($i = 0; $i <= 6; $i++): ?>
-                <?php
-                    $photo_main_var = "training_photo{$i}_main";
-                    $photo_tmb_var = "training_photo{$i}_tmb";
-                ?>
-                <div class="form-item">
-                    <label for="training_photo<?php echo $i; ?>_main">Upload Photo <?php echo $i; ?>:</label><br>
+    <?php for ($i = 0; $i <= 6; $i++): ?>
+        <?php
+            $photo_main_var = "training_photo{$i}_main";
+            $photo_tmb_var = "training_photo{$i}_tmb";
+            $photo_number = $i + 1; // ✅ Adjust display number (start at 1)
+        ?>
+        <div class="form-item">
+            <label for="training_photo<?php echo $i; ?>_main">
+                Upload Photo <?php echo $photo_number; ?>:
+            </label><br>
 
-                    <!-- ✅ Show existing image if available -->
-                    <?php if (!empty($$photo_main_var)): ?>
-                        <div class="existing-image">
-                            <img src="<?php echo htmlspecialchars($$photo_main_var, ENT_QUOTES, 'UTF-8'); ?>"
-                                 alt="Existing Image <?php echo $i; ?>"
-                                 style="max-width: 200px; max-height: 200px;">
-                            <p>Current Image</p>
-                        </div>
-
-                    <?php endif; ?>
-
-                    <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
-                    <p class="form-caption" data-lang-id="select-photo-<?php echo $i; ?>-instruction">Testsdf</p>
-
+            <!-- ✅ Show existing image if available -->
+            <?php if (!empty($$photo_main_var)): ?>
+                <div class="existing-image">
+                    <img src="<?php echo htmlspecialchars($$photo_main_var, ENT_QUOTES, 'UTF-8'); ?>"
+                         alt="Existing Image <?php echo $photo_number; ?>"
+                         style="max-width: 200px; max-height: 200px;">
+                    <p>Current Image</p>
                 </div>
-            <?php endfor; ?>
+            <?php endif; ?>
 
-            <div data-lang-id="013-submit-upload-button">
-                <input type="submit" value="⬆️ Upload Photos" id="upload-progress-button" aria-label="Submit photos for upload">
-            </div>
+            <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
+            <p class="form-caption" data-lang-id="select-photo-<?php echo $photo_number; ?>-instruction">
+                Select a photo for Upload Photo <?php echo $photo_number; ?>.
+            </p>
+        </div>
+    <?php endfor; ?>
 
-        </form>  <!-- ✅ FORM ENDS HERE -->
+    <div data-lang-id="013-submit-upload-button">
+        <input type="submit" value="⬆️ Upload Photos" id="upload-progress-button" aria-label="Submit photos for upload">
+    </div>
+
+</form>  <!-- ✅ FORM ENDS HERE -->
+
 
 
 
 <!-- ✅ BACK LINK -->
+<div style="text-align:center; padding:20px;width: 100%;">
 <a href="#" onclick="goBack()"  aria-label="Go back to re-enter data" class="back-link" data-lang-id="015-go-back-link">↩ Back to Step 1</a>
-
+</div>
 
 </div>
 </div> <!-- ✅ Closes photos-submission-box -->
