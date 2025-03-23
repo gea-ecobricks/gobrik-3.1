@@ -310,6 +310,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="text" id="training_title" name="training_title"
             value="<?php echo htmlspecialchars($training_title ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Training Title" required>
+             <p class="form-caption" data-lang-id="012-training-title">Give your training a title.  This will be how your report is featured.</p>
     </div>
 
     <div class="form-item">
@@ -317,6 +318,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <input type="datetime-local" id="training_date" name="training_date"
     value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
     aria-label="Training Date" required>
+    <p class="form-caption" data-lang-id="012-training-date">On what date and time did this training run?</p>
 
 </div>
 
@@ -324,6 +326,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <label for="no_participants">Number of Participants:</label><br>
         <input type="number" id="no_participants" name="no_participants" min="1" max="5000" required
             value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+            <p class="form-caption" data-lang-id="012-training-count">How many people particiapted (including trainers)?</p>
     </div>
 
     <div class="form-item">
@@ -331,6 +334,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="text" id="lead_trainer" name="lead_trainer"
             value="<?php echo htmlspecialchars($lead_trainer ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Lead Trainer" required>
+            <p class="form-caption" data-lang-id="012-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
     </div>
 
 
