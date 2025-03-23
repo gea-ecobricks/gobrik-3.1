@@ -58,7 +58,7 @@ $editing = ($training_id > 0);
 // ✅ Fetch existing training details if editing
 if ($editing) {
     $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
-                  training_type, briks_made, avg_brik_weight, location_lat, location_long, location_full,
+                  training_type, briks_made, avg_brik_weight, location_lat, location_long, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, featured_description, community_id
                   FROM tb_trainings WHERE training_id = ?";
@@ -460,13 +460,13 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                 value="<?php echo htmlspecialchars($location_full ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
         <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
-<div class="form-item">
-                   <label for="training_location" data-lang-id="015-location">Training Location:</label><br>
-                   <input type="text" id="training_location" name="training_location" aria-label="Training Location" required>
-                    <p class="form-caption" data-lang-id="015-location-caption">Please provide the general location where the training was conducted.</p>
+    <div class="form-item">
+                       <label for="training_location" data-lang-id="015-location">Training Location:</label><br>
+                       <input type="text" id="training_location" name="training_location" aria-label="Training Location" required>
+                        <p class="form-caption" data-lang-id="015-location-caption">Please provide the general location where the training was conducted.</p>
 
-                   <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.  For online workshops, specify the country of the lead trainer.</div>
-              </div>
+                       <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.  For online workshops, specify the country of the lead trainer.</div>
+                  </div>
 
 <!-- Moodle URL -->
     <div class="form-item">
