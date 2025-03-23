@@ -173,7 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             briks_made, avg_brik_weight, location_lat, location_long, training_location, training_summary,
             training_agenda, training_success, training_challenges, training_lessons_learned, youtube_result_video,
             moodle_url, ready_to_show, featured_description, community_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $gobrik_conn->prepare($sql);
         $stmt->bind_param("ssisisiissssssssisi",
