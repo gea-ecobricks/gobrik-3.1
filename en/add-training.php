@@ -154,15 +154,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // ✅ UPDATE existing training report
         $sql = "UPDATE tb_trainings SET
             training_title=?, lead_trainer=?, country_id=?, training_date=?, no_participants=?, training_type=?,
-            briks_made=?, avg_brik_weight=?, location_lat=?, location_long=?, training_location=?, training_summary=?,
+            briks_made=?, avg_brik_weight=?, training_location=?, training_summary=?,
             training_agenda=?, training_success=?, training_challenges=?, training_lessons_learned=?,
             youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
             WHERE training_id=?";
 
         $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("ssisisiiddssssssssisi",
+        $stmt->bind_param("ssisisiissssssssisi",
             $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
-            $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location, $training_summary,
+            $briks_made, $avg_brik_weight, $training_location, $training_summary,
             $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
             $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id, $training_id
         );
@@ -176,9 +176,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("ssisisiiddssssssssisi",
+        $stmt->bind_param("ssisisiissssssssisi"",
             $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
-            $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location, $training_summary,
+            $briks_made, $avg_brik_weight, $training_location, $training_summary,
             $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
             $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
         );
