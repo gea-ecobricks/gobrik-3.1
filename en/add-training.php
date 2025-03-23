@@ -122,17 +122,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lead_trainer = trim($_POST['lead_trainer'] ?? '');
     $training_date = trim($_POST['training_date'] ?? '');
 
-// Ensure training_date is never NULL
+// Ensure training_date is not empty
 if (!empty($training_date)) {
+    // If only a date (YYYY-MM-DD) is provided, append default time "12:00"
+    if (strlen($training_date) == 10) { // Example: "2025-03-11"
+        $training_date .= "T12:00"; // Append default time
+    }
+
+    // Convert to MySQL DATETIME format
     $training_date = date("Y-m-d H:i:s", strtotime($training_date));
 } else {
-    die("Error: Training date is required."); // Debugging: Remove in production
+    die("Error: Training date is required."); // Debugging - Remove in production
 }
+
 
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
     $moodle_url = trim($_POST['moodle_url'] ?? '');
     $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
     $featured_description = trim($_POST['featured_description'] ?? '');
+    $training_summary = trim($_POST['training_summary'] ?? '');
     $training_success = trim($_POST['training_success'] ?? '');
     $training_challenges = trim($_POST['training_challenges'] ?? '');
     $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
