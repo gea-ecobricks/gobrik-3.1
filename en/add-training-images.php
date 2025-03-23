@@ -293,11 +293,12 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                                  style="max-width: 200px; max-height: 200px;">
                             <p>Current Image</p>
                         </div>
-                     <p class="form-caption" data-lang-id="select-photo-<?php echo $i; ?>-instruction"></p>
+
                     <?php endif; ?>
 
                     <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
-                    <p class="form-caption">Optional: Choose a new image to replace the existing one.</p>
+                    <p class="form-caption" data-lang-id="select-photo-<?php echo $i; ?>-instruction"></p>
+
                 </div>
             <?php endfor; ?>
 
