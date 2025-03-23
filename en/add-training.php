@@ -141,6 +141,7 @@ if (!empty($training_date)) {
     $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
     $featured_description = trim($_POST['featured_description'] ?? '');
     $training_summary = trim($_POST['training_summary'] ?? '');
+    $training_agenda = trim($_POST['training_agenda'] ?? '');
     $training_success = trim($_POST['training_success'] ?? '');
     $training_challenges = trim($_POST['training_challenges'] ?? '');
     $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
@@ -371,17 +372,18 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 </div>
 
 
-    <div class="form-item">
-        <label for="briks_made">How many ecobricks were made?</label><br>
-        <input type="number" id="briks_made" name="briks_made" min="1" max="5000" required
-            value="<?php echo htmlspecialchars($briks_made ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    </div>
+  <div class="form-item">
+    <label for="briks_made">How many ecobricks were made?</label><br>
+    <input type="number" id="briks_made" name="briks_made" min="0" max="5000" required
+        value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
+</div>
 
-    <div class="form-item">
-        <label for="avg_brik_weight">Average Brik Weight (grams):</label><br>
-        <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="100" max="2000"
-            value="<?php echo htmlspecialchars($avg_brik_weight ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    </div>
+<div class="form-item">
+    <label for="avg_brik_weight">Average Brik Weight (grams):</label><br>
+    <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" required
+        value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
+</div>
+
 
     <div class="form-item">
     <label for="country_id">Country:</label><br>
