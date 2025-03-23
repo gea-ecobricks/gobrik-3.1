@@ -351,7 +351,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <!-- "Add a new community" text link -->
     <p class="form-caption" data-lang-id="012-community-caption-xx">
-        Start typing to see and select a community.
+        What community was this training for?  Start typing to see and select a GoBrik community.
         <a href="#" onclick="openAddCommunityModal(); return false;"
            style="color: #007BFF; text-decoration: underline;">
             Don't see your community? Add it.
@@ -373,6 +373,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </option>
         <?php endforeach; ?>
     </select>
+   <p class="form-caption" data-lang-id="012-training-trainers">Please categorize this training.</p>
+
 </div>
 
 
@@ -380,12 +382,15 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <label for="briks_made">How many ecobricks were made?</label><br>
     <input type="number" id="briks_made" name="briks_made" min="0" max="5000" required
         value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
+    <p class="form-caption" data-lang-id="012-training-trainers">No ecobricks made in this training? Just set at "0" then.</p>
+
 </div>
 
 <div class="form-item">
     <label for="avg_brik_weight">Average Brik Weight (grams):</label><br>
     <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" required
         value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
+        <p class="form-caption" data-lang-id="012-training-trainers">No ecobricks made in this training? Just set at "0" then.</p>
 </div>
 
 
@@ -401,6 +406,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </option>
         <?php endforeach; ?>
     </select>
+<p class="form-caption" data-lang-id="012-training-trainers">Where was this training run?  If it was an online training, select the country of the lead trainer.</p>
 </div>
 
 
@@ -416,30 +422,37 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <div class="form-item">
         <label for="training_agenda">Training Agenda:</label><br>
         <textarea id="training_agenda" name="training_agenda"><?php echo htmlspecialchars($training_agenda ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-            <p class="form-caption">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
+            <p class="form-caption">Optional: Please layout the agenda that your training followed. Max 1000 words. You may not need to update this field as it was shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
 
     </div>
 
 
 <h4>Training Reporting</h4>
+<p>These text fields will be used to compile your report</p>
 
     <div class="form-item">
         <label for="training_summary">Training Summary:</label><br>
         <textarea id="training_summary" name="training_summary" required><?php echo htmlspecialchars($training_summary ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <p class="form-caption" data-lang-id="012-training-summary">Provide a summary of the training. Max 150 words. Avoid special characters..</p>
     </div>
     <div class="form-item">
         <label for="training_success">Training Successes:</label><br>
         <textarea id="training_success" name="training_success" required><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+      <p class="form-caption" data-lang-id="012-training-success">Share the successes of the training. Max 500 words. Avoid special characters..</p>
+
     </div>
 
     <div class="form-item">
         <label for="training_challenges">Training Challenges:</label><br>
         <textarea id="training_challenges" name="training_challenges" required><?php echo htmlspecialchars($training_challenges ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+              <p class="form-caption" data-lang-id="012-training-challenges">Share the challenges you faced leading your training. Max 500 words. Avoid special characters.</p>
+
     </div>
 
     <div class="form-item">
         <label for="training_lessons_learned">Lessons Learned:</label><br>
         <textarea id="training_lessons_learned" name="training_lessons_learned" required><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <p class="form-caption" data-lang-id="012-training-lessons">Share the lessons learned from leading your training. Max 1000 words. Avoid special characters.</p>
     </div>
 
 <!--        <div class="form-item">
