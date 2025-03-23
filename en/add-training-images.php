@@ -294,11 +294,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         <br>
 
-        <!-- ✅ FORM STARTS HERE (Must match JavaScript) -->
-        <form id="photoform" action="" method="post" enctype="multipart/form-data">
+        <!-- ✅ FORM STARTS HERE -->
+        <form id="photoform" method="post" enctype="multipart/form-data">
 
-            <!-- ✅ Hidden input for Training ID -->
-            <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+            <!-- ✅ Hidden field for training_id -->
+            <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id']); ?>">
 
             <?php for ($i = 0; $i <= 6; $i++): ?>
                 <?php
@@ -329,30 +329,27 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         </form>  <!-- ✅ FORM ENDS HERE -->
 
+    </div> <!-- ✅ Closes form-container -->
+</div> <!-- ✅ Closes photos-submission-box -->
 
+<!-- ✅ UPLOAD SUCCESS MESSAGE -->
+<div id="upload-success" class="form-container" style="display:none;">
+    <div class="step-graphic" style="width:fit-content;margin:auto;">
+        <img src="../svgs/step3-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 3: Upload Success">
+    </div>
+    <div id="upload-success-message"></div>
+    <a class="confirm-button" href="training.php?training_id=<?php echo $_GET['training_id']; ?>" data-lang-id="013-view-training-post">🎉 View Training Post</a>
+    <a class="confirm-button" data-lang-id="014-edit-training" href="edit-training.php?training_id=<?php echo $_GET['training_id']; ?>">Edit Training Post</a>
 
+    <form id="deleteForm" action="" method="POST">
+        <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id']); ?>">
+        <input type="hidden" name="action" value="delete_training">
+        <a class="confirm-button" style="background:red; cursor:pointer;" id="deleteButton" data-lang-id="014-delete-training">❌ Delete Training</a>
+    </form>
+</div>
 
-
-
-
-
-
-        <div id="upload-success" class="form-container" style="display:none;">
-            <div class="step-graphic" style="width:fit-content;margin:auto;">
-                <img src="../svgs/step3-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 3: Upload Success">
-            </div>
-            <div id="upload-success-message"></div>
-            <a class="confirm-button" href="training.php?training_id=<?php echo $_GET['training_id']; ?>" data-lang-id="013-view-training-post">🎉 View Training Post</a>
-            <a class="confirm-button" data-lang-id="014-edit-training" href="edit-training.php?training_id=<?php echo $_GET['training_id']; ?>">Edit Training Post</a>
-
-            <form id="deleteForm" action="" method="POST">
-                <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id']); ?>">
-                <input type="hidden" name="action" value="delete_training">
-                <a class="confirm-button" style="background:red; cursor:pointer;" id="deleteButton" data-lang-id="014-delete-training">❌ Delete Training</a>
-            </form>
-        </div>
-
-        <a href="#" onclick="goBack()"  aria-label="Go back to re-enter data" class="back-link" data-lang-id="015-go-back-link">↩ Back to Step 1</a>
+<!-- ✅ BACK LINK -->
+<a href="#" onclick="goBack()"  aria-label="Go back to re-enter data" class="back-link" data-lang-id="015-go-back-link">↩ Back to Step 1</a>
 
 
     </div> <!-- ✅ Closes form-container -->
