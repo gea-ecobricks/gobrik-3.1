@@ -118,6 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include '../scripts/photo-functions.php';
 
     // ✅ Capture form data safely
+    $training_title = trim($_POST['training_title'] ?? '');
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
     $moodle_url = trim($_POST['moodle_url'] ?? '');
     $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
@@ -186,10 +187,6 @@ if ($editing) {
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
     );
 }
-
-
-
-
 
     // ✅ Execute statement & check for errors
     if (!$stmt->execute()) {
