@@ -244,57 +244,66 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <div class="splash-content-block"></div>
     <div id="splash-bar"></div>
 
-    <!-- PAGE CONTENT-->
+    <!-- PAGE CONTENT -->
+<div id="photos-submission-box" style="display:flex;flex-flow:column;">
 
-    <div id="photos-submission-box" style="display:flex;flex-flow:column;">
+    <div class="form-container" id="upload-photo-form">
 
-        <div class="form-container" id="upload-photo-form">
+        <div class="step-graphic" style="width:fit-content;margin:auto;">
+            <img src="../svgs/step2-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 2: Upload images">
+        </div>
 
-            <div class="step-graphic" style="width:fit-content;margin:auto;">
-                <img src="../svgs/step2-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 2: Upload images">
+        <div class="splash-form-content-block">
+            <div class="splash-box">
+                <div class="splash-heading" data-lang-id="001-form-title">Upload Training Photos</div>
             </div>
-
-            <div class="splash-form-content-block">
-                <div class="splash-box">
-
-                    <div class="splash-heading" data-lang-id="001-form-title">Upload Training Photos</div>
-                </div>
-                <div class="splash-image" data-lang-id="003-splash-image-alt">
-                    <img src="../svgs/square-training-photo.svg" style="width:65%" alt="Please take a square photo">
-                </div>
+            <div class="splash-image" data-lang-id="003-splash-image-alt">
+                <img src="../svgs/square-training-photo.svg" style="width:65%" alt="Please take a square photo">
             </div>
+        </div>
 
-            <p data-lang-id="002-form-description2">Show the world your training! Upload up to six images showing your training session and what you accomplished. <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span></p>
+        <p data-lang-id="002-form-description2">
+            Show the world your training! Upload up to six images showing your training session and what you accomplished.
+            <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span>
+        </p>
 
-            <br>
+        <br>
 
+        <!-- ✅ FORM STARTS HERE -->
+        <form action="your-upload-handler.php" method="post" enctype="multipart/form-data">
 
             <?php for ($i = 0; $i <= 6; $i++): ?>
-    <?php
-        $photo_main_var = "training_photo{$i}_main";
-        $photo_tmb_var = "training_photo{$i}_tmb";
-    ?>
-    <div class="form-item">
-        <label for="training_photo<?php echo $i; ?>_main">Upload Photo <?php echo $i; ?>:</label><br>
+                <?php
+                    $photo_main_var = "training_photo{$i}_main";
+                    $photo_tmb_var = "training_photo{$i}_tmb";
+                ?>
+                <div class="form-item">
+                    <label for="training_photo<?php echo $i; ?>_main">Upload Photo <?php echo $i; ?>:</label><br>
 
-        <!-- ✅ Show existing image if available -->
-        <?php if (!empty($$photo_main_var)): ?>
-            <div class="existing-image">
-                <img src="<?php echo htmlspecialchars($$photo_main_var, ENT_QUOTES, 'UTF-8'); ?>"
-                     alt="Existing Image <?php echo $i; ?>"
-                     style="max-width: 200px; max-height: 200px;">
-                <p>Current Image</p>
-            </div>
-        <?php endif; ?>
+                    <!-- ✅ Show existing image if available -->
+                    <?php if (!empty($$photo_main_var)): ?>
+                        <div class="existing-image">
+                            <img src="<?php echo htmlspecialchars($$photo_main_var, ENT_QUOTES, 'UTF-8'); ?>"
+                                 alt="Existing Image <?php echo $i; ?>"
+                                 style="max-width: 200px; max-height: 200px;">
+                            <p>Current Image</p>
+                        </div>
+                    <?php endif; ?>
 
-        <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
-        <p class="form-caption">Optional: Choose a new image to replace the existing one.</p>
-    </div>
-<?php endfor; ?>
-
-   <div data-lang-id="013-submit-upload-button">
-                    <input type="submit" value="⬆️ Upload Photos" id="upload-progress-button" aria-label="Submit photos for upload">
+                    <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
+                    <p class="form-caption">Optional: Choose a new image to replace the existing one.</p>
                 </div>
+            <?php endfor; ?>
+
+            <div data-lang-id="013-submit-upload-button">
+                <input type="submit" value="⬆️ Upload Photos" id="upload-progress-button" aria-label="Submit photos for upload">
+            </div>
+
+        </form>  <!-- ✅ FORM ENDS HERE -->
+
+    </div> <!-- ✅ Closes form-container -->
+</div> <!-- ✅ Closes photos-submission-box -->
+
 
 
 
