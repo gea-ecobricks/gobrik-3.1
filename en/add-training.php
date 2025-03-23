@@ -139,6 +139,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // ✅ Validate `community_id`
     $community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id']) ? (int)$_POST['community_id'] : null;
+    if ($community_id !== null) {
+        $stmt_check_community = $gobrik_conn->prepare("SELECT com_id FROM communities_tb WHERE com_id = ?");
+        $stmt_check_community->bind_param("i", $community_id);
+        $stmt_check_community->execute();
+        $stmt_check_community->store_result();
+        if ($stmt_check_community->num_rows === 0) {
+            $community_id = null;
+        }
+        $stmt_check_community->close();
+    }
 
 
 if ($editing) {
@@ -152,7 +162,7 @@ if ($editing) {
         WHERE training_id=?";
 
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiddssssssssssi",
+    $stmt->bind_param("ssisisiiiddssssssssssi",
         $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
@@ -166,10 +176,10 @@ if ($editing) {
         training_type, briks_made, avg_brik_weight, location_lat, location_long,
         training_location, training_summary, training_agenda, training_success, training_challenges,
         training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiddssssssssssi",
+    $stmt->bind_param("ssisisiiiddssssssssssi",
         $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
