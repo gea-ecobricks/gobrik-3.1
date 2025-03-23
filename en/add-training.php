@@ -113,123 +113,86 @@ $result = $gobrik_conn->query($sql);
 while ($row = $result->fetch_assoc()) {
     $communities[] = $row;
 }
-
 // ✅ If form is submitted, insert/update the training report
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include '../scripts/photo-functions.php';
 
+    // ✅ Capture form data safely
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
     $moodle_url = trim($_POST['moodle_url'] ?? '');
-    $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0; // Convert checkbox to 0 or 1
+    $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
     $featured_description = trim($_POST['featured_description'] ?? '');
-    $training_success = isset($_POST['training_success']) ? trim($_POST['training_success']) : null;
-$training_challenges = isset($_POST['training_challenges']) ? trim($_POST['training_challenges']) : null;
-$training_lessons_learned = isset($_POST['training_lessons_learned']) ? trim($_POST['training_lessons_learned']) : null;
+    $training_success = trim($_POST['training_success'] ?? '');
+    $training_challenges = trim($_POST['training_challenges'] ?? '');
+    $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
+    $training_location = trim($_POST['training_location'] ?? '');
 
+    // ✅ Convert datetime-local format
+    $training_date = !empty($_POST['training_date']) ? date("Y-m-d H:i:s", strtotime($_POST['training_date'])) : null;
 
-    // ✅ Convert `datetime-local` format to MySQL `DATETIME`
-$training_date = !empty($_POST['training_date'])
-    ? date("Y-m-d H:i:s", strtotime($_POST['training_date']))
-    : NULL;
+    // ✅ Convert numeric fields safely
+    $no_participants = isset($_POST['no_participants']) && is_numeric($_POST['no_participants']) ? (int) $_POST['no_participants'] : 0;
+    $briks_made = isset($_POST['briks_made']) && is_numeric($_POST['briks_made']) ? (int) $_POST['briks_made'] : null;
+    $avg_brik_weight = isset($_POST['avg_brik_weight']) && is_numeric($_POST['avg_brik_weight']) ? (int) $_POST['avg_brik_weight'] : null;
+    $country_id = isset($_POST['country_id']) && is_numeric($_POST['country_id']) ? (int) $_POST['country_id'] : null;
+    $training_type = trim($_POST['training_type'] ?? '');
 
-    $no_participants = isset($_POST['no_participants']) && is_numeric($_POST['no_participants'])
-    ? (int) $_POST['no_participants']
-    : 0; // Default to 0 if empty or not numeric
-
-
-
-$community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id']) ? (int)$_POST['community_id'] : NULL;
-
-// Check if community_id exists in communities_tb before inserting/updating
-if ($community_id !== NULL) {
-    $check_community_sql = "SELECT com_id FROM communities_tb WHERE com_id = ?";
-    $stmt_check_community = $gobrik_conn->prepare($check_community_sql);
-    $stmt_check_community->bind_param("i", $community_id);
-    $stmt_check_community->execute();
-    $stmt_check_community->store_result();
-
-    if ($stmt_check_community->num_rows === 0) {
-        // Community does not exist, set to NULL
-        $community_id = NULL;
+    // ✅ Validate `community_id`
+    $community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id']) ? (int)$_POST['community_id'] : null;
+    if ($community_id !== null) {
+        $stmt_check_community = $gobrik_conn->prepare("SELECT com_id FROM communities_tb WHERE com_id = ?");
+        $stmt_check_community->bind_param("i", $community_id);
+        $stmt_check_community->execute();
+        $stmt_check_community->store_result();
+        if ($stmt_check_community->num_rows === 0) {
+            $community_id = null;
+        }
+        $stmt_check_community->close();
     }
-    $stmt_check_community->close();
+
+    if ($editing) {
+        // ✅ UPDATE existing training report
+        $sql = "UPDATE tb_trainings SET
+            training_title=?, lead_trainer=?, country_id=?, training_date=?, no_participants=?, training_type=?,
+            briks_made=?, avg_brik_weight=?, location_lat=?, location_long=?, training_location=?, training_summary=?,
+            training_agenda=?, training_success=?, training_challenges=?, training_lessons_learned=?,
+            youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
+            WHERE training_id=?";
+
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("ssisisiiisssssssssssi",
+            $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
+            $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location, $training_summary,
+            $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
+            $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id, $training_id
+        );
+    } else {
+        // ✅ INSERT new training report
+        $sql = "INSERT INTO tb_trainings
+            (training_title, lead_trainer, country_id, training_date, no_participants, training_type,
+            briks_made, avg_brik_weight, location_lat, location_long, training_location, training_summary,
+            training_agenda, training_success, training_challenges, training_lessons_learned, youtube_result_video,
+            moodle_url, ready_to_show, featured_description, community_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("ssisisiiisssssssssssi",
+            $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
+            $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location, $training_summary,
+            $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
+            $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
+        );
+    }
+
+    // ✅ Execute statement & check for errors
+    if (!$stmt->execute()) {
+        die("Database update failed: " . $stmt->error);
+    }
+
+    // ✅ Close statement
+    $stmt->close();
 }
 
-$training_type = isset($_POST['training_type']) ? trim($_POST['training_type']) : null;
-if (empty($training_type)) {
-    die("Error: training_type value is empty or invalid.");
-}
-
-$briks_made = isset($_POST['briks_made']) && is_numeric($_POST['briks_made']) ? (int)$_POST['briks_made'] : null;
-$avg_brik_weight = isset($_POST['avg_brik_weight']) && is_numeric($_POST['avg_brik_weight']) ? (int)$_POST['avg_brik_weight'] : null;
-
-// Debugging - remove later
-if ($briks_made === null) {
-    die("Error: briks_made value is missing or invalid.");
-}
-if ($avg_brik_weight === null) {
-    die("Error: avg_brik_weight value is missing or invalid.");
-}
-
-$country_id = isset($_POST['country_id']) && is_numeric($_POST['country_id']) ? (int)$_POST['country_id'] : null;
-
-// Debugging (REMOVE LATER)
-if ($country_id === null) {
-    die("Error: country_id is missing or invalid.");
-}
-
-
-$featured_description = isset($_POST['featured_description']) ? trim($_POST['featured_description']) : null;
-
-// Debugging - remove later
-if ($featured_description === null) {
-    die("Error: featured_description is missing.");
-}
-
-
-
-
-
-if ($editing) {
-    // ✅ UPDATE existing training report
-    $sql = "UPDATE tb_trainings SET
-        training_title=?, lead_trainer=?, country_id=?, training_date=?,
-        no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
-        location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?,
-        training_success=?, training_challenges=?, training_lessons_learned=?,
-        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
-        WHERE training_id=?";
-
-    $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiiddssssssssssi",
-        $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-        $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-        $featured_description, $community_id, $training_id
-    );
-} else {
-    // ✅ INSERT new training report
-    $sql = "INSERT INTO tb_trainings
-        (training_title, lead_trainer, country_id, training_date, no_participants,
-        training_type, briks_made, avg_brik_weight, location_lat, location_long,
-        training_location, training_summary, training_agenda, training_success, training_challenges,
-        training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiiddssssssssssi",
-        $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-        $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
-    );
-}
-
-// ✅ Execute statement & error checking
-if (!$stmt->execute()) {
-    die("Database update failed: " . $stmt->error);
-}
 
 
 
