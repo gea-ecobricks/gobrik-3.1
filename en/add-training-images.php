@@ -6,7 +6,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.55';
+$version = '0.56';
 $page = 'add-training-images';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -283,7 +283,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                     $photo_tmb_var = "training_photo{$i}_tmb";
                 ?>
                 <div class="form-item">
-                    <label for="training_photo<?php echo $i; ?>_main" data-lang-id="select-photo-<?php echo $i; ?>"></label><br>
+                    <label for="training_photo<?php echo $i; ?>_main></label><br>
+                    <p data-lang-id="select-photo-<?php echo $i; ?></p>
 
                     <!-- ✅ Show existing image if available -->
                     <?php if (!empty($$photo_main_var)): ?>
