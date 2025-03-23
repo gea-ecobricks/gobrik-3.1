@@ -122,8 +122,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lead_trainer = trim($_POST['lead_trainer'] ?? '');
     $training_date = trim($_POST['training_date'] ?? '');
 
-// Convert from 'Y-m-d\TH:i' (HTML format) to 'Y-m-d H:i:s' (MySQL DATETIME format)
-$training_date = !empty($training_date) ? date("Y-m-d H:i:s", strtotime($training_date)) : null;
+// Ensure training_date is never NULL
+if (!empty($training_date)) {
+    $training_date = date("Y-m-d H:i:s", strtotime($training_date));
+} else {
+    die("Error: Training date is required."); // Debugging: Remove in production
+}
 
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
     $moodle_url = trim($_POST['moodle_url'] ?? '');
@@ -302,8 +306,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <div class="form-item">
     <label for="training_date">Training Date:</label><br>
     <input type="datetime-local" id="training_date" name="training_date"
-        value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : ''; ?>"
-        aria-label="Training Date" required>
+    value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : ''; ?>"
+    aria-label="Training Date" required>
 </div>
 
     <div class="form-item">
