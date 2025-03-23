@@ -269,30 +269,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         <br>
 
-       <!-- PAGE CONTENT -->
-<div id="photos-submission-box" style="display:flex;flex-flow:column;">
 
-    <div class="form-container" id="upload-photo-form">
-
-        <div class="step-graphic" style="width:fit-content;margin:auto;">
-            <img src="../svgs/step2-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 2: Upload images">
-        </div>
-
-        <div class="splash-form-content-block">
-            <div class="splash-box">
-                <div class="splash-heading" data-lang-id="001-form-title">Upload Training Photos</div>
-            </div>
-            <div class="splash-image" data-lang-id="003-splash-image-alt">
-                <img src="../svgs/square-training-photo.svg" style="width:65%" alt="Please take a square photo">
-            </div>
-        </div>
-
-        <p data-lang-id="002-form-description2">
-            Show the world your training! Upload up to six images showing your training session and what you accomplished.
-            <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span>
-        </p>
-
-        <br>
 
         <!-- ✅ FORM STARTS HERE -->
         <form id="photoform" method="post" enctype="multipart/form-data">
