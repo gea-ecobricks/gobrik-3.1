@@ -176,10 +176,10 @@ if ($editing) {
         training_type, briks_made, avg_brik_weight, location_lat, location_long,
         training_location, training_summary, training_agenda, training_success, training_challenges,
         training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiddssssssssisii",
+    $stmt->bind_param("ssisisiiddssssssssisi",
         $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
