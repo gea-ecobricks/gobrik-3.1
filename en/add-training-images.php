@@ -6,7 +6,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.57';
+$version = '0.6';
 $page = 'add-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -297,7 +297,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                     <?php endif; ?>
 
                     <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
-                    <p class="form-caption" data-lang-id="select-photo-<?php echo $i; ?>-instruction"></p>
+                    <p class="form-caption" data-lang-id="select-photo-<?php echo $i; ?>-instruction">Testsdf</p>
 
                 </div>
             <?php endfor; ?>
@@ -308,6 +308,15 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         </form>  <!-- ✅ FORM ENDS HERE -->
 
+
+
+<!-- ✅ BACK LINK -->
+<a href="#" onclick="goBack()"  aria-label="Go back to re-enter data" class="back-link" data-lang-id="015-go-back-link">↩ Back to Step 1</a>
+
+
+
+    </div> <!-- ✅ Closes form-container -->
+</div> <!-- ✅ Closes photos-submission-box -->
 
 <!-- ✅ UPLOAD SUCCESS MESSAGE -->
 <div id="upload-success" class="form-container" style="display:none;">
@@ -323,14 +332,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="hidden" name="action" value="delete_training">
         <a class="confirm-button" style="background:red; cursor:pointer;" id="deleteButton" data-lang-id="014-delete-training">❌ Delete Training</a>
     </form>
-
-
-<!-- ✅ BACK LINK -->
-<a href="#" onclick="goBack()"  aria-label="Go back to re-enter data" class="back-link" data-lang-id="015-go-back-link">↩ Back to Step 1</a>
-
-
-    </div> <!-- ✅ Closes form-container -->
-</div> <!-- ✅ Closes photos-submission-box -->
 
 
 
