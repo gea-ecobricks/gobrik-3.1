@@ -258,6 +258,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
     </div>
 <?php endfor; ?>
 
+   <div data-lang-id="013-submit-upload-button">
+                    <input type="submit" value="⬆️ Upload Photos" id="upload-progress-button" aria-label="Submit photos for upload">
+                </div>
+
 
 
 
