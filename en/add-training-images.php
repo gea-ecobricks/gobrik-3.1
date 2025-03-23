@@ -6,7 +6,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.6';
+$version = '0.61';
 $page = 'add-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -263,7 +263,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         </div>
 
         <p data-lang-id="002-form-description2">
-            Show the world your training! Upload up to six images showing your training session and what you accomplished.
+            Show the world your training! Upload up to seven images showing your training session and what you accomplished.
             <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span>
         </p>
 
