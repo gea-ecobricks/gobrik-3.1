@@ -120,6 +120,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // ✅ Capture form data safely
     $training_title = trim($_POST['training_title'] ?? '');
     $lead_trainer = trim($_POST['lead_trainer'] ?? '');
+    $training_date = trim($_POST['training_date'] ?? '');
+
+// Convert from 'Y-m-d\TH:i' (HTML format) to 'Y-m-d H:i:s' (MySQL DATETIME format)
+$training_date = !empty($training_date) ? date("Y-m-d H:i:s", strtotime($training_date)) : null;
+
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
     $moodle_url = trim($_POST['moodle_url'] ?? '');
     $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
