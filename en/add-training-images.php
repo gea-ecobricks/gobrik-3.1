@@ -244,30 +244,33 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <div class="splash-content-block"></div>
     <div id="splash-bar"></div>
 
-    <!-- PAGE CONTENT -->
-<div id="photos-submission-box" style="display:flex;flex-flow:column;">
 
-    <div class="form-container" id="upload-photo-form">
+  <!-- PAGE CONTENT-->
 
-        <div class="step-graphic" style="width:fit-content;margin:auto;">
-            <img src="../svgs/step2-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 2: Upload images">
-        </div>
-
-        <div class="splash-form-content-block">
-            <div class="splash-box">
-                <div class="splash-heading" data-lang-id="001-form-title">Upload Training Photos</div>
+    <div id="form-submission-box">
+        <div class="form-container">
+            <div class="form-top-header" style="display:flex;flex-flow:row;">
+                <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
+                    <img src="../svgs/step1-log-project.svg" style="height:25px;">
+                </div>
+                <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages"><span data-lang-id="000-language-code">🌐 EN</span></div>
             </div>
-            <div class="splash-image" data-lang-id="003-splash-image-alt">
-                <img src="../svgs/square-training-photo.svg" style="width:65%" alt="Please take a square photo">
+
+            <div class="splash-form-content-block">
+                <div class="splash-box">
+                    <div class="splash-heading" data-lang-id="001-splash-title-upload">Upload Training Photos</div>
+                </div>
+                <div class="splash-image" data-lang-id="003-splash-image-alt">
+                    <img src="../svgs/square-training-photo.svg" style="width:65%" alt="Upload your training photos">
+                </div>
             </div>
-        </div>
 
-        <p data-lang-id="002-form-description2">
-            Show the world your training! Upload up to seven images showing your training session and what you accomplished.
-            <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span>
-        </p>
+            <div class="lead-page-paragraph-upload">
+Show the world your training! Upload up to seven images showing your training session and what you accomplished.
+            <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span>            </div>
 
-        <br>
+    <!-- PART 6 THE FORM -->
+
 
 
 
