@@ -314,8 +314,9 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <div class="form-item">
     <label for="training_date">Training Date:</label><br>
     <input type="datetime-local" id="training_date" name="training_date"
-    value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : ''; ?>"
+    value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
     aria-label="Training Date" required>
+
 </div>
 
     <div class="form-item">
