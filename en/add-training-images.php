@@ -436,23 +436,28 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
 
 
 
+function handleFormResponse(response) {
+    try {
+        console.log("Raw server response:", response); // ✅ Debugging
 
-        // Function to handle form submission response
-        function handleFormResponse(response) {
-            try {
-                var responseData = JSON.parse(response);
-                if (responseData.error) {
-                    showFormModal(responseData.error);
-                    console.log(responseData.error);
-                } else {
-                    // Call the uploadSuccess function with the new structure
-                    uploadSuccess(responseData);
-                }
-            } catch (error) {
-                showFormModal("Error parsing server response: " + response);
-                console.error(error);
-            }
+        // ✅ Attempt to safely parse JSON
+        var responseData = typeof response === "string" ? JSON.parse(response.trim()) : response;
+
+        // ✅ Check if there's an error in the response
+        if (responseData.error) {
+            showFormModal(responseData.error);
+            console.log("Error in response:", responseData.error);
+        } else {
+            console.log("Parsed JSON response:", responseData); // ✅ Debugging
+            uploadSuccess(responseData);
         }
+    } catch (error) {
+        console.error("Error parsing server response:", error, "Raw response:", response);
+        showFormModal("Error parsing server response. Check console for details.");
+    }
+}
+
+
 
         // Updated function to handle upload success with multiple images
         function uploadSuccess(data) {
