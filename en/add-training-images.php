@@ -147,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
     if (!empty($db_fields) && empty($error_message)) {
         // Fetch the briks_made and avg_brik_weight for the current training
         $fetch_sql = "SELECT briks_made, avg_brik_weight FROM tb_trainings WHERE training_id = ?";
-        $fetch_stmt = $conn->prepare($fetch_sql);
+        $fetch_stmt = $gobrik_conn->prepare($fetch_sql);
         $fetch_stmt->bind_param("i", $training_id);
         $fetch_stmt->execute();
         $fetch_stmt->bind_result($briks_made, $avg_brik_weight);
@@ -166,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
         $db_values[] = $training_id;
         $db_types .= "i";
 
-        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt = $gobrik_conn->prepare($update_sql);
         $update_stmt->bind_param($db_types, ...$db_values);
         if (!$update_stmt->execute()) {
             $error_message .= "Database update failed: " . $update_stmt->error;
@@ -306,8 +306,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         </form>  <!-- ✅ FORM ENDS HERE -->
 
-    </div> <!-- ✅ Closes form-container -->
-</div> <!-- ✅ Closes photos-submission-box -->
 
 <!-- ✅ UPLOAD SUCCESS MESSAGE -->
 <div id="upload-success" class="form-container" style="display:none;">
