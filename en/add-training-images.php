@@ -51,8 +51,40 @@ if ($result_languages && $result_languages->num_rows > 0) {
 
 $buwana_conn->close(); // Close the database connection
 
-require_once '../gobrikconn_env.php';
 
+
+//PART 4
+//FEATCH IMAGE URLS
+// ✅ Get training_id from URL
+$training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
+
+// ✅ Fetch image URLs
+$sql_fetch = "SELECT training_title,
+                     training_photo0_main, training_photo0_tmb,
+                     training_photo1_main, training_photo1_tmb,
+                     training_photo2_main, training_photo2_tmb,
+                     training_photo3_main, training_photo3_tmb,
+                     training_photo4_main, training_photo4_tmb,
+                     training_photo5_main, training_photo5_tmb,
+                     training_photo6_main, training_photo6_tmb
+              FROM tb_trainings
+              WHERE training_id = ?";
+
+$stmt_fetch = $gobrik_conn->prepare($sql_fetch);
+$stmt_fetch->bind_param("i", $training_id);
+$stmt_fetch->execute();
+$stmt_fetch->bind_result(
+    $training_title,
+    $training_photo0_main, $training_photo0_tmb,
+    $training_photo1_main, $training_photo1_tmb,
+    $training_photo2_main, $training_photo2_tmb,
+    $training_photo3_main, $training_photo3_tmb,
+    $training_photo4_main, $training_photo4_tmb,
+    $training_photo5_main, $training_photo5_tmb,
+    $training_photo6_main, $training_photo6_tmb
+);
+$stmt_fetch->fetch();
+$stmt_fetch->close();
 
 
 $error_message = '';
@@ -62,12 +94,16 @@ $main_file_sizes = [];
 $thumbnail_file_sizes = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
-    $training_id = $_POST['training_id'];
-    include '../project-photo-functions.php';
+    $training_id = intval($_POST['training_id']);
+    if ($training_id <= 0) {
+        die("Error: Invalid training ID.");
+    }
+
+    include '../scripts/photo-functions.php';
 
     // Handle training deletion
     if (isset($_POST['action']) && $_POST['action'] == 'delete_training') {
-        $deleteResult = deleteTraining($training_id, $conn);
+        $deleteResult = deleteTraining($training_id, $gobrik_conn);
         if ($deleteResult === true) {
             echo "<script>alert('Training has been successfully deleted.'); window.location.href='add-training.php';</script>";
             exit;
@@ -198,68 +234,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
 
             <br>
 
-            <form id="photoform" action="" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="training_id" value="<?php echo $_GET['training_id']; ?>">
+
+            <?php for ($i = 0; $i <= 6; $i++): ?>
+    <?php
+        $photo_main_var = "training_photo{$i}_main";
+        $photo_tmb_var = "training_photo{$i}_tmb";
+    ?>
+    <div class="form-item">
+        <label for="training_photo<?php echo $i; ?>_main">Upload Photo <?php echo $i; ?>:</label><br>
+
+        <!-- ✅ Show existing image if available -->
+        <?php if (!empty($$photo_main_var)): ?>
+            <div class="existing-image">
+                <img src="<?php echo htmlspecialchars($$photo_main_var, ENT_QUOTES, 'UTF-8'); ?>"
+                     alt="Existing Image <?php echo $i; ?>"
+                     style="max-width: 200px; max-height: 200px;">
+                <p>Current Image</p>
+            </div>
+        <?php endif; ?>
+
+        <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
+        <p class="form-caption">Optional: Choose a new image to replace the existing one.</p>
+    </div>
+<?php endfor; ?>
 
 
-                <!-- Photo 0 - the MAIN PHOTO Main & Thumbnail -->
-                <div class="form-item">
-                    <div>
-                        <label for="training_photo0_main" data-lang-id="003-feature-photo">Feature image:</label><br>
-                        <input type="file" id="training_photo0_main" name="training_photo0_main" required>
-                        <p class="form-caption" data-lang-id="004-feature-desc">Please choose a featured photo for this training. Required.</p>
-                    </div>
-                </div>
 
-                <!-- Photo 1 Main & Thumbnail -->
-                <div class="form-item">
-                    <div>
-                        <label for="training_photo1_main" data-lang-id="003-feature-photo">Feature image:</label><br>
-                        <input type="file" id="training_photo1_main" name="training_photo1_main">
-                        <p class="form-caption" data-lang-id="004-feature-desc">Please choose a featured photo for this training.</p>
-                    </div>
-                </div>
-
-                <!-- Photo 2 Main & Thumbnail -->
-                <div class="form-item">
-                    <label for="training_photo2_main" data-lang-id="005-another-photo">Choose another photo:</label><br>
-                    <input type="file" id="training_photo2_main" name="training_photo2_main">
-                    <p class="form-caption" data-lang-id="006-another-photo-optional">Optional</p>
-                </div>
-
-                <!-- Photo 3 Main & Thumbnail -->
-                <div class="form-item">
-                    <label for="training_photo3_main" data-lang-id="007-another-photo">Choose another photo:</label><br>
-                    <input type="file" id="training_photo3_main" name="training_photo3_main">
-                    <p class="form-caption" data-lang-id="008-another-photo-optional">Optional</p>
-                </div>
-
-                <!-- Photo 4 Main & Thumbnail -->
-                <div class="form-item">
-                    <label for="training_photo4_main" data-lang-id="009-another-photo">Choose another photo:</label><br>
-                    <input type="file" id="training_photo4_main" name="training_photo4_main">
-                    <p class="form-caption" data-lang-id="010-another-photo-optional">Optional</p>
-                </div>
-
-                <!-- Photo 5 Main & Thumbnail -->
-                <div class="form-item">
-                    <label for="training_photo5_main" data-lang-id="011-another-photo">Choose another photo:</label><br>
-                    <input type="file" id="training_photo5_main" name="training_photo5_main">
-                    <p class="form-caption" data-lang-id="012-another-photo-optional">Optional</p>
-                </div>
-
-                <!-- Photo 6 Main & Thumbnail -->
-                <div class="form-item">
-                    <label for="training_photo6_main" data-lang-id="011-another-photo">Choose another photo:</label><br>
-                    <input type="file" id="training_photo6_main" name="training_photo6_main">
-                    <p class="form-caption" data-lang-id="012-another-photo-optional">Optional</p>
-                </div>
-
-                <div data-lang-id="013-submit-upload-button">
-                    <input type="submit" value="⬆️ Upload Photos" id="upload-progress-button" aria-label="Submit photos for upload">
-                </div>
-            </form>
-        </div>
 
         <div id="upload-success" class="form-container" style="display:none;">
             <div class="step-graphic" style="width:fit-content;margin:auto;">
