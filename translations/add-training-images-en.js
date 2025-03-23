@@ -26,7 +26,15 @@ const en_Page_Translations = {
     "013-view-project-post": "🎉 View Training Post",
     "014-edit-project": "Edit Training Post",
     "014-delete-project": "❌ Delete Training",
-    "015-go-back-link": "↩ Back to Step 1"
+    "015-go-back-link": "↩ Back to Step 1",
+
+    "select-photo-1": "Select the lead photo for your training report",
+    "select-photo-1-instruction": "This photo will be used to feature your report.",
+    "select-photo-2": "Select a second main photo",
+    "select-photo-2-instruction": "This photo will be used in your report.",
+    "select-photo-3": "Select a third photo",
+    "select-photo-3-instruction": "(optional) This photo will be used in your report.",
+
 
 };
 
