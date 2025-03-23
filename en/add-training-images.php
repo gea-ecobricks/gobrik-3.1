@@ -6,8 +6,8 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.57';
-$page = 'add-training-images';
+$version = '0.54';
+$page = 'add-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 ob_start(); // Prevent output before headers
@@ -283,8 +283,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                     $photo_tmb_var = "training_photo{$i}_tmb";
                 ?>
                 <div class="form-item">
-
-                    <p data-lang-id="select-photo-<?php echo $i; ?></p>
+                    <label for="training_photo<?php echo $i; ?>_main">Upload Photo <?php echo $i; ?>:</label><br>
 
                     <!-- ✅ Show existing image if available -->
                     <?php if (!empty($$photo_main_var)): ?>
@@ -294,10 +293,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                                  style="max-width: 200px; max-height: 200px;">
                             <p>Current Image</p>
                         </div>
+                     <p class="form-caption" data-lang-id="select-photo-<?php echo $i; ?>-instruction"></p>
                     <?php endif; ?>
 
                     <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
-                    <p class="form-caption" data-lang-id="select-photo-<?php echo $i; ?>-instruction></p>
+                    <p class="form-caption">Optional: Choose a new image to replace the existing one.</p>
                 </div>
             <?php endfor; ?>
 
