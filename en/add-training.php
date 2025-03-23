@@ -160,7 +160,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             WHERE training_id=?";
 
         $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("ssisisiiisssssssssssi",
+        $stmt->bind_param("ssisisiiddssssssssisi",
             $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
             $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location, $training_summary,
             $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
@@ -176,7 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("ssisisiiisssssssssssi",
+        $stmt->bind_param("ssisisiiddssssssssisi",
             $training_title, $lead_trainer, $country_id, $training_date, $no_participants, $training_type,
             $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location, $training_summary,
             $training_agenda, $training_success, $training_challenges, $training_lessons_learned,
