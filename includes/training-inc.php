@@ -5,7 +5,6 @@
 <link rel="preload" as="image" href="../svgs/brik-market-banner3.svg">
 <link rel="preload" as="image" href="../svgs/shanti.svg">
 
-<?php require_once ("../meta/training-$lang.php");?>
 
 
 <STYLE>

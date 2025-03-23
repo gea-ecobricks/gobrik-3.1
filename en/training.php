@@ -1,29 +1,60 @@
+
+<!--PART 4 GENERATE META TAGS-->
+
 <!DOCTYPE html>
-<HTML lang="en"> 
+<HTML lang="en">
 <HEAD>
-<META charset="UTF-8">
-<?php $lang='en';
-error_reporting(E_ALL);
-ini_set('display_errors', 1);?>
-<?php $version='2.13';?>
-<?php $page='training-details';?>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
-
-<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <META charset="UTF-8">
 
 
-<?php 
-require_once ("../includes/training-inc.php");
-include '../gobrikconn_env.php';
+<title><?php echo !empty($training_title) ? $training_title : 'Log your Training Report'; ?></title>
+<meta name="keywords" content="GEA Registration, Community, Event, Webinar, Course">
+<meta name="description" content="<?php echo !empty($training_type) && !empty($lead_trainer) && !empty($training_date)
+    ? "Log the $training_type led by $lead_trainer on $training_date on the GEA reporting system. Reports will be shared on the front page of Ecobricks.org."
+    : "Log your GEA workshop. Reports will be featured on the front page of Ecobricks.org and shareable on social media."; ?>">
 
-$conn->set_charset("utf8mb4");
+<!-- Facebook Open Graph Tags for social sharing -->
+<meta property="og:url" content="https://www.gobrik.com/<?php echo $lang; ?>/add-report.php">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<?php echo !empty($training_title) ? $training_title : 'Log your Training Report'; ?>">
+<meta property="og:description" content="<?php echo !empty($training_type) && !empty($lead_trainer) && !empty($training_date)
+    ? "Log the $training_type led by $lead_trainer on $training_date on the GEA reporting system. Reports will be shared on the front page of Ecobricks.org."
+    : "Log your GEA workshop. Reports will be featured on the front page of Ecobricks.org and shareable on social media."; ?>">
 
+<!-- Default image in case no feature image is available -->
+<?php
+$og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobrik.com/svgs/shanti.svg";
+?>
+<meta property="og:image" content="<?php echo $og_image; ?>">
+<meta property="fb:app_id" content="1781710898523821">
+<meta property="og:image:width" content="1000">
+<meta property="og:image:height" content="1000">
+<meta property="og:image:alt" content="<?php echo !empty($training_title) ? $training_title : 'GEA Trainer in action'; ?>">
+<meta property="og:locale" content="en_GB">
+
+<meta property="article:modified_time" content="<?php echo date("c"); ?>">
+
+<meta name="author" content="GoBrik.com">
+<meta property="og:type" content="page">
+<meta property="og:site_name" content="GoBrik.com">
+<meta property="article:publisher" content="https://web.facebook.com/ecobricks.org">
+<meta property="og:image:type" content="image/png">
+<meta name="author" content="GoBrik.com">
+
+<!--PART 5 TOP DECORATION-->
+    <?php require_once ("../includes/training-inc.php");?>
+
+    <div class="splash-content-block"></div>
+    <div id="splash-bar"></div>
+
+
+<?php
+require_once '../gobrikconn_env.php';
 
 $trainingId = $_GET['training_id'];
 
 $sql = "SELECT * FROM tb_trainings WHERE training_id = ?";
-$stmt = $conn->prepare($sql);
+$stmt = $gobrik_conn->prepare($sql);
 $stmt->bind_param("i", $trainingId);
 $stmt->execute();
 $result = $stmt->get_result();
