@@ -251,7 +251,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <div class="form-container">
             <div class="form-top-header" style="display:flex;flex-flow:row;">
                 <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
-                    <img src="../svgs/step1-log-project.svg" style="height:25px;">
+                    <img src="../svgs/step2-log-project.svg" style="height:25px;">
                 </div>
                 <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages"><span data-lang-id="000-language-code">🌐 EN</span></div>
             </div>
@@ -266,7 +266,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </div>
 
             <div class="lead-page-paragraph-upload">
-<p data-lang-id="004-form-description-upload"> Show the world your training! Upload up to seven images showing your training session and what you accomplished.
+<p data-lang-id="004-form-description-upload" style="text-align: center; padding:20px;"> Show the world your training! Upload up to seven images showing your training session and what you accomplished.
             <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span> </p>           </div>
 
     <!-- PART 6 THE FORM -->
@@ -313,7 +313,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <a href="#" onclick="goBack()"  aria-label="Go back to re-enter data" class="back-link" data-lang-id="015-go-back-link">↩ Back to Step 1</a>
 
 
-
+</div>
 </div> <!-- ✅ Closes photos-submission-box -->
 
 <!-- ✅ UPLOAD SUCCESS MESSAGE -->
@@ -336,6 +336,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <br><br>
 
     </div>
+</div>
 
     <!--FOOTER STARTS HERE-->
     <?php require_once ("../footer-2024.php");?>
