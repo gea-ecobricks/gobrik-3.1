@@ -266,15 +266,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </div>
 
             <div class="lead-page-paragraph-upload">
-Show the world your training! Upload up to seven images showing your training session and what you accomplished.
-            <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span>            </div>
+<p data-lang-id="004-form-description-upload"> Show the world your training! Upload up to seven images showing your training session and what you accomplished.
+            <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span> </p>           </div>
 
     <!-- PART 6 THE FORM -->
 
-
-
-
-        <!-- ✅ FORM STARTS HERE -->
         <form id="photoform" method="post" enctype="multipart/form-data">
 
             <!-- ✅ Hidden field for training_id -->
@@ -318,7 +314,6 @@ Show the world your training! Upload up to seven images showing your training se
 
 
 
-    </div> <!-- ✅ Closes form-container -->
 </div> <!-- ✅ Closes photos-submission-box -->
 
 <!-- ✅ UPLOAD SUCCESS MESSAGE -->
