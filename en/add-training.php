@@ -401,11 +401,13 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
 </div>
 
-
-    <div class="form-item">
+<div class="form-item">
     <label for="country_id">Country:</label><br>
     <select id="country_id" name="country_id" required class="form-field-style">
-        <option value="" disabled>Select a country...</option>
+        <!-- ✅ Ensures placeholder is selected when no country is set -->
+        <option value="" disabled <?php echo empty($country_id) ? 'selected' : ''; ?>>
+            Select a country...
+        </option>
 
         <?php foreach ($countries as $country): ?>
             <option value="<?php echo htmlspecialchars($country['country_id'], ENT_QUOTES, 'UTF-8'); ?>"
@@ -414,8 +416,12 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </option>
         <?php endforeach; ?>
     </select>
-<p class="form-caption" data-lang-id="012-training-trainers">Where was this training run?  If it was an online training, select the country of the lead trainer.</p>
+
+    <p class="form-caption" data-lang-id="012-training-trainers">
+        Where was this training run? If it was an online training, select the country of the lead trainer.
+    </p>
 </div>
+
 
 
 <div class="form-item">
