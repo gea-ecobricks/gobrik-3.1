@@ -540,9 +540,18 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     var trainingDate = document.getElementById('training_date').value.trim();
     displayError('date-error-required', trainingDate === '');
 
-    // 🔹 3. Number of Participants (1 - 5000)
+    // 🔹 3. Number of Participants (Required, 1 - 5000)
     var noParticipants = parseInt(document.getElementById('no_participants').value, 10);
-    displayError('participants-error-required', isNaN(noParticipants) || noParticipants < 1 || noParticipants > 5000);
+    if (isNaN(noParticipants) || noParticipants === '') {
+        displayError('participants-error-required', true);
+        displayError('participants-error-range', false);
+    } else if (noParticipants < 1 || noParticipants > 5000) {
+        displayError('participants-error-required', false);
+        displayError('participants-error-range', true);
+    } else {
+        displayError('participants-error-required', false);
+        displayError('participants-error-range', false);
+    }
 
     // 🔹 4. Lead Trainer (Required)
     var leadTrainer = document.getElementById('lead_trainer').value.trim();
