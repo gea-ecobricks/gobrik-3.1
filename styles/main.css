@@ -2107,9 +2107,9 @@ input[type="date"] {
 
 input[type="text"], input[type="name"], input[type="credential"],  input[type="password"], input[type="number"], input[type="email"], input[type="date"] {
   width: 100%;
-  padding: 8px 10px;
+  padding: 9px 11px;
   margin: 4px 0;
-  font-size: 20px;
+  font-size: 20px !important;
   box-sizing: border-box;
   border: 3px solid var(--button-2-1);
   border-radius: 5px;
