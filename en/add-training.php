@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.6';
+$version = '0.61';
 $page = 'add-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -316,12 +316,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </div>
 
 
-
-
-
-
-
-//data lang it
     <div class="form-item">
     <label for="training_date" datal-lang-id="006-title-date">Training Date:</label><br>
     <input type="datetime-local" id="training_date" name="training_date"
