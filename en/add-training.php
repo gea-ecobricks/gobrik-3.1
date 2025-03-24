@@ -475,8 +475,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                 </div>
 
 
-    <div class="form-item" data-lang-id="018-title-successes">
-        <label for="training_success">Training Successes:</label><br>
+    <div class="form-item">
+        <label for="training_success" data-lang-id="018-title-successes">Training Successes:</label><br>
         <textarea id="training_success" name="training_success" required><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
       <p class="form-caption" data-lang-id="018-training-success">Share the successes of the training. Max 500 words. Avoid special characters..</p>
    <!--ERRORS-->
