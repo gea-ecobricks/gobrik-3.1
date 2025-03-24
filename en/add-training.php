@@ -291,15 +291,15 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
             <div class="splash-form-content-block">
                 <div class="splash-box">
-                    <div class="splash-heading" data-lang-id="001-splash-title">Post a GEA Training</div>
+                    <div class="splash-heading" data-lang-id="001-splash-title-post">Post a GEA Training Report</div>
                 </div>
                 <div class="splash-image" data-lang-id="003-splash-image-alt">
-                    <img src="../svgs/shanti.svg" style="width:65%" alt="There are many ways to conduct training with ecobricks">
+                    <img src="../svgs/shanti.svg" style="width:65%" alt="GEA trainer in action: File a GEA training report">
                 </div>
             </div>
 
             <div class="lead-page-paragraph">
-                <p data-lang-id="004-form-description">Is your workshop complete?  Share your social success with the world! Use this form to file and post your completed event or training report. Trainings will be featured on our main page and archived in our trainings database.</p>
+                <p data-lang-id="004-form-description-post">Is your workshop, event or training complete?  Share your social success with the world! Use this form to file and post your completed event or training report. Trainings will be featured on our main page and archived in our trainings database.</p>
             </div>
 
     <!-- PART 6 THE FORM -->
@@ -311,6 +311,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             value="<?php echo htmlspecialchars($training_title ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Training Title" required>
              <p class="form-caption" data-lang-id="012-training-title">Give your training a title.  This will be how your report is featured.</p>
+             <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
     </div>
 
     <div class="form-item">
@@ -319,6 +320,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
     aria-label="Training Date" required>
     <p class="form-caption" data-lang-id="012-training-date">On what date and time did this training run?</p>
+    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
 
 </div>
 
@@ -327,6 +329,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="number" id="no_participants" name="no_participants" min="1" max="5000" required
             value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             <p class="form-caption" data-lang-id="012-training-count">How many people particiapted (including trainers)?</p>
+            <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
     </div>
 
     <div class="form-item">
@@ -335,6 +338,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             value="<?php echo htmlspecialchars($lead_trainer ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Lead Trainer" required>
             <p class="form-caption" data-lang-id="012-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
+            <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
     </div>
 
 
@@ -357,6 +361,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             Don't see your community? Add it.
         </a>
     </p>
+<div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
 </div>
 
 
@@ -374,6 +379,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <?php endforeach; ?>
     </select>
    <p class="form-caption" data-lang-id="012-training-trainers">Please categorize this training.</p>
+   <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
 
 </div>
 
@@ -383,6 +389,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <input type="number" id="briks_made" name="briks_made" min="0" max="5000" required
         value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
     <p class="form-caption" data-lang-id="012-training-trainers">No ecobricks made in this training? Just set at "0" then.</p>
+    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
 
 </div>
 
@@ -391,6 +398,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" required
         value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
         <p class="form-caption" data-lang-id="012-training-trainers">No ecobricks made in this training? Just set at "0" then.</p>
+        <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
 </div>
 
 

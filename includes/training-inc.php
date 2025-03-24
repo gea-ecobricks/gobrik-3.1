@@ -9,7 +9,9 @@
 
 <STYLE>
 
-
+.form-item input {
+  background: var(--input-background);
+  font-size: 1.3em;
 
 
 .featured-content-gallery {
