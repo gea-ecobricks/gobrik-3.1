@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.59';
+$version = '0.6';
 $page = 'add-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -247,7 +247,8 @@ if ($editing) {
 <!-- Facebook Open Graph Tags for social sharing -->
 <meta property="og:url" content="https://www.gobrik.com/<?php echo $lang; ?>/add-report.php">
 <meta property="og:type" content="website">
-<meta property="og:title" content="<?php echo !empty($training_title) ? 'Log:' $training_title : 'Log your Training Report'; ?>">
+<meta property="og:title" content="<meta property="og:title" content="<?php echo !empty($training_title) ? 'Log: ' . $training_title : 'Log your Training Report'; ?>">
+">
 <meta property="og:description" content="<?php echo !empty($training_type) && !empty($lead_trainer) && !empty($training_date)
     ? "Log the $training_type led by $lead_trainer on $training_date on the GEA reporting system. Reports will be shared on the front page of Ecobricks.org."
     : "Log your GEA workshop. Reports will be featured on the front page of Ecobricks.org and shareable on social media."; ?>">
@@ -286,7 +287,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                 <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
                     <img src="../svgs/step1-log-project.svg" style="height:25px;">
                 </div>
-                <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages"><span data-lang-id="000-language-code">🌐 EN</span></div>
+                <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages">🌐<span data-lang-id="000-language-code"> EN</span></div>
             </div>
 
             <div class="splash-form-content-block">
@@ -306,21 +307,28 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <form id="submit-form" method="post" action="" enctype="multipart/form-data" novalidate>
 
     <div class="form-item" style="margin-top: 25px;">
-        <label for="training_title">Training Title:</label><br>
+        <label for="training_title" data-lang-id="005-title-title">Training Title:</label><br>
         <input type="text" id="training_title" name="training_title"
             value="<?php echo htmlspecialchars($training_title ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Training Title" required>
-             <p class="form-caption" data-lang-id="012-training-title">Give your training a title.  This will be how your report is featured.</p>
-             <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
+             <p class="form-caption" data-lang-id="005-training-give-title">Give your training a title.  This will be how your report is featured.</p>
+             <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
     </div>
 
+
+
+
+
+
+
+//data lang it
     <div class="form-item">
-    <label for="training_date">Training Date:</label><br>
+    <label for="training_date" datal-lang-id="006-title-date">Training Date:</label><br>
     <input type="datetime-local" id="training_date" name="training_date"
     value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
     aria-label="Training Date" required class="form-field-style">
-    <p class="form-caption" data-lang-id="012-training-date">On what date and time did this training run?</p>
-    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
+    <p class="form-caption" data-lang-id="006-training-date">On what date and time did this training run?</p>
+    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 
 </div>
 
@@ -328,8 +336,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <label for="no_participants">Number of Participants:</label><br>
         <input type="number" id="no_participants" name="no_participants" min="1" max="5000" required
             value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-            <p class="form-caption" data-lang-id="012-training-count">How many people particiapted (including trainers)?</p>
-            <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
+            <p class="form-caption" data-lang-id="007-training-count">How many people particiapted (including trainers)?</p>
+            <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
     </div>
 
     <div class="form-item">
@@ -338,7 +346,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             value="<?php echo htmlspecialchars($lead_trainer ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Lead Trainer" required>
             <p class="form-caption" data-lang-id="012-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
-            <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
+            <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
     </div>
 
 
@@ -361,7 +369,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             Don't see your community? Add it.
         </a>
     </p>
-<div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
+<div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 </div>
 
 
@@ -379,7 +387,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <?php endforeach; ?>
     </select>
    <p class="form-caption" data-lang-id="012-training-trainers">Please categorize this training.</p>
-   <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
+   <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 
 </div>
 
@@ -389,7 +397,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <input type="number" id="briks_made" name="briks_made" min="0" max="5000" required
         value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
     <p class="form-caption" data-lang-id="012-training-trainers">No ecobricks made in this training? Just set at "0" then.</p>
-    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
+    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 
 </div>
 
@@ -398,7 +406,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" required
         value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
         <p class="form-caption" data-lang-id="012-training-trainers">No ecobricks made in this training? Just set at "0" then.</p>
-        <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
+        <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 </div>
 
 <div class="form-item">
