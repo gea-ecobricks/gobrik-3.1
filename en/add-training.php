@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.62';
+$version = '0.63';
 $page = 'add-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -612,7 +612,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-
 document.getElementById('submit-form').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent form submission until validation passes
     var isValid = true;
@@ -630,63 +629,67 @@ document.getElementById('submit-form').addEventListener('submit', function(event
         return invalidChars.test(value);
     }
 
-    // 1. Training Title
+    // 🔹 1. Training Title (Required & Max 50 chars)
     var trainingTitle = document.getElementById('training_title').value.trim();
     displayError('title-error-required', trainingTitle === '');
     displayError('title-error-long', trainingTitle.length > 50);
     displayError('title-error-invalid', hasInvalidChars(trainingTitle));
 
-    // 2. Training Date
+    // 🔹 2. Training Date (Required)
     var trainingDate = document.getElementById('training_date').value.trim();
     displayError('date-error-required', trainingDate === '');
 
-    // 3. Number of Participants
+    // 🔹 3. Number of Participants (1 - 5000)
     var noParticipants = parseInt(document.getElementById('no_participants').value, 10);
-    displayError('participants-error-range', isNaN(noParticipants) || noParticipants < 1 || noParticipants > 5000);
+    displayError('participants-error-required', isNaN(noParticipants) || noParticipants < 1 || noParticipants > 5000);
 
-    // 4. Lead Trainer
+    // 🔹 4. Lead Trainer (Required)
     var leadTrainer = document.getElementById('lead_trainer').value.trim();
     displayError('trainer-error-required', leadTrainer === '');
 
-    // 5. Training Type (Fix)
+    // 🔹 5. Training Type (Required)
     var trainingType = document.getElementById('training_type').value;
-    displayError('type-error-required', trainingType === "" || trainingType === "disabled");
+    displayError('type-error-required', trainingType === "");
 
-    // 6. Bricks Made
+    // 🔹 6. Briks Made (Must be 0+)
     var briksMade = parseInt(document.getElementById('briks_made').value, 10);
-    displayError('briks-error-range', isNaN(briksMade) || briksMade < 1 || briksMade > 5000);
+    displayError('briks-error-required', isNaN(briksMade) || briksMade < 0 || briksMade > 5000);
 
-    // 7. Average Weight
-    var estimatedWeight = parseInt(document.getElementById('avg_brik_weight').value, 10);
-    displayError('weight-error-range', isNaN(estimatedWeight) || estimatedWeight < 100 || estimatedWeight > 2000);
+    // 🔹 7. Average Brik Weight (Must be 0+)
+    var avgBrikWeight = parseInt(document.getElementById('avg_brik_weight').value, 10);
+    displayError('weight-error-required', isNaN(avgBrikWeight) || avgBrikWeight < 0 || avgBrikWeight > 2000);
 
-    // 8. Training Country
+    // 🔹 8. Training Country (Required)
     var trainingCountry = document.getElementById('country_id').value.trim();
     displayError('country-error-required', trainingCountry === '');
 
-    // 9. Training Summary (Fix)
+    // 🔹 9. Training Summary (Max 2000 chars)
     var trainingSummary = document.getElementById('training_summary').value.trim();
+    displayError('summary-error-required', trainingSummary === '');
     displayError('summary-error-long', trainingSummary.length > 2000);
     displayError('summary-error-invalid', hasInvalidChars(trainingSummary));
 
-    // 10. Training Agenda
-    var trainingAgenda = document.getElementById('training_agenda').value.trim();
-    displayError('agenda-error-long', trainingAgenda.length > 2000);
-
-    // 11. Training Success
+    // 🔹 10. Training Success (Max 2000 chars)
     var trainingSuccess = document.getElementById('training_success').value.trim();
+    displayError('success-error-required', trainingSuccess === '');
     displayError('success-error-long', trainingSuccess.length > 2000);
     displayError('success-error-invalid', hasInvalidChars(trainingSuccess));
 
-    // 12. Training Challenges
+    // 🔹 11. Training Challenges (Max 2000 chars)
     var trainingChallenges = document.getElementById('training_challenges').value.trim();
+    displayError('challenges-error-required', trainingChallenges === '');
     displayError('challenges-error-long', trainingChallenges.length > 2000);
     displayError('challenges-error-invalid', hasInvalidChars(trainingChallenges));
 
-    // 13. Lessons Learned
-    var trainingLessonsLearned = document.getElementById('training_lessons_learned').value.trim();
-    displayError('lessons-error-long', trainingLessonsLearned.length > 2000);
-    displayError('lessons-error-invalid', hasInvalidChars(trainingLessonsLearned));
+    // 🔹 12. Lessons Learned (Max 2000 chars)
+    var trainingLessons = document.getElementById('training_lessons_learned').value.trim();
+    displayError('lessons-error-required', trainingLessons === '');
+    displayError('lessons-error-long', trainingLessons.length > 2000);
+    displayError('lessons-error-invalid', hasInvalidChars(trainingLessons));
+
+    // 🔹 13. Training Location (Required)
+    var trainingLocation = document.getElementById('training_location').value.trim();
+    displayError('location-error-required', trainingLocation === '');
 
     // ✅ Scroll to First Error
     if (!isValid) {
@@ -700,6 +703,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
         this.submit(); // ✅ If valid, submit the form
     }
 });
+
 
 
 
