@@ -21,7 +21,7 @@
   border-radius: 5px;
   background-color: var(--top-header);
   color: var(--h1);
-   border: 1.6px solid var(--button-2-1) !important;
+   border: 1px solid var(--button-2-1) !important;
 }
 
 

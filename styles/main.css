@@ -2107,7 +2107,7 @@ input[type="date"] {
 
 input[type="text"], input[type="name"], input[type="credential"],  input[type="password"], input[type="number"], input[type="email"], input[type="date"], input[type="url"] {
   width: 100%;
-  padding: 9px 11px;
+  padding: 10px 11px;
   margin: 4px 0;
   font-size: 20px !important;
   box-sizing: border-box;
@@ -2115,7 +2115,7 @@ input[type="text"], input[type="name"], input[type="credential"],  input[type="p
   border-radius: 5px;
   background-color: var(--top-header);
   color: var(--h1);
-   border: 1.6px solid var(--button-2-1) !important;
+   border: 1.5px solid var(--button-2-1);
 }
 
 select {
