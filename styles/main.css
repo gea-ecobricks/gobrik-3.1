@@ -2131,7 +2131,11 @@ select {
   border-radius: 5px;
   background-color: var(--top-header);
    border: 2px solid var(--button-2-1);
-   color: grey !important;
+   color: var(--h1);
+}
+
+select option:disabled {
+    color: grey;
 }
 
 
