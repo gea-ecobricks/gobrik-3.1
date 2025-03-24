@@ -55,9 +55,28 @@ $buwana_conn->close(); // Close the database connection
 
 //PART 4
 //FEATCH IMAGE URLS
-// ✅ Get training_id from URL
+require_once '../gobrikconn_env.php'; // Ensure DB connection is established
+
+// ✅ Get training_id from URL if available
 $training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
 
+// ✅ If no training_id is found, fetch the latest (highest) ID from the database
+if ($training_id === 0) {
+    $sql = "SELECT MAX(training_id) AS latest_training_id FROM tb_trainings";
+    $stmt = $gobrik_conn->prepare($sql);
+    $stmt->execute();
+    $stmt->bind_result($latest_training_id);
+    $stmt->fetch();
+    $stmt->close();
+
+    // ✅ Set training_id to the latest one found
+    $training_id = $latest_training_id ?? 0; // Fallback to 0 if no records exist
+}
+
+// ✅ If no valid training_id is found, redirect to avoid errors
+if ($training_id === 0) {
+    die("Error: No valid training record found. Please go back and submit the form again.");
+}
 // ✅ Fetch image URLs
 $sql_fetch = "SELECT training_title,
                      training_photo0_main, training_photo0_tmb,

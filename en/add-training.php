@@ -51,11 +51,11 @@ $buwana_conn->close(); // Close the database connection
 
 require_once '../gobrikconn_env.php';
 
-// ✅ Get `training_id` from URL (for editing existing report)
+// ✅ Get training_id from URL (for editing)
 $training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
 $editing = ($training_id > 0);
 
-// ✅ Fetch existing training details if editing
+// ✅ If editing, fetch existing training details
 if ($editing) {
     $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
                   training_type, briks_made, avg_brik_weight, location_lat, location_long, training_location,
@@ -74,67 +74,49 @@ if ($editing) {
     $stmt_fetch->close();
 }
 
-// Fetch unique training types from the database
+// ✅ Fetch Unique Training Types
 $training_types = [];
-$query = "SELECT DISTINCT training_type FROM tb_trainings ORDER BY training_type ASC";
-$result = $gobrik_conn->query($query);
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $training_types[] = $row['training_type'];
-    }
-}
-
-// Fetch list of countries
-$countries = [];
-$query = "SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC";
-$result = $gobrik_conn->query($query);
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $countries[] = $row;
-    }
-}
-
-$community_name = ''; // Default empty
-if (!empty($community_id)) {
-    $sql_get_community = "SELECT com_name FROM communities_tb WHERE com_id = ?";
-    $stmt_get_community = $gobrik_conn->prepare($sql_get_community);
-    $stmt_get_community->bind_param("i", $community_id);
-    $stmt_get_community->execute();
-    $stmt_get_community->bind_result($community_name);
-    $stmt_get_community->fetch();
-    $stmt_get_community->close();
-}
-
-
-// Fetch list of communities
-$communities = [];
-$sql = "SELECT com_id, com_name FROM communities_tb ORDER BY com_name ASC";
-$result = $gobrik_conn->query($sql);
+$result = $gobrik_conn->query("SELECT DISTINCT training_type FROM tb_trainings ORDER BY training_type ASC");
 while ($row = $result->fetch_assoc()) {
-    $communities[] = $row;
+    $training_types[] = $row['training_type'];
 }
-// ✅ If form is submitted, insert/update the training report
+
+// ✅ Fetch List of Countries
+$countries = [];
+$result = $gobrik_conn->query("SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC");
+while ($row = $result->fetch_assoc()) {
+    $countries[] = $row;
+}
+
+// ✅ Fetch Community Name if Exists
+$community_name = '';
+if (!empty($community_id)) {
+    $stmt = $gobrik_conn->prepare("SELECT com_name FROM communities_tb WHERE com_id = ?");
+    $stmt->bind_param("i", $community_id);
+    $stmt->execute();
+    $stmt->bind_result($community_name);
+    $stmt->fetch();
+    $stmt->close();
+}
+
+// ✅ Process Form Submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include '../scripts/photo-functions.php';
 
-    // ✅ Capture form data safely
+    // ✅ Capture & Validate Form Data
     $training_title = trim($_POST['training_title'] ?? '');
     $lead_trainer = trim($_POST['lead_trainer'] ?? '');
     $training_date = trim($_POST['training_date'] ?? '');
 
-// Ensure training_date is not empty
-if (!empty($training_date)) {
-    // If only a date (YYYY-MM-DD) is provided, append default time "12:00"
-    if (strlen($training_date) == 10) { // Example: "2025-03-11"
-        $training_date .= "T12:00"; // Append default time
+    // ✅ Ensure valid `training_date`
+    if (!empty($training_date)) {
+        if (strlen($training_date) == 10) { // Only date (YYYY-MM-DD) provided
+            $training_date .= "T12:00"; // Append default time
+        }
+        $training_date = date("Y-m-d H:i:s", strtotime($training_date));
+    } else {
+        die("Error: Training date is required.");
     }
-
-    // Convert to MySQL DATETIME format
-    $training_date = date("Y-m-d H:i:s", strtotime($training_date));
-} else {
-    die("Error: Training date is required."); // Debugging - Remove in production
-}
-
 
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
     $moodle_url = trim($_POST['moodle_url'] ?? '');
@@ -146,85 +128,66 @@ if (!empty($training_date)) {
     $training_challenges = trim($_POST['training_challenges'] ?? '');
     $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
     $training_location = trim($_POST['training_location'] ?? '');
-
-    // ✅ Convert datetime-local format
-    $training_date = !empty($_POST['training_date']) ? date("Y-m-d H:i:s", strtotime($_POST['training_date'])) : null;
-
-    // ✅ Convert numeric fields safely
-    $no_participants = isset($_POST['no_participants']) && is_numeric($_POST['no_participants']) ? (int) $_POST['no_participants'] : 0;
-    $briks_made = isset($_POST['briks_made']) && is_numeric($_POST['briks_made']) ? (int) $_POST['briks_made'] : null;
-    $avg_brik_weight = isset($_POST['avg_brik_weight']) && is_numeric($_POST['avg_brik_weight']) ? (int) $_POST['avg_brik_weight'] : null;
-    $country_id = isset($_POST['country_id']) && is_numeric($_POST['country_id']) ? (int) $_POST['country_id'] : null;
     $training_type = trim($_POST['training_type'] ?? '');
 
-    // ✅ Validate `community_id`
-    $community_id = isset($_POST['community_id']) && is_numeric($_POST['community_id']) ? (int)$_POST['community_id'] : null;
+    // ✅ Convert Numeric Fields
+    $no_participants = filter_var($_POST['no_participants'], FILTER_VALIDATE_INT) ?? 0;
+    $briks_made = filter_var($_POST['briks_made'], FILTER_VALIDATE_INT) ?? 0;
+    $avg_brik_weight = filter_var($_POST['avg_brik_weight'], FILTER_VALIDATE_INT) ?? 0;
+    $country_id = filter_var($_POST['country_id'], FILTER_VALIDATE_INT) ?? null;
+    $community_id = filter_var($_POST['community_id'], FILTER_VALIDATE_INT) ?? null;
+
+    // ✅ Validate Community ID
     if ($community_id !== null) {
-        $stmt_check_community = $gobrik_conn->prepare("SELECT com_id FROM communities_tb WHERE com_id = ?");
-        $stmt_check_community->bind_param("i", $community_id);
-        $stmt_check_community->execute();
-        $stmt_check_community->store_result();
-        if ($stmt_check_community->num_rows === 0) {
+        $stmt = $gobrik_conn->prepare("SELECT com_id FROM communities_tb WHERE com_id = ?");
+        $stmt->bind_param("i", $community_id);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows === 0) {
             $community_id = null;
         }
-        $stmt_check_community->close();
+        $stmt->close();
     }
 
+    if ($editing) {
+        // ✅ UPDATE existing training report
+        $sql = "UPDATE tb_trainings SET
+            training_title=?, lead_trainer=?, country_id=?, training_date=?,
+            no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
+            location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?,
+            training_success=?, training_challenges=?, training_lessons_learned=?,
+            youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
+            WHERE training_id=?";
 
-if ($editing) {
-    // ✅ UPDATE existing training report
-    $sql = "UPDATE tb_trainings SET
-        training_title=?, lead_trainer=?, country_id=?, training_date=?,
-        no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
-        location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?,
-        training_success=?, training_challenges=?, training_lessons_learned=?,
-        youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
-        WHERE training_id=?";
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("ssisisiiddssssssssisii",
+            $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
+            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
+            $training_summary, $training_agenda, $training_success, $training_challenges,
+            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
+            $featured_description, $community_id, $training_id
+        );
+    } else {
+        // ✅ INSERT new training report
+        $sql = "INSERT INTO tb_trainings
+            (training_title, lead_trainer, country_id, training_date, no_participants,
+            training_type, briks_made, avg_brik_weight, location_lat, location_long,
+            training_location, training_summary, training_agenda, training_success, training_challenges,
+            training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiddssssssssisii",
-        $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-        $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-        $featured_description, $community_id, $training_id
-    );
-} else {
-    // ✅ INSERT new training report
-    $sql = "INSERT INTO tb_trainings
-        (training_title, lead_trainer, country_id, training_date, no_participants,
-        training_type, briks_made, avg_brik_weight, location_lat, location_long,
-        training_location, training_summary, training_agenda, training_success, training_challenges,
-        training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiddssssssssisi",
-        $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-        $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
-    );
-}
-
-    // ✅ Execute statement & check for errors
-    if (!$stmt->execute()) {
-        die("Database update failed: " . $stmt->error);
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param("ssisisiiddssssssssisi",
+            $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
+            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
+            $training_summary, $training_agenda, $training_success, $training_challenges,
+            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
+        );
     }
-
-
-
-
-
-
 
     $stmt->execute();
-    $stmt->close();
-
-    header("Location: add-training-images.php?training_id=" . $training_id);
-    exit();
+    echo json_encode(['success' => true, 'training_id' => $gobrik_conn->insert_id]);
+    exit;
 }
-
 ?>
 
 
@@ -750,26 +713,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
             if (relatedInput) relatedInput.focus();
         }
     } else {
-        if (!isValid) {
-            var firstError = document.querySelector('.form-field-error:not([style*="display: none"])');
-            if (firstError) {
-                firstError.scrollIntoView({behavior: "smooth", block: "center"});
-                var relatedInput = firstError.closest('.form-item').querySelector('input, select, textarea');
-                if (relatedInput) relatedInput.focus();
-            }
-        } else {
-            // ✅ Get training_id from the form
-            var trainingId = document.querySelector('input[name="training_id"]').value;
-
-            // ✅ Ensure training_id is valid before redirecting
-            if (trainingId && trainingId > 0) {
-                window.location.href = `add-training-images.php?training_id=${trainingId}`;
-            } else {
-                console.error("Invalid training_id:", trainingId);
-                alert("Error: Training ID is missing or invalid.");
-            }
-        }
-
+        this.submit(); // ✅ If valid, submit the form
     }
 });
 
