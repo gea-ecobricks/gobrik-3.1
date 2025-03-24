@@ -22,7 +22,7 @@
   background-color: var(--top-header);
   color: var(--h1);
    border: 1.6px solid var(--button-2-1) !important;
-}}
+}
 
 
 .advanced-box-content {

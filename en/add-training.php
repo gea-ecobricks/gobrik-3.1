@@ -318,7 +318,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <label for="training_date">Training Date:</label><br>
     <input type="datetime-local" id="training_date" name="training_date"
     value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
-    aria-label="Training Date" required>
+    aria-label="Training Date" required class="form-field-style">
     <p class="form-caption" data-lang-id="012-training-date">On what date and time did this training run?</p>
     <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: block;">This field is required.</div>
 
@@ -488,7 +488,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <label for="moodle_url">Moodle Course URL:</label><br>
         <input type="url" id="moodle_url" name="moodle_url"
                value="<?php echo htmlspecialchars($moodle_url ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-               placeholder="Enter Moodle Course Link">
+               placeholder="Enter Moodle Course Link" class="form-field-style">
         <p class="form-caption" data-lang-id="015-moodle-caption">
         Was there a moodle course created for this training on learning.ecobricks.org?  If so, include the URL here.
     </p>
@@ -500,7 +500,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <label for="youtube_result_video">YouTube Video URL:</label><br>
         <input type="url" id="youtube_result_video" name="youtube_result_video"
                value="<?php echo htmlspecialchars($youtube_result_video ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-               placeholder="Enter YouTube Video URL">
+               placeholder="Enter YouTube Video URL" class="form-field-style">
          <p class="form-caption" data-lang-id="015-location-caption">
         Was a Youtube video of this training posted?  If so include the URL here pleas.
     </p>
@@ -508,9 +508,10 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <!-- Ready to Show -->
     <div class="form-item">
-        <label for="ready_to_show">Publish this training publicly?</label>
+
         <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
                <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+               <label for="ready_to_show">Publish this training publicly?</label><br>
         <p class="form-caption" data-lang-id="016-ready-to-post-caption">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
     </div>
 
