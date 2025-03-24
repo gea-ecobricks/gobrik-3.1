@@ -548,7 +548,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
                <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
-               <label for="ready_to_show" data-lang-id="024-title-show">Publish this training publicly?</label><br>
+               <label for="ready_to_show" data-lang-id="024-title-show">🚀 Publish this training publicly?</label><br>
         <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
     </div>
 
@@ -750,7 +750,26 @@ document.getElementById('submit-form').addEventListener('submit', function(event
             if (relatedInput) relatedInput.focus();
         }
     } else {
-        this.submit(); // ✅ If valid, submit the form
+        if (!isValid) {
+            var firstError = document.querySelector('.form-field-error:not([style*="display: none"])');
+            if (firstError) {
+                firstError.scrollIntoView({behavior: "smooth", block: "center"});
+                var relatedInput = firstError.closest('.form-item').querySelector('input, select, textarea');
+                if (relatedInput) relatedInput.focus();
+            }
+        } else {
+            // ✅ Get training_id from the form
+            var trainingId = document.querySelector('input[name="training_id"]').value;
+
+            // ✅ Ensure training_id is valid before redirecting
+            if (trainingId && trainingId > 0) {
+                window.location.href = `add-training-images.php?training_id=${trainingId}`;
+            } else {
+                console.error("Invalid training_id:", trainingId);
+                alert("Error: Training ID is missing or invalid.");
+            }
+        }
+
     }
 });
 

@@ -49,7 +49,7 @@ const en_Page_Translations = {
     "022-moodle-caption": "Was there a Moodle course created for this training on learning.ecobricks.org? If so, include the URL here.",
     "023-title-youtube": "YouTube Video URL:",
     "023-training-youtube": "Was a YouTube video of this training posted? If so, include the URL here please.",
-    "024-title-show": "Publish this training publicly?",
+    "024-title-show": "🚀 Publish this training publicly?",
     "022-training-show": "Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don't worry, you can always come back here to edit the live listing!",
     "100-submit-report-1": "Next: Upload Photos ➡️"
 };
