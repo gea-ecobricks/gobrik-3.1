@@ -13,18 +13,7 @@
 .form-item input {
   background: var(--input-background) !important;
   font-size: 1.3em;
-
-  input[type="text"], input[type="number"], textarea, input[type="date"] {
-  font-family: "Mulish", sans-serif;
-  font-weight: 300;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid var(--divider-line);
-  border-radius: 5px;
-  box-sizing: border-box;
-  margin-top: 8px;
-
+}
 
 .featured-content-gallery {
     height: fit-content;
