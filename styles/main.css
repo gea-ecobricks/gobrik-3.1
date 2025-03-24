@@ -1909,7 +1909,10 @@ label {
 }
 
 
-
+/* .form-item input { */
+/*   background: var(--input-background); */
+/*   font-size: 1.3em; */
+/* } */
 
 .form-item textarea {
   background: var(--input-background);
@@ -2112,13 +2115,8 @@ input[type="text"], input[type="name"], input[type="credential"],  input[type="p
   border-radius: 5px;
   background-color: var(--top-header);
   color: var(--h1);
-   border: 2px solid var(--button-2-1);
+   border: 1px solid var(--button-2-1) !important;
 }
-
-.form-item input {
-  background: var(--input-background);
-  font-size: 1.3em;
-
 
 select {
   width: 100%;
