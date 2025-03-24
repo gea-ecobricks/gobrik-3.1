@@ -312,8 +312,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             value="<?php echo htmlspecialchars($training_title ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Training Title" required>
              <p class="form-caption" data-lang-id="005-training-give-title">Give your training a title.  This will be how your report is featured.</p>
-             <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
-    </div>
+ <!--ERRORS-->
+                    <div id="title-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="title-error-long" class="form-field-error" data-lang-id="000-title-field-too-long-error">Your training title is too long. Max 50 characters.</div>
+                    <div id="title-error-invalid" class="form-field-error" data-lang-id="005b-training-title-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs please.</div>
+        </div>
 
 
     <div class="form-item">
@@ -331,8 +334,10 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="number" id="no_participants" name="no_participants" min="1" max="5000" required
             value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             <p class="form-caption" data-lang-id="007-training-count">How many people participated (including trainers)?</p>
-            <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
-    </div>
+            <!--ERRORS-->
+                    <div id="participants-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="participants-error-range" class="form-field-error" data-lang-id="000-field-participants-number-error">A number (between 1 and 5000).</div>
+             </div>
 
     <div class="form-item">
         <label for="lead_trainer" data-lang-id="008-lead-trainer">Lead Trainer:</label><br>
@@ -340,8 +345,9 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             value="<?php echo htmlspecialchars($lead_trainer ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Lead Trainer" required>
             <p class="form-caption" data-lang-id="008-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
-            <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
-    </div>
+             <!--ERRORS-->
+                    <div id="trainer-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                </div>
 
 
 <div class="form-item">
@@ -363,8 +369,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             Don't see your community? Add it.
         </a>
     </p>
-<div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
-</div>
+<div id="community-error-required" class="form-field-error" data-lang-id="000-field-too-long-error">A community must be selected</div>
+                </div>
 
 
 
@@ -381,9 +387,9 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <?php endforeach; ?>
     </select>
    <p class="form-caption" data-lang-id="010-training-type">Please categorize this training.</p>
-   <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
-
-</div>
+   <!--ERROR-->
+                    <div id="type-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                </div>
 
 
   <div class="form-item">
@@ -391,17 +397,19 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <input type="number" id="briks_made" name="briks_made" min="0" max="5000" required
         value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
     <p class="form-caption" data-lang-id="011-how-many-briks">No ecobricks made in this training? Just set at "0" then.</p>
-    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
-
-</div>
+    <!--ERRORS-->
+                    <div id="briks-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="briks-error-range" class="form-field-error" data-lang-id="000-field-brik-number-error">Just a number (between 1 and 5000).</div>
+                </div>
 
 <div class="form-item">
     <label for="avg_brik_weight" data-lang-id="012-title-average">Average Brik Weight (grams):</label><br>
     <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" required
         value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
         <p class="form-caption" data-lang-id="012-training-average">No ecobricks made in this training? Just set at "0" then.</p>
-        <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
-</div>
+         <!--ERRORS-->
+                    <div id="weight-error-range" class="form-field-error" data-lang-id="000-field-weight-number-error">Your estimated average brick weight (in grams) must be a number between 100 and 2000.</div>
+                </div>
 
 <div class="form-item">
     <label for="country_id" data-lang-id="013-title-country">Country:</label><br>
@@ -422,8 +430,9 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <p class="form-caption" data-lang-id="013-training-country">
         Where was this training run? If it was an online training, select the country of the lead trainer.
     </p>
-<div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
-</div>
+<!--ERRORS-->
+                    <div id="country-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                </div>
 
 
 
@@ -433,15 +442,20 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
               placeholder="Write a compelling description for this training..."
               rows="5"><?php echo htmlspecialchars($featured_description ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
     <p class="form-caption" data-lang-id="014-training-description">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
-</div>
+<!--ERRORS-->
+                    <div id="featured-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="featured-error-long" class="form-field-error" data-lang-id="000-field-summary-too-long-error">Your training summary is too long. Max 255 characters.</div>
+                    <div id="featured-error-invalid" class="form-field-error" data-lang-id="005b-training-summary-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
+                </div>
 
 
     <div class="form-item">
         <label for="training_agenda" data-lang-id="015-title-training-agenda">Training Agenda:</label><br>
         <textarea id="training_agenda" name="training_agenda"><?php echo htmlspecialchars($training_agenda ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
             <p class="form-caption" data-lang-id="015-training-agenda">Optional: Please layout the agenda that your training followed. Max 1000 words. You may not need to update this field as it was shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
-
-    </div>
+<!--ERRORS-->
+                    <div id="agenda-error-long" class="form-field-error" data-lang-id="000-long-field-too-long-error">Your training agenda is too long. Maximum 2000 characters.</div>
+                </div>
 
 <br><br>
 <hr>
@@ -453,26 +467,44 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <label for="training_summary" data-lang-id="017-title-summary">Training Summary:</label><br>
         <textarea id="training_summary" name="training_summary" required><?php echo htmlspecialchars($training_summary ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         <p class="form-caption" data-lang-id="017-training-summary">Provide a summary of the training. Max 150 words. Avoid special characters..</p>
-    </div>
+    <!--ERRORS-->
+                    <div id="summary-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="summary-error-long" class="form-field-error" data-lang-id="000-field-summary-too-long-error">Your training summary is too long. Max 255 characters.</div>
+                    <div id="summary-error-invalid" class="form-field-error" data-lang-id="005b-training-summary-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
+                </div>
+
 
     <div class="form-item" data-lang-id="018-title-successes">
         <label for="training_success">Training Successes:</label><br>
         <textarea id="training_success" name="training_success" required><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
       <p class="form-caption" data-lang-id="018-training-success">Share the successes of the training. Max 500 words. Avoid special characters..</p>
-    </div>
+   <!--ERRORS-->
+                    <div id="success-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="success-error-long" class="form-field-error" data-lang-id="000-field-success-too-long-error">Your entry is too long. Max 2000 characters.</div>
+                    <div id="success-error-invalid" class="form-field-error" data-lang-id="005b-training-success-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
+                </div>
 
     <div class="form-item">
         <label for="training_challenges" data-lang-id="019-title-challenges">Training Challenges:</label><br>
         <textarea id="training_challenges" name="training_challenges" required><?php echo htmlspecialchars($training_challenges ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
               <p class="form-caption" data-lang-id="019-training-challenges">Share the challenges you faced leading your training. Max 500 words. Avoid special characters.</p>
 
-    </div>
+            <!--ERRORS-->
+                    <div id="challenges-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="challenges-error-long" class="form-field-error" data-lang-id="000-field-challenges-too-long-error">Your entry is too long. Max 1500 characters.</div>
+                    <div id="challenges-error-invalid" class="form-field-error" data-lang-id="005b-training-challenges-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
+                </div>
+
 
     <div class="form-item">
         <label for="training_lessons_learned" data-lang-id="020-title-lessons">Lessons Learned:</label><br>
         <textarea id="training_lessons_learned" name="training_lessons_learned" required><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         <p class="form-caption" data-lang-id="020-training-lessons">Share the lessons learned from leading your training. Max 1000 words. Avoid special characters.</p>
-    </div>
+ <!--ERRORS-->
+                    <div id="lessons-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="lessons-error-long" class="form-field-error" data-lang-id="000-field-lessons-too-long-error">Your lessons learned are too long. Max 3000 characters.</div>
+                    <div id="lessons-error-invalid" class="form-field-error" data-lang-id="005b-training-lessons-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
+                </div>
 
 <div class="form-item">
     <label for="training_location" data-lang-id="021-title-location">Training Location:</label><br>
@@ -482,10 +514,9 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         Please provide the general location where the training was conducted.
     </p>
 
-    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">
-        This field is required. For online workshops, specify the country of the lead trainer.
-    </div>
-</div>
+     <!--ERRORS-->
+             <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                </div>
 
 
 <!-- Moodle URL -->
