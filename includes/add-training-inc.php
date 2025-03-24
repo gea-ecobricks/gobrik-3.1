@@ -9,18 +9,20 @@
 .form-item input {
   background: var(--input-background) !important;
   font-size: 1.5em;
+}
 
-  input[type="text"], input[type="number"], textarea, input[type="date"] {
-  font-family: "Mulish", sans-serif;
-  font-weight: 300;
+.form-field-style {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid var(--divider-line);
-  border-radius: 5px;
+  padding: 9px 11px;
+  margin: 4px 0;
+  font-size: 20px !important;
   box-sizing: border-box;
-  margin-top: 8px;
-
+  border: 3px solid var(--button-2-1);
+  border-radius: 5px;
+  background-color: var(--top-header);
+  color: var(--h1);
+   border: 1.6px solid var(--button-2-1) !important;
+}}
 
 
 .advanced-box-content {

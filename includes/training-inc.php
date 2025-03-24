@@ -10,11 +10,6 @@
 <STYLE>
 
 
-.form-item input {
-  background: var(--input-background) !important;
-  font-size: 1.3em;
-}
-
 .featured-content-gallery {
     height: fit-content;
     background-size: contain;
