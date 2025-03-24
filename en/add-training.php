@@ -608,7 +608,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 document.getElementById('submit-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent submission until validation passes
+    event.preventDefault(); // Prevent default form submission
     var isValid = true;
 
     function displayError(elementId, showError) {
@@ -712,9 +712,38 @@ document.getElementById('submit-form').addEventListener('submit', function(event
             var relatedInput = firstError.closest('.form-item').querySelector('input, select, textarea');
             if (relatedInput) relatedInput.focus();
         }
-    } else {
-        this.submit(); // ✅ If valid, submit the form
+        return; // Stop execution if validation fails
     }
+
+    // ✅ Proceed with AJAX Submission
+    var formData = new FormData(this);
+    var submitButton = document.querySelector('input[type="submit"]');
+    var originalButtonText = submitButton.value;
+    submitButton.value = "Processing...";
+    submitButton.disabled = true;
+
+    fetch(this.action, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // ✅ Redirect to image upload page with correct training_id
+            window.location.href = "add-training-images.php?training_id=" + data.training_id;
+        } else {
+            // ❌ Show error message if submission fails
+            alert("Error: " + (data.error || "An unknown error occurred."));
+            submitButton.value = originalButtonText;
+            submitButton.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error("Submission error:", error);
+        alert("There was a problem submitting the form.");
+        submitButton.value = originalButtonText;
+        submitButton.disabled = false;
+    });
 });
 
 
