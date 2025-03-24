@@ -13,14 +13,13 @@
 
 .form-field-style {
   width: 100%;
-  padding: 9px 11px;
+  padding: 9px 11px !important;
   margin: 4px 0;
   font-size: 20px !important;
   box-sizing: border-box;
   border: 3px solid var(--button-2-1);
   border-radius: 5px;
   background-color: var(--top-header);
-  color: var(--h1);
    border: 1px solid var(--button-2-1) !important;
 }
 

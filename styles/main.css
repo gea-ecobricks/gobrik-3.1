@@ -2130,8 +2130,8 @@ select {
   border: 3px solid var(--button-2-1);
   border-radius: 5px;
   background-color: var(--top-header);
-  color: var(--h1);
    border: 2px solid var(--button-2-1);
+   color: grey !important;
 }
 
 
