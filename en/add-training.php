@@ -247,7 +247,7 @@ if ($editing) {
 <!-- Facebook Open Graph Tags for social sharing -->
 <meta property="og:url" content="https://www.gobrik.com/<?php echo $lang; ?>/add-report.php">
 <meta property="og:type" content="website">
-<meta property="og:title" content="<?php echo !empty($training_title) ? $training_title : 'Log your Training Report'; ?>">
+<meta property="og:title" content="<?php echo !empty($training_title) ? 'Log:' $training_title : 'Log your Training Report'; ?>">
 <meta property="og:description" content="<?php echo !empty($training_type) && !empty($lead_trainer) && !empty($training_date)
     ? "Log the $training_type led by $lead_trainer on $training_date on the GEA reporting system. Reports will be shared on the front page of Ecobricks.org."
     : "Log your GEA workshop. Reports will be featured on the front page of Ecobricks.org and shareable on social media."; ?>">
@@ -440,7 +440,9 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     </div>
 
-
+<br><br>
+<hr>
+<br>
 <h4>Training Reporting</h4>
 <p>These text fields will be used to compile your report</p>
 
