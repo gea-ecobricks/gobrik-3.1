@@ -333,25 +333,25 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 </div>
 
     <div class="form-item">
-        <label for="no_participants">Number of Participants:</label><br>
+        <label for="no_participants" data-lang-id="007-title-participants">Number of Participants:</label><br>
         <input type="number" id="no_participants" name="no_participants" min="1" max="5000" required
             value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-            <p class="form-caption" data-lang-id="007-training-count">How many people particiapted (including trainers)?</p>
+            <p class="form-caption" data-lang-id="007-training-count">How many people participated (including trainers)?</p>
             <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
     </div>
 
     <div class="form-item">
-        <label for="lead_trainer">Lead Trainer:</label><br>
+        <label for="lead_trainer" data-lang-id="008-lead-trainer">Lead Trainer:</label><br>
         <input type="text" id="lead_trainer" name="lead_trainer"
             value="<?php echo htmlspecialchars($lead_trainer ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Lead Trainer" required>
-            <p class="form-caption" data-lang-id="012-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
+            <p class="form-caption" data-lang-id="008-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
             <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
     </div>
 
 
 <div class="form-item">
-    <label for="community_search">Trained Community:</label><br>
+    <label for="community_search" data-lang-id="009-title-community">Trained Community:</label><br>
     <input type="text" id="community_search" name="community_search"
            placeholder="Start typing..." autocomplete="off"
            value="<?php echo htmlspecialchars($community_name ?? '', ENT_QUOTES, 'UTF-8'); ?>">
@@ -362,7 +362,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <div id="community_results" class="autocomplete-results"></div>
 
     <!-- "Add a new community" text link -->
-    <p class="form-caption" data-lang-id="012-community-caption-xx">
+    <p class="form-caption" data-lang-id="008-community-trained">
         What community was this training for?  Start typing to see and select a GoBrik community.
         <a href="#" onclick="openAddCommunityModal(); return false;"
            style="color: #007BFF; text-decoration: underline;">
