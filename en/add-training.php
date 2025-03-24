@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.61';
+$version = '0.62';
 $page = 'add-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -369,7 +369,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 
     <div class="form-item">
-    <label for="training_type">What type of training was this?</label><br>
+    <label for="training_type" data-lang-id="010-title-type">What type of training was this?</label><br>
     <select id="training_type" name="training_type" required class="form-field-style">
         <option value="" disabled selected>Select training type...</option>
 
@@ -380,31 +380,31 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </option>
         <?php endforeach; ?>
     </select>
-   <p class="form-caption" data-lang-id="012-training-trainers">Please categorize this training.</p>
+   <p class="form-caption" data-lang-id="010-training-type">Please categorize this training.</p>
    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 
 </div>
 
 
   <div class="form-item">
-    <label for="briks_made">How many ecobricks were made?</label><br>
+    <label for="briks_made" data-lang-id="011-title-how-many">How many ecobricks were made?</label><br>
     <input type="number" id="briks_made" name="briks_made" min="0" max="5000" required
         value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
-    <p class="form-caption" data-lang-id="012-training-trainers">No ecobricks made in this training? Just set at "0" then.</p>
+    <p class="form-caption" data-lang-id="011-how-many-briks">No ecobricks made in this training? Just set at "0" then.</p>
     <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 
 </div>
 
 <div class="form-item">
-    <label for="avg_brik_weight">Average Brik Weight (grams):</label><br>
+    <label for="avg_brik_weight" data-lang-id="012-title-average">Average Brik Weight (grams):</label><br>
     <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" required
         value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
-        <p class="form-caption" data-lang-id="012-training-trainers">No ecobricks made in this training? Just set at "0" then.</p>
+        <p class="form-caption" data-lang-id="012-training-average">No ecobricks made in this training? Just set at "0" then.</p>
         <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 </div>
 
 <div class="form-item">
-    <label for="country_id">Country:</label><br>
+    <label for="country_id" data-lang-id="013-title-country">Country:</label><br>
     <select id="country_id" name="country_id" required class="form-field-style">
         <!-- ✅ Ensures placeholder is selected when no country is set -->
         <option value="" disabled <?php echo empty($country_id) ? 'selected' : ''; ?>>
@@ -419,71 +419,66 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <?php endforeach; ?>
     </select>
 
-    <p class="form-caption" data-lang-id="012-training-trainers">
+    <p class="form-caption" data-lang-id="013-training-country">
         Where was this training run? If it was an online training, select the country of the lead trainer.
     </p>
+<div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
 </div>
 
 
 
 <div class="form-item">
-    <label for="featured_description">Featured Description:</label><br>
+    <label for="featured_description" data-lang-id="014-feature-description">Featured Description:</label><br>
     <textarea id="featured_description" name="featured_description"
               placeholder="Write a compelling description for this training..."
               rows="5"><?php echo htmlspecialchars($featured_description ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-    <p class="form-caption">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
+    <p class="form-caption" data-lang-id="014-training-description">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
 </div>
 
 
     <div class="form-item">
-        <label for="training_agenda">Training Agenda:</label><br>
+        <label for="training_agenda" data-lang-id="015-title-training-agenda">Training Agenda:</label><br>
         <textarea id="training_agenda" name="training_agenda"><?php echo htmlspecialchars($training_agenda ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-            <p class="form-caption">Optional: Please layout the agenda that your training followed. Max 1000 words. You may not need to update this field as it was shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
+            <p class="form-caption" data-lang-id="015-training-agenda">Optional: Please layout the agenda that your training followed. Max 1000 words. You may not need to update this field as it was shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
 
     </div>
 
 <br><br>
 <hr>
 <br>
-<h4>Training Reporting</h4>
-<p>These text fields will be used to compile your report</p>
+<h4 data-lang-id="016-training-reporting">Training Reporting</h4>
+<p data-lang-id="016b-training-reporting-desc">These text fields will be used to compile your report</p>
 
     <div class="form-item">
-        <label for="training_summary">Training Summary:</label><br>
+        <label for="training_summary" data-lang-id="017-title-summary">Training Summary:</label><br>
         <textarea id="training_summary" name="training_summary" required><?php echo htmlspecialchars($training_summary ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-        <p class="form-caption" data-lang-id="012-training-summary">Provide a summary of the training. Max 150 words. Avoid special characters..</p>
+        <p class="form-caption" data-lang-id="017-training-summary">Provide a summary of the training. Max 150 words. Avoid special characters..</p>
     </div>
-    <div class="form-item">
+
+    <div class="form-item" data-lang-id="018-title-successes">
         <label for="training_success">Training Successes:</label><br>
         <textarea id="training_success" name="training_success" required><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-      <p class="form-caption" data-lang-id="012-training-success">Share the successes of the training. Max 500 words. Avoid special characters..</p>
-
+      <p class="form-caption" data-lang-id="018-training-success">Share the successes of the training. Max 500 words. Avoid special characters..</p>
     </div>
 
     <div class="form-item">
-        <label for="training_challenges">Training Challenges:</label><br>
+        <label for="training_challenges" data-lang-id="019-title-challenges">Training Challenges:</label><br>
         <textarea id="training_challenges" name="training_challenges" required><?php echo htmlspecialchars($training_challenges ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-              <p class="form-caption" data-lang-id="012-training-challenges">Share the challenges you faced leading your training. Max 500 words. Avoid special characters.</p>
+              <p class="form-caption" data-lang-id="019-training-challenges">Share the challenges you faced leading your training. Max 500 words. Avoid special characters.</p>
 
     </div>
 
     <div class="form-item">
-        <label for="training_lessons_learned">Lessons Learned:</label><br>
+        <label for="training_lessons_learned" data-lang-id="020-title-lessons">Lessons Learned:</label><br>
         <textarea id="training_lessons_learned" name="training_lessons_learned" required><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-        <p class="form-caption" data-lang-id="012-training-lessons">Share the lessons learned from leading your training. Max 1000 words. Avoid special characters.</p>
+        <p class="form-caption" data-lang-id="020-training-lessons">Share the lessons learned from leading your training. Max 1000 words. Avoid special characters.</p>
     </div>
 
-<!--        <div class="form-item">
-            <label for="location_address">Training Location:</label><br>
-            <input type="text" id="location_address" name="location_address" placeholder="Start typing your town..." required
-                value="<?php echo htmlspecialchars($training_location ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-        </div>
-        <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>-->
 <div class="form-item">
-    <label for="training_location" data-lang-id="015-location">Training Location:</label><br>
+    <label for="training_location" data-lang-id="021-title-location">Training Location:</label><br>
     <input type="text" id="training_location" name="training_location" aria-label="Training Location" required
         value="<?php echo htmlspecialchars($training_location ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <p class="form-caption" data-lang-id="015-location-caption">
+    <p class="form-caption" data-lang-id="020-location-caption">
         Please provide the general location where the training was conducted.
     </p>
 
@@ -495,11 +490,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 <!-- Moodle URL -->
     <div class="form-item">
-        <label for="moodle_url">Moodle Course URL:</label><br>
+        <label for="moodle_url" data-lang-id="022-title-moodle">Moodle Course URL:</label><br>
         <input type="url" id="moodle_url" name="moodle_url"
                value="<?php echo htmlspecialchars($moodle_url ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                placeholder="Enter Moodle Course Link" class="form-field-style">
-        <p class="form-caption" data-lang-id="015-moodle-caption">
+        <p class="form-caption" data-lang-id="022-moodle-caption">
         Was there a moodle course created for this training on learning.ecobricks.org?  If so, include the URL here.
     </p>
 
@@ -507,11 +502,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <!-- YouTube Result Video -->
     <div class="form-item">
-        <label for="youtube_result_video">YouTube Video URL:</label><br>
+        <label for="youtube_result_video" data-lang-id="023-title-youtube">YouTube Video URL:</label><br>
         <input type="url" id="youtube_result_video" name="youtube_result_video"
                value="<?php echo htmlspecialchars($youtube_result_video ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                placeholder="Enter YouTube Video URL" class="form-field-style">
-         <p class="form-caption" data-lang-id="015-location-caption">
+         <p class="form-caption" data-lang-id="023-training-youtube">
         Was a Youtube video of this training posted?  If so include the URL here pleas.
     </p>
     </div>
@@ -521,17 +516,18 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
                <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
-               <label for="ready_to_show">Publish this training publicly?</label><br>
-        <p class="form-caption" data-lang-id="016-ready-to-post-caption">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
+               <label for="ready_to_show" data-lang-id="024-title-show">Publish this training publicly?</label><br>
+        <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
     </div>
 
 
     <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
-    <div>
-        <input type="submit" value="Next: Upload Photos ➡️">
-    </div>
+<div>
+    <input type="submit" value="Next: Upload Photos ➡️" data-lang-id="100-submit-report-1">
+</div>
+
 
 </form>
 
