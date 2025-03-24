@@ -8,13 +8,13 @@
 
 .form-item input {
   background: var(--input-background) !important;
-  font-size: 1.3em;
+  font-size: 1.5em;
 
   input[type="text"], input[type="number"], textarea, input[type="date"] {
   font-family: "Mulish", sans-serif;
   font-weight: 300;
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin-bottom: 10px;
   border: 1px solid var(--divider-line);
   border-radius: 5px;
