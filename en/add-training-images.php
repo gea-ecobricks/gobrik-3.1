@@ -279,7 +279,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                 <div class="splash-box">
                     <div class="splash-heading" data-lang-id="001-splash-title-upload">Upload Training Photos</div>
                 </div>
-                <div class="splash-image" data-lang-id="003-splash-image-alt">
+                <div class="splash-image" data-lang-id="003-splash-image-upload">
                     <img src="../svgs/square-training-photo.svg" style="width:65%" alt="Upload your training photos">
                 </div>
             </div>

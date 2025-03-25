@@ -121,7 +121,7 @@ function sendBugReportEmail($message_id, $created_by, $date_sent, $message, $sen
             'form_params' => [
                 'from' => 'GoBrik Support <support@ecobricks.org>',
                 'to' => 'support@ecobricks.org',
-                'bcc' => 'russ@ecobricks.org, franoflanagan@ecobricks.org, mikejpof@gmail.com',
+                'bcc' => 'russ@ecobricks.org, oflanagan.frances@gmail.com, mikejpof@gmail.com',
                 'subject' => $subject,
                 'html' => $html_body,
                 'text' => $text_body,
