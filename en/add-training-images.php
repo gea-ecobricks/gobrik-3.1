@@ -288,9 +288,9 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <p data-lang-id="004-form-description-upload" style="text-align: center; padding:20px;"> Show the world your training! Upload up to seven images showing your training session and what you accomplished.
             <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span> </p>           </div>
 
-    <!-- PART 6 THE FORM -->
+        <!-- PART 6 THE FORM -->
 
-       <form id="photoform" method="post" enctype="multipart/form-data">
+<form id="photoform" method="post" enctype="multipart/form-data">
 
     <!-- ✅ Hidden field for training_id -->
     <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id']); ?>">
@@ -300,6 +300,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             $photo_main_var = "training_photo{$i}_main";
             $photo_tmb_var = "training_photo{$i}_tmb";
             $photo_number = $i + 1; // ✅ Adjust display number (start at 1)
+            $existingPhotoUrl = $$photo_main_var ?? ''; // Get the existing photo URL
+            $existingFileName = $existingPhotoUrl ? basename($existingPhotoUrl) : ''; // Extract file name
         ?>
         <div class="form-item">
             <label for="training_photo<?php echo $i; ?>_main">
@@ -307,19 +309,38 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </label><br>
 
             <!-- ✅ Show existing image if available -->
-            <?php if (!empty($$photo_main_var)): ?>
+            <?php if (!empty($existingPhotoUrl)): ?>
                 <div class="existing-image">
-                    <img src="<?php echo htmlspecialchars($$photo_main_var, ENT_QUOTES, 'UTF-8'); ?>"
+                    <img src="<?php echo htmlspecialchars($existingPhotoUrl, ENT_QUOTES, 'UTF-8'); ?>"
                          alt="Existing Image <?php echo $photo_number; ?>"
                          style="max-width: 200px; max-height: 200px;">
-                    <p>Current Image</p>
+                    <p>Current Image: <strong><?php echo htmlspecialchars($existingFileName, ENT_QUOTES, 'UTF-8'); ?></strong></p>
                 </div>
             <?php endif; ?>
 
-            <input type="file" id="training_photo<?php echo $i; ?>_main" name="training_photo<?php echo $i; ?>_main">
+            <!-- ✅ File Upload Field -->
+            <input type="file" id="training_photo<?php echo $i; ?>_main"
+                   name="training_photo<?php echo $i; ?>_main"
+                   class="photo-input"
+                   data-photo-number="<?php echo $photo_number; ?>"
+                   <?php if (!empty($existingPhotoUrl)): ?> data-has-image="true"<?php endif; ?>>
+
+            <!-- ✅ Display the file name if already uploaded -->
+            <span class="file-name">
+                <?php echo !empty($existingFileName) ? htmlspecialchars($existingFileName, ENT_QUOTES, 'UTF-8') : "No file selected..."; ?>
+            </span>
+
             <p class="form-caption" data-lang-id="select-photo-<?php echo $photo_number; ?>-instruction">
                 Select a photo for Upload Photo <?php echo $photo_number; ?>.
             </p>
+
+            <!-- ✅ Clear Button (Only Show if Image Exists) -->
+            <?php if (!empty($existingPhotoUrl)): ?>
+                <button type="button" class="clear-photo-button"
+                        data-clear-target="training_photo<?php echo $i; ?>_main">
+                    Clear uploaded image
+                </button>
+            <?php endif; ?>
         </div>
     <?php endfor; ?>
 
@@ -327,7 +348,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <input type="submit" value="⬆️ Upload Photos" id="upload-progress-button" aria-label="Submit photos for upload">
     </div>
 
-</form>  <!-- ✅ FORM ENDS HERE -->
+</form> <!-- ✅ FORM ENDS HERE -->
+
 
 
 
@@ -452,6 +474,40 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     xhr.open(form.method, form.action, true);
     xhr.send(formData);
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".photo-input").forEach(input => {
+        const fileNameSpan = input.nextElementSibling; // The span next to the input
+
+        // ✅ Update file name on file selection
+        input.addEventListener("change", function () {
+            if (this.files.length > 0) {
+                fileNameSpan.textContent = this.files[0].name; // Show selected file name
+            } else {
+                fileNameSpan.textContent = "No file selected..."; // Reset if empty
+            }
+        });
+
+        // ✅ Change "Browse..." to "Change Image..." if an image is already uploaded
+        if (input.dataset.hasImage === "true") {
+            input.setAttribute("title", "Change Image...");
+        }
+    });
+
+    // ✅ Handle "Clear uploaded image" button click
+    document.querySelectorAll(".clear-photo-button").forEach(button => {
+        button.addEventListener("click", function () {
+            const targetInputId = this.getAttribute("data-clear-target");
+            const fileInput = document.getElementById(targetInputId);
+            const fileNameSpan = fileInput.nextElementSibling; // The span next to the input
+
+            fileInput.value = ""; // Clear the file input
+            fileNameSpan.textContent = "No file selected..."; // Reset file name text
+        });
+    });
+});
+
 
 
 
