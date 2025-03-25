@@ -288,8 +288,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <p data-lang-id="004-form-description-upload" style="text-align: center; padding:20px;"> Show the world your training! Upload up to seven images showing your training session and what you accomplished.
             <span style="color:red">Square photos are best. Be sure photos are under 8MB.</span> </p>           </div>
 
-        <!-- PART 6 THE FORM -->
-
+       <!-- PART 6 THE FORM -->
 <form id="photoform" method="post" enctype="multipart/form-data">
 
     <!-- ✅ Hidden field for training_id -->
@@ -309,14 +308,17 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </label><br>
 
             <!-- ✅ Show existing image if available -->
-            <?php if (!empty($existingPhotoUrl)): ?>
-                <div class="existing-image">
-                    <img src="<?php echo htmlspecialchars($existingPhotoUrl, ENT_QUOTES, 'UTF-8'); ?>"
-                         alt="Existing Image <?php echo $photo_number; ?>"
-                         style="max-width: 200px; max-height: 200px;">
-                    <p>Current Image: <strong><?php echo htmlspecialchars($existingFileName, ENT_QUOTES, 'UTF-8'); ?></strong></p>
-                </div>
-            <?php endif; ?>
+            <div class="existing-image-container" id="image-container-<?php echo $i; ?>"
+                 style="display: <?php echo !empty($existingPhotoUrl) ? 'block' : 'none'; ?>;">
+                <img src="<?php echo htmlspecialchars($existingPhotoUrl, ENT_QUOTES, 'UTF-8'); ?>"
+                     alt="Existing Image <?php echo $photo_number; ?>"
+                     class="existing-image"
+                     id="preview-<?php echo $i; ?>"
+                     style="max-width: 200px; max-height: 200px;">
+                <p class="file-name" id="file-name-<?php echo $i; ?>">
+                    <?php echo !empty($existingFileName) ? "Current Image: <strong>" . htmlspecialchars($existingFileName, ENT_QUOTES, 'UTF-8') . "</strong>" : ""; ?>
+                </p>
+            </div>
 
             <!-- ✅ File Upload Field -->
             <input type="file" id="training_photo<?php echo $i; ?>_main"
@@ -326,7 +328,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                    <?php if (!empty($existingPhotoUrl)): ?> data-has-image="true"<?php endif; ?>>
 
             <!-- ✅ Display the file name if already uploaded -->
-            <span class="file-name">
+            <span class="file-name" id="selected-file-<?php echo $i; ?>">
                 <?php echo !empty($existingFileName) ? htmlspecialchars($existingFileName, ENT_QUOTES, 'UTF-8') : "No file selected..."; ?>
             </span>
 
@@ -335,12 +337,16 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
             </p>
 
             <!-- ✅ Clear Button (Only Show if Image Exists) -->
-            <?php if (!empty($existingPhotoUrl)): ?>
-                <button type="button" class="clear-photo-button"
-                        data-clear-target="training_photo<?php echo $i; ?>_main">
-                    Clear uploaded image
-                </button>
-            <?php endif; ?>
+            <button type="button" class="clear-photo-button"
+                    id="clear-btn-<?php echo $i; ?>"
+                    data-clear-target="training_photo<?php echo $i; ?>_main"
+                    data-image-container="image-container-<?php echo $i; ?>"
+                    data-preview="preview-<?php echo $i; ?>"
+                    data-file-name="file-name-<?php echo $i; ?>"
+                    data-selected-file="selected-file-<?php echo $i; ?>"
+                    style="display: <?php echo !empty($existingPhotoUrl) ? 'inline-block' : 'none'; ?>;">
+                Clear uploaded image
+            </button>
         </div>
     <?php endfor; ?>
 
@@ -349,6 +355,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </div>
 
 </form> <!-- ✅ FORM ENDS HERE -->
+
 
 
 
@@ -476,6 +483,9 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
 });
 
 
+
+//photo clearing functions
+
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".photo-input").forEach(input => {
         const fileNameSpan = input.nextElementSibling; // The span next to the input
@@ -500,10 +510,30 @@ document.addEventListener("DOMContentLoaded", function () {
         button.addEventListener("click", function () {
             const targetInputId = this.getAttribute("data-clear-target");
             const fileInput = document.getElementById(targetInputId);
-            const fileNameSpan = fileInput.nextElementSibling; // The span next to the input
+            const fileNameSpan = document.getElementById(this.getAttribute("data-selected-file"));
+            const imageContainer = document.getElementById(this.getAttribute("data-image-container"));
+            const previewImage = document.getElementById(this.getAttribute("data-preview"));
+            const fileNameText = document.getElementById(this.getAttribute("data-file-name"));
 
-            fileInput.value = ""; // Clear the file input
-            fileNameSpan.textContent = "No file selected..."; // Reset file name text
+            // ✅ Clear input field
+            fileInput.value = "";
+
+            // ✅ Hide and clear preview image and text
+            if (imageContainer) {
+                imageContainer.style.display = "none";
+            }
+            if (previewImage) {
+                previewImage.src = "";
+            }
+            if (fileNameText) {
+                fileNameText.innerHTML = "";
+            }
+            if (fileNameSpan) {
+                fileNameSpan.textContent = "No file selected...";
+            }
+
+            // ✅ Hide the clear button itself
+            this.style.display = "none";
         });
     });
 });
