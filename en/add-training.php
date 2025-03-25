@@ -28,6 +28,8 @@ if (!$gea_status || stripos($gea_status, 'trainer') === false) {
 }
 
 
+
+
 // PART 3: ✅ Fetch User Details
 require_once '../buwanaconn_env.php';
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
@@ -55,7 +57,7 @@ require_once '../gobrikconn_env.php';
 $training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
 $editing = ($training_id > 0);
 
-// ✅ If editing, fetch existing training details
+// ✅ If editi   ng, fetch existing training details
 if ($editing) {
     $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
                   training_type, briks_made, avg_brik_weight, location_lat, location_long, training_location,
@@ -104,6 +106,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include '../scripts/photo-functions.php';
 
     // ✅ Capture & Validate Form Data
+    $training_id = isset($_POST['training_id']) ? intval($_POST['training_id']) : 0;
+    $editing = ($training_id > 0); // Ensure proper update detection
+
     $training_title = trim($_POST['training_title'] ?? '');
     $lead_trainer = trim($_POST['lead_trainer'] ?? '');
     $training_date = trim($_POST['training_date'] ?? '');
@@ -115,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         $training_date = date("Y-m-d H:i:s", strtotime($training_date));
     } else {
-        die("Error: Training date is required.");
+        die(json_encode(['success' => false, 'error' => 'Training date is required.']));
     }
 
     $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
@@ -166,6 +171,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
             $featured_description, $community_id, $training_id
         );
+
+        if ($stmt->execute()) {
+            $new_training_id = $training_id; // Keep the same ID on update
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Update failed.']);
+            exit();
+        }
     } else {
         // ✅ INSERT new training report
         $sql = "INSERT INTO tb_trainings
@@ -182,12 +194,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $training_summary, $training_agenda, $training_success, $training_challenges,
             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
         );
+
+        if ($stmt->execute()) {
+            $new_training_id = $gobrik_conn->insert_id; // Get the last inserted ID
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Insert failed.']);
+            exit();
+        }
     }
 
-    $stmt->execute();
-    echo json_encode(['success' => true, 'training_id' => $gobrik_conn->insert_id]);
-    exit;
+    // ✅ Return JSON response with the correct `training_id`
+    echo json_encode(['success' => true, 'training_id' => $new_training_id]);
+    exit();
 }
+
 ?>
 
 
@@ -514,6 +534,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                <label for="ready_to_show" data-lang-id="024-title-show">🚀 Publish this training publicly?</label><br>
         <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
     </div>
+<input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
 
     <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
@@ -609,7 +630,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 document.getElementById('submit-form').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission
-    var isValid = true;
+        var isValid = true;
+    var trainingIdField = document.getElementById('training_id');
+    var trainingId = trainingIdField ? trainingIdField.value.trim() : "";
+
 
     function displayError(elementId, showError) {
         var errorDiv = document.getElementById(elementId);
@@ -716,6 +740,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     }
 
     // ✅ Proceed with AJAX Submission
+// ✅ Prepare Form Data for Submission
     var formData = new FormData(this);
     var submitButton = document.querySelector('input[type="submit"]');
     var originalButtonText = submitButton.value;
@@ -729,10 +754,9 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // ✅ Redirect to image upload page with correct training_id
-            window.location.href = "add-training-images.php?training_id=" + data.training_id;
+            var newTrainingId = data.training_id || trainingId; // Use returned ID or existing one
+            window.location.href = "add-training-images.php?training_id=" + newTrainingId;
         } else {
-            // ❌ Show error message if submission fails
             alert("Error: " + (data.error || "An unknown error occurred."));
             submitButton.value = originalButtonText;
             submitButton.disabled = false;
