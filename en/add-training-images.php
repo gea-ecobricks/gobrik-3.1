@@ -422,7 +422,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 
         // ✅ UPLOAD SUBMIT ACTION AND BUTTON
-
 document.querySelector('#photoform').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -432,34 +431,44 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     button.disabled = true; // Disable button to prevent multiple submissions
 
     var messages = {
-        en: "Please choose a file.",
-        es: "Por favor, elige un archivo.",
-        fr: "Veuillez choisir un fichier.",
-        id: "Silakan pilih sebuah berkas."
+        en: "Please choose a file or remove an existing image.",
+        es: "Por favor, elige un archivo o elimina una imagen existente.",
+        fr: "Veuillez choisir un fichier ou supprimer une image existante.",
+        id: "Silakan pilih sebuah berkas atau hapus gambar yang ada."
     };
 
     var currentLang = window.currentLanguage || 'en';
     var chooseFileMessage = messages[currentLang] || messages.en;
 
-    // ✅ Check if at least one file is selected
+    var form = event.target;
+    var formData = new FormData(form);
     var fileSelected = false;
+    var clearedImages = [];
+
     for (var i = 0; i <= 6; i++) {
         var fileInput = document.getElementById(`training_photo${i}_main`);
+        var clearButton = document.getElementById(`clear-btn-${i}`);
+
         if (fileInput && fileInput.files.length > 0) {
-            fileSelected = true;
-            break; // ✅ Exit loop if a file is found
+            fileSelected = true; // ✅ A file is selected
+        } else if (clearButton && clearButton.style.display === "none") {
+            clearedImages.push(i); // ✅ Track cleared images
         }
     }
 
-    if (!fileSelected) {
+    // ✅ If no file is selected and no image was cleared, prevent submission
+    if (!fileSelected && clearedImages.length === 0) {
         showFormModal(chooseFileMessage);
         button.innerHTML = originalButtonText; // Restore button text
         button.disabled = false; // Enable button
         return;
     }
 
-    var form = event.target;
-    var formData = new FormData(form);
+    // ✅ Append cleared images to FormData
+    if (clearedImages.length > 0) {
+        formData.append("cleared_images", JSON.stringify(clearedImages));
+    }
+
     var xhr = new XMLHttpRequest();
 
     xhr.upload.onprogress = function(event) {
@@ -481,7 +490,6 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     xhr.open(form.method, form.action, true);
     xhr.send(formData);
 });
-
 
 
 //photo clearing functions
