@@ -167,12 +167,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
         }
     }
 
-    echo json_encode([
-        'training_id' => $training_id,
-        'full_urls' => $valid_full_urls,
-        'thumbnail_paths' => $valid_thumbnails
-    ]);
-    exit();
+   // ✅ Calculate file sizes for uploaded images
+$main_file_sizes = [];
+$thumbnail_file_sizes = [];
+
+foreach ($full_urls as $index => $file) {
+    $main_file_sizes[] = file_exists($file) ? round(filesize($file) / 1024, 1) : 0;
+}
+
+foreach ($thumbnail_paths as $index => $file) {
+    $thumbnail_file_sizes[] = file_exists($file) ? round(filesize($file) / 1024, 1) : 0;
+}
+
+// ✅ Construct the final JSON response
+$response = array(
+    'training_id' => $training_id,
+    'full_urls' => $full_urls,
+    'thumbnail_paths' => $thumbnail_paths,
+    'main_file_sizes' => $main_file_sizes,  // ✅ Added this
+    'thumbnail_file_sizes' => $thumbnail_file_sizes // ✅ Added this
+);
+
+header('Content-Type: application/json');
+echo json_encode($response);
+exit();
+
 }
 
 
@@ -569,6 +588,7 @@ function uploadSuccess(data) {
 
     var currentLang = window.currentLanguage || 'en';
     var selectedMessage = messages[currentLang] || messages.en;
+
 
     // ✅ Construct success message
     var successMessage = `
