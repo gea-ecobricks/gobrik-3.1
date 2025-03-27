@@ -370,7 +370,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 </div> <!-- ✅ Closes photos-submission-box -->
 
 <!-- ✅ UPLOAD SUCCESS MESSAGE -->
-<div id="upload-success" class="form-container" style="display:none;">
+<div id="upload-success" class="form-container" style="display:none;  text-align: center;">
     <div class="step-graphic" style="width:fit-content;margin:auto;">
         <img src="../svgs/step3-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 3: Upload Success">
     </div>
@@ -417,7 +417,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                 document.getElementById('deleteForm').submit();
             }
         });
-
 
 
 // ✅ UPLOAD SUBMIT ACTION AND BUTTON
