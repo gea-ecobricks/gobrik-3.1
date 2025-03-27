@@ -153,44 +153,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
         $update_stmt->close();
     }
 
-    // ✅ Fetch updated images after processing deletions & uploads
-    $valid_full_urls = [];
-    $valid_thumbnails = [];
 
-    for ($i = 0; $i <= 6; $i++) {
-        $photo_main = ${"training_photo{$i}_main"};
-        $photo_tmb = ${"training_photo{$i}_tmb"};
-
-        if (!empty($photo_main) && !empty($photo_tmb)) {
-            $valid_full_urls[] = $photo_main;
-            $valid_thumbnails[] = $photo_tmb;
-        }
-    }
-
-   // ✅ Calculate file sizes for uploaded images
+// ✅ PART 6: Fetch updated images after processing deletions & uploads
+$valid_full_urls = [];
+$valid_thumbnails = [];
 $main_file_sizes = [];
 $thumbnail_file_sizes = [];
 
-foreach ($full_urls as $index => $file) {
-    $main_file_sizes[] = file_exists($file) ? round(filesize($file) / 1024, 1) : 0;
-}
+// ✅ Fetch updated image paths from database
+$sql_fetch_updated = "SELECT training_photo0_main, training_photo0_tmb,
+                             training_photo1_main, training_photo1_tmb,
+                             training_photo2_main, training_photo2_tmb,
+                             training_photo3_main, training_photo3_tmb,
+                             training_photo4_main, training_photo4_tmb,
+                             training_photo5_main, training_photo5_tmb,
+                             training_photo6_main, training_photo6_tmb
+                      FROM tb_trainings WHERE training_id = ?";
+$stmt_fetch_updated = $gobrik_conn->prepare($sql_fetch_updated);
+$stmt_fetch_updated->bind_param("i", $training_id);
+$stmt_fetch_updated->execute();
+$stmt_fetch_updated->bind_result(
+    $training_photo0_main, $training_photo0_tmb,
+    $training_photo1_main, $training_photo1_tmb,
+    $training_photo2_main, $training_photo2_tmb,
+    $training_photo3_main, $training_photo3_tmb,
+    $training_photo4_main, $training_photo4_tmb,
+    $training_photo5_main, $training_photo5_tmb,
+    $training_photo6_main, $training_photo6_tmb
+);
+$stmt_fetch_updated->fetch();
+$stmt_fetch_updated->close();
 
-foreach ($thumbnail_paths as $index => $file) {
-    $thumbnail_file_sizes[] = file_exists($file) ? round(filesize($file) / 1024, 1) : 0;
+// ✅ Process updated images
+for ($i = 0; $i <= 6; $i++) {
+    $photo_main = ${"training_photo{$i}_main"};
+    $photo_tmb = ${"training_photo{$i}_tmb"};
+
+    if (!empty($photo_main) && !empty($photo_tmb)) {
+        $valid_full_urls[] = $photo_main;
+        $valid_thumbnails[] = $photo_tmb;
+
+        // ✅ Calculate file sizes
+        $main_file_sizes[] = file_exists($photo_main) ? round(filesize($photo_main) / 1024, 1) : 0;
+        $thumbnail_file_sizes[] = file_exists($photo_tmb) ? round(filesize($photo_tmb) / 1024, 1) : 0;
+    }
 }
 
 // ✅ Construct the final JSON response
-$response = array(
+$response = [
     'training_id' => $training_id,
-    'full_urls' => $full_urls,
-    'thumbnail_paths' => $thumbnail_paths,
-    'main_file_sizes' => $main_file_sizes,  // ✅ Added this
-    'thumbnail_file_sizes' => $thumbnail_file_sizes // ✅ Added this
-);
+    'full_urls' => $valid_full_urls,  // ✅ Fixed variable
+    'thumbnail_paths' => $valid_thumbnails,  // ✅ Fixed variable
+    'main_file_sizes' => $main_file_sizes,  // ✅ File sizes now correctly assigned
+    'thumbnail_file_sizes' => $thumbnail_file_sizes  // ✅ File sizes now correctly assigned
+];
 
 header('Content-Type: application/json');
 echo json_encode($response);
 exit();
+
 
 }
 
