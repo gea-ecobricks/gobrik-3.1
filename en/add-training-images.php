@@ -120,26 +120,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
 
     include '../scripts/photo-functions.php';
 
-    // Handle training deletion
-    if (isset($_POST['action']) && $_POST['action'] == 'delete_training') {
-        $deleteResult = deleteTraining($training_id, $gobrik_conn);
-        if ($deleteResult === true) {
-            echo "<script>alert('Training has been successfully deleted.'); window.location.href='add-training.php';</script>";
-            exit;
-        } else {
-            echo "<script>alert('" . $deleteResult . "');</script>";
-            exit;
+    // ✅ Process deleted images
+    if (isset($_POST['deleted_images'])) {
+        $deleted_images = json_decode($_POST['deleted_images'], true);
+
+        if (is_array($deleted_images) && count($deleted_images) > 0) {
+            foreach ($deleted_images as $photo_field) {
+                deleteTrainingImage($training_id, $photo_field, $gobrik_conn);
+            }
         }
     }
 
+    // ✅ Process new image uploads
     $upload_dir = '../trainings/photos/';
     $thumbnail_dir = '../trainings/tmbs/';
-
     $db_fields = [];
     $db_values = [];
     $db_types = "";
 
-    // Upload photos from training_photo0_main to training_photo6_main
     for ($i = 0; $i <= 6; $i++) {
         $file_input_name = "training_photo{$i}_main";
         if (isset($_FILES[$file_input_name]) && $_FILES[$file_input_name]['error'] == UPLOAD_ERR_OK) {
@@ -149,19 +147,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
 
             if (resizeAndConvertToWebP($_FILES[$file_input_name]['tmp_name'], $targetPath, 1000, 88)) {
                 createTrainingThumbnail($targetPath, $thumbnail_dir . $new_file_name_webp, 250, 250, 77);
-                $full_urls[] = $targetPath;
-                $thumbnail_paths[] = $thumbnail_dir . $new_file_name_webp;
-                $main_file_sizes[] = filesize($targetPath) / 1024;
-                $thumbnail_file_sizes[] = filesize($thumbnail_dir . $new_file_name_webp) / 1024;
-
-                array_push($db_fields, "training_photo{$i}_main", "training_photo{$i}_tmb");
-                array_push($db_values, $targetPath, $thumbnail_dir . $new_file_name_webp);
+                $db_fields[] = "training_photo{$i}_main";
+                $db_fields[] = "training_photo{$i}_tmb";
+                $db_values[] = $targetPath;
+                $db_values[] = $thumbnail_dir . $new_file_name_webp;
                 $db_types .= "ss";
             } else {
-                $error_message .= "Error processing image {$i}. Please try again.<br>";
+                die(json_encode(['error' => "Error processing image {$i}."]));
             }
         }
     }
+
+    // ✅ Update database if new images were uploaded
+    if (!empty($db_fields)) {
+        $fields_for_update = implode(", ", array_map(fn($field) => "{$field} = ?", $db_fields));
+        $update_sql = "UPDATE tb_trainings SET {$fields_for_update} WHERE training_id = ?";
+        $db_values[] = $training_id;
+        $db_types .= "i";
+
+        $update_stmt = $gobrik_conn->prepare($update_sql);
+        $update_stmt->bind_param($db_types, ...$db_values);
+        $update_stmt->execute();
+        $update_stmt->close();
+    }
+
+    echo json_encode(['success' => true]);
+    exit();
+}
+
 
     if (!empty($db_fields) && empty($error_message)) {
         // Fetch the briks_made and avg_brik_weight for the current training
@@ -419,6 +432,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         });
 
 
+
 // ✅ UPLOAD SUBMIT ACTION AND BUTTON
 document.querySelector('#photoform').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -450,7 +464,7 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
 
         if (fileInput && fileInput.files.length > 0) {
             fileSelected = true; // ✅ A file is selected
-        } else if (clearButton && clearButton.style.display === "none") {
+        } else if (clearButton && clearButton.getAttribute("data-cleared") === "true") {
             deletedImages.push(`training_photo${i}_main`); // ✅ Track cleared images
         }
     }
@@ -469,6 +483,7 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     }
 
     var xhr = new XMLHttpRequest();
+    xhr.open(form.method, form.action, true);
 
     xhr.upload.onprogress = function(event) {
         if (event.lengthComputable) {
@@ -486,60 +501,35 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
         }
     };
 
-    xhr.open(form.method, form.action, true);
     xhr.send(formData);
 });
 
-// ✅ Photo clearing functions
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".photo-input").forEach(input => {
-        const fileNameSpan = input.nextElementSibling; // The span next to the input
+// ✅ Handle "Clear uploaded image" button click
+document.querySelectorAll(".clear-photo-button").forEach(button => {
+    button.addEventListener("click", function () {
+        const targetInputId = this.getAttribute("data-clear-target");
+        const fileInput = document.getElementById(targetInputId);
+        const fileNameSpan = document.getElementById(this.getAttribute("data-selected-file"));
+        const imageContainer = document.getElementById(this.getAttribute("data-image-container"));
+        const previewImage = document.getElementById(this.getAttribute("data-preview"));
 
-        // ✅ Update file name on file selection
-        input.addEventListener("change", function () {
-            if (this.files.length > 0) {
-                fileNameSpan.textContent = this.files[0].name; // Show selected file name
-            } else {
-                fileNameSpan.textContent = "No file selected..."; // Reset if empty
-            }
-        });
+        // ✅ Clear input field
+        fileInput.value = "";
 
-        // ✅ Change "Browse..." to "Change Image..." if an image is already uploaded
-        if (input.dataset.hasImage === "true") {
-            input.setAttribute("title", "Change Image...");
+        // ✅ Hide and clear preview image
+        if (imageContainer) {
+            imageContainer.style.display = "none";
         }
-    });
+        if (previewImage) {
+            previewImage.src = "";
+        }
+        if (fileNameSpan) {
+            fileNameSpan.textContent = "No file selected...";
+        }
 
-    // ✅ Handle "Clear uploaded image" button click
-    document.querySelectorAll(".clear-photo-button").forEach(button => {
-        button.addEventListener("click", function () {
-            const targetInputId = this.getAttribute("data-clear-target");
-            const fileInput = document.getElementById(targetInputId);
-            const fileNameSpan = document.getElementById(this.getAttribute("data-selected-file"));
-            const imageContainer = document.getElementById(this.getAttribute("data-image-container"));
-            const previewImage = document.getElementById(this.getAttribute("data-preview"));
-            const fileNameText = document.getElementById(this.getAttribute("data-file-name"));
-
-            // ✅ Clear input field
-            fileInput.value = "";
-
-            // ✅ Hide and clear preview image and text
-            if (imageContainer) {
-                imageContainer.style.display = "none";
-            }
-            if (previewImage) {
-                previewImage.src = "";
-            }
-            if (fileNameText) {
-                fileNameText.innerHTML = "";
-            }
-            if (fileNameSpan) {
-                fileNameSpan.textContent = "No file selected...";
-            }
-
-            // ✅ Hide the clear button itself
-            this.style.display = "none";
-        });
+        // ✅ Mark image as cleared
+        this.setAttribute("data-cleared", "true");
+        this.style.display = "none";
     });
 });
 
