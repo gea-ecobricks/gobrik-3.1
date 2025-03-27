@@ -14,7 +14,7 @@ ob_start(); // Prevent output before headers
 
 // PART 2: ✅ LOGIN & ROLE CHECK
 if (!isLoggedIn()) {
-    header("Location: login.php");
+    header("Location: login.php?redirect=add_training.php");
     exit();
 }
 
@@ -375,8 +375,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <img src="../svgs/step3-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 3: Upload Success">
     </div>
     <div id="upload-success-message"></div>
-    <a class="confirm-button" target="_blank" href="https://ecobricks.org/training.php?training_id=<?php echo $_GET['training_id']; ?>" data-lang-id="013-view-training-post">🎉 View Training Post</a>
-    <a class="confirm-button" data-lang-id="014-edit-training" href="edit-training.php?training_id=<?php echo $_GET['training_id']; ?>">Edit Training Post</a>
+    <a class="confirm-button" target="_blank" href="https://ecobricks.org/en/training.php?training_id=<?php echo $_GET['training_id']; ?>" data-lang-id="013-view-training-post">🎉 View Training Post</a>
+    <a class="confirm-button" data-lang-id="014-edit-training" href="add-training.php?training_id=<?php echo $_GET['training_id']; ?>">Edit Training Post</a>
 
     <form id="deleteForm" action="" method="POST">
         <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id']); ?>">
@@ -420,15 +420,14 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 
 
-
-        // ✅ UPLOAD SUBMIT ACTION AND BUTTON
+// ✅ UPLOAD SUBMIT ACTION AND BUTTON
 document.querySelector('#photoform').addEventListener('submit', function(event) {
     event.preventDefault();
 
     var button = document.getElementById('upload-progress-button');
-    var originalButtonText = button.value; // Save the original button text
-    button.innerHTML = '<div class="spinner-photo-loading"></div>'; // Replace button text with spinner
-    button.disabled = true; // Disable button to prevent multiple submissions
+    var originalButtonText = button.value; // Save original button text
+    button.innerHTML = '<div class="spinner-photo-loading"></div>'; // Show spinner
+    button.disabled = true; // Prevent multiple submissions
 
     var messages = {
         en: "Please choose a file or remove an existing image.",
@@ -443,8 +442,9 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     var form = event.target;
     var formData = new FormData(form);
     var fileSelected = false;
-    var clearedImages = [];
+    var deletedImages = [];
 
+    // ✅ Check for selected or deleted images
     for (var i = 0; i <= 6; i++) {
         var fileInput = document.getElementById(`training_photo${i}_main`);
         var clearButton = document.getElementById(`clear-btn-${i}`);
@@ -452,21 +452,21 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
         if (fileInput && fileInput.files.length > 0) {
             fileSelected = true; // ✅ A file is selected
         } else if (clearButton && clearButton.style.display === "none") {
-            clearedImages.push(i); // ✅ Track cleared images
+            deletedImages.push(`training_photo${i}_main`); // ✅ Track cleared images
         }
     }
 
-    // ✅ If no file is selected and no image was cleared, prevent submission
-    if (!fileSelected && clearedImages.length === 0) {
+    // ✅ If no file is selected and no image was deleted, prevent submission
+    if (!fileSelected && deletedImages.length === 0) {
         showFormModal(chooseFileMessage);
         button.innerHTML = originalButtonText; // Restore button text
         button.disabled = false; // Enable button
         return;
     }
 
-    // ✅ Append cleared images to FormData
-    if (clearedImages.length > 0) {
-        formData.append("cleared_images", JSON.stringify(clearedImages));
+    // ✅ Append deleted images list to FormData
+    if (deletedImages.length > 0) {
+        formData.append("deleted_images", JSON.stringify(deletedImages));
     }
 
     var xhr = new XMLHttpRequest();
@@ -491,9 +491,7 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     xhr.send(formData);
 });
 
-
-//photo clearing functions
-
+// ✅ Photo clearing functions
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".photo-input").forEach(input => {
         const fileNameSpan = input.nextElementSibling; // The span next to the input
@@ -546,9 +544,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
-
-
+// ✅ Handle the form response from the server
 function handleFormResponse(response) {
     try {
         console.log("Raw server response:", response); // ✅ Debugging
@@ -569,6 +565,7 @@ function handleFormResponse(response) {
         showFormModal("Error parsing server response. Check console for details.");
     }
 }
+
 
 
 function uploadSuccess(data) {

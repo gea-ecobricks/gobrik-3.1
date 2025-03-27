@@ -303,6 +303,56 @@ function deleteTraining($trainingId, $conn) {
 }
 
 
+function deleteTrainingImage($training_id, $photo_field, $conn) {
+    // Fetch the current image file name
+    $query = "SELECT $photo_field FROM tb_trainings WHERE training_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $training_id);
+    $stmt->execute();
+    $stmt->bind_result($file_name);
+    $stmt->fetch();
+    $stmt->close();
+
+    if (!empty($file_name)) {
+        $file_path = "../uploads/trainings/" . $file_name;
+
+        // Delete the file from the server if it exists
+        if (file_exists($file_path)) {
+            unlink($file_path);
+        }
+
+        // Remove the image reference from the database
+        $update_query = "UPDATE tb_trainings SET $photo_field = NULL WHERE training_id = ?";
+        $update_stmt = $conn->prepare($update_query);
+        $update_stmt->bind_param("i", $training_id);
+        $update_stmt->execute();
+        $update_stmt->close();
+    }
+}
+
+
+function uploadTrainingImage($training_id, $photo_field, $file, $conn) {
+    if ($file['error'] == UPLOAD_ERR_OK) {
+        $file_tmp = $file['tmp_name'];
+        $file_name = time() . "_" . basename($file['name']);
+        $upload_path = "../uploads/trainings/" . $file_name;
+
+        // Check if an old image exists and delete it before uploading the new one
+        deleteTrainingImage($training_id, $photo_field, $conn);
+
+        // Move the new uploaded file
+        if (move_uploaded_file($file_tmp, $upload_path)) {
+            // Update the database with the new image filename
+            $update_query = "UPDATE tb_trainings SET $photo_field = ? WHERE training_id = ?";
+            $stmt = $conn->prepare($update_query);
+            $stmt->bind_param("si", $file_name, $training_id);
+            $stmt->execute();
+            $stmt->close();
+            return true;
+        }
+    }
+    return false;
+}
 
 
 
