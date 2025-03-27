@@ -533,7 +533,7 @@ document.querySelectorAll(".clear-photo-button").forEach(button => {
     });
 });
 
-// ✅ Handle the form response from the server
+
 function handleFormResponse(response) {
     try {
         console.log("Raw server response:", response); // ✅ Debugging
@@ -547,7 +547,13 @@ function handleFormResponse(response) {
             console.log("Error in response:", responseData.error);
         } else {
             console.log("Parsed JSON response:", responseData); // ✅ Debugging
-            uploadSuccess(responseData);
+
+            // ✅ Ensure we only pass existing images to `uploadSuccess`
+            if (responseData.thumbnail_paths && responseData.thumbnail_paths.length > 0) {
+                uploadSuccess(responseData);
+            } else {
+                showFormModal("No images available after upload. Please try again.");
+            }
         }
     } catch (error) {
         console.error("Error parsing server response:", error, "Raw response:", response);
@@ -556,75 +562,31 @@ function handleFormResponse(response) {
 }
 
 
+function handleFormResponse(response) {
+    try {
+        console.log("Raw server response:", response); // ✅ Debugging
 
-function uploadSuccess(data) {
-    // ✅ Define messages for different languages
-    var messages = {
-        en: {
-            heading: "Upload Successful!",
-            description: "Nice. Your training has now been added to the database.",
-            button: "➕ Add Next Training"
-        },
-        es: {
-            heading: "Carga Exitosa!",
-            description: "Genial. Tu capacitación ha sido agregada a la base de datos.",
-            button: "➕ Agregar Siguiente Capacitación"
-        },
-        fr: {
-            heading: "Téléchargement Réussi!",
-            description: "Super. Votre formation a été ajoutée à la base de données.",
-            button: "➕ Ajouter la Formation Suivante"
-        },
-        id: {
-            heading: "Berhasil Diunggah!",
-            description: "Bagus. Pelatihan Anda telah ditambahkan ke dalam basis data.",
-            button: "➕ Tambah Pelatihan Berikutnya"
+        // ✅ Attempt to safely parse JSON
+        var responseData = typeof response === "string" ? JSON.parse(response.trim()) : response;
+
+        // ✅ Check if there's an error in the response
+        if (responseData.error) {
+            showFormModal(responseData.error);
+            console.log("Error in response:", responseData.error);
+        } else {
+            console.log("Parsed JSON response:", responseData); // ✅ Debugging
+
+            // ✅ Ensure we only pass existing images to `uploadSuccess`
+            if (responseData.thumbnail_paths && responseData.thumbnail_paths.length > 0) {
+                uploadSuccess(responseData);
+            } else {
+                showFormModal("No images available after upload. Please try again.");
+            }
         }
-    };
-
-    var currentLang = window.currentLanguage || 'en';
-    var selectedMessage = messages[currentLang] || messages.en;
-
-    // ✅ Construct success message
-    var successMessage = `
-        <h1>${selectedMessage.heading}</h1>
-        <p>${selectedMessage.description}</p><br>
-    `;
-
-    // ✅ Create gallery HTML
-    var galleryHTML = '<div id="three-column-gal" class="three-column-gal">';
-
-    for (var i = 0; i < data.thumbnail_paths.length; i++) {
-        var directoryPathText = data.thumbnail_paths[i].substring(data.thumbnail_paths[i].lastIndexOf('/') + 1);
-        var captionText = `${directoryPathText} | ${data.thumbnail_file_sizes[i].toFixed(1)} KB | ${data.main_file_sizes[i].toFixed(1)} KB`;
-        var fullUrlText = data.full_urls[i];
-        var modalCaption = `${directoryPathText} | ${data.main_file_sizes[i].toFixed(1)} KB | ${data.thumbnail_file_sizes[i].toFixed(1)} KB`;
-
-        galleryHTML += `
-            <div class="gal-photo">
-                <img src="${data.thumbnail_paths[i]}" alt="${directoryPathText}">
-                <p style="font-size:small;">${captionText}</p>
-            </div>
-        `;
+    } catch (error) {
+        console.error("Error parsing server response:", error, "Raw response:", response);
+        showFormModal("Error parsing server response. Check console for details.");
     }
-
-    galleryHTML += '</div>';
-    successMessage += galleryHTML;
-
-    // ✅ Add "Next Training" button
-    successMessage += `<a class="confirm-button" href="add-training.php">${selectedMessage.button}</a>`;
-
-    // ✅ Update the success div content
-    var uploadSuccessDiv = document.getElementById('upload-success');
-    var uploadSuccessMessageDiv = document.getElementById('upload-success-message');
-    uploadSuccessMessageDiv.innerHTML = successMessage;
-
-    // ✅ Show success message & hide submission form
-    document.getElementById('form-submission-box').style.display = 'none'; // Hide form
-    uploadSuccessDiv.style.display = 'block'; // Show success message
-
-    // ✅ Scroll to top for better UX
-    window.scrollTo(0, 0);
 }
 
 
