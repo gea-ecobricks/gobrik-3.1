@@ -725,8 +725,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
 
     // 🔹 15. Featured Description (Optional, Max 255 chars)
     var featuredDescription = document.getElementById('featured_description').value.trim();
-    displayError('featured-error-long', featuredDescription.length > 255);
-    displayError('featured-error-invalid', hasInvalidChars(featuredDescription));
+    displayError('featured-error-long', featuredDescription.length > 2000);
 
     // ✅ Scroll to First Error if any
     if (!isValid) {
