@@ -204,11 +204,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
             <a href="bug-report.php" class="page-button">Report a Bug</a>
             <a href="accounting.php" class="page-button">GEA Accounting</a>
-            <a href="register.php" class="confirm-button enabled" id="event-register-button" data-lang-id="004-event-regist" style="margin: 10px;">Register for GEA Community Event</a>
+            <a href="add-training.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">Log Training Report</a>
 
         </div>
     </div>
 
+
+<!-- TRAINER TRAININGS -->
 
 <!-- TRAINER TRAININGS -->
 <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
@@ -223,21 +225,31 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <th>Location</th>
                 <th>Type</th>
                 <th>Registered</th> <!-- Updated Column Name -->
+                <th>Report</th> <!-- New Column -->
             </tr>
         </thead>
         <tbody>
             <?php foreach ($trainings as $training): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($training['training_title']); ?></td>
-                    <td><?php echo htmlspecialchars($training['training_date']); ?></td>
+
+                    <!-- Format the date to remove time -->
+                    <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
+
                     <td><?php echo htmlspecialchars($training['training_location']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_type']); ?></td>
+
+                    <!-- Updated Registered Column -->
                     <td style="text-align:center;">
-                        <a href="javascript:void(0);"
-                           style="text-decoration:underline; font-weight:bold;"
-                           onclick="openTraineesModal(<?php echo $training['training_id']; ?>,
-                                                      '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
-                            <?php echo (int) $training['trainee_count']; ?> 🔎
+                        <a href="javascript:void(0);" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
+                            <span style="text-decoration: underline;"><?php echo (int) $training['trainee_count']; ?></span> 🔎
+                        </a>
+                    </td>
+
+                    <!-- New Report Column -->
+                    <td style="text-align:center;">
+                        <a href="add-training.php?training_id=<?php echo $training['training_id']; ?>" class="log-report-btn">
+                            Log Report
                         </a>
                     </td>
                 </tr>
@@ -521,10 +533,6 @@ function openRegisteredTrainingsModal(trainingId, trainingLocation) {
 }
 
 
-
-
-
-
 $(document).ready(function() {
     let table = $("#trainer-trainings").DataTable({
         "pageLength": 10,
@@ -545,8 +553,8 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [4] }, // Disable sorting on "Registered" column
-            { "targets": [1, 2, 3], "visible": true }, // Default: show Date, Location, Type
+            { "orderable": false, "targets": [4, 5] }, // Disable sorting on "Registered" and "Report" columns
+            { "targets": [1, 2, 3], "visible": true }, // Show Date, Location, Type
             { "targets": [1, 2, 3], "visible": false, "responsivePriority": 1 } // Hide on small screens
         ]
     });

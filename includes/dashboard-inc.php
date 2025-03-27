@@ -15,6 +15,19 @@
 <STYLE>
 
 
+.log-report-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.log-report-btn:hover {
+    background-color: #0056b3;
+}
 
 
 
