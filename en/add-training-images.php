@@ -175,16 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
     exit();
 }
 
-/**
- * ✅ Function to delete a training image from the database and server
- */
-function deleteTrainingImage($training_id, $photo_field, $gobrik_conn) {
-    $update_sql = "UPDATE tb_trainings SET {$photo_field} = NULL, REPLACE({$photo_field}, 'photos/', 'tmbs/') = NULL WHERE training_id = ?";
-    $update_stmt = $gobrik_conn->prepare($update_sql);
-    $update_stmt->bind_param("i", $training_id);
-    $update_stmt->execute();
-    $update_stmt->close();
-}
+
 ?>
 
 

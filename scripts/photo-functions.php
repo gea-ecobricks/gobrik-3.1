@@ -329,6 +329,37 @@ function uploadTrainingImage($training_id, $photo_field, $file, $conn) {
 }
 
 
+/**
+ * ✅ Function to delete a training image from the database and server
+ */
+function deleteTrainingImage($training_id, $photo_field, $gobrik_conn) {
+    // ✅ Determine the corresponding thumbnail field
+    $thumbnail_field = str_replace('_main', '_tmb', $photo_field);
+
+    // ✅ Fetch existing file paths before deletion
+    $sql_fetch = "SELECT {$photo_field}, {$thumbnail_field} FROM tb_trainings WHERE training_id = ?";
+    $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
+    $stmt_fetch->bind_param("i", $training_id);
+    $stmt_fetch->execute();
+    $stmt_fetch->bind_result($photo_path, $thumbnail_path);
+    $stmt_fetch->fetch();
+    $stmt_fetch->close();
+
+    // ✅ Delete the files from the server (if they exist)
+    if (!empty($photo_path) && file_exists($photo_path)) {
+        unlink($photo_path);
+    }
+    if (!empty($thumbnail_path) && file_exists($thumbnail_path)) {
+        unlink($thumbnail_path);
+    }
+
+    // ✅ Update the database to set both fields to NULL
+    $sql_update = "UPDATE tb_trainings SET {$photo_field} = NULL, {$thumbnail_field} = NULL WHERE training_id = ?";
+    $stmt_update = $gobrik_conn->prepare($sql_update);
+    $stmt_update->bind_param("i", $training_id);
+    $stmt_update->execute();
+    $stmt_update->close();
+}
 
 
 ?>
