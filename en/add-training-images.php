@@ -29,7 +29,6 @@ if (!$gea_status || stripos($gea_status, 'trainer') === false) {
     exit();
 }
 
-
 // PART 3: ✅ Fetch User Details
 require_once '../buwanaconn_env.php';
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
@@ -51,16 +50,13 @@ if ($result_languages && $result_languages->num_rows > 0) {
 
 $buwana_conn->close(); // Close the database connection
 
-
-
-//PART 4
-//FEATCH IMAGE URLS
+// PART 4: ✅ FETCH IMAGE URLS
 require_once '../gobrikconn_env.php'; // Ensure DB connection is established
+require_once '../scripts/photo-functions.php'; // Include photo functions
 
-// ✅ Get training_id from URL if available
+// ✅ Get training_id from URL or latest entry if not provided
 $training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
 
-// ✅ If no training_id is found, fetch the latest (highest) ID from the database
 if ($training_id === 0) {
     $sql = "SELECT MAX(training_id) AS latest_training_id FROM tb_trainings";
     $stmt = $gobrik_conn->prepare($sql);
@@ -68,16 +64,14 @@ if ($training_id === 0) {
     $stmt->bind_result($latest_training_id);
     $stmt->fetch();
     $stmt->close();
-
-    // ✅ Set training_id to the latest one found
-    $training_id = $latest_training_id ?? 0; // Fallback to 0 if no records exist
+    $training_id = $latest_training_id ?? 0;
 }
 
-// ✅ If no valid training_id is found, redirect to avoid errors
 if ($training_id === 0) {
-    die("Error: No valid training record found. Please go back and submit the form again.");
+    die(json_encode(['error' => "No valid training record found."]));
 }
-// ✅ Fetch image URLs
+
+// ✅ Fetch training images from database
 $sql_fetch = "SELECT training_title,
                      training_photo0_main, training_photo0_tmb,
                      training_photo1_main, training_photo1_tmb,
@@ -86,8 +80,7 @@ $sql_fetch = "SELECT training_title,
                      training_photo4_main, training_photo4_tmb,
                      training_photo5_main, training_photo5_tmb,
                      training_photo6_main, training_photo6_tmb
-              FROM tb_trainings
-              WHERE training_id = ?";
+              FROM tb_trainings WHERE training_id = ?";
 
 $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
 $stmt_fetch->bind_param("i", $training_id);
@@ -105,25 +98,15 @@ $stmt_fetch->bind_result(
 $stmt_fetch->fetch();
 $stmt_fetch->close();
 
-
-$error_message = '';
-$full_urls = [];
-$thumbnail_paths = [];
-$main_file_sizes = [];
-$thumbnail_file_sizes = [];
-
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
     $training_id = intval($_POST['training_id']);
     if ($training_id <= 0) {
-        die("Error: Invalid training ID.");
+        die(json_encode(['error' => "Invalid training ID."]));
     }
 
-    include '../scripts/photo-functions.php';
-
-    // ✅ Process deleted images
+    // ✅ Handle deleted images
     if (isset($_POST['deleted_images'])) {
         $deleted_images = json_decode($_POST['deleted_images'], true);
-
         if (is_array($deleted_images) && count($deleted_images) > 0) {
             foreach ($deleted_images as $photo_field) {
                 deleteTrainingImage($training_id, $photo_field, $gobrik_conn);
@@ -131,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
         }
     }
 
-    // ✅ Process new image uploads
+    // ✅ Handle new image uploads
     $upload_dir = '../trainings/photos/';
     $thumbnail_dir = '../trainings/tmbs/';
     $db_fields = [];
@@ -141,8 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
     for ($i = 0; $i <= 6; $i++) {
         $file_input_name = "training_photo{$i}_main";
         if (isset($_FILES[$file_input_name]) && $_FILES[$file_input_name]['error'] == UPLOAD_ERR_OK) {
-            $file_extension = strtolower(pathinfo($_FILES[$file_input_name]['name'], PATHINFO_EXTENSION));
-            $new_file_name_webp = 'training-' . $training_id . '-' . $i . '.webp';
+            $new_file_name_webp = "training-{$training_id}-{$i}.webp";
             $targetPath = $upload_dir . $new_file_name_webp;
 
             if (resizeAndConvertToWebP($_FILES[$file_input_name]['tmp_name'], $targetPath, 1000, 88)) {
@@ -171,61 +153,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
         $update_stmt->close();
     }
 
-    echo json_encode(['success' => true]);
-    exit();
+    // ✅ Fetch updated images after processing deletions & uploads
+    $valid_full_urls = [];
+    $valid_thumbnails = [];
 
+    for ($i = 0; $i <= 6; $i++) {
+        $photo_main = ${"training_photo{$i}_main"};
+        $photo_tmb = ${"training_photo{$i}_tmb"};
 
-
-    if (!empty($db_fields) && empty($error_message)) {
-        // Fetch the briks_made and avg_brik_weight for the current training
-        $fetch_sql = "SELECT briks_made, avg_brik_weight FROM tb_trainings WHERE training_id = ?";
-        $fetch_stmt = $gobrik_conn->prepare($fetch_sql);
-        $fetch_stmt->bind_param("i", $training_id);
-        $fetch_stmt->execute();
-        $fetch_stmt->bind_result($briks_made, $avg_brik_weight);
-        $fetch_stmt->fetch();
-        $fetch_stmt->close();
-
-        // Calculate est_plastic_packed in kg
-        $est_plastic_packed = round(($briks_made * $avg_brik_weight) / 1000, 1);
-
-        array_push($db_fields, "training_logged", "ready_to_show", "est_plastic_packed");
-        array_push($db_values, date("Y-m-d H:i:s"), 1, $est_plastic_packed);
-        $db_types .= "sis";
-
-        $fields_for_update = implode(", ", array_map(function($field) { return "{$field} = ?"; }, $db_fields));
-        $update_sql = "UPDATE tb_trainings SET {$fields_for_update} WHERE training_id = ?";
-        $db_values[] = $training_id;
-        $db_types .= "i";
-
-        $update_stmt = $gobrik_conn->prepare($update_sql);
-        $update_stmt->bind_param($db_types, ...$db_values);
-        if (!$update_stmt->execute()) {
-            $error_message .= "Database update failed: " . $update_stmt->error;
+        if (!empty($photo_main) && !empty($photo_tmb)) {
+            $valid_full_urls[] = $photo_main;
+            $valid_thumbnails[] = $photo_tmb;
         }
-        $update_stmt->close();
     }
 
-    if (!empty($error_message)) {
-        http_response_code(400);
-        header('Content-Type: application/json');
-        echo json_encode(['error' => "An error has occurred: " . $error_message . " END"]);
-        exit;
-    } else {
-        $response = array(
-            'training_id' => $training_id,
-            'full_urls' => $full_urls,
-            'thumbnail_paths' => $thumbnail_paths,
-            'main_file_sizes' => $main_file_sizes,
-            'thumbnail_file_sizes' => $thumbnail_file_sizes
-        );
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit;
-    }
+    echo json_encode([
+        'training_id' => $training_id,
+        'full_urls' => $valid_full_urls,
+        'thumbnail_paths' => $valid_thumbnails
+    ]);
+    exit();
 }
 
+/**
+ * ✅ Function to delete a training image from the database and server
+ */
+function deleteTrainingImage($training_id, $photo_field, $conn) {
+    $update_sql = "UPDATE tb_trainings SET {$photo_field} = NULL, REPLACE({$photo_field}, 'photos/', 'tmbs/') = NULL WHERE training_id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("i", $training_id);
+    $update_stmt->execute();
+    $update_stmt->close();
+}
 ?>
+
 
 
 
