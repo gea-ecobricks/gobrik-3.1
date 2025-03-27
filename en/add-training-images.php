@@ -173,7 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['training_id'])) {
 
     echo json_encode(['success' => true]);
     exit();
-}
+
 
 
     if (!empty($db_fields) && empty($error_message)) {
