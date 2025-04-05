@@ -146,14 +146,14 @@ if (!empty($credential_key)) {
             </div>
         <p class="form-caption" style="text-align:center; margin-top: 10px;font-size:0.9em;" data-lang-id="009-terms">Earthen newsletters and GoBrik are sent according to our non-profit, privacy <a href="#" onclick="showModalInfo('terms', '<?php echo $lang; ?>')" class="underline-link"> Terms of Service</a>.</p>
 
-<hr style="margin-top:50px; margin-bottom:14px;">
+<!--<hr style="margin-top:50px; margin-bottom:14px;">
 <h2 data-lang-id="008-that-is-it">That's it!</h2>
 <p data-lang-id="008b-your-activation-complete">Your Buwana account activation process is complete!  Now you can wrap up and login...</p>
 
-           </div>
+           </div>-->
 
             <div id="submit-section" style="text-align:center;margin-top:25px;" data-lang-id="016x-complete-button">
-                <input type="submit" id="submit-button" value="Finish & Login" class="submit-button enabled">
+                <input type="submit" id="submit-button" value="Finalize..." class="submit-button enabled">
             </div>
         </form>
 
