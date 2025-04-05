@@ -105,23 +105,34 @@ if (is_null($ecobricker_id)) {
     exit();
 }
 
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
 
 function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
     $mail = new PHPMailer(true);
 
     try {
+        // Enable SMTP debug output to logs (for development)
+        $mail->SMTPDebug = 2; // 0 = off (prod), 2 = detailed
+        $mail->Debugoutput = function($str, $level) {
+            error_log("SMTP Debug [$level]: $str");
+        };
+
         // Server settings
         $mail->isSMTP();
         $mail->Host = getenv('SMTP_HOST');           // mail.ecobricks.org
         $mail->SMTPAuth = getenv('SMTP_AUTH') === 'true';
         $mail->Username = getenv('SMTP_USERNAME');   // gobrik@ecobricks.org
-        $mail->Password = getenv('SMTP_PASSWORD');   // your email password (set securely)
+        $mail->Password = getenv('SMTP_PASSWORD');   // secured env var
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = getenv('SMTP_PORT');           // 465
+
+        // Log basic SMTP config (masking password!)
+        error_log("SMTP fallback: Trying to send email using:");
+        error_log("Host: " . $mail->Host);
+        error_log("Port: " . $mail->Port);
+        error_log("Username: " . $mail->Username);
+        error_log("SMTPAuth: " . ($mail->SMTPAuth ? "true" : "false"));
 
         // Sender & recipient
         $mail->setFrom('gobrik@ecobricks.org', 'GoBrik Backup Mailer');
@@ -159,13 +170,13 @@ function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
         $mail->AltBody = $text_body;
 
         $mail->send();
-        error_log("SMTP: Fallback verification email sent successfully to $email_addr");
+        error_log("✅ SMTP: Fallback verification email sent successfully to $email_addr");
         return true;
 
-   } catch (Exception $e) {
-    error_log("PHPMailer Exception: " . $e->getMessage());
-    error_log("PHPMailer ErrorInfo: " . $mail->ErrorInfo);
-    return false;
+    } catch (Exception $e) {
+        error_log("❌ PHPMailer Exception: " . $e->getMessage());
+        error_log("❌ PHPMailer ErrorInfo: " . $mail->ErrorInfo);
+        return false;
     }
 }
 
