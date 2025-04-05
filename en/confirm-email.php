@@ -163,21 +163,27 @@ function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
                 break;
         }
 
-        // Email content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body = $html_body;
-        $mail->AltBody = $text_body;
+// Email content
+$mail->isHTML(true);
+$mail->Subject = $subject;
+$mail->Body = $html_body;
+$mail->AltBody = $text_body;
 
-        $mail->send();
-        error_log("✅ SMTP: Fallback verification email sent successfully to $email_addr");
-        return true;
+// Add timeouts and safety
+$mail->Timeout = 10;
+$mail->SMTPConnectTimeout = 10;
+$mail->SMTPKeepAlive = false;
 
-    } catch (Exception $e) {
-        error_log("❌ PHPMailer Exception: " . $e->getMessage());
-        error_log("❌ PHPMailer ErrorInfo: " . $mail->ErrorInfo);
-        return false;
-    }
+try {
+    $mail->send();
+    error_log("✅ SMTP: Fallback verification email sent successfully to $email_addr");
+    return true;
+} catch (\Throwable $e) {
+    error_log("🚨 PHPMailer Throwable Exception: " . $e->getMessage());
+    error_log("❌ PHPMailer ErrorInfo: " . $mail->ErrorInfo);
+    return false;
+}
+
 }
 
 
@@ -229,11 +235,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['send_email']) || iss
         $code_sent = backUpSMTPsender($first_name, $email_addr, $generated_code, $lang);
     }
 
-    if ($code_sent) {
-        $code_sent_flag = true;
-    } else {
-        echo '<script>alert("We tried both our main and backup servers, but the message could not be sent. Please try again later.");</script>';
-    }
+if ($code_sent) {
+    $code_sent_flag = true;
+} else {
+    echo '<script>alert("We tried both our main and backup servers, but your verification email could not be sent. Please try again later or contact support.");</script>';
+    error_log("❌ Final email attempt failed.");
+}
 }
 
 
