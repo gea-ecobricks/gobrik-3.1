@@ -109,8 +109,6 @@ if (is_null($ecobricker_id)) {
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-composer require phpmailer/phpmailer
-
 
 function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
     $mail = new PHPMailer(true);
