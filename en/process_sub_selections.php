@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 
 require_once("../buwanaconn_env.php");
@@ -76,4 +77,5 @@ if ($buwana_id) {
 // PART 4: Redirect the user to the login page with the required parameters after processing
 header('Location: finalize.php?id=' . urlencode($buwana_id));
 exit();
+ob_end_flush(); // Flush the buffer and send output
 ?>
