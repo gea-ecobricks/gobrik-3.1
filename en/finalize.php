@@ -361,6 +361,7 @@ const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_Q
 
 
 function openAddCommunityModal() {
+console.log("🌍 userCountryId:", userCountryId);
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
