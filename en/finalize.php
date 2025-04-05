@@ -211,14 +211,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div id="splash-bar"></div>
 
 <!-- PAGE CONTENT -->
-<div id="top-page-image" class="welcome-casandra top-page-image"></div>
+<div id="top-page-image" class="biosphere top-page-image"></div>
 
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;">
             <p style="color:green;">✔ <?php echo htmlspecialchars($first_name); ?>, <span data-lang-id="001-subs-set"> your subscriptions to Earthen are confirmed!</p>
-            <div id="status-message"><span data-lang-id="012-status-heading2"> Now the fun part!</span></div>
-            <div id="sub-status-message" data-lang-id="013-sub-ecozone" style="font-size:1.3em;padding-top:10px;padding-bottom:10px;">To finalize your account, please choose your fellow Earthling emoji to best represent who you are.  This emoji will accompany your user name when you're logged in.</div>
+            <div id="status-message"><h2 data-lang-id="012-status-heading2"> Now the fun part!</h2></div>
+            <p id="sub-status-message" data-lang-id="013-sub-ecozone" style="font-size:1.3em;padding-top:10px;padding-bottom:10px;">To finalize your account, please choose your fellow Earthling emoji to best represent who you are.  This emoji will accompany your user name when you're logged in.</p>
         </div>
 
         <!-- FINALIZE ACCOUNT FORM -->
