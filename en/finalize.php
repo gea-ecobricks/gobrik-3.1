@@ -307,6 +307,7 @@ $emoji_options = [
 
 
 
+
 <?php
 // Get current language directory from URL (e.g., 'en', 'fr', etc.)
 $current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));

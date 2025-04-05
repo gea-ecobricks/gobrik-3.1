@@ -10,22 +10,21 @@ if (!$buwana_id || $_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Collect form data
-$community_name = $_POST['community_name'] ?? null;
-$country_name = $_POST['country_name'] ?? null;
-$language_id = $_POST['language_id'] ?? null;
-$earthling_emoji = $_POST['earthling_emoji'] ?? null;
+$community_name   = $_POST['community_name'] ?? null;
+$country_id       = $_POST['country_name'] ?? null; // now actually the country_id
+$language_id      = $_POST['language_id'] ?? null;
+$earthling_emoji  = $_POST['earthling_emoji'] ?? null;
 
-// Lookup country_id and continent_code
-$country_id = null;
+// Lookup continent_code for selected country_id
 $continent_code = null;
 
-$sql_country = "SELECT country_id, continent_code FROM countries_tb WHERE country_name = ?";
+$sql_country = "SELECT continent_code FROM countries_tb WHERE country_id = ?";
 $stmt_country = $buwana_conn->prepare($sql_country);
 
 if ($stmt_country) {
-    $stmt_country->bind_param('s', $country_name);
+    $stmt_country->bind_param('i', $country_id);
     $stmt_country->execute();
-    $stmt_country->bind_result($country_id, $continent_code);
+    $stmt_country->bind_result($continent_code);
     $stmt_country->fetch();
     $stmt_country->close();
 } else {
