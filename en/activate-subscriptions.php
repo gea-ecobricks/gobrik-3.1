@@ -147,7 +147,7 @@ if (!empty($credential_key)) {
 
 <!--<hr style="margin-top:50px; margin-bottom:14px;">
 <h2 data-lang-id="008-that-is-it">That's it!</h2>-->
-<p data-lang-id="008b-your-activation-complete">Your Buwana account activation almost complete...</p>
+<p data-lang-id="008c-your-activation-complete">Your Buwana account activation is almost complete...</p>
 
            </div>
 
