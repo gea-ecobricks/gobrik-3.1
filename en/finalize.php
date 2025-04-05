@@ -332,7 +332,7 @@ $current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));
 
 
     <!-- SUBMIT SECTION -->
-    <div id="submit-section" style="text-align: center; margin-top: 25px; " data-lang-id="016-next-button">
+    <div id="submit-section" style="text-align: center; margin-top: 25px; " data-lang-id="016-all-done-button">
         <input type="submit" id="submit-button" value="All done!" class="submit-button enabled">
 
     </div>
