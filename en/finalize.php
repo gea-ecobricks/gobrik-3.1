@@ -355,6 +355,10 @@ $current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));
 
 
 
+const userLanguageId = "<?php echo $current_lang_dir; ?>"; // from URL directory
+const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_QUOTES, 'UTF-8'); ?>"; // from DB
+
+
 
 function openAddCommunityModal() {
     const modal = document.getElementById('form-modal-message');
@@ -406,7 +410,7 @@ function openAddCommunityModal() {
                 <?php endforeach; ?>
             </select>
 
-            <button type="submit" style="margin-top:10px;">Submit</button>
+            <button type="submit" style="margin-top:10px;" class="confirm-button enabled">Submit</button>
         </form>
     `;
 
@@ -425,10 +429,6 @@ function openAddCommunityModal() {
     }, 100); // Small delay ensures elements exist in the DOM
 }
 
-
-
-const userLanguageId = "<?php echo $current_lang_dir; ?>"; // from URL directory
-const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_QUOTES, 'UTF-8'); ?>"; // from DB
 
 
 
