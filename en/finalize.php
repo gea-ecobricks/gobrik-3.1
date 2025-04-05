@@ -268,7 +268,29 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div id="emoji-grid" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
         <?php
         // A curated list of lifeform-related emojis
-        $emoji_options = ['🐢','🐦','🐝','🦋','🐞','🐘','🦍','🐬','🦜','🦚','🐳','🐊','🦕','🦖','🦑','🐙','🐿️','🦫','🌎','🌍','🌏'];
+$emoji_options = [
+    // Mammals
+    '🐶','🐺','🦊','🐱','🐯','🦁','🐮','🐷','🐸','🐵','🦍','🦧','🐔','🐧','🦇','🐻','🐨','🐼','🦘','🦡','🦨','🦥','🦦','🦣','🦌','🦬','🐐','🐑','🐎','🫏','🐪','🐫','🦙','🦒','🦓','🐘','🐖','🐄','🐂',
+
+    // Marine
+    '🐬','🐳','🐋','🐟','🐠','🐡','🦈','🐙','🦑','🦐','🦀','🪼',
+
+    // Reptiles & Amphibians
+    '🐊','🦎','🐍','🐢','🦕','🦖',
+
+    // Birds
+    '🐦','🐧','🕊️','🦅','🦆','🦢','🦉','🦜','🪶',
+
+    // Insects
+    '🐝','🐞','🦋','🐛','🦗','🪲','🪳','🦟','🪰','🪱',
+
+    // Plants
+    '🌱','🌿','☘️','🍀','🎋','🌵','🌴','🌲','🌳','🪴','🪹','🪺',
+
+    // Human-like characters (no faces)
+    '🧑','🧒','🧓','👩','👨','👧','👦',
+    '🧕','🧔','👮','🕵️','💂','🧙','🧝','🧛','🧟','🧞','🧜','🧚','🧑‍🚀','🧑‍🔬','🧑‍🌾','🧑‍🏫','🧑‍🎨','🧑‍🚒','🧑‍🍳','🧑‍⚖️','🧑‍💻','🧑‍🔧','🧑‍🔬','🧑‍🏭'
+];
         foreach ($emoji_options as $emoji): ?>
             <div class="emoji-option" onclick="selectEmoji(this)" style="cursor:pointer; font-size: 28px; padding: 6px 10px; border: 2px solid transparent; border-radius: 8px;">
                 <?php echo $emoji; ?>
@@ -283,7 +305,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 
     <!-- SUBMIT SECTION -->
-    <div id="submit-section" style="text-align: center; margin-top: 25px; display: none;" data-lang-id="016-next-button">
+    <div id="submit-section" style="text-align: center; margin-top: 25px; " data-lang-id="016-next-button">
         <input type="submit" id="submit-button" value="Next ➡️" class="submit-button enabled">
 
     </div>
