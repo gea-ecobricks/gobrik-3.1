@@ -201,12 +201,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;">
-            <p style="color:green;">✔ <?php echo htmlspecialchars($first_name); ?>, <span data-lang-id="001-password-set"> your password is set!</p>
-            <div id="status-message"><span data-lang-id="012-status-heading2"> Now let's get you localized.</span></div>
+            <p style="color:green;">✔ <?php echo htmlspecialchars($first_name); ?>, <span data-lang-id="001-subs-set"> your subscriptions to Earthen are confirmed!</p>
+            <div id="status-message"><span data-lang-id="012-status-heading2"> Now let's finalize the last details of your Buwana Account</span></div>
             <div id="sub-status-message" data-lang-id="013-sub-ecozone" style="font-size:1.3em;padding-top:10px;padding-bottom:10px;">GoBrik is all about ecological action. Please help us determine your ecological zone:  the water shed or riverbasin where you live.</div>
         </div>
 
-        <!-- ACTIVATE 3 FORM -->
+        <!-- FINALIZE ACCOUNT FORM -->
 
       <form id="user-info-form" method="post" action="activate-3.php?id=<?php echo htmlspecialchars($buwana_id); ?>">
 
@@ -233,6 +233,52 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </a>
     </p>
 </div>
+
+<!-- COUNTRY SELECT -->
+<div class="form-item" id="country-section" style="margin-top: 20px;">
+    <label for="country_name">🌍 Select your country:</label><br>
+    <select id="country_name" name="country_name" required style="width: 100%; padding: 10px;">
+        <option value="">-- Select your country --</option>
+        <?php foreach ($countries as $country): ?>
+            <option value="<?php echo htmlspecialchars($country['country_name']); ?>">
+                <?php echo htmlspecialchars($country['country_name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+
+<!-- LANGUAGE SELECT -->
+<div class="form-item" id="language-section" style="margin-top: 20px;">
+    <label for="language_id">🗣️ Select your language:</label><br>
+    <select id="language_id" name="language_id" required style="width: 100%; padding: 10px;">
+        <option value="">-- Select your language --</option>
+        <?php foreach ($languages as $language): ?>
+            <option value="<?php echo htmlspecialchars($language['language_id']); ?>">
+                <?php echo htmlspecialchars($language['languages_native_name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+
+<!-- EARTHLING EMOJI SELECT -->
+<div class="form-item" id="emoji-section" style="margin-top: 20px;">
+    <label for="earthling_emoji">🧬 Choose an emoji to represent you:</label>
+    <div id="emoji-grid" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+        <?php
+        // A curated list of lifeform-related emojis
+        $emoji_options = ['🐢','🐦','🐝','🦋','🐞','🐘','🦍','🐬','🦜','🦚','🐳','🐊','🦕','🦖','🦑','🐙','🐿️','🦫','🌎','🌍','🌏'];
+        foreach ($emoji_options as $emoji): ?>
+            <div class="emoji-option" onclick="selectEmoji(this)" style="cursor:pointer; font-size: 28px; padding: 6px 10px; border: 2px solid transparent; border-radius: 8px;">
+                <?php echo $emoji; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <input type="hidden" name="earthling_emoji" id="earthling_emoji">
+    <p style="margin-top: 5px; font-size: 0.9em; color: #555;">Click one emoji to represent your Earthling identity.</p>
+</div>
+
 
 
 
@@ -263,7 +309,25 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 
+
 <script>
+function selectEmoji(element) {
+    // Remove highlight from all
+    const all = document.querySelectorAll('.emoji-option');
+    all.forEach(el => el.style.border = '2px solid transparent');
+
+    // Highlight the selected one
+    element.style.border = '2px solid #28a745';
+
+    // Set the hidden input value
+    document.getElementById('earthling_emoji').value = element.innerText;
+}
+</script>
+
+
+<script>
+
+
 
  function openAddCommunityModal() {
     const modal = document.getElementById('form-modal-message');
