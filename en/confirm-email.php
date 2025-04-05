@@ -121,12 +121,15 @@ function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
 
         // Server settings
         $mail->isSMTP();
-        $mail->Host = getenv('SMTP_HOST');           // mail.ecobricks.org
-        $mail->SMTPAuth = getenv('SMTP_AUTH') === 'true';
-        $mail->Username = getenv('SMTP_USERNAME');   // gobrik@ecobricks.org
-        $mail->Password = getenv('SMTP_PASSWORD');   // secure
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port = getenv('SMTP_PORT');           // 465
+$mail->Host = getenv('SMTP_HOST');
+$mail->SMTPAuth = true;
+$mail->Username = getenv('SMTP_USERNAME');
+$mail->Password = getenv('SMTP_PASSWORD');
+$mail->Port = getenv('SMTP_PORT');
+
+// Disable encryption
+$mail->SMTPSecure = false;
+$mail->SMTPAutoTLS = false;
 
         // Log basic SMTP config
         error_log("SMTP fallback: Trying to send email using:");
