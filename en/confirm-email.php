@@ -6,6 +6,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
+
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.39';
@@ -105,6 +106,70 @@ if (is_null($ecobricker_id)) {
 }
 
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
+    $mail = new PHPMailer(true);
+
+    try {
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = getenv('SMTP_HOST');           // mail.ecobricks.org
+        $mail->SMTPAuth = getenv('SMTP_AUTH') === 'true';
+        $mail->Username = getenv('SMTP_USERNAME');   // gobrik@ecobricks.org
+        $mail->Password = getenv('SMTP_PASSWORD');   // your email password (set securely)
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port = getenv('SMTP_PORT');           // 465
+
+        // Sender & recipient
+        $mail->setFrom('gobrik@ecobricks.org', 'GoBrik Backup Mailer');
+        $mail->addAddress($email_addr, $first_name);
+
+        // Language-specific subject and body
+        switch ($lang) {
+            case 'fr':
+                $subject = 'Code de vérification GoBrik';
+                $html_body = "Bonjour $first_name!<br><br>Votre code d'activation est : <b>$verification_code</b><br><br>Retournez à votre navigateur pour le saisir.<br><br>L'équipe GoBrik";
+                $text_body = "Bonjour $first_name! Votre code d'activation est : $verification_code. Retournez à votre navigateur pour le saisir. L'équipe GoBrik";
+                break;
+            case 'es':
+                $subject = 'Código de verificación de GoBrik';
+                $html_body = "Hola $first_name!<br><br>Tu código de activación es: <b>$verification_code</b><br><br>Vuelve a tu navegador para ingresarlo.<br><br>El equipo de GoBrik";
+                $text_body = "Hola $first_name! Tu código de activación es: $verification_code. Vuelve a tu navegador para ingresarlo. El equipo de GoBrik";
+                break;
+            case 'id':
+                $subject = 'Kode Verifikasi GoBrik';
+                $html_body = "Halo $first_name!<br><br>Kode aktivasi Anda adalah: <b>$verification_code</b><br><br>Kembali ke browser Anda untuk memasukkan kode.<br><br>Tim GoBrik";
+                $text_body = "Halo $first_name! Kode aktivasi Anda adalah: $verification_code. Kembali ke browser Anda untuk memasukkan kode. Tim GoBrik";
+                break;
+            case 'en':
+            default:
+                $subject = 'GoBrik Verification Code';
+                $html_body = "Hello $first_name!<br><br>Your activation code is: <b>$verification_code</b><br><br>Return to your browser and enter the code.<br><br>The GoBrik team";
+                $text_body = "Hello $first_name! Your activation code is: $verification_code. Return to your browser and enter the code. The GoBrik team";
+                break;
+        }
+
+        // Email content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $html_body;
+        $mail->AltBody = $text_body;
+
+        $mail->send();
+        error_log("SMTP: Fallback verification email sent successfully to $email_addr");
+        return true;
+
+    } catch (Exception $e) {
+        error_log("PHPMailer Exception: " . $mail->ErrorInfo);
+        return false;
+    }
+}
+
+
+
+
 
 // PART 4: Look up user information using ecobricker_id provided in URL
 require_once("../gobrikconn_env.php");
@@ -142,15 +207,22 @@ if ($stmt_update_code) {
 }
 
 
-//PART 6: Handle form submission to send the confirmation code by email
+// PART 6: Handle form submission to send the confirmation code by email
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['send_email']) || isset($_POST['resend_email']))) {
     $code_sent = sendVerificationCode($first_name, $email_addr, $generated_code, $lang);
+
+    if (!$code_sent) {
+        // Try backup SMTP method
+        $code_sent = backUpSMTPsender($first_name, $email_addr, $generated_code, $lang);
+    }
+
     if ($code_sent) {
         $code_sent_flag = true;
     } else {
-        echo '<script>alert("Message could not be sent. Please try again later.");</script>';
+        echo '<script>alert("We tried both our main and backup servers, but the message could not be sent. Please try again later.");</script>';
     }
 }
+
 
 $gobrik_conn->close();
 
