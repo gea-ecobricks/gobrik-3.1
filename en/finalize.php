@@ -202,8 +202,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;">
             <p style="color:green;">✔ <?php echo htmlspecialchars($first_name); ?>, <span data-lang-id="001-subs-set"> your subscriptions to Earthen are confirmed!</p>
-            <div id="status-message"><span data-lang-id="012-status-heading2"> Now let's finalize the last details of your Buwana Account</span></div>
-            <div id="sub-status-message" data-lang-id="013-sub-ecozone" style="font-size:1.3em;padding-top:10px;padding-bottom:10px;">GoBrik is all about ecological action. Please help us determine your ecological zone:  the water shed or riverbasin where you live.</div>
+            <div id="status-message"><span data-lang-id="012-status-heading2"> Now the fun part!</span></div>
+            <div id="sub-status-message" data-lang-id="013-sub-ecozone" style="font-size:1.3em;padding-top:10px;padding-bottom:10px;">To finalize your account, please choose your fellow Earthling emoji to best represent who you are.  This emoji will accompany your user name when you're logged in.</div>
         </div>
 
         <!-- FINALIZE ACCOUNT FORM -->
@@ -211,55 +211,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <form id="user-info-form" method="post" action="finalize_process.php?id=<?php echo htmlspecialchars($buwana_id); ?>">
 
 
-  <!-- COMMUNITY FIELD -->
-<div class="form-item" id="community-section" style="display: none; margin-top:20px;">
-    <label for="community_name" data-lang-id="012-community-name">Select and confirm your GoBrik community:</label><br>
-    <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
-           placeholder="Type your community" style="width: 100%; padding: 10px;"
-           value="<?php echo htmlspecialchars($pre_community ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <datalist id="community_list">
-        <?php foreach ($communities as $community) : ?>
-            <option value="<?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>" <?php echo (isset($pre_community) && $community === $pre_community) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>
-            </option>
-        <?php endforeach; ?>
-        <option value="+Add a new community..." onclick="openAddCommunityModal()">+ Add a new community...</option>
-    </datalist>
-
-    <!-- "Add a new community" text link -->
-    <p class="form-caption" data-lang-id="012-community-caption-xx">
-        Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
-            Don't see your community? Add it.
-        </a>
-    </p>
-</div>
-
-<!-- COUNTRY SELECT -->
-<div class="form-item" id="country-section" style="margin-top: 20px;">
-    <label for="country_name">🌍 Select your country:</label><br>
-    <select id="country_name" name="country_name" required style="width: 100%; padding: 10px;">
-        <option value="">-- Select your country --</option>
-        <?php foreach ($countries as $country): ?>
-            <option value="<?php echo htmlspecialchars($country['country_name']); ?>">
-                <?php echo htmlspecialchars($country['country_name']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
-
-
-<!-- LANGUAGE SELECT -->
-<div class="form-item" id="language-section" style="margin-top: 20px;">
-    <label for="language_id">🗣️ Select your language:</label><br>
-    <select id="language_id" name="language_id" required style="width: 100%; padding: 10px;">
-        <option value="">-- Select your language --</option>
-        <?php foreach ($languages as $language): ?>
-            <option value="<?php echo htmlspecialchars($language['language_id']); ?>">
-                <?php echo htmlspecialchars($language['languages_native_name']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
 
 
 <!-- EARTHLING EMOJI SELECT -->
@@ -301,6 +252,62 @@ $emoji_options = [
     <p style="margin-top: 5px; font-size: 0.9em; color: #555;">Click one emoji to represent your Earthling identity.</p>
 </div>
 
+
+
+  <!-- COMMUNITY FIELD -->
+<div class="form-item" id="community-section" style="display: none; margin-top:20px;">
+    <label for="community_name" data-lang-id="012-community-name">Buwana accounts are all about connecting us with our local and global communities.  There's a good chance someone local to you has already set one up!  Please select your primary local community or add it here:</label><br>
+    <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
+           placeholder="Type your community" style="width: 100%; padding: 10px;"
+           value="<?php echo htmlspecialchars($pre_community ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <datalist id="community_list">
+        <?php foreach ($communities as $community) : ?>
+            <option value="<?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>" <?php echo (isset($pre_community) && $community === $pre_community) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+        <?php endforeach; ?>
+        <option value="+Add a new community..." onclick="openAddCommunityModal()">+ Add a new community...</option>
+    </datalist>
+
+    <!-- "Add a new community" text link -->
+    <p class="form-caption" data-lang-id="012-community-caption-xx">
+        Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
+            Don't see your community? Add it.
+        </a>
+    </p>
+</div>
+
+<!-- COUNTRY SELECT -->
+<div class="form-item" id="country-section" style="margin-top: 20px;">
+    <label for="country_name">🌍 Please make sure we've connected you with the right country:</label><br>
+    <select id="country_name" name="country_name" required style="width: 100%; padding: 10px;">
+        <option value="">-- Select your country --</option>
+        <?php foreach ($countries as $country): ?>
+            <option value="<?php echo htmlspecialchars($country['country_name']); ?>">
+                <?php echo htmlspecialchars($country['country_name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+<?php
+// Get current language directory from URL (e.g., 'en', 'fr', etc.)
+$current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));
+?>
+
+<!-- LANGUAGE SELECT -->
+<div class="form-item" id="language-section" style="margin-top: 20px;">
+    <label for="language_id">🗣️ Please make sure we've selected the right primary language for you:</label><br>
+    <select id="language_id" name="language_id" required style="width: 100%; padding: 10px;">
+        <option value="">-- Select your language --</option>
+        <?php foreach ($languages as $language): ?>
+            <option value="<?php echo htmlspecialchars($language['language_id']); ?>"
+                <?php echo ($language['language_id'] === $current_lang_dir) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($language['languages_native_name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
 
 
 
