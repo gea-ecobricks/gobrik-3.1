@@ -279,12 +279,26 @@ background: url(../svgs/dolphin-top-optimized-dark.svg) no-repeat bottom;
   margin-bottom:-10px;
 }
 
+
+@media screen and (max-width: 700px) {
 #main {
   /* background-image:linear-gradient(var(--main-background),var(--main-background),black); */
   background: url(../svgs/starry-night-2.svg) repeat-x bottom;
   background-size: contain;
-
   }
+  }
+
+@media screen and (min-width: 700px) {
+#main {
+  background: linear-gradient(var(--main-background), var(--main-background), black),
+    url(../svgs/starry-night-2.svg) bottom no-repeat;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: none;
+  image-rendering: -webkit-optimize-contrast;
+}
+}
+
 
 .vision-landscape {
   background: url(../webps/ocean-footer-night3.webp?v=3) no-repeat center;
