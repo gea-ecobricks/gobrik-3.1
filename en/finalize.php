@@ -365,10 +365,6 @@ function selectEmoji(element) {
     // Set the hidden input value
     document.getElementById('earthling_emoji').value = element.innerText;
 }
-</script>
-
-
-<script>
 
 
 
