@@ -230,7 +230,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <!-- EARTHLING EMOJI SELECT -->
 <div class="form-item" id="emoji-section" style="margin-top: 20px;">
-    <label for="earthling_emoji">🧬 Choose an emoji to represent you:</label>
+    <!--<label for="earthling_emoji">🧬 Choose an emoji to represent you:</label>-->
     <div id="emoji-grid" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
         <?php
         // A curated list of lifeform-related emojis
@@ -285,8 +285,7 @@ $emoji_options = [
 
     <!-- "Add a new community" text link -->
     <p class="form-caption" data-lang-id="012-community-caption-xx">
-        Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
-            Don't see your community? Add it.
+        Start typing to see and select a community. Don't see your community?  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">+ Add it.
         </a>
     </p>
 </div>
