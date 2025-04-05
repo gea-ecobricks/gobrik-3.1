@@ -108,12 +108,16 @@ if (is_null($ecobricker_id)) {
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
     $mail = new PHPMailer(true);
 
     try {
         // Enable SMTP debug output to logs (for development)
-        $mail->SMTPDebug = 2; // 0 = off (prod), 2 = detailed
+        $mail->SMTPDebug = 2; // 0 = off, 2 = verbose
         $mail->Debugoutput = function($str, $level) {
             error_log("SMTP Debug [$level]: $str");
         };
@@ -123,11 +127,11 @@ function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
         $mail->Host = getenv('SMTP_HOST');           // mail.ecobricks.org
         $mail->SMTPAuth = getenv('SMTP_AUTH') === 'true';
         $mail->Username = getenv('SMTP_USERNAME');   // gobrik@ecobricks.org
-        $mail->Password = getenv('SMTP_PASSWORD');   // secured env var
+        $mail->Password = getenv('SMTP_PASSWORD');   // secure
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = getenv('SMTP_PORT');           // 465
 
-        // Log basic SMTP config (masking password!)
+        // Log basic SMTP config
         error_log("SMTP fallback: Trying to send email using:");
         error_log("Host: " . $mail->Host);
         error_log("Port: " . $mail->Port);
@@ -138,7 +142,7 @@ function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
         $mail->setFrom('gobrik@ecobricks.org', 'GoBrik Backup Mailer');
         $mail->addAddress($email_addr, $first_name);
 
-        // Language-specific subject and body
+        // Language-specific content
         switch ($lang) {
             case 'fr':
                 $subject = 'Code de vérification GoBrik';
@@ -163,29 +167,28 @@ function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
                 break;
         }
 
-// Email content
-$mail->isHTML(true);
-$mail->Subject = $subject;
-$mail->Body = $html_body;
-$mail->AltBody = $text_body;
+        // Email content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $html_body;
+        $mail->AltBody = $text_body;
 
-// Add timeouts and safety
-$mail->Timeout = 10;
-$mail->SMTPConnectTimeout = 10;
-$mail->SMTPKeepAlive = false;
+        // Add timeouts and safety
+        $mail->Timeout = 10;
+        $mail->SMTPConnectTimeout = 10;
+        $mail->SMTPKeepAlive = false;
 
-try {
-    $mail->send();
-    error_log("✅ SMTP: Fallback verification email sent successfully to $email_addr");
-    return true;
-} catch (\Throwable $e) {
-    error_log("🚨 PHPMailer Throwable Exception: " . $e->getMessage());
-    error_log("❌ PHPMailer ErrorInfo: " . $mail->ErrorInfo);
-    return false;
+        $mail->send();
+        error_log("✅ SMTP: Fallback verification email sent successfully to $email_addr");
+        return true;
+
+    } catch (\Throwable $e) {
+        error_log("🚨 PHPMailer Throwable Exception: " . $e->getMessage());
+        error_log("❌ PHPMailer ErrorInfo: " . $mail->ErrorInfo);
+        return false;
+    }
 }
 
-}
-}
 
 
 
