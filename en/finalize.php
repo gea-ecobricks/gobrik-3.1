@@ -431,7 +431,6 @@ function openAddCommunityModal() {
 
 
 
-
 function addCommunity2Buwana(event) {
     event.preventDefault(); // Prevent normal form submission
 
@@ -442,33 +441,46 @@ function addCommunity2Buwana(event) {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Server responded with an error status');
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log("✅ API response:", data);
         alert(data.message); // Show success or error message
 
         if (data.success) {
             // Close modal
             closeModal();
 
-            // Add the new community to the dropdown
+            // Safely try to update the main community field
             const communityInput = document.getElementById('community_name');
             const communityList = document.getElementById('community_list');
 
-            // Create new option
-            const newOption = document.createElement('option');
-            newOption.value = data.community_name;
-            newOption.textContent = data.community_name;
-            communityList.appendChild(newOption);
+            if (communityInput && communityList) {
+                // Create new option
+                const newOption = document.createElement('option');
+                newOption.value = data.community_name;
+                newOption.textContent = data.community_name;
+                communityList.appendChild(newOption);
 
-            // Set selected value
-            communityInput.value = data.community_name;
+                // Set selected value
+                communityInput.value = data.community_name;
+
+                console.log(`🌱 New community "${data.community_name}" added to dropdown`);
+            } else {
+                console.warn("⚠️ Could not find main form elements to update.");
+            }
         }
     })
     .catch(error => {
         alert('Error adding community. Please try again.');
-        console.error('Error:', error);
+        console.error('❌ Fetch or logic error:', error);
     });
 }
+
 
 
 
