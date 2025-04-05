@@ -351,24 +351,9 @@ $current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));
 <?php require_once ("../footer-2024.php"); ?>
 
 
-
-
+<!-- place at the bottom of your HTML page -->
 <script>
-function selectEmoji(element) {
-    // Remove highlight from all
-    const all = document.querySelectorAll('.emoji-option');
-    all.forEach(el => el.style.border = '2px solid transparent');
-
-    // Highlight the selected one
-    element.style.border = '2px solid #28a745';
-
-    // Set the hidden input value
-    document.getElementById('earthling_emoji').value = element.innerText;
-}
-
-
-
- function openAddCommunityModal() {
+function openAddCommunityModal() {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
@@ -422,6 +407,24 @@ function selectEmoji(element) {
         </form>
     `;
 }
+</script>
+
+
+<script>
+function selectEmoji(element) {
+    // Remove highlight from all
+    const all = document.querySelectorAll('.emoji-option');
+    all.forEach(el => el.style.border = '2px solid transparent');
+
+    // Highlight the selected one
+    element.style.border = '2px solid #28a745';
+
+    // Set the hidden input value
+    document.getElementById('earthling_emoji').value = element.innerText;
+}
+
+
+
 
 
 function addCommunity2Buwana(event) {
