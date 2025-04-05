@@ -284,7 +284,6 @@ $emoji_options = [
                 <?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>
             </option>
         <?php endforeach; ?>
-        <option value="+Add a new community..." onclick="openAddCommunityModal()">+ Add a new community...</option>
     </datalist>
 
     <!-- "Add a new community" text link -->
