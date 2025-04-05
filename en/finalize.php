@@ -221,9 +221,7 @@ exit();
 <html lang="<?php echo $lang; ?>">
 <head>
 <meta charset="UTF-8">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <!--
 GoBrik.com site version 3.0
 Developed and made open source by the Global Ecobrick Alliance
@@ -250,33 +248,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
       <form id="user-info-form" method="post" action="activate-3.php?id=<?php echo htmlspecialchars($buwana_id); ?>">
 
-    <!-- LOCATION FULL -->
-    <div class="form-item">
-        <label for="location_full" data-lang-id="011-your-local-area">Where is your home?</label><br>
-        <div class="input-container">
-            <input type="text" id="location_full" name="location_full" aria-label="Location Full" required style="padding-left:45px;">
-            <div id="loading-spinner" class="spinner" style="display: none;"></div>
-            <div id="location-pin" class="pin-icon">📍</div>
-        </div>
-        <p class="form-caption" data-lang-id="011-location-full-caption">Start typing your home location (without the street location!), and we'll fill in the rest.  Data source: OpenStreetMap API.</p>
-        <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
-    </div>
-
-    <input type="hidden" id="lat" name="latitude">
-    <input type="hidden" id="lon" name="longitude">
-
-    <!-- MAP AND WATERSHED SEARCH SECTION -->
-    <div class="form-item" id="watershed-map-section" style="display: none; margin-top:20px;">
-        <label for="watershed_select" data-lang-id="011-watershed-select">To what river/stream watershed does your local water flow?</label><br>
-        <div id="map" style="height: 350px; border-radius: 0px 0px 12px 12px; margin-top: 8px;"></div>
-        <p class="form-caption" data-lang-id="012-river-basics" style="margin-top:10px;">ℹ️ <a href="#" onclick="showModalInfo('watershed', '<?php echo $lang; ?>')" class="underline-link">Watersheds</a> provide a great non-political way to localize our users by ecological region!  The map shows rivers and streams around you.  Choose the one to which your water flows.</p>
-        <select id="watershed_select" name="watershed_select" aria-label="Watershed Select" style="width: 100%; padding: 10px;">
-            <option value="" disabled selected data-lang-id="011b-select-river">👉 Select river/stream...</option>
-
-        </select>
-
-
-    </div>
 
   <!-- COMMUNITY FIELD -->
 <div class="form-item" id="community-section" style="display: none; margin-top:20px;">

@@ -19,10 +19,10 @@ if (isLoggedIn()) {
 }
 
 // Initialize variables
-$buwana_id = $_GET['id'] ?? null;  // Correctly initializing buwana_id
+$buwana_id = $_GET['id'] ?? null;
 $page = 'activate';
 $first_name = '';
-$pre_community = '';  // Ensure pre_community is initialized
+$pre_community = '';
 
 // PART 1: Check if the user is already logged in
 if (isset($_SESSION['buwana_id'])) {
@@ -42,7 +42,6 @@ if (is_null($buwana_id)) {
 // PART 3: Look up user information using buwana_id provided in URL
 require_once("../buwanaconn_env.php");
 
-// Fetch user information using buwana_id from the Buwana database
 $sql_user_info = "SELECT first_name FROM users_tb WHERE buwana_id = ?";
 $stmt_user_info = $buwana_conn->prepare($sql_user_info);
 
@@ -56,12 +55,11 @@ if ($stmt_user_info) {
     die('Error preparing statement for fetching user info: ' . $buwana_conn->error);
 }
 
-// Ensure $first_name is set and not empty
 if (empty($first_name)) {
-    $first_name = 'User'; // Fallback if first name is not set
+    $first_name = 'User';
 }
 
-// PART 4: Fetch Ecobricker's community from GoBrik database
+// PART 4: Fetch Ecobricker's community from GoBrik database (can be skipped or left blank safely)
 require_once("../gobrikconn_env.php");
 
 $sql_ecobricker_community = "SELECT community FROM tb_ecobrickers WHERE buwana_id = ?";
@@ -77,19 +75,7 @@ if ($stmt_ecobricker_community) {
     die('Error preparing statement for fetching ecobricker community: ' . $gobrik_conn->error);
 }
 
-// PART 5: Fetch all communities from the communities_tb table in Buwana database
-$communities = [];
-$sql_communities = "SELECT com_name FROM communities_tb";
-$result_communities = $buwana_conn->query($sql_communities);
-
-if ($result_communities && $result_communities->num_rows > 0) {
-    while ($row = $result_communities->fetch_assoc()) {
-        $communities[] = $row['com_name'];
-    }
-}
-
-
-// Fetch all countries
+// PART 5: Fetch all countries
 $countries = [];
 $sql_countries = "SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC";
 $result_countries = $buwana_conn->query($sql_countries);
@@ -111,21 +97,17 @@ if ($result_languages && $result_languages->num_rows > 0) {
     }
 }
 
-
-
 // PART 6: Handle form submission (if needed)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_location_full = $_POST['location_full'];
     $user_lat = $_POST['latitude'];
     $user_lon = $_POST['longitude'];
-    $location_watershed = $_POST['watershed_select']; // Capture the selected watershed
-    $selected_community_name = $_POST['community_name']; // Get the selected community name from the form
+    $location_watershed = $_POST['watershed_select'];
 
-    // Extract country from the last term in the location string (after the last comma)
+    // Extract country from the last term in the location string
     $location_parts = explode(',', $user_location_full);
     $selected_country = trim(end($location_parts));
 
-    // Fetch the country_id from the countries_tb using the extracted country name
     $sql_country = "SELECT country_id, continent_code FROM countries_tb WHERE country_name = ?";
     $stmt_country = $buwana_conn->prepare($sql_country);
 
@@ -139,75 +121,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die('Error preparing statement for fetching country info: ' . $buwana_conn->error);
     }
 
-    // Check if the country, continent, or community were found in the database and set to null if not
-$set_country_id = !empty($set_country_id) ? $set_country_id : null;
-$set_continent_code = !empty($set_continent_code) ? $set_continent_code : null;
-$community_id = !empty($community_id) ? $community_id : null;
+    $set_country_id = !empty($set_country_id) ? $set_country_id : null;
+    $set_continent_code = !empty($set_continent_code) ? $set_continent_code : null;
 
-// Update the Buwana user's continent, country, location, watershed, and community using buwana_id
-$sql_update_buwana = "UPDATE users_tb SET continent_code = ?, country_id = ?, location_full = ?, location_lat = ?, location_long = ?, location_watershed = ?, community_id = ? WHERE buwana_id = ?";
-$stmt_update_buwana = $buwana_conn->prepare($sql_update_buwana);
-if ($stmt_update_buwana) {
-    $stmt_update_buwana->bind_param('sissdsii', $set_continent_code, $set_country_id, $user_location_full, $user_lat, $user_lon, $location_watershed, $community_id, $buwana_id);
-    $stmt_update_buwana->execute();
-    $stmt_update_buwana->close();
+    // Update the Buwana user's basic info
+    $sql_update_buwana = "UPDATE users_tb SET continent_code = ?, country_id = ?, location_full = ?, location_lat = ?, location_long = ?, location_watershed = ? WHERE buwana_id = ?";
+    $stmt_update_buwana = $buwana_conn->prepare($sql_update_buwana);
+    if ($stmt_update_buwana) {
+        $stmt_update_buwana->bind_param('sissdsi', $set_continent_code, $set_country_id, $user_location_full, $user_lat, $user_lon, $location_watershed, $buwana_id);
+        $stmt_update_buwana->execute();
+        $stmt_update_buwana->close();
 
-    // PART 7: Open GoBrik connection and update tb_ecobrickers
-require_once("../gobrikconn_env.php");
+        // Update GoBrik user
+        require_once("../gobrikconn_env.php");
 
-$sql_update_gobrik = "UPDATE tb_ecobrickers
-    SET buwana_activated = 1,
-        account_notes = CONCAT(account_notes, ' Location set.'),
-        location_full_txt = ?,
-        country_txt = ?,
-        location_full = ?,
-        location_lat = ?,
-        location_long = ?,
-        country_id = ?,
-        community_id = ?
-    WHERE buwana_id = ?";
+        $sql_update_gobrik = "UPDATE tb_ecobrickers
+            SET buwana_activated = 1,
+                account_notes = CONCAT(account_notes, ' Location set.'),
+                location_full_txt = ?,
+                country_txt = ?,
+                location_full = ?,
+                location_lat = ?,
+                location_long = ?,
+                country_id = ?
+            WHERE buwana_id = ?";
 
-$stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
+        $stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
 
-if ($stmt_update_gobrik) {
-    // Bind parameters for the update
-    $stmt_update_gobrik->bind_param(
-        'sssddiii',
-        $user_location_full,   // Location full text
-        $selected_country,     // Country text derived from earlier
-        $user_location_full,   // Full location for GoBrik
-        $user_lat,             // Latitude
-        $user_lon,             // Longitude
-        $set_country_id,       // Country ID derived earlier
-        $community_id,         // Community ID derived earlier
-        $buwana_id             // Buwana ID to match
-    );
+        if ($stmt_update_gobrik) {
+            $stmt_update_gobrik->bind_param(
+                'sssddii',
+                $user_location_full,
+                $selected_country,
+                $user_location_full,
+                $user_lat,
+                $user_lon,
+                $set_country_id,
+                $buwana_id
+            );
 
-    // Execute the query and handle potential errors
-    if ($stmt_update_gobrik->execute()) {
-        $stmt_update_gobrik->close();
-    } else {
-        error_log('Error executing update on tb_ecobrickers: ' . $stmt_update_gobrik->error);
-        echo "Failed to update GoBrik record.";
+            if ($stmt_update_gobrik->execute()) {
+                $stmt_update_gobrik->close();
+            } else {
+                error_log('Error executing update on tb_ecobrickers: ' . $stmt_update_gobrik->error);
+                echo "Failed to update GoBrik record.";
+            }
+        } else {
+            error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
+            echo "Failed to prepare GoBrik update statement.";
+        }
+
+        $gobrik_conn->close();
+
+        // Redirect to the next step
+        header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
+        exit();
     }
-} else {
-    error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
-    echo "Failed to prepare GoBrik update statement.";
-}
-
-// Close the GoBrik connection
-$gobrik_conn->close();
-
-// Redirect to the next step
-header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
-exit();
-
-
-}
-
-
 }
 ?>
+
 
 
 
@@ -279,28 +251,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     </div>
 
-  <!-- COMMUNITY FIELD -->
-<div class="form-item" id="community-section" style="display: none; margin-top:20px;">
-    <label for="community_name" data-lang-id="012-community-name">Select and confirm your GoBrik community:</label><br>
-    <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
-           placeholder="Type your community" style="width: 100%; padding: 10px;"
-           value="<?php echo htmlspecialchars($pre_community ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <datalist id="community_list">
-        <?php foreach ($communities as $community) : ?>
-            <option value="<?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>" <?php echo (isset($pre_community) && $community === $pre_community) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($community, ENT_QUOTES, 'UTF-8'); ?>
-            </option>
-        <?php endforeach; ?>
-        <option value="+Add a new community..." onclick="openAddCommunityModal()">+ Add a new community...</option>
-    </datalist>
 
-    <!-- "Add a new community" text link -->
-    <p class="form-caption" data-lang-id="012-community-caption-xx">
-        Start typing to see and select a community.  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">
-            Don't see your community? Add it.
-        </a>
-    </p>
-</div>
 
 
 
@@ -323,103 +274,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php require_once ("../footer-2024.php"); ?>
 
 
-
 <script>
-
- function openAddCommunityModal() {
-    const modal = document.getElementById('form-modal-message');
-    const modalBox = document.getElementById('modal-content-box');
-
-    modal.style.display = 'flex';
-    modalBox.style.flexFlow = 'column';
-    document.getElementById('page-content')?.classList.add('blurred');
-    document.getElementById('footer-full')?.classList.add('blurred');
-    document.body.classList.add('modal-open');
-
-    modalBox.style.maxHeight = '80vh';
-    modalBox.style.overflowY = 'auto';
-
-    modalBox.innerHTML = `
-        <h2 style="text-align:center;">Add Your Community</h2>
-        <p>Add your community to GoBrik so you can manage local projects and ecobricks.</p>
-
-        <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
-            <label for="newCommunityName">Name of Community:</label>
-            <input type="text" id="newCommunityName" name="newCommunityName" required>
-
-            <label for="newCommunityType">Type of Community:</label>
-            <select id="newCommunityType" name="newCommunityType" required>
-                <option value="">Select Type</option>
-                <option value="neighborhood">Neighborhood</option>
-                <option value="city">City</option>
-                <option value="school">School</option>
-                <option value="organization">Organization</option>
-            </select>
-
-            <label for="communityCountry">Country:</label>
-            <select id="communityCountry" name="communityCountry" required>
-                <option value="">Select Country</option>
-                <?php foreach ($countries as $country) : ?>
-                    <option value="<?php echo $country['country_id']; ?>">
-                        <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <label for="communityLanguage">Preferred Language:</label>
-            <select id="communityLanguage" name="communityLanguage" required>
-                <option value="">Select Language</option>
-                <?php foreach ($languages as $language) : ?>
-                    <option value="<?php echo $language['language_id']; ?>">
-                        <?php echo htmlspecialchars($language['languages_native_name'], ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <button type="submit" style="margin-top:10px;width:100%;" class="submit-button enabled">Submit</button>
-        </form>
-    `;
-}
-
-
-function addCommunity2Buwana(event) {
-    event.preventDefault(); // Prevent normal form submission
-
-    const form = document.getElementById('addCommunityForm');
-    const formData = new FormData(form);
-
-    fetch('../scripts/add_community.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message); // Show success or error message
-
-        if (data.success) {
-            // Close modal
-            closeInfoModal();
-
-            // Add the new community to the dropdown
-            const communityInput = document.getElementById('community_name');
-            const communityList = document.getElementById('community_list');
-
-            // Create new option
-            const newOption = document.createElement('option');
-            newOption.value = data.community_name;
-            newOption.textContent = data.community_name;
-            communityList.appendChild(newOption);
-
-            // Set selected value
-            communityInput.value = data.community_name;
-        }
-    })
-    .catch(error => {
-        alert('Error adding community. Please try again.');
-        console.error('Error:', error);
-    });
-}
-
 
 
 
