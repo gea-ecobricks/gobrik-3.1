@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.43';
-$page = 'finalize';
+$page = 'activate';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 $is_logged_in = false; // Ensure not logged in for this page
@@ -19,14 +19,10 @@ if (isLoggedIn()) {
 }
 
 // Initialize variables
-$buwana_id = $_GET['id'] ?? null;  // Correctly initializing buwana_id
+$buwana_id = $_GET['id'] ?? null;
 $page = 'activate';
 $first_name = '';
-$pre_community = '';  // Ensure pre_community is initialized
-  $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-
+$pre_community = '';
 
 // PART 1: Check if the user is already logged in
 if (isset($_SESSION['buwana_id'])) {
@@ -46,7 +42,6 @@ if (is_null($buwana_id)) {
 // PART 3: Look up user information using buwana_id provided in URL
 require_once("../buwanaconn_env.php");
 
-// Fetch user information using buwana_id from the Buwana database
 $sql_user_info = "SELECT first_name FROM users_tb WHERE buwana_id = ?";
 $stmt_user_info = $buwana_conn->prepare($sql_user_info);
 
@@ -60,9 +55,8 @@ if ($stmt_user_info) {
     die('Error preparing statement for fetching user info: ' . $buwana_conn->error);
 }
 
-// Ensure $first_name is set and not empty
 if (empty($first_name)) {
-    $first_name = 'User'; // Fallback if first name is not set
+    $first_name = 'User';
 }
 
 // PART 4: Fetch Ecobricker's community from GoBrik database
@@ -92,7 +86,6 @@ if ($result_communities && $result_communities->num_rows > 0) {
     }
 }
 
-
 // Fetch all countries
 $countries = [];
 $sql_countries = "SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC";
@@ -115,26 +108,19 @@ if ($result_languages && $result_languages->num_rows > 0) {
     }
 }
 
-
-
-// PART 6: Handle form submission (if needed)
+// PART 6: Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_location_full = $_POST['location_full'];
-    $user_lat = $_POST['latitude'];
-    $user_lon = $_POST['longitude'];
-    $location_watershed = $_POST['watershed_select']; // Capture the selected watershed
-    $selected_community_name = $_POST['community_name']; // Get the selected community name from the form
+    $selected_community_name = $_POST['community_name'];
+    $selected_country_name = $_POST['country_name'];
+    $selected_language_id = $_POST['language_id'];
+    $earthling_emoji = $_POST['earthling_emoji'] ?? '🌍'; // Fallback default emoji
 
-    // Extract country from the last term in the location string (after the last comma)
-    $location_parts = explode(',', $user_location_full);
-    $selected_country = trim(end($location_parts));
-
-    // Fetch the country_id from the countries_tb using the extracted country name
+    // Fetch country_id and continent_code from selected country
     $sql_country = "SELECT country_id, continent_code FROM countries_tb WHERE country_name = ?";
     $stmt_country = $buwana_conn->prepare($sql_country);
 
     if ($stmt_country) {
-        $stmt_country->bind_param('s', $selected_country);
+        $stmt_country->bind_param('s', $selected_country_name);
         $stmt_country->execute();
         $stmt_country->bind_result($set_country_id, $set_continent_code);
         $stmt_country->fetch();
@@ -143,75 +129,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die('Error preparing statement for fetching country info: ' . $buwana_conn->error);
     }
 
-    // Check if the country, continent, or community were found in the database and set to null if not
-$set_country_id = !empty($set_country_id) ? $set_country_id : null;
-$set_continent_code = !empty($set_continent_code) ? $set_continent_code : null;
-$community_id = !empty($community_id) ? $community_id : null;
+    $set_country_id = !empty($set_country_id) ? $set_country_id : null;
+    $set_continent_code = !empty($set_continent_code) ? $set_continent_code : null;
 
-// Update the Buwana user's continent, country, location, watershed, and community using buwana_id
-$sql_update_buwana = "UPDATE users_tb SET continent_code = ?, country_id = ?, location_full = ?, location_lat = ?, location_long = ?, location_watershed = ?, community_id = ? WHERE buwana_id = ?";
-$stmt_update_buwana = $buwana_conn->prepare($sql_update_buwana);
-if ($stmt_update_buwana) {
-    $stmt_update_buwana->bind_param('sissdsii', $set_continent_code, $set_country_id, $user_location_full, $user_lat, $user_lon, $location_watershed, $community_id, $buwana_id);
-    $stmt_update_buwana->execute();
-    $stmt_update_buwana->close();
+    // Update Buwana user with country, continent, language, community, and emoji
+    $sql_update_buwana = "UPDATE users_tb SET continent_code = ?, country_id = ?, community_id = (SELECT community_id FROM communities_tb WHERE com_name = ?), language_id = ?, earthling_emoji = ? WHERE buwana_id = ?";
+    $stmt_update_buwana = $buwana_conn->prepare($sql_update_buwana);
 
-    // PART 7: Open GoBrik connection and update tb_ecobrickers
-require_once("../gobrikconn_env.php");
+    if ($stmt_update_buwana) {
+        $stmt_update_buwana->bind_param('sisssi', $set_continent_code, $set_country_id, $selected_community_name, $selected_language_id, $earthling_emoji, $buwana_id);
+        $stmt_update_buwana->execute();
+        $stmt_update_buwana->close();
 
-$sql_update_gobrik = "UPDATE tb_ecobrickers
-    SET buwana_activated = 1,
-        account_notes = CONCAT(account_notes, ' Location set.'),
-        location_full_txt = ?,
-        country_txt = ?,
-        location_full = ?,
-        location_lat = ?,
-        location_long = ?,
-        country_id = ?,
-        community_id = ?
-    WHERE buwana_id = ?";
+        // Update GoBrik record
+        require_once("../gobrikconn_env.php");
 
-$stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
+        $sql_update_gobrik = "UPDATE tb_ecobrickers
+            SET community_id = (SELECT community_id FROM communities_tb WHERE com_name = ?),
+                country_id = ?,
+                language_id = ?,
+                account_notes = CONCAT(account_notes, ' Finalized community and language.')
+            WHERE buwana_id = ?";
 
-if ($stmt_update_gobrik) {
-    // Bind parameters for the update
-    $stmt_update_gobrik->bind_param(
-        'sssddiii',
-        $user_location_full,   // Location full text
-        $selected_country,     // Country text derived from earlier
-        $user_location_full,   // Full location for GoBrik
-        $user_lat,             // Latitude
-        $user_lon,             // Longitude
-        $set_country_id,       // Country ID derived earlier
-        $community_id,         // Community ID derived earlier
-        $buwana_id             // Buwana ID to match
-    );
+        $stmt_update_gobrik = $gobrik_conn->prepare($sql_update_gobrik);
 
-    // Execute the query and handle potential errors
-    if ($stmt_update_gobrik->execute()) {
-        $stmt_update_gobrik->close();
+        if ($stmt_update_gobrik) {
+            $stmt_update_gobrik->bind_param('siii', $selected_community_name, $set_country_id, $selected_language_id, $buwana_id);
+            $stmt_update_gobrik->execute();
+            $stmt_update_gobrik->close();
+        } else {
+            error_log('Error preparing GoBrik update: ' . $gobrik_conn->error);
+            echo "Failed to update GoBrik record.";
+        }
+
+        $gobrik_conn->close();
+
+        // Redirect to dashboard or next step
+        header("Location: dashboard.php");
+        exit();
     } else {
-        error_log('Error executing update on tb_ecobrickers: ' . $stmt_update_gobrik->error);
-        echo "Failed to update GoBrik record.";
+        error_log('Error preparing Buwana update: ' . $buwana_conn->error);
+        echo "Failed to update Buwana record.";
     }
-} else {
-    error_log('Error preparing GoBrik statement: ' . $gobrik_conn->error);
-    echo "Failed to prepare GoBrik update statement.";
-}
-
-// Close the GoBrik connection
-$gobrik_conn->close();
-
-// Redirect to the next step
-header("Location: activate-subscriptions.php?id=" . urlencode($buwana_id));
-exit();
-
-
-}
-
-
 }
 ?>
+
 
 
 
