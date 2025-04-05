@@ -98,21 +98,18 @@ if ($result_countries && $result_countries->num_rows > 0) {
 }
 
 // Fetch user's country_id from users_tb
-$user_country_name = '';
+$user_country_id = null;
 
-$sql_country_lookup = "SELECT c.country_name
-                       FROM users_tb u
-                       LEFT JOIN countries_tb c ON u.country_id = c.country_id
-                       WHERE u.buwana_id = ?";
-
+$sql_country_lookup = "SELECT country_id FROM users_tb WHERE buwana_id = ?";
 $stmt_country_lookup = $buwana_conn->prepare($sql_country_lookup);
 if ($stmt_country_lookup) {
     $stmt_country_lookup->bind_param('i', $buwana_id);
     $stmt_country_lookup->execute();
-    $stmt_country_lookup->bind_result($user_country_name);
+    $stmt_country_lookup->bind_result($user_country_id);
     $stmt_country_lookup->fetch();
     $stmt_country_lookup->close();
 }
+
 
 
 // Fetch all languages
@@ -294,19 +291,21 @@ $emoji_options = [
     </p>
 </div>
 
+
 <!-- COUNTRY SELECT -->
 <div class="form-item" id="country-section" style="margin-top: 20px;">
     <label for="country_name">🌍 Please make sure we've connected you with the right country:</label><br>
     <select id="country_name" name="country_name" required style="width: 100%; padding: 10px;">
         <option value="">-- Select your country --</option>
         <?php foreach ($countries as $country): ?>
-            <option value="<?php echo htmlspecialchars($country['country_name']); ?>"
-                <?php echo ($country['country_name'] === $user_country_name) ? 'selected' : ''; ?>>
+            <option value="<?php echo htmlspecialchars($country['country_id']); ?>"
+                <?php echo ($country['country_id'] == $user_country_id) ? 'selected' : ''; ?>>
                 <?php echo htmlspecialchars($country['country_name']); ?>
             </option>
         <?php endforeach; ?>
     </select>
 </div>
+
 
 
 <?php
