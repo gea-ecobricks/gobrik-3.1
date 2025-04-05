@@ -2,15 +2,13 @@
 require_once '../buwanaconn_env.php';
 header('Content-Type: application/json');
 
-// Only handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get form values
     $com_name = trim($_POST['newCommunityName']);
     $com_type = trim($_POST['newCommunityType']);
     $country_id = intval($_POST['communityCountry']);
-    $com_lang = intval($_POST['communityLanguage']); // Now directly using language_id
+    $com_lang = trim($_POST['communityLanguage']); // This is the actual language_id (e.g. 'en', 'es')
 
-    // Fetch country name from countries_tb using the provided country_id
+    // Get the country name from countries_tb
     $sql_get_country = "SELECT country_name FROM countries_tb WHERE country_id = ?";
     $stmt_country = $buwana_conn->prepare($sql_get_country);
     $stmt_country->bind_param("i", $country_id);
@@ -20,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt_country->close();
 
     // Debug log
-    error_log("Received: Name=$com_name, Type=$com_type, Country ID=$country_id, Country=$com_country, Lang ID=$com_lang");
+    error_log("🌍 Community Creation: name=$com_name, type=$com_type, country_id=$country_id, country=$com_country, language_id=$com_lang");
 
     // Validate inputs
     if (empty($com_name) || empty($com_type) || empty($com_country) || empty($com_lang)) {
@@ -28,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Insert the new community into communities_tb
+    // Insert into communities_tb
     $sql_insert = "INSERT INTO communities_tb (com_name, com_country, com_type, com_lang, country_id, created_at, updated_at)
                    VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
 
@@ -42,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "community_name" => $com_name
         ]);
     } else {
-        error_log("Insert failed: " . $stmt_insert->error);
+        error_log("❌ MySQL insert error: " . $stmt_insert->error);
         echo json_encode(["success" => false, "message" => "Error adding community."]);
     }
 
