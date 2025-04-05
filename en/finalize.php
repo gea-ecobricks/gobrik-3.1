@@ -438,7 +438,7 @@ function addCommunity2Buwana(event) {
     const form = document.getElementById('addCommunityForm');
     const formData = new FormData(form);
 
-    fetch('scripts/add_community.php', {
+    fetch('../scripts/add_community.php', {
         method: 'POST',
         body: formData
     })
