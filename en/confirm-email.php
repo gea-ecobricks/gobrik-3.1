@@ -109,6 +109,9 @@ if (is_null($ecobricker_id)) {
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+composer require phpmailer/phpmailer
+
+
 function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
     $mail = new PHPMailer(true);
 
@@ -161,9 +164,10 @@ function backUpSMTPsender($first_name, $email_addr, $verification_code, $lang) {
         error_log("SMTP: Fallback verification email sent successfully to $email_addr");
         return true;
 
-    } catch (Exception $e) {
-        error_log("PHPMailer Exception: " . $mail->ErrorInfo);
-        return false;
+   } catch (Exception $e) {
+    error_log("PHPMailer Exception: " . $e->getMessage());
+    error_log("PHPMailer ErrorInfo: " . $mail->ErrorInfo);
+    return false;
     }
 }
 
