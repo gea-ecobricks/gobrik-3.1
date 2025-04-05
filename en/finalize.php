@@ -208,7 +208,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         <!-- FINALIZE ACCOUNT FORM -->
 
-      <form id="user-info-form" method="post" action="activate-3.php?id=<?php echo htmlspecialchars($buwana_id); ?>">
+<form id="user-info-form" method="post" action="finalize_process.php?id=<?php echo htmlspecialchars($buwana_id); ?>">
 
 
   <!-- COMMUNITY FIELD -->
