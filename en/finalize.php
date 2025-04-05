@@ -406,23 +406,6 @@ function openAddCommunityModal() {
         </form>
     `;
 }
-</script>
-
-
-<script>
-function selectEmoji(element) {
-    // Remove highlight from all
-    const all = document.querySelectorAll('.emoji-option');
-    all.forEach(el => el.style.border = '2px solid transparent');
-
-    // Highlight the selected one
-    element.style.border = '2px solid #28a745';
-
-    // Set the hidden input value
-    document.getElementById('earthling_emoji').value = element.innerText;
-}
-
-
 
 
 
@@ -463,6 +446,30 @@ function addCommunity2Buwana(event) {
         console.error('Error:', error);
     });
 }
+
+
+
+
+
+function selectEmoji(element) {
+    // Remove highlight from all
+    const all = document.querySelectorAll('.emoji-option');
+    all.forEach(el => el.style.border = '2px solid transparent');
+
+    // Highlight the selected one
+    element.style.border = '2px solid #28a745';
+
+    // Set the hidden input value
+    document.getElementById('earthling_emoji').value = element.innerText;
+}
+
+
+</script>
+
+
+</body>
+</html>
+
 
 
 
