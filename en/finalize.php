@@ -413,7 +413,7 @@ function openAddCommunityModal() {
 }
 
 
-    const userLanguageId = "<?php echo $current_lang_dir; ?>"; // from URL directory
+const userLanguageId = "<?php echo $current_lang_dir; ?>"; // from URL directory
 const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_QUOTES, 'UTF-8'); ?>"; // from DB
 
 
@@ -473,17 +473,28 @@ function openAddCommunityModal() {
 
     // Preselect country and language after form is injected
     setTimeout(() => {
-        const countrySelect = document.getElementById('communityCountry');
-        const languageSelect = document.getElementById('communityLanguage');
+    const countrySelect = document.getElementById('communityCountry');
+    const languageSelect = document.getElementById('communityLanguage');
 
-        if (countrySelect && userCountryId) {
+    if (countrySelect && userCountryId) {
+        const optionToSelect = countrySelect.querySelector(`option[value="${userCountryId}"]`);
+        if (optionToSelect) {
             countrySelect.value = userCountryId;
+        } else {
+            console.warn(`Country ID ${userCountryId} not found in dropdown`);
         }
+    }
 
-        if (languageSelect && userLanguageId) {
+    if (languageSelect && userLanguageId) {
+        const optionToSelect = languageSelect.querySelector(`option[value="${userLanguageId}"]`);
+        if (optionToSelect) {
             languageSelect.value = userLanguageId;
+        } else {
+            console.warn(`Language ID ${userLanguageId} not found in dropdown`);
         }
-    }, 50); // Small delay ensures elements exist in the DOM
+    }
+}, 100); // Slightly longer delay just in case
+
 }
 
 
