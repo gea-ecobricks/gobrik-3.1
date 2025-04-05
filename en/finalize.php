@@ -97,6 +97,24 @@ if ($result_countries && $result_countries->num_rows > 0) {
     }
 }
 
+// Fetch user's country_id from users_tb
+$user_country_name = '';
+
+$sql_country_lookup = "SELECT c.country_name
+                       FROM users_tb u
+                       LEFT JOIN countries_tb c ON u.country_id = c.country_id
+                       WHERE u.buwana_id = ?";
+
+$stmt_country_lookup = $buwana_conn->prepare($sql_country_lookup);
+if ($stmt_country_lookup) {
+    $stmt_country_lookup->bind_param('i', $buwana_id);
+    $stmt_country_lookup->execute();
+    $stmt_country_lookup->bind_result($user_country_name);
+    $stmt_country_lookup->fetch();
+    $stmt_country_lookup->close();
+}
+
+
 // Fetch all languages
 $languages = [];
 $sql_languages = "SELECT language_id, languages_native_name FROM languages_tb ORDER BY languages_native_name ASC";
@@ -283,12 +301,14 @@ $emoji_options = [
     <select id="country_name" name="country_name" required style="width: 100%; padding: 10px;">
         <option value="">-- Select your country --</option>
         <?php foreach ($countries as $country): ?>
-            <option value="<?php echo htmlspecialchars($country['country_name']); ?>">
+            <option value="<?php echo htmlspecialchars($country['country_name']); ?>"
+                <?php echo ($country['country_name'] === $user_country_name) ? 'selected' : ''; ?>>
                 <?php echo htmlspecialchars($country['country_name']); ?>
             </option>
         <?php endforeach; ?>
     </select>
 </div>
+
 
 <?php
 // Get current language directory from URL (e.g., 'en', 'fr', etc.)
