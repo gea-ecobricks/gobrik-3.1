@@ -356,67 +356,6 @@ $current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));
 
 
 
-
-function openAddCommunityModal() {
-    const modal = document.getElementById('form-modal-message');
-    const modalBox = document.getElementById('modal-content-box');
-
-    modal.style.display = 'flex';
-    modalBox.style.flexFlow = 'column';
-    document.getElementById('page-content')?.classList.add('blurred');
-    document.getElementById('footer-full')?.classList.add('blurred');
-    document.body.classList.add('modal-open');
-
-    modalBox.style.maxHeight = '80vh';
-    modalBox.style.overflowY = 'auto';
-
-    modalBox.innerHTML = `
-        <h4 style="text-align:center;">Add Your Community</h4>
-        <p>Add your community to GoBrik so you can manage local projects and ecobricks.</p>
-
-        <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
-            <label for="newCommunityName">Name of Community:</label>
-            <input type="text" id="newCommunityName" name="newCommunityName" required>
-
-            <label for="newCommunityType">Type of Community:</label>
-            <select id="newCommunityType" name="newCommunityType" required>
-                <option value="">Select Type</option>
-                <option value="neighborhood">Neighborhood</option>
-                <option value="city">City</option>
-                <option value="school">School</option>
-                <option value="organization">Organization</option>
-            </select>
-
-            <label for="communityCountry">Country:</label>
-            <select id="communityCountry" name="communityCountry" required>
-                <option value="">Select Country</option>
-                <?php foreach ($countries as $country) : ?>
-                    <option value="<?php echo $country['country_id']; ?>">
-                        <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <label for="communityLanguage">Preferred Language:</label>
-            <select id="communityLanguage" name="communityLanguage" required>
-                <option value="">Select Language</option>
-                <?php foreach ($languages as $language) : ?>
-                    <option value="<?php echo $language['language_id']; ?>">
-                        <?php echo htmlspecialchars($language['languages_native_name'], ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <button type="submit" style="margin-top:10px;">Submit</button>
-        </form>
-    `;
-}
-
-
-const userLanguageId = "<?php echo $current_lang_dir; ?>"; // from URL directory
-const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_QUOTES, 'UTF-8'); ?>"; // from DB
-
-
 function openAddCommunityModal() {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -473,28 +412,62 @@ function openAddCommunityModal() {
 
     // Preselect country and language after form is injected
     setTimeout(() => {
-    const countrySelect = document.getElementById('communityCountry');
-    const languageSelect = document.getElementById('communityLanguage');
+        const countrySelect = document.getElementById('communityCountry');
+        const languageSelect = document.getElementById('communityLanguage');
 
-    if (countrySelect && userCountryId) {
-        const optionToSelect = countrySelect.querySelector(`option[value="${userCountryId}"]`);
-        if (optionToSelect) {
+        if (countrySelect && userCountryId) {
             countrySelect.value = userCountryId;
-        } else {
-            console.warn(`Country ID ${userCountryId} not found in dropdown`);
         }
-    }
 
-    if (languageSelect && userLanguageId) {
-        const optionToSelect = languageSelect.querySelector(`option[value="${userLanguageId}"]`);
-        if (optionToSelect) {
+        if (languageSelect && userLanguageId) {
             languageSelect.value = userLanguageId;
-        } else {
-            console.warn(`Language ID ${userLanguageId} not found in dropdown`);
         }
-    }
-}, 100); // Slightly longer delay just in case
+    }, 100); // Small delay ensures elements exist in the DOM
+}
 
+
+
+const userLanguageId = "<?php echo $current_lang_dir; ?>"; // from URL directory
+const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_QUOTES, 'UTF-8'); ?>"; // from DB
+
+
+
+function addCommunity2Buwana(event) {
+    event.preventDefault(); // Prevent normal form submission
+
+    const form = document.getElementById('addCommunityForm');
+    const formData = new FormData(form);
+
+    fetch('scripts/add_community.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message); // Show success or error message
+
+        if (data.success) {
+            // Close modal
+            closeModal();
+
+            // Add the new community to the dropdown
+            const communityInput = document.getElementById('community_name');
+            const communityList = document.getElementById('community_list');
+
+            // Create new option
+            const newOption = document.createElement('option');
+            newOption.value = data.community_name;
+            newOption.textContent = data.community_name;
+            communityList.appendChild(newOption);
+
+            // Set selected value
+            communityInput.value = data.community_name;
+        }
+    })
+    .catch(error => {
+        alert('Error adding community. Please try again.');
+        console.error('Error:', error);
+    });
 }
 
 
