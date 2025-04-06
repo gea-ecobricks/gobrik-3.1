@@ -90,7 +90,7 @@ if ($result_languages && $result_languages->num_rows > 0) {
 $community_name = "Unknown Community"; // Default value if no match found
 
 if (!empty($community_id)) {
-    $sql_community = "SELECT com_name FROM communities_tb WHERE com_id = ?";
+    $sql_community = "SELECT com_name FROM communities_tb WHERE community_id = ?";
     if ($stmt = $buwana_conn->prepare($sql_community)) {
         $stmt->bind_param("i", $community_id);
         $stmt->execute();
