@@ -242,13 +242,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div class="form-item" id="watershed-map-section" style="display: none; margin-top:20px;">
         <label for="watershed_select" data-lang-id="011-watershed-select">To what river/stream watershed does your local water flow?</label><br>
         <div id="map" style="height: 350px; border-radius: 0px 0px 12px 12px; margin-top: 8px;"></div>
-
+        <p class="form-caption" data-lang-id="012-river-basics" style="margin-top:10px;">ℹ️ The map shows rivers and streams around you.  Choose the one to which your water flows.</p>
         <select id="watershed_select" name="watershed_select" aria-label="Watershed Select" style="width: 100%; padding: 10px;">
             <option value="" disabled selected data-lang-id="011b-select-river">👉 Select river/stream...</option>
 
         </select>
-
-    <p data-lang-id="012-river-basics" style="margin-top:10px;">ℹ️ <a href="#" onclick="showModalInfo('watershed', '<?php echo $lang; ?>')" class="underline-link">Watersheds</a> provide a great non-political way to localize our users by ecological region!  The map shows rivers and streams around you.  Choose the one to which your water flows.</p>
 
 
     </div>
@@ -259,6 +257,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     <!-- SUBMIT SECTION -->
     <div id="submit-section" style="text-align: center; margin-top: 25px; display: none;" data-lang-id="016-next-button">
+
+        <p>Buwana accounts use <a href="#" onclick="showModalInfo('watershed', '<?php echo $lang; ?>')" class="underline-link">watersheds</a> provide a great non-political way to localize our users by bioregion!</p>
+
         <input type="submit" id="submit-button" value="Next ➡️" class="submit-button enabled">
 
     </div>
