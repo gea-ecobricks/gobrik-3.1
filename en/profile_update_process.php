@@ -17,9 +17,14 @@ if (!isset($_SESSION['buwana_id'])) {
 $buwana_id = $_SESSION['buwana_id'];
 
 // Check if all required fields are present
-$required_fields = ['first_name', 'last_name', 'country_id', 'language_id', 'birth_date', 'continent_code', 'community_id', 'location_full', 'latitude', 'longitude', 'location_watershed'];
+$required_fields = [
+    'first_name', 'last_name', 'country_id', 'language_id', 'birth_date',
+    'continent_code', 'community_id', 'location_full', 'latitude', 'longitude',
+    'location_watershed', 'earthling_emoji' // 👈 Add emoji to required fields
+];
+
 foreach ($required_fields as $field) {
-    if (empty($_POST[$field])) {
+    if (!isset($_POST[$field]) || $_POST[$field] === '') {
         echo json_encode(['status' => 'failed', 'message' => 'Missing required field: ' . $field]);
         exit();
     }
@@ -37,10 +42,7 @@ $location_full = trim($_POST['location_full']);
 $latitude = (float)$_POST['latitude'];
 $longitude = (float)$_POST['longitude'];
 $location_watershed = trim($_POST['location_watershed']);
-
-// Debugging: Log received data
-error_log("Received community_id from POST: " . $_POST['community_id']);
-error_log("Sanitized values: community_id=$community_id, buwana_id=$buwana_id");
+$earthling_emoji = trim($_POST['earthling_emoji']);
 
 // Prevent saving zero as community_id if it’s invalid
 if ($community_id <= 0) {
@@ -62,17 +64,17 @@ if ($stmt_check->num_rows === 0) {
 }
 $stmt_check->close();
 
-// Update the user's profile in the Buwana database
+// Update the user's profile in the Buwana database, including earthling_emoji
 $sql_update = "UPDATE users_tb
                SET first_name = ?, last_name = ?, country_id = ?, language_id = ?, birth_date = ?,
                    continent_code = ?, community_id = ?, location_full = ?,
-                   location_lat = ?, location_long = ?, location_watershed = ?
+                   location_lat = ?, location_long = ?, location_watershed = ?, earthling_emoji = ?
                WHERE buwana_id = ?";
 
 $stmt_update = $buwana_conn->prepare($sql_update);
 
 if ($stmt_update) {
-    $stmt_update->bind_param('ssisssisddsi',
+    $stmt_update->bind_param('ssisssissdssi',
         $first_name,
         $last_name,
         $country_id,
@@ -84,18 +86,19 @@ if ($stmt_update) {
         $latitude,
         $longitude,
         $location_watershed,
+        $earthling_emoji,
         $buwana_id
     );
 
     if ($stmt_update->execute()) {
         echo json_encode(['status' => 'succeeded']);
     } else {
-        error_log("Error executing query: " . $stmt_update->error);
+        error_log("❌ Query execution error: " . $stmt_update->error);
         echo json_encode(['status' => 'failed', 'message' => 'Failed to execute update query: ' . $stmt_update->error]);
     }
     $stmt_update->close();
 } else {
-    error_log("Error preparing statement: " . $buwana_conn->error);
+    error_log("❌ Statement preparation error: " . $buwana_conn->error);
     echo json_encode(['status' => 'failed', 'message' => 'Failed to prepare update statement: ' . $buwana_conn->error]);
 }
 
