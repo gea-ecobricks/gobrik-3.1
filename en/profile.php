@@ -21,7 +21,6 @@ if ($is_logged_in) {
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
     $gea_status = getGEA_status($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $ecobrick_unique_id = '0';
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
@@ -90,7 +89,7 @@ if ($result_languages && $result_languages->num_rows > 0) {
 $community_name = "Unknown Community"; // Default value if no match found
 
 if (!empty($community_id)) {
-    $sql_community = "SELECT com_name FROM communities_tb WHERE community_id = ?";
+    $sql_community = "SELECT com_name FROM communities_tb WHERE com_id = ?";
     if ($stmt = $buwana_conn->prepare($sql_community)) {
         $stmt->bind_param("i", $community_id);
         $stmt->execute();
