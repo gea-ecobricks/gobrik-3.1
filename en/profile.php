@@ -307,13 +307,14 @@ echo '<!DOCTYPE html>
         <button
             type="button"
             onclick="earthlingEmojiSelect()"
-            style="margin-left: 10px; padding: 6px 12px; font-size: 1.5em;"
+            style="margin-left: 10px; padding: 10px 14px; font-size: 1.0em;"
         >
             Change...
         </button>
     <br>
-        <p style="font-size:0.9em">Your selected Earthling emoji.</p>
+
     </div>
+<p style="font-size:0.9em">Your selected Earthling emoji.</p>
 </div>
 
 
