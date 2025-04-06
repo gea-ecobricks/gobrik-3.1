@@ -992,7 +992,7 @@ function confirmDeletion(ecobrickerId, lang = 'en') {
         if (confirm("Ok. We will delete your account! Note that this does not affect ecobrick data that has been permanently archived in the brikchain. If you have a Buwana account and/or a subscription to our Earthen newsletter it will also be deleted.")) {
 
             // Send request to delete the user
-            fetch('../scripts/delete_accounts.php?id=' + encodeURIComponent(ecobrickerId))
+            fetch('../api/delete_accounts.php?id=' + encodeURIComponent(ecobrickerId))
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.redirect) {
