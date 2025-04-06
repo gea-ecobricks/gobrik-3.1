@@ -93,7 +93,7 @@ while ($row = $result->fetch_assoc()) {
 // ✅ Fetch Community Name if Exists
 $community_name = '';
 if (!empty($community_id)) {
-    $stmt = $gobrik_conn->prepare("SELECT com_name FROM communities_tb WHERE com_id = ?");
+    $stmt = $gobrik_conn->prepare("SELECT com_name FROM communities_tb WHERE community_id = ?");
     $stmt->bind_param("i", $community_id);
     $stmt->execute();
     $stmt->bind_result($community_name);
@@ -144,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // ✅ Validate Community ID
     if ($community_id !== null) {
-        $stmt = $gobrik_conn->prepare("SELECT com_id FROM communities_tb WHERE com_id = ?");
+        $stmt = $gobrik_conn->prepare("SELECT community_id FROM communities_tb WHERE community_id = ?");
         $stmt->bind_param("i", $community_id);
         $stmt->execute();
         if ($stmt->get_result()->num_rows === 0) {
@@ -593,15 +593,15 @@ document.addEventListener("DOMContentLoaded", function() {
                         data.forEach(community => {
                             let div = document.createElement("div");
                             div.textContent = community.com_name;
-                            div.dataset.id = community.com_id; // Store the ID
+                            div.dataset.id = community.community_id; // Store the ID
                             div.classList.add("autocomplete-item");
 
                             div.addEventListener("mousedown", function(event) {
                                 event.preventDefault();
                                 communityInput.value = community.com_name;
-                                communityIdField.value = community.com_id; // Ensure correct ID is set
+                                communityIdField.value = community.community_id; // Ensure correct ID is set
                                 resultsDiv.innerHTML = "";
-                                console.log("Selected Community ID: ", community.com_id);
+                                console.log("Selected Community ID: ", community.community_id);
                             });
 
                             resultsDiv.appendChild(div);

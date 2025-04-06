@@ -26,26 +26,29 @@ if ($is_logged_in) {
 
     $user_community_id = '';
 
-    // Fetch user information including community_id, location_watershed, location_full, latitude, and longitude
-    $sql_user_info = "SELECT full_name, first_name, last_name, email, country_id, language_id, birth_date,
-                      created_at, last_login, brikcoin_balance, role, account_status, notes,
-                      terms_of_service, continent_code, location_watershed, location_full, community_id,
-                      location_lat, location_long
-                      FROM users_tb WHERE buwana_id = ?";
-    $stmt_user_info = $buwana_conn->prepare($sql_user_info);
+    // Fetch user information including earthling_emoji
+$sql_user_info = "SELECT full_name, first_name, last_name, email, country_id, language_id, birth_date,
+                  created_at, last_login, brikcoin_balance, role, account_status, notes,
+                  terms_of_service, continent_code, location_watershed, location_full, community_id,
+                  location_lat, location_long, earthling_emoji
+                  FROM users_tb WHERE buwana_id = ?";
+$stmt_user_info = $buwana_conn->prepare($sql_user_info);
 
-    if ($stmt_user_info) {
-        $stmt_user_info->bind_param('i', $buwana_id);
-        $stmt_user_info->execute();
-        $stmt_user_info->bind_result($full_name, $first_name, $last_name, $email, $country_id, $language_id,
-                                     $birth_date, $created_at, $last_login, $brikcoin_balance, $role, $account_status,
-                                     $notes, $terms_of_service, $continent_code, $location_watershed,
-                                     $location_full, $community_id, $latitude, $longitude);
-        $stmt_user_info->fetch();
-        $stmt_user_info->close();
-    } else {
-        die('Error preparing statement for fetching user info: ' . $buwana_conn->error);
-    }
+if ($stmt_user_info) {
+    $stmt_user_info->bind_param('i', $buwana_id);
+    $stmt_user_info->execute();
+    $stmt_user_info->bind_result(
+        $full_name, $first_name, $last_name, $email, $country_id, $language_id,
+        $birth_date, $created_at, $last_login, $brikcoin_balance, $role, $account_status,
+        $notes, $terms_of_service, $continent_code, $location_watershed,
+        $location_full, $community_id, $latitude, $longitude, $earthling_emoji // 👈 Added here
+    );
+    $stmt_user_info->fetch();
+    $stmt_user_info->close();
+} else {
+    die('Error preparing statement for fetching user info: ' . $buwana_conn->error);
+}
+
 
 
 // Fetch active languages from Buwana database
@@ -85,11 +88,12 @@ if ($result_languages && $result_languages->num_rows > 0) {
         }
     }
 
+
 // Fetch user's community name from communities_tb based on community_id in users_tb
 $community_name = "Unknown Community"; // Default value if no match found
 
 if (!empty($community_id)) {
-    $sql_community = "SELECT com_name FROM communities_tb WHERE com_id = ?";
+    $sql_community = "SELECT com_name FROM communities_tb WHERE community_id = ?";
     if ($stmt = $buwana_conn->prepare($sql_community)) {
         $stmt->bind_param("i", $community_id);
         $stmt->execute();
@@ -691,7 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // When a suggestion is clicked, set the community name and ID
             suggestionItem.addEventListener('click', function() {
                 communityNameInput.value = community.com_name; // Set community name in input
-                communityIdInput.value = community.com_id;     // Set ID in hidden input
+                communityIdInput.value = community.community_id;     // Set ID in hidden input
                 suggestionsBox.innerHTML = '';  // Clear suggestions after selection
             });
 

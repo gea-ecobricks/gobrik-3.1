@@ -49,7 +49,7 @@ if ($community_id <= 0) {
 }
 
 // Additional check: Verify if community_id exists in communities_tb
-$sql_check_community = "SELECT com_id FROM communities_tb WHERE com_id = ?";
+$sql_check_community = "SELECT community_id FROM communities_tb WHERE community_id = ?";
 $stmt_check = $buwana_conn->prepare($sql_check_community);
 $stmt_check->bind_param("i", $community_id);
 $stmt_check->execute();
