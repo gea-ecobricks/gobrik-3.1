@@ -147,12 +147,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                         <input type="checkbox" id="terms" name="terms" required checked>
                         <label for="terms" class="form-caption" data-lang-id="013-by-registering">By registering today, I agree to the <a href="#" onclick="showModalInfo('terms', '<?php echo $lang; ?>')" class="underline-link">GoBrik Terms of Service</a></label>
                     </div>
-                <!--
-                    <div>
-                        <input type="checkbox" id="newsletter" name="newsletter" checked>
-                        <label for="newsletter" style="font-size:1.0;" class="form-caption" data-lang-id="014-i-agree-newsletter">I agree to receive the <a href="#" onclick="showModalInfo('earthen', '<?php echo $lang; ?>')" class="underline-link">Earthen newsletter</a> for app, ecobrick, and earthen updates</label>
-                    </div>
-                -->
 
 
 
@@ -185,7 +179,7 @@ $(document).ready(function() {
     const passwordField = document.getElementById('password_hash');
     const confirmPasswordField = document.getElementById('confirm_password');
     const humanCheckField = document.getElementById('human_check');
-    const termsCheckbox = document.getElementById('terms_checkbox'); // Make sure this ID matches your checkbox
+    const termsCheckbox = document.getElementById('terms'); // Make sure this ID matches your checkbox
     const submitButton = document.getElementById('submit-button');
     const confirmPasswordSection = document.getElementById('confirm-password-section');
     const humanCheckSection = document.getElementById('human-check-section');
