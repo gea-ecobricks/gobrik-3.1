@@ -23,7 +23,7 @@ if ($is_logged_in) {
     $gea_status = getGEA_status($buwana_id);
     $ecobrick_unique_id = '0';
     $first_name = getFirstName($buwana_conn, $buwana_id);
-
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $user_community_id = '';
 
     // Fetch user information including earthling_emoji
@@ -88,24 +88,6 @@ if ($result_languages && $result_languages->num_rows > 0) {
         }
     }
 
-
-// Fetch user's community name from communities_tb based on community_id in users_tb
-$community_name = "Unknown Community"; // Default value if no match found
-
-if (!empty($community_id)) {
-    $sql_community = "SELECT com_name FROM communities_tb WHERE community_id = ?";
-    if ($stmt = $buwana_conn->prepare($sql_community)) {
-        $stmt->bind_param("i", $community_id);
-        $stmt->execute();
-        $stmt->bind_result($community_name); // Directly bind result to $community_name
-        if (!$stmt->fetch()) { // If no result found, log and retain default
-            error_log("Community ID not found in communities_tb: " . $community_id);
-        }
-        $stmt->close();
-    } else {
-        error_log("Error preparing community fetch statement: " . $buwana_conn->error);
-    }
-}
 
 
 
