@@ -461,27 +461,26 @@ echo '<!DOCTYPE html>
 
 
 
-<!-- DELETE ACCOUNT -->
-<div class="form-container" style="padding-top:20px; margin-top: 20px; border-top: 1px solid #ddd;">
-    <h2 data-lang-id="028-delete-heading">Delete Your Account</h2>
-    <p data-lang-id="029-delete-warning">Warning: Deleting your account will permanently remove all your data and cannot be undone.</p>
-
 <!-- DELETE ACCOUNT FORM -->
-            <form id="delete-account-form" method="post" action="../api/delete_accounts.php?id=<?php echo htmlspecialchars($ecobricker_id); ?>">
-                <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                    <button type="button" class="submit-button delete" onclick="confirmDeletion()" data-lang-id="0010-delete-button">Delete My Account</button>
-                </div>
+<div class="form-container" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
+    <h2 data-lang-id="028-delete-heading">Delete Your Account</h2>
+    <p data-lang-id="029-delete-warning">
+        Warning: Deleting your account will permanently remove all your data and cannot be undone.
+        This includes your Buwana account, your GoBrik profile, and your Earthen newsletter subscription.
+    </p>
 
-            </form>
-
-    <!--<form id="delete-account-form" method="post">
-    <button type="button" onclick="confirmDeletion('<?php echo htmlspecialchars($buwana_id); ?>', '<?php echo htmlspecialchars($lang); ?>')" class="submit-button delete" aria-label="Delete Account" data-lang-id="030-delete-my-account-button">Delete My Account</button>
-
-</form>-->
-
-
-
+    <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+        <button
+            type="button"
+            class="submit-button delete"
+            onclick="confirmDeletion('<?php echo htmlspecialchars($ecobricker_id); ?>', '<?php echo htmlspecialchars($lang); ?>')"
+            data-lang-id="0010-delete-button"
+        >
+            Delete My Account
+        </button>
+    </div>
 </div>
+
 
 
     </div> <!-- close form-container -->
@@ -988,14 +987,29 @@ function selectEarthlingEmoji(emoji) {
 </script>
 
 <script>
-function confirmDeletion() {
+function confirmDeletion(ecobrickerId, lang = 'en') {
     if (confirm("Are you certain you wish to delete your account? This cannot be undone.")) {
         if (confirm("Ok. We will delete your account! Note that this does not affect ecobrick data that has been permanently archived in the brikchain. If you have a Buwana account and/or a subscription to our Earthen newsletter it will also be deleted.")) {
-            document.getElementById('delete-account-form').submit();
+
+            // Send request to delete the user
+            fetch('../scripts/delete_accounts.php?id=' + encodeURIComponent(ecobrickerId))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.redirect) {
+                        window.location.href = data.redirect; // 🔁 Redirect to goodbye.php
+                    } else {
+                        alert("Error: " + (data.error || "Unknown error occurred while deleting your account."));
+                    }
+                })
+                .catch(err => {
+                    console.error("Deletion error:", err);
+                    alert("Something went wrong while deleting your account.");
+                });
         }
     }
 }
 </script>
+
 </body>
 
 </html>
