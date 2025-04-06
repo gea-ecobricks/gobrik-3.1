@@ -495,7 +495,7 @@ function updateStatusMessage(status, message = '') {
 
         if (!communityId && communityName && communityName.length >= 3) {
             try {
-                const response = await fetch('../api/get_community_id_by_name.php', {
+                const response = await fetch('../scripts/get_community_id_by_name.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'name=' + encodeURIComponent(communityName)
