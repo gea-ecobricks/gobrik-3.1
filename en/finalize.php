@@ -331,7 +331,7 @@ $current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));
 
     <!-- SUBMIT SECTION -->
     <div id="submit-section" style="text-align: center; margin-top: 25px; " data-lang-id="016-all-done-button">
-        <input type="submit" id="submit-button" value="All done!" class="submit-button enabled">
+        <input type="submit" id="submit-button" value="👌 All done!" class="submit-button enabled">
 
     </div>
 <p class="form-caption" data-lang-id="022" style="text-align: center;margin-top: 20px;">Complete your Buwana account registration and login! 🐵</p>
