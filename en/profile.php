@@ -461,10 +461,11 @@ echo '<!DOCTYPE html>
 <!-- FOOTER STARTS HERE -->
 <?php require_once("../footer-2024.php"); ?>
 
+
 <script>
+document.addEventListener('DOMContentLoaded', function () {
 
-
-function updateStatusMessage(status, message = '') {
+    function updateStatusMessage(status, message = '') {
         const updateStatusDiv = document.getElementById('update-status');
         const updateErrorDiv = document.getElementById('update-error');
 
@@ -508,7 +509,7 @@ function updateStatusMessage(status, message = '') {
                     formData.set('community_id', result.community_id);
                 } else {
                     console.warn('❌ No matching community found for:', communityName);
-                    formData.set('community_id', ''); // or keep it blank
+                    formData.set('community_id', ''); // Optional: explicitly blank
                 }
             } catch (err) {
                 console.error('⚠️ Error fetching community ID:', err);
@@ -534,7 +535,6 @@ function updateStatusMessage(status, message = '') {
             updateStatusMessage('failed', error.message);
         });
     });
-});
 
     // Check for status message from URL and handle it
     const urlParams = new URLSearchParams(window.location.search);
@@ -542,6 +542,7 @@ function updateStatusMessage(status, message = '') {
     if (status) {
         updateStatusMessage(status);
     }
+
 });
 </script>
 
