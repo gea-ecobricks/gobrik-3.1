@@ -20,6 +20,13 @@
 <STYLE>
 
 
+#emoji-grid .emoji-option:hover {
+    background-color: #e0f7fa;
+    border-radius: 8px;
+    transform: scale(1.2);
+}
+
+
 
     #main {
         height: fit-content;

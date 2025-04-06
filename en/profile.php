@@ -300,7 +300,9 @@ echo '<!DOCTYPE html>
             id="earthling_emoji"
             value="<?php echo htmlspecialchars($earthling_emoji); ?>"
             readonly
-            style="flex: 1; padding: 10px; background-color: #f9f9f9; border: 1px solid #ccc; cursor: not-allowed;"
+            style="flex: 1; padding: 10px; background-color: #f9f9f9; border: 1px solid #ccc; cursor: not-allowed;width: 30px;
+            font-size: 1.7em;"
+
         >
         <button
             type="button"
@@ -883,6 +885,69 @@ $(function () {
         updateWatershedPinVisibility();
     });
 });
+</script>
+
+
+<script>
+function earthlingEmojiSelect() {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    modalBox.style.maxHeight = '80vh';
+    modalBox.style.overflowY = 'auto';
+
+    const emojiOptions = [
+        // Mammals
+        '🐶','🐺','🦊','🐱','🐯','🦁','🐮','🐷','🐸','🐵','🦍','🦧','🐔','🐧','🦇','🐻','🐨','🐼','🦘','🦡','🦨','🦥','🦦','🦣','🦌','🦬','🐐','🐑','🐎','🫏','🐪','🐫','🦙','🦒','🦓','🐘','🐖','🐄','🐂',
+        // Marine
+        '🐬','🐳','🐋','🐟','🐠','🐡','🦈','🐙','🦑','🦐','🦀','🪼',
+        // Reptiles & Amphibians
+        '🐊','🦎','🐍','🐢','🦕','🦖',
+        // Birds
+        '🐦','🐧','🕊️','🦅','🦆','🦢','🦉','🦜','🪶',
+        // Insects
+        '🐝','🐞','🦋','🐛','🦗','🪲','🪳','🦟','🪰','🪱',
+        // Plants
+        '🌱','🌿','☘️','🍀','🎋','🌵','🌴','🌲','🌳','🪴','🪹','🪺',
+        // Human-like characters (no faces)
+        '🧑','🧒','🧓','👩','👨','👧','👦',
+        '🧕','🧔','👮','🕵️','💂','🧙','🧝','🧛','🧟','🧞','🧜','🧚',
+        '🧑‍🚀','🧑‍🔬','🧑‍🌾','🧑‍🏫','🧑‍🎨','🧑‍🚒','🧑‍🍳','🧑‍⚖️','🧑‍💻','🧑‍🔧','🧑‍🏭'
+    ];
+
+    // Build emoji grid
+    let emojiHTML = `<h4 style="text-align:center;">Your Buwana Totem</h4>
+    <p style="text-align:center;">Please choose your fellow Earthling emoji to best represent who you are.<br>
+    This emoji totem will accompany your user name when you're logged in.</p>
+    <div id="emoji-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; padding: 10px; text-align: center; font-size: 28px;">`;
+
+    emojiOptions.forEach(emoji => {
+        emojiHTML += `<div class="emoji-option" style="cursor: pointer;" onclick="selectEarthlingEmoji('${emoji}')">${emoji}</div>`;
+    });
+
+    emojiHTML += `</div>`;
+
+    modalBox.innerHTML = emojiHTML;
+}
+</script>
+
+<script>
+function selectEarthlingEmoji(emoji) {
+    // Set emoji to the form input
+    const emojiField = document.getElementById('earthling_emoji');
+    if (emojiField) {
+        emojiField.value = emoji;
+    }
+
+    // Close the modal
+    closeInfoModal(); // Assumes GoBrik's modal close function
+}
 </script>
 
 
