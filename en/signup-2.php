@@ -284,26 +284,7 @@ $(document).ready(function() {
         }
     });
 
-// Activate submit button when a valid word is typed and terms checkbox is checked
-function updateSubmitButtonState() {
-    const validWords = ['ecobrick', 'ecoladrillo', 'écobrique', 'ecobrique']; // List of accepted words
-    const enteredWord = humanCheckField.value.toLowerCase(); // Get the user's input and convert to lowercase
 
-    // Check if the entered word is in the list of valid words and if the terms checkbox is checked
-    if (validWords.includes(enteredWord) && termsCheckbox.checked) {
-        submitButton.classList.remove('disabled');
-        submitButton.classList.add('enabled');
-        submitButton.disabled = false;
-    } else {
-        submitButton.classList.remove('enabled');
-        submitButton.classList.add('disabled');
-        submitButton.disabled = true;
-    }
-}
-
-
-    humanCheckField.addEventListener('input', updateSubmitButtonState);
-    termsCheckbox.addEventListener('change', updateSubmitButtonState);
 
     // Form submission
     $('#password-confirm-form').on('submit', function(e) {
@@ -350,6 +331,50 @@ function updateSubmitButtonState() {
 
 
 </script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const humanCheckField = document.getElementById('human_check');
+    const termsCheckbox = document.getElementById('terms_checkbox'); // Replace with actual ID if different
+    const submitButton = document.getElementById('submit-button');
+    const form = document.getElementById('password-confirm-form');
+
+    const validWords = ['ecobrick', 'ecoladrillo', 'écobrique', 'ecobrique'];
+
+    function updateSubmitButtonState() {
+        const enteredWord = humanCheckField.value.toLowerCase();
+
+        if (validWords.includes(enteredWord) && termsCheckbox.checked) {
+            submitButton.classList.remove('disabled');
+            submitButton.classList.add('enabled');
+            submitButton.disabled = false;
+        } else {
+            submitButton.classList.remove('enabled');
+            submitButton.classList.add('disabled');
+            submitButton.disabled = true;
+        }
+    }
+
+    // Prevent form submission if requirements not met
+    form.addEventListener('submit', function (event) {
+        const enteredWord = humanCheckField.value.toLowerCase();
+
+        if (!validWords.includes(enteredWord) || !termsCheckbox.checked) {
+            event.preventDefault(); // Block form from submitting
+            alert("Please enter a valid ecobrick keyword and agree to the terms before continuing.");
+        }
+    });
+
+    // Live validation
+    humanCheckField.addEventListener('input', updateSubmitButtonState);
+    termsCheckbox.addEventListener('change', updateSubmitButtonState);
+
+    // Initial check in case of autofill
+    updateSubmitButtonState();
+});
+</script>
+
 
 
 
