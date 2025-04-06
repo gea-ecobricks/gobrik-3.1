@@ -117,7 +117,7 @@ if (!empty($credential_key)) {
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;">
             <h2 data-lang-id="001-select-subs">Select Earthen Subscriptions</h2>
-            <h4 style="color:#748931;" data-lang-id="002-sub-subtitle">We share news and notifications by email.</h4>
+            <h4 style="color:#748931;" data-lang-id="002-sub-subtitle">📨 We share news and notifications by email.</h4>
             <p><span  data-lang-id="003-get-your">Get our free Earthen newsletter and GoBrik notifications sent to </span><?php echo $credential_key; ?>.<span data-lang-id="004-later-upgrade">  Later you can upgrade to a paid subscription to support the movement.</span>
             </p>
            <div id="subscribed" style="color:green;display:<?php echo $is_subscribed ? 'block' : 'none'; ?>;">
@@ -147,7 +147,7 @@ if (!empty($credential_key)) {
 
 <!--<hr style="margin-top:50px; margin-bottom:14px;">
 <h2 data-lang-id="008-that-is-it">That's it!</h2>-->
-<p data-lang-id="008c-your-activation-complete-2" style="text-align:center;margin-top:25px;">Your Buwana account activation is almost complete!  We saved the best part for last.</p>
+<p data-lang-id="008c-your-activation-complete-2" style="text-align:center;margin-top:35px;">Your Buwana account activation is almost complete!  We saved the best part for last.</p>
 
            </div>
 
