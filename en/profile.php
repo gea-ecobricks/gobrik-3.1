@@ -26,6 +26,21 @@ if ($is_logged_in) {
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $user_community_id = '';
 
+    // Use prepared statement for security
+$stmt = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE buwana_id = ?");
+$stmt->bind_param("i", $buwana_id); // Change to "i" if buwana_id is an integer
+$stmt->execute();
+$stmt->bind_result($fetched_ecobricker_id);
+
+if ($stmt->fetch()) {
+    $ecobricker_id = $fetched_ecobricker_id;
+} else {
+    $ecobricker_id = null; // Not found
+}
+
+
+
+
     // Fetch user information including earthling_emoji
 $sql_user_info = "SELECT full_name, first_name, last_name, email, country_id, language_id, birth_date,
                   created_at, last_login, brikcoin_balance, role, account_status, notes,
@@ -113,19 +128,7 @@ if ($result_languages && $result_languages->num_rows > 0) {
     }
 
 
- // Use prepared statement for security
-    $stmt = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE buwana_id = ?");
-    $stmt->bind_param("s", $buwana_id); // Assuming buwana_id is a string (use "i" if it's an integer)
-    $stmt->execute();
-    $stmt->bind_result($ecobricker_id);
 
-    if ($stmt->fetch()) {
-        $stmt->close();
-        return $ecobricker_id;
-    } else {
-        $stmt->close();
-        return null; // Not found
-    }
 
 
 
@@ -237,6 +240,14 @@ echo '<!DOCTYPE html>
     <div class="form-item">
         <p data-lang-id="022-buwana-id"><strong>Buwana ID:</strong> <?php echo htmlspecialchars($buwana_id); ?></p>
     </div>
+
+<!-- Ecobricker ID -->
+<div class="form-item">
+    <p data-lang-id="022b-ecobricker-id">
+        <strong>Ecobricker ID:</strong>
+        <?php echo $ecobricker_id !== null ? htmlspecialchars($ecobricker_id) : '<span style="color: gray;">Not linked</span>'; ?>
+    </p>
+</div>
 
     <!-- GEA Status -->
     <div class="form-item">
