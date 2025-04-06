@@ -49,7 +49,11 @@ if ($stmt_user_info) {
     die('Error preparing statement for fetching user info: ' . $buwana_conn->error);
 }
 
-
+// Safely fallback any potentially null values
+$last_name       = $last_name       ?? '';
+$earthling_emoji = $earthling_emoji ?? '';
+$first_name      = $first_name      ?? '';
+$location_full   = $location_full   ?? '';
 
 // Fetch active languages from Buwana database
 $languages = [];
@@ -285,6 +289,29 @@ echo '<!DOCTYPE html>
         <label for="birth_date" data-lang-id="019-birth-date">Birth Date:</label>
         <input type="date" name="birth_date" id="birth_date" value="<?php echo htmlspecialchars($birth_date); ?>">
     </div>
+
+<!-- Earthling Emoji -->
+<div class="form-item">
+    <label for="earthling_emoji" data-lang-id="999-earthling-emoji">Earthling Emoji:</label>
+    <div style="display: flex; align-items: center;">
+        <input
+            type="text"
+            name="earthling_emoji"
+            id="earthling_emoji"
+            value="<?php echo htmlspecialchars($earthling_emoji); ?>"
+            readonly
+            style="flex: 1; padding: 10px; background-color: #f9f9f9; border: 1px solid #ccc; cursor: not-allowed;"
+        >
+        <button
+            type="button"
+            onclick="earthlingEmojiSelect()"
+            style="margin-left: 10px; padding: 6px 12px; font-size: 0.9em;"
+        >
+            Change...
+        </button>
+    </div>
+</div>
+
 
     <br><br>
 
