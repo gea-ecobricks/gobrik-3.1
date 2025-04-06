@@ -397,7 +397,7 @@ echo '<!DOCTYPE html>
             <?php endforeach; ?>
         </select>
     </div>
-
+<br><br>
     <!-- Save and Update Button -->
     <div style="margin:auto;text-align: center;margin-top:30px;">
         <button type="submit" class="submit-button enabled" aria-label="Save and update" data-lang-id="020-submit-button">💾 Save and Update</button>
@@ -464,64 +464,64 @@ echo '<!DOCTYPE html>
 <script>
 
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Prevent user interaction on uneditable fields
-    const uneditableFields = document.querySelectorAll('.uneditable-select select');
-    uneditableFields.forEach(field => {
-        field.addEventListener('focus', event => event.preventDefault());
-    });
-
-    // Function to update status message (success or error)
-    function updateStatusMessage(status, message = '') {
+function updateStatusMessage(status, message = '') {
         const updateStatusDiv = document.getElementById('update-status');
         const updateErrorDiv = document.getElementById('update-error');
 
-        if (updateStatusDiv && updateErrorDiv) {
-            updateStatusDiv.innerHTML = ''; // Clear previous messages
-            updateErrorDiv.innerHTML = '';  // Clear previous messages
+        updateStatusDiv.innerHTML = '';
+        updateErrorDiv.innerHTML = '';
 
-            if (status === 'succeeded') {
-                updateStatusDiv.innerHTML = "👍 Your user profile was updated!";
-            } else if (status === 'failed') {
-                updateErrorDiv.innerHTML = "🤔 Something went wrong with the update: " + message;
-            } else {
-                updateStatusDiv.innerHTML = "❓ Unexpected status: " + status;
-            }
-
-            scrollToTop();
+        if (status === 'succeeded') {
+            updateStatusDiv.innerHTML = "👍 Your user profile was updated!";
+        } else if (status === 'failed') {
+            updateErrorDiv.innerHTML = "🤔 Something went wrong with the update: " + message;
         } else {
-            console.warn("Warning: 'update-status' or 'update-error' elements not found.");
+            updateStatusDiv.innerHTML = "❓ Unexpected status: " + status;
         }
-    }
 
-    // Smooth scroll to the top of the page
-    function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Form submission with AJAX
-    document.querySelector('#main-buwana-update').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent default form submission
+    // 🚀 FORM SUBMIT LISTENER
+    document.querySelector('#main-buwana-update').addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-        const formData = new FormData(this);
+        const form = this;
+        const formData = new FormData(form);
 
-        // Log formData entries for troubleshooting
-        console.log("Submitting form data:");
-        formData.forEach((value, key) => {
-            console.log(key + ": " + value);
-        });
+        // 🧠 If community_id is blank, try to fetch it from the server
+        const communityId = formData.get('community_id');
+        const communityName = formData.get('community_name');
 
+        if (!communityId && communityName && communityName.length >= 3) {
+            try {
+                const response = await fetch('../api/get_community_id_by_name.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'name=' + encodeURIComponent(communityName)
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.community_id) {
+                    console.log('✅ Matched community_id from API:', result.community_id);
+                    formData.set('community_id', result.community_id);
+                } else {
+                    console.warn('❌ No matching community found for:', communityName);
+                    formData.set('community_id', ''); // or keep it blank
+                }
+            } catch (err) {
+                console.error('⚠️ Error fetching community ID:', err);
+            }
+        }
+
+        // 📨 Submit the form via fetch
         fetch('profile_update_process.php', {
             method: 'POST',
             body: formData
         })
-        .then(response => {
-            console.log("Response received:", response); // Log the full response object for troubleshooting
-            return response.json();
-        })
+        .then(res => res.json())
         .then(data => {
-            console.log("Parsed response data:", data); // Log parsed JSON data
-
             if (data.status === 'succeeded') {
                 updateStatusMessage('succeeded');
             } else {
@@ -530,10 +530,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
         .catch(error => {
-            console.error('Error submitting form:', error);
-            updateStatusMessage('failed', 'Error submitting the form: ' + error.message);
+            console.error('🚨 Error submitting form:', error);
+            updateStatusMessage('failed', error.message);
         });
     });
+});
 
     // Check for status message from URL and handle it
     const urlParams = new URLSearchParams(window.location.search);
