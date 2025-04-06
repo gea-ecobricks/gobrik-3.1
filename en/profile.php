@@ -292,7 +292,7 @@ echo '<!DOCTYPE html>
 
 <!-- Earthling Emoji -->
 <div class="form-item">
-    <label for="earthling_emoji" data-lang-id="999-earthling-emoji">Earthling Emoji:</label>
+    <label for="earthling_emoji" data-lang-id="999-earthling-emoji">Your Buwana Totem:</label>
     <div style="display: flex; align-items: center;">
         <input
             type="text"
@@ -300,7 +300,7 @@ echo '<!DOCTYPE html>
             id="earthling_emoji"
             value="<?php echo htmlspecialchars($earthling_emoji); ?>"
             readonly
-            style="flex: 1; padding: 10px; background-color: #f9f9f9; border: 1px solid #ccc; cursor: not-allowed;width: 30px;
+            style="flex: 1; padding: 10px; background-color: #f9f9f9; cursor: not-allowed;max-width: 77px;
             font-size: 1.7em;"
 
         >
@@ -311,6 +311,7 @@ echo '<!DOCTYPE html>
         >
             Change...
         </button>
+        <p style="font-size:0.9em">Your selected Earthling emoji.</p>
     </div>
 </div>
 
