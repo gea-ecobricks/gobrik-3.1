@@ -217,8 +217,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;">
             <p style="color:green;">✔ <?php echo htmlspecialchars($first_name); ?>, <span data-lang-id="001-subs-set"> your subscriptions to Earthen are confirmed!</p>
-            <div id="status-message"><h2 data-lang-id="012-status-heading2"> Now the fun part!</h2></div>
-            <p id="sub-status-message" data-lang-id="013-sub-ecozone" style="font-size:1.3em;padding-top:10px;padding-bottom:10px;">To finalize your account, please choose your fellow Earthling emoji to best represent who you are.  This emoji will accompany your user name when you're logged in.</p>
+            <div id="status-message"><h4 data-lang-id="012-status-heading2"> Now the fun part!</h4></div>
+            <p data-lang-id="013-sub-ecozone" style="font-size:1.3em;padding-top:10px;padding-bottom:10px;">To finalize your account, please choose your fellow Earthling emoji to best represent who you are.  This emoji will accompany your user name when you're logged in.</p>
         </div>
 
         <!-- FINALIZE ACCOUNT FORM -->
@@ -271,7 +271,7 @@ $emoji_options = [
 
   <!-- COMMUNITY FIELD -->
 <div class="form-item" id="community-section" style="margin-top:20px;">
-    <label for="community_name" data-lang-id="012-community-name">Buwana accounts are all about connecting us with our local and global communities.  There's a good chance someone local to you has already set one up!  Please select your primary local community or add it here:</label><br>
+    <label for="community_name" data-lang-id="012-community-name-x">Buwana accounts are all about connecting us with our local and global communities.  There's a good chance someone local to you has already set one up!  Please select your primary local community or add it here:</label><br>
     <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
            placeholder="Type your community" style="width: 100%; padding: 10px;"
            value="<?php echo htmlspecialchars($pre_community ?? '', ENT_QUOTES, 'UTF-8'); ?>">
@@ -285,7 +285,7 @@ $emoji_options = [
 
     <!-- "Add a new community" text link -->
     <p class="form-caption" data-lang-id="012-community-caption-xx">
-        Start typing to see and select a community. Don't see your community?  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">+ Add it.
+        Start typing to see and select a community. <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">Don't see your community?  + Add it.
         </a>
     </p>
 </div>
