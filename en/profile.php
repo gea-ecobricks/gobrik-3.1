@@ -241,7 +241,7 @@ echo '<!DOCTYPE html>
 
 
 <!-- Profile Update Form -->
-<form action="../profile_update_process.php" method="POST" id="main-buwana-update">
+<form action="profile_update_process.php" method="POST" id="main-buwana-update">
 
     <!-- First Name -->
     <div class="form-item">
