@@ -258,7 +258,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <!-- SUBMIT SECTION -->
     <div id="submit-section" style="text-align: center; margin-top: 25px; display: none;" data-lang-id="016-next-button-2">
 
-        <p>Buwana accounts use <a href="#" onclick="showModalInfo('watershed', '<?php echo $lang; ?>')" class="underline-link">watersheds</a> provide a great non-political way to localize our users by bioregion!</p>
+        <p style="margin-bottom:15px;">Buwana accounts use <a href="#" onclick="showModalInfo('watershed', '<?php echo $lang; ?>')" class="underline-link">watersheds</a> as a great non-political way to localize users by bioregion!</p>
 
         <input type="submit" id="submit-button" value="Next ➡️" class="submit-button enabled">
 
