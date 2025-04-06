@@ -442,18 +442,10 @@ echo '<!DOCTYPE html>
     <h2 data-lang-id="028-delete-heading">Delete Your Account</h2>
     <p data-lang-id="029-delete-warning">Warning: Deleting your account will permanently remove all your data and cannot be undone.</p>
 
-<!-- DELETE ACCOUNT FORM -->
-            <form id="delete-account-form" method="post" action="../api/delete_accounts.php?id=<?php echo htmlspecialchars($ecobricker_id); ?>">
-                <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                    <button type="button" class="submit-button delete" onclick="confirmDeletion()" data-lang-id="0010-delete-button">Delete My Account</button>
-                </div>
-
-            </form>
-
-    <!--<form id="delete-account-form" method="post">
+    <!----><form id="delete-account-form" method="post">
     <button type="button" onclick="confirmDeletion('<?php echo htmlspecialchars($buwana_id); ?>', '<?php echo htmlspecialchars($lang); ?>')" class="submit-button delete" aria-label="Delete Account" data-lang-id="030-delete-my-account-button">Delete My Account</button>
 
-</form>-->
+</form>
 
 
 
