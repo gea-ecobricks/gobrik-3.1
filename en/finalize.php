@@ -217,7 +217,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;">
             <p style="color:green;">✔ <?php echo htmlspecialchars($first_name); ?>, <span data-lang-id="001-subs-set"> your Earthen subscriptions are confirmed!</p>
-            <div id="status-message"><h4 data-lang-id="012-status-heading2" style="margin-bottom: -35px;"> Now the fun part!</h4></div>
+            <div id="status-message"><h4 data-lang-id="012-status-heading2" style="margin-bottom: 12px;"> Now the fun part!</h4></div>
             <p data-lang-id="013-sub-ecozone" style="font-size:1.4em;padding-bottom:10px;">To finalize your account, please choose your fellow Earthling emoji to best represent who you are.  This is your Buwana totem that will accompany your username when you're logged in.</p>
         </div>
 
@@ -271,7 +271,7 @@ $emoji_options = [
 
   <!-- COMMUNITY FIELD -->
 <div class="form-item" id="community-section" style="margin-top:20px;">
-    <label for="community_name" data-lang-id="012-community-name-x">Buwana accounts are all about connecting us with our local and global communities.  There's a good chance someone local to you has already set one up!  Please select your primary local community or add it here:</label><br>
+    <label for="community_name" data-lang-id="012-community-name-x">Buwana accounts are all about connecting us with our local and global communities.  Select your primary local community:</label><br>
     <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
            placeholder="Type your community" style="width: 100%; padding: 10px;"
            value="<?php echo htmlspecialchars($pre_community ?? '', ENT_QUOTES, 'UTF-8'); ?>">
@@ -285,7 +285,7 @@ $emoji_options = [
 
     <!-- "Add a new community" text link -->
     <p class="form-caption" data-lang-id="012-community-caption-xx">
-        Start typing to see and select a community. <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">Don't see your community?  + Add it.
+        Start typing to see and select a community. There's a good chance someone local to you has already set one up!  <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;">Don't see your community?  + Add it.
         </a>
     </p>
 </div>
