@@ -147,12 +147,12 @@ if (!empty($credential_key)) {
 
 <!--<hr style="margin-top:50px; margin-bottom:14px;">
 <h2 data-lang-id="008-that-is-it">That's it!</h2>-->
-<p data-lang-id="008c-your-activation-complete">Your Buwana account activation is almost complete...</p>
+<p data-lang-id="008c-your-activation-complete-2" style="text-align:center;margin-top:25px;">Your Buwana account activation is almost complete!  We saved the best part for last.</p>
 
            </div>
 
-            <div id="submit-section" style="text-align:center;margin-top:25px;" data-lang-id="016x-complete-button">
-                <input type="submit" id="submit-button" value="🐼 Finalize" class="submit-button enabled">
+            <div id="submit-section" style="text-align:center;margin-top:10px;" data-lang-id="016x-complete-button">
+                <input type="submit" id="submit-button" value="🐼 Finalize..." class="submit-button enabled">
             </div>
                 <p class="form-caption" style="text-align:center; margin-top: 10px;font-size:0.9em;" data-lang-id="009-terms">Earthen newsletters and GoBrik are sent according to our non-profit, privacy <a href="#" onclick="showModalInfo('terms', '<?php echo $lang; ?>')" class="underline-link"> Terms of Service</a>.</p>
 
