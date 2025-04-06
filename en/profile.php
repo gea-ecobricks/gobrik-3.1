@@ -300,17 +300,18 @@ echo '<!DOCTYPE html>
             id="earthling_emoji"
             value="<?php echo htmlspecialchars($earthling_emoji); ?>"
             readonly
-            style="flex: 1; padding: 10px; background-color: #f9f9f9; cursor: not-allowed;max-width: 77px;
-            font-size: 1.7em;"
+            style="flex: 1; padding: 10px; background-color: #f9f9f9; cursor: not-allowed;max-width: 57px;
+            font-size: 1.5em;"
 
         >
         <button
             type="button"
             onclick="earthlingEmojiSelect()"
-            style="margin-left: 10px; padding: 6px 12px; font-size: 0.9em;"
+            style="margin-left: 10px; padding: 6px 12px; font-size: 1.5em;"
         >
             Change...
         </button>
+    <br>
         <p style="font-size:0.9em">Your selected Earthling emoji.</p>
     </div>
 </div>
