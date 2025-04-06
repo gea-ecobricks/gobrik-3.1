@@ -178,7 +178,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <!--FOOTER STARTS HERE-->
     <?php require_once ("../footer-2024.php"); ?>
 
-
 <script>
 $(document).ready(function() {
     // Elements
@@ -186,7 +185,7 @@ $(document).ready(function() {
     const passwordField = document.getElementById('password_hash');
     const confirmPasswordField = document.getElementById('confirm_password');
     const humanCheckField = document.getElementById('human_check');
-    const termsCheckbox = document.getElementById('terms');
+    const termsCheckbox = document.getElementById('terms_checkbox'); // Make sure this ID matches your checkbox
     const submitButton = document.getElementById('submit-button');
     const confirmPasswordSection = document.getElementById('confirm-password-section');
     const humanCheckSection = document.getElementById('human-check-section');
@@ -196,6 +195,9 @@ $(document).ready(function() {
     const duplicateEmailError = $('#duplicate-email-error');
     const duplicateGobrikEmail = $('#duplicate-gobrik-email');
     const loadingSpinner = $('#loading-spinner');
+    const form = document.getElementById('password-confirm-form');
+
+    const validWords = ['ecobrick', 'ecoladrillo', 'écobrique', 'ecobrique'];
 
     // Initially hide all sections except the email field
     setPasswordSection.style.display = 'none';
@@ -230,7 +232,6 @@ $(document).ready(function() {
                         return;
                     }
 
-                    // Handle different responses
                     if (res.success) {
                         duplicateEmailError.hide();
                         duplicateGobrikEmail.hide();
@@ -245,7 +246,7 @@ $(document).ready(function() {
                         duplicateGobrikEmail.show();
                         duplicateEmailError.hide();
                         loadingSpinner.removeClass('red').addClass('green').show();
-                        setPasswordSection.style.display = 'none'; // don't allow user to proceed with password setup
+                        setPasswordSection.style.display = 'none';
                     } else {
                         alert("An error occurred: " + res.error);
                     }
@@ -256,7 +257,7 @@ $(document).ready(function() {
                 }
             });
         } else {
-            setPasswordSection.style.display = 'none'; // Hide password section if email is invalid
+            setPasswordSection.style.display = 'none';
         }
     });
 
@@ -284,17 +285,42 @@ $(document).ready(function() {
         }
     });
 
+    // Enable/disable submit button based on valid ecobrick word + terms checkbox
+    function updateSubmitButtonState() {
+        const enteredWord = humanCheckField.value.toLowerCase();
 
+        if (validWords.includes(enteredWord) && termsCheckbox.checked) {
+            submitButton.classList.remove('disabled');
+            submitButton.classList.add('enabled');
+            submitButton.disabled = false;
+        } else {
+            submitButton.classList.remove('enabled');
+            submitButton.classList.add('disabled');
+            submitButton.disabled = true;
+        }
+    }
 
-    // Form submission
+    humanCheckField.addEventListener('input', updateSubmitButtonState);
+    termsCheckbox.addEventListener('change', updateSubmitButtonState);
+    updateSubmitButtonState(); // Initial check in case of autofill
+
+    // Secure form submission
     $('#password-confirm-form').on('submit', function(e) {
-        e.preventDefault(); // Prevent the form from submitting normally
+        const enteredWord = humanCheckField.value.toLowerCase();
+
+        if (!validWords.includes(enteredWord) || !termsCheckbox.checked) {
+            e.preventDefault();
+            alert("Please enter a valid ecobrick keyword and agree to the terms before continuing.");
+            return;
+        }
+
+        e.preventDefault(); // Prevent default submit
         loadingSpinner.removeClass('green red').show();
 
         $.ajax({
             url: 'signup_process.php?id=<?php echo htmlspecialchars($buwana_id); ?>',
             type: 'POST',
-            data: $(this).serialize(), // Serialize the form data
+            data: $(this).serialize(),
             success: function(response) {
                 loadingSpinner.hide();
                 try {
@@ -325,55 +351,8 @@ $(document).ready(function() {
         });
     });
 });
-
-
-/* Control the header position as the page scrolls*/
-
-
 </script>
 
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const humanCheckField = document.getElementById('human_check');
-    const termsCheckbox = document.getElementById('terms_checkbox'); // Replace with actual ID if different
-    const submitButton = document.getElementById('submit-button');
-    const form = document.getElementById('password-confirm-form');
-
-    const validWords = ['ecobrick', 'ecoladrillo', 'écobrique', 'ecobrique'];
-
-    function updateSubmitButtonState() {
-        const enteredWord = humanCheckField.value.toLowerCase();
-
-        if (validWords.includes(enteredWord) && termsCheckbox.checked) {
-            submitButton.classList.remove('disabled');
-            submitButton.classList.add('enabled');
-            submitButton.disabled = false;
-        } else {
-            submitButton.classList.remove('enabled');
-            submitButton.classList.add('disabled');
-            submitButton.disabled = true;
-        }
-    }
-
-    // Prevent form submission if requirements not met
-    form.addEventListener('submit', function (event) {
-        const enteredWord = humanCheckField.value.toLowerCase();
-
-        if (!validWords.includes(enteredWord) || !termsCheckbox.checked) {
-            event.preventDefault(); // Block form from submitting
-            alert("Please enter a valid ecobrick keyword and agree to the terms before continuing.");
-        }
-    });
-
-    // Live validation
-    humanCheckField.addEventListener('input', updateSubmitButtonState);
-    termsCheckbox.addEventListener('change', updateSubmitButtonState);
-
-    // Initial check in case of autofill
-    updateSubmitButtonState();
-});
-</script>
 
 
 
