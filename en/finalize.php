@@ -217,7 +217,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div class="form-container">
         <div style="text-align:center;width:100%;margin:auto;">
             <p style="color:green;">✔ <?php echo htmlspecialchars($first_name); ?>, <span data-lang-id="001-subs-set"> your Earthen subscriptions are confirmed!</p>
-            <div id="status-message"><h4 data-lang-id="012-status-heading2"> Now the fun part!</h4></div>
+            <div id="status-message"><h2 data-lang-id="012-status-heading2" style="margin-bottom: -35px;"> Now the fun part!</h2></div>
             <p data-lang-id="013-sub-ecozone" style="font-size:1.4em;padding-bottom:10px;">To finalize your account, please choose your fellow Earthling emoji to best represent who you are.  This is your Buwana totem that will accompany your username when you're logged in.</p>
         </div>
 
