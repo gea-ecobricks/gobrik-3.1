@@ -333,6 +333,16 @@ function sendEmail($to, $htmlBody) {
 <div class="form-container">
     <h2>Ghost Newsletter Emailer</h2>
 
+    <!-- Auto-send toggle -->
+<div style="margin: 10px 0;">
+    <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
+        <input type="checkbox" id="auto-send-toggle" checked style="transform: scale(1.2); margin-right: 8px;">
+        Enable Auto-Send
+    </label>
+    <p style="font-size: 13px; color: #666;">Uncheck this to prevent the email from sending automatically after countdown.</p>
+</div>
+
+
     <?php if ($has_alerts): ?>
         <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
             <h3 style="color: red;">⚠️ Admin Alerts Found!</h3>
@@ -398,31 +408,34 @@ function sendEmail($to, $htmlBody) {
 
 
 <script>
-
-    $(document).ready(function () {
+$(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 1; // Start countdown from 3 seconds
+    let countdown = 2; // Set to 2 seconds as in original
+    const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
 
-    // 🚨 Stop countdown if there are alerts & disable sending 🚨
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#send-email-btn').prop('disabled', true);
-        return; // Stop execution
+        return;
     }
 
-    // ✅ Start countdown only if no alerts
-    startCountdown();
+    // Auto-start countdown if auto-send is enabled
+    if (autoSendEnabled()) {
+        startCountdown();
+    } else {
+        $('#countdown-timer').hide();
+    }
 
-    // 📨 Handle the email submission when button is clicked
+    // Manual Send Button
     $('#send-email-btn').on('click', function (event) {
-        event.preventDefault(); // Prevent default form submission
-        $('#email-form').trigger('submit'); // ✅ Now submits correctly
+        event.preventDefault();
+        $('#email-form').trigger('submit');
     });
 
-    // ✅ Handle form submission properly
+    // AJAX Form Submission
     $('#email-form').on('submit', function (event) {
-        event.preventDefault(); // Prevent page reload
+        event.preventDefault();
 
         const emailTo = $('#email_to').val().trim();
         const emailBody = $('#email_html').val().trim();
@@ -432,16 +445,15 @@ function sendEmail($to, $htmlBody) {
             return;
         }
 
-        // ✅ Send email via AJAX
         $.ajax({
-            url: "", // ✅ Use empty string to submit to the same PHP file
+            url: "", // Submits to same file
             type: "POST",
             data: {
                 send_email: "1",
                 email_to: emailTo,
                 email_html: emailBody
             },
-            success: function (response) {
+            success: function () {
                 $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
                 setTimeout(() => location.reload(), 1000);
             },
@@ -451,7 +463,7 @@ function sendEmail($to, $htmlBody) {
         });
     });
 
-    // ⏳ Countdown function
+    // Countdown Logic
     function startCountdown() {
         $('#countdown-timer').show();
         $('#stop-timer-btn').show();
@@ -463,28 +475,27 @@ function sendEmail($to, $htmlBody) {
 
             if (countdown <= 0) {
                 clearInterval(countdownTimer);
-                $('#email-form').trigger('submit'); // ✅ Automatically submits form
+                if (autoSendEnabled()) {
+                    $('#email-form').trigger('submit');
+                } else {
+                    $('#countdown-timer').hide();
+                }
             }
         }, 1000);
     }
 
-    // 🔄 Update countdown text
     function updateCountdownText() {
         $('#countdown').text(countdown);
     }
 
-    // 🛑 Stop countdown
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownTimer);
         $('#countdown-timer').hide();
         $(this).hide();
     });
 });
-
-
-
-
 </script>
+
 
 
 
