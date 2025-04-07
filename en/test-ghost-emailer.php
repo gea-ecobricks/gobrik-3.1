@@ -375,14 +375,17 @@ function sendEmail($to, $htmlBody) {
     <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
 
     <br><br>
-    <!-- Updated button text with recipient email
-    <button type="submit" id="send-email-btn" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
-        📨 Send to <?php echo htmlspecialchars($recipient_email); ?>
-    </button>-->
-    <!-- Button (always defaulted to russmaier@gmail.com now) -->
-<button type="submit" id="send-email-btn" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+<!-- Auto-send Button (hidden by default unless auto-send is enabled) -->
+<button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+    📨 Send to <?php echo htmlspecialchars($recipient_email); ?>
+</button>
+
+<!-- Test Send Button (visible by default when auto-send is off) -->
+<button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
     📨 Send to russmaier@gmail.com
 </button>
+
+
 </form>
 
 <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
@@ -419,44 +422,48 @@ function sendEmail($to, $htmlBody) {
     </table>
 </div>
 
+
+
 <script>
 $(document).ready(function () {
 
-    // 🔹 PART ONE: Config & Utility Setup
+    // 🔹 PART ONE: Config & Setup
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
     let countdown = 2;
+    const recipientEmail = $('#email_to').val().trim();
 
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
+    const testSendEnabled = () => $('#test-email-toggle').is(':checked');
 
-    function toggleTestCheckbox() {
-        if (!autoSendEnabled()) {
-            $('#test-email-container').show();
-            const testChecked = $('#test-email-toggle').is(':checked');
-            if (testChecked) {
-                $('#send-email-btn').html("📨 Send to russmaier@gmail.com");
-            } else {
-                $('#send-email-btn').html("📨 Send (no recipient selected)");
-            }
+    function updateVisibleButton() {
+        if (autoSendEnabled()) {
+            $('#test-send-button').hide();
+            $('#auto-send-button').show();
+            $('#auto-send-button').html(`📨 Send to ${recipientEmail || 'recipient'}`);
+        } else if (testSendEnabled()) {
+            $('#auto-send-button').hide();
+            $('#test-send-button').show();
+            $('#test-send-button').html("📨 Send to russmaier@gmail.com");
         } else {
-            $('#test-email-container').hide();
-            $('#test-email-toggle').prop('checked', false);
-            const recipient = $('#email_to').val().trim();
-            $('#send-email-btn').html(`📨 Send to ${recipient || 'recipient'}`);
+            $('#auto-send-button').hide();
+            $('#test-send-button').show();
+            $('#test-send-button').html("📨 Send (no recipient selected)");
         }
     }
 
-    // 🔹 PART TWO: Initialize Toggles From localStorage
+    // 🔹 PART TWO: Load from localStorage
     const savedAutoSend = localStorage.getItem('autoSend') === 'true';
     const savedTestSend = localStorage.getItem('testSend') === 'true';
 
     $('#auto-send-toggle').prop('checked', savedAutoSend);
     $('#test-email-toggle').prop('checked', savedTestSend);
     toggleTestCheckbox();
+    updateVisibleButton();
 
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
-        $('#send-email-btn').prop('disabled', true);
+        $('#auto-send-button, #test-send-button').prop('disabled', true);
         return;
     }
 
@@ -471,6 +478,7 @@ $(document).ready(function () {
         const isChecked = $(this).is(':checked');
         localStorage.setItem('autoSend', isChecked);
         toggleTestCheckbox();
+        updateVisibleButton();
 
         if (isChecked) {
             startCountdown();
@@ -483,30 +491,29 @@ $(document).ready(function () {
     $('#test-email-toggle').on('change', function () {
         const isChecked = $(this).is(':checked');
         localStorage.setItem('testSend', isChecked);
-        toggleTestCheckbox();
+        updateVisibleButton();
     });
 
-    // 🔹 PART FOUR: Manual Send Button Click
-    $('#send-email-btn').on('click', function (event) {
+    // 🔹 PART FOUR: Manual Button Clicks
+    $('#test-send-button, #auto-send-button').on('click', function (event) {
         event.preventDefault();
         $('#email-form').trigger('submit');
     });
 
-    // 🔹 PART FIVE: Form Submit Handler
+    // 🔹 PART FIVE: Submit Handler
     $('#email-form').on('submit', function (event) {
         event.preventDefault();
 
-        const emailTo = $('#email_to').val().trim();
         const emailBody = $('#email_html').val().trim();
-        const isTestMode = $('#test-email-toggle').is(':checked');
 
         if (!emailBody) {
             alert("⚠️ Please fill out the email content before sending.");
             return;
         }
 
-        // ✅ Test Email Mode
-        if (isTestMode && !autoSendEnabled()) {
+        const isTestMode = testSendEnabled() && !autoSendEnabled();
+
+        if (isTestMode) {
             $.ajax({
                 url: "",
                 type: "POST",
@@ -516,13 +523,9 @@ $(document).ready(function () {
                     email_html: emailBody
                 },
                 success: function () {
-                    $('#send-email-btn').html(`✅ Test sent to russmaier@gmail.com!`).prop('disabled', true);
-                    $('#test-email-toggle').prop('disabled', true);
-
-                    // Reset state after send
+                    $('#test-send-button').html(`✅ Sent to russmaier@gmail.com!`).prop('disabled', true);
                     localStorage.removeItem('autoSend');
                     localStorage.removeItem('testSend');
-
                     setTimeout(() => location.reload(), 2000);
                 },
                 error: function () {
@@ -532,8 +535,8 @@ $(document).ready(function () {
             return;
         }
 
-        // ✅ Regular Email Mode
-        if (!emailTo) {
+        // ✅ Real recipient send
+        if (!recipientEmail) {
             alert("⚠️ No recipient found for regular sending.");
             return;
         }
@@ -543,16 +546,13 @@ $(document).ready(function () {
             type: "POST",
             data: {
                 send_email: "1",
-                email_to: emailTo,
+                email_to: recipientEmail,
                 email_html: emailBody
             },
             success: function () {
-                $('#send-email-btn').html(`✅ Sent to ${emailTo}!`).prop('disabled', true);
-
-                // Reset state after send
+                $('#auto-send-button').html(`✅ Sent to ${recipientEmail}!`).prop('disabled', true);
                 localStorage.removeItem('autoSend');
                 localStorage.removeItem('testSend');
-
                 setTimeout(() => location.reload(), 1000);
             },
             error: function () {
@@ -561,7 +561,7 @@ $(document).ready(function () {
         });
     });
 
-    // 🔹 PART SIX: Countdown Timer
+    // 🔹 PART SIX: Countdown
     function startCountdown() {
         $('#countdown-timer').show();
         $('#stop-timer-btn').show();
@@ -586,15 +586,25 @@ $(document).ready(function () {
         $('#countdown').text(countdown);
     }
 
-    // 🔹 PART SEVEN: Stop Timer Manually
+    // 🔹 PART SEVEN: Stop Button
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownTimer);
         $('#countdown-timer').hide();
         $(this).hide();
     });
 
+    // 🔹 PART EIGHT: Toggle Test Checkbox Visibility
+    function toggleTestCheckbox() {
+        if (!autoSendEnabled()) {
+            $('#test-email-container').show();
+        } else {
+            $('#test-email-container').hide();
+            $('#test-email-toggle').prop('checked', false);
+        }
+    }
 });
 </script>
+
 
 
 
