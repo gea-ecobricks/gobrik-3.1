@@ -333,16 +333,16 @@ function sendEmail($to, $htmlBody) {
 <div class="form-container">
     <h2>Ghost Newsletter Emailer</h2>
 
-    <!-- Auto-send toggle -->
+   <!-- Auto-send toggle -->
 <div style="margin: 10px 0;">
     <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
-        <input type="checkbox" id="auto-send-toggle" checked style="transform: scale(1.2); margin-right: 8px;">
+        <input type="checkbox" id="auto-send-toggle" style="transform: scale(1.2); margin-right: 8px;">
         Enable Auto-Send
     </label>
     <p style="font-size: 13px; color: #666;">Uncheck this to prevent the email from sending automatically after countdown.</p>
 </div>
 
-<!-- Send one test email (appears only when auto-send is disabled) -->
+<!-- Send one test email (hidden unless auto-send is off) -->
 <div id="test-email-container" style="margin: 10px 0; display: none;">
     <label for="test-email-toggle" style="font-weight: bold; font-size: 16px;">
         <input type="checkbox" id="test-email-toggle" style="transform: scale(1.2); margin-right: 8px;">
@@ -375,10 +375,14 @@ function sendEmail($to, $htmlBody) {
     <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
 
     <br><br>
-    <!-- Updated button text with recipient email -->
+    <!-- Updated button text with recipient email
     <button type="submit" id="send-email-btn" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
         📨 Send to <?php echo htmlspecialchars($recipient_email); ?>
-    </button>
+    </button>-->
+    <!-- Button (always defaulted to russmaier@gmail.com now) -->
+<button type="submit" id="send-email-btn" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+    📨 Send to russmaier@gmail.com
+</button>
 </form>
 
 <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
@@ -416,57 +420,69 @@ function sendEmail($to, $htmlBody) {
 </div>
 
 
-
 <script>
 $(document).ready(function () {
 
-    // 🔹 PART ONE: Config & Utility Setup
+    // 🔹 PART ONE: Config & Setup
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 2; // ⏳ Start from 2 seconds
+    let countdown = 2;
 
-    // Utility to check toggle state
+    // Utility: Check if auto-send is on
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
 
-    // Utility to show/hide the test email checkbox
+    // Utility: Update test checkbox visibility and button label
     function toggleTestCheckbox() {
         if (!autoSendEnabled()) {
             $('#test-email-container').show();
+            $('#test-email-toggle').prop('checked', true); // ✅ Check test send by default
+            $('#send-email-btn').html("📨 Send to russmaier@gmail.com");
         } else {
             $('#test-email-container').hide();
             $('#test-email-toggle').prop('checked', false);
+            const recipient = $('#email_to').val().trim();
+            $('#send-email-btn').html(`📨 Send to ${recipient || 'recipient'}`);
         }
     }
 
-    // 🔹 PART TWO: Initial Alert Check & Countdown Trigger
+    // 🔹 PART TWO: Disable auto-send by default on load
+
+    $('#auto-send-toggle').prop('checked', false); // ✅ Unchecked on load
+    toggleTestCheckbox(); // Set checkbox visibility and label on load
+
+    // Alert check
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#send-email-btn').prop('disabled', true);
         return;
     }
 
-    // Auto-start countdown only if auto-send is enabled
+    // Only start countdown if auto-send is enabled (now default is OFF)
     if (autoSendEnabled()) {
         startCountdown();
     } else {
         $('#countdown-timer').hide();
     }
 
-    // Initial test checkbox visibility
-    toggleTestCheckbox();
-
-    // 🔹 PART THREE: Watch for Toggle Changes
+    // 🔹 PART THREE: Toggle watch
     $('#auto-send-toggle').on('change', function () {
         toggleTestCheckbox();
+
+        if (autoSendEnabled()) {
+            startCountdown();
+        } else {
+            clearInterval(countdownTimer);
+            $('#countdown-timer').hide();
+        }
     });
 
-    // 🔹 PART FOUR: Manual Send Button Click
+    // 🔹 PART FOUR: Manual Send Click
     $('#send-email-btn').on('click', function (event) {
         event.preventDefault();
         $('#email-form').trigger('submit');
     });
 
-    // 🔹 PART FIVE: Form Submit Logic (Handles auto-send, manual send, test-send)
+    // 🔹 PART FIVE: Form Submission Logic
     $('#email-form').on('submit', function (event) {
         event.preventDefault();
 
@@ -479,7 +495,6 @@ $(document).ready(function () {
             return;
         }
 
-        // ✅ Test Email Mode
         if (isTestMode) {
             $.ajax({
                 url: "",
@@ -501,7 +516,6 @@ $(document).ready(function () {
             return;
         }
 
-        // ✅ Normal Send (auto or manual)
         if (!emailTo) {
             alert("⚠️ No recipient found for regular sending.");
             return;
@@ -550,15 +564,15 @@ $(document).ready(function () {
         $('#countdown').text(countdown);
     }
 
-    // 🔹 PART SEVEN: Stop Countdown Button
+    // 🔹 PART SEVEN: Stop Timer Button
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownTimer);
         $('#countdown-timer').hide();
         $(this).hide();
     });
-
 });
 </script>
+
 
 
 
