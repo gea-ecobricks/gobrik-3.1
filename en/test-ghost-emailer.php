@@ -342,6 +342,15 @@ function sendEmail($to, $htmlBody) {
     <p style="font-size: 13px; color: #666;">Uncheck this to prevent the email from sending automatically after countdown.</p>
 </div>
 
+<!-- Send one test email (appears only when auto-send is disabled) -->
+<div id="test-email-container" style="margin: 10px 0; display: none;">
+    <label for="test-email-toggle" style="font-weight: bold; font-size: 16px;">
+        <input type="checkbox" id="test-email-toggle" style="transform: scale(1.2); margin-right: 8px;">
+        Send one test email
+    </label>
+    <p style="font-size: 13px; color: #666;">Will send this email once to russmaier@gmail.com</p>
+</div>
+
 
     <?php if ($has_alerts): ?>
         <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
@@ -407,46 +416,99 @@ function sendEmail($to, $htmlBody) {
 </div>
 
 
+
 <script>
 $(document).ready(function () {
+
+    // 🔹 PART ONE: Config & Utility Setup
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     let countdownTimer;
-    let countdown = 2; // Set to 2 seconds as in original
+    let countdown = 2; // ⏳ Start from 2 seconds
+
+    // Utility to check toggle state
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
 
+    // Utility to show/hide the test email checkbox
+    function toggleTestCheckbox() {
+        if (!autoSendEnabled()) {
+            $('#test-email-container').show();
+        } else {
+            $('#test-email-container').hide();
+            $('#test-email-toggle').prop('checked', false);
+        }
+    }
+
+    // 🔹 PART TWO: Initial Alert Check & Countdown Trigger
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#send-email-btn').prop('disabled', true);
         return;
     }
 
-    // Auto-start countdown if auto-send is enabled
+    // Auto-start countdown only if auto-send is enabled
     if (autoSendEnabled()) {
         startCountdown();
     } else {
         $('#countdown-timer').hide();
     }
 
-    // Manual Send Button
+    // Initial test checkbox visibility
+    toggleTestCheckbox();
+
+    // 🔹 PART THREE: Watch for Toggle Changes
+    $('#auto-send-toggle').on('change', function () {
+        toggleTestCheckbox();
+    });
+
+    // 🔹 PART FOUR: Manual Send Button Click
     $('#send-email-btn').on('click', function (event) {
         event.preventDefault();
         $('#email-form').trigger('submit');
     });
 
-    // AJAX Form Submission
+    // 🔹 PART FIVE: Form Submit Logic (Handles auto-send, manual send, test-send)
     $('#email-form').on('submit', function (event) {
         event.preventDefault();
 
         const emailTo = $('#email_to').val().trim();
         const emailBody = $('#email_html').val().trim();
+        const isTestMode = $('#test-email-toggle').is(':checked');
 
-        if (!emailTo || !emailBody) {
-            alert("⚠️ Please fill out all fields before sending the email.");
+        if (!emailBody) {
+            alert("⚠️ Please fill out the email content before sending.");
+            return;
+        }
+
+        // ✅ Test Email Mode
+        if (isTestMode) {
+            $.ajax({
+                url: "",
+                type: "POST",
+                data: {
+                    send_email: "1",
+                    email_to: "russmaier@gmail.com",
+                    email_html: emailBody
+                },
+                success: function () {
+                    $('#send-email-btn').html(`✅ Test sent to russmaier@gmail.com!`).prop('disabled', true);
+                    $('#test-email-toggle').prop('disabled', true);
+                    setTimeout(() => location.reload(), 2000);
+                },
+                error: function () {
+                    alert("❌ Failed to send the test email.");
+                }
+            });
+            return;
+        }
+
+        // ✅ Normal Send (auto or manual)
+        if (!emailTo) {
+            alert("⚠️ No recipient found for regular sending.");
             return;
         }
 
         $.ajax({
-            url: "", // Submits to same file
+            url: "",
             type: "POST",
             data: {
                 send_email: "1",
@@ -458,12 +520,12 @@ $(document).ready(function () {
                 setTimeout(() => location.reload(), 1000);
             },
             error: function () {
-                alert("❌ Failed to send the email. Please try again.");
+                alert("❌ Failed to send the email.");
             }
         });
     });
 
-    // Countdown Logic
+    // 🔹 PART SIX: Countdown Logic
     function startCountdown() {
         $('#countdown-timer').show();
         $('#stop-timer-btn').show();
@@ -488,13 +550,16 @@ $(document).ready(function () {
         $('#countdown').text(countdown);
     }
 
+    // 🔹 PART SEVEN: Stop Countdown Button
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownTimer);
         $('#countdown-timer').hide();
         $(this).hide();
     });
+
 });
 </script>
+
 
 
 
