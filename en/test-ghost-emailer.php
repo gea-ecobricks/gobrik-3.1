@@ -306,7 +306,7 @@ function sendEmail($to, $htmlBody) {
         'form_params' => [
             'from' => '[Earthen] GEA Center Circle <earthen@ecobricks.org>',
             'to' => $to,
-            'subject' => 'We\'ve moved on from the US dollar',
+            'subject' => 'TEST send of Equinox newsletter',
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
             'o:stop-retrying' => 'yes',  // Stops Mailgun from retrying if delivery fails
