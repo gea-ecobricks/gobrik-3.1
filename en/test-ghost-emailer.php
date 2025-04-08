@@ -123,14 +123,13 @@ $email_template = <<<HTML
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>We've moved on from the US Dollar</title>
+    <title>Equinox Recap: Spring update</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             color: #15212A;
             line-height: 1.5;
-            background-color: #fff;
+            background-color: #ffffff;
             margin: 0;
             padding: 0;
         }
@@ -140,136 +139,130 @@ $email_template = <<<HTML
             padding: 20px;
             background-color: #ffffff;
         }
-
         .header {
             text-align: center;
             padding-bottom: 20px;
         }
         .header img {
             max-width: 100%;
-            height: auto;
         }
         .post-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
             text-align: center;
-            margin-top: 20px;
+            margin-bottom: 10px;
         }
         .post-meta {
             font-size: 14px;
             color: #738a94;
             text-align: center;
-            margin-bottom: 20px;
-        }
-        .content {
-            margin-top: 20px;
-        }
-        .content p {
-            margin-bottom: 15px;
+            margin-bottom: 30px;
         }
         .image-caption {
-            font-size: 14px;
+            font-size: 13px;
             color: #738a94;
             text-align: center;
             margin-top: 5px;
         }
+        .content p {
+            margin-bottom: 16px;
+        }
+        .bookmark-card {
+            border: 1px solid #e0e7eb;
+            padding: 16px;
+            margin-bottom: 24px;
+            background-color: #f9f9f9;
+        }
+        .bookmark-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #15212A;
+        }
+        .bookmark-description {
+            font-size: 14px;
+            color: #73818c;
+            margin-top: 8px;
+        }
         .footer {
-            font-size: 12px;
             text-align: center;
-            color: #738a94;
-            margin-top: 20px;
+            color: #73818c;
+            font-size: 12px;
+            margin-top: 30px;
         }
         .footer a {
-            color: #4B8501;
-            text-decoration: none;
-        }
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #4B8501;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 16px;
-            text-align: center;
-        }
-        .button:hover {
-            background-color: #3A6A00;
+            color: #73818c;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+<div class="container">
 
-        <!-- Header -->
-        <div class="header">
-            <a href="https://earthen.io/">
-                <img src="https://earthen.io/content/images/size/w1200/2022/08/email-cover-1200px.jpg" alt="Earthen">
-            </a>
-        </div>
-
-        <!-- View in Browser Link -->
-        <div class="post-meta">
-            <a href="https://earthen.io/p/f021c1cc-d488-4564-86aa-65c095a8a2c2/" style="color: #738a94; text-decoration: underline;">
-                View in Browser
-            </a>
-        </div>
-
-        <!-- Title -->
-        <div class="post-title">
-            <a href="https://earthen.io/p/f021c1cc-d488-4564-86aa-65c095a8a2c2/" style="text-decoration: none; color: #15212A;">
-                We've moved on from the US Dollar
-            </a>
-        </div>
-
-        <!-- Meta Information -->
-        <div class="post-meta">
-            By GEA Center Circle • 25 Feb 2025
-        </div>
-
-        <!-- Feature Image -->
-        <div class="header">
-            <img src="https://earthen.io/content/images/size/w1200/2025/02/Nasser-Ishtayeh---Nablus-Olive-Tree-cut-down-by-IDF.jpg" alt="Feature Image">
-        </div>
-        <div class="image-caption">
-            A Palestinian woman despairs as her olive trees are destroyed by occupying forces funded in USD - Nablus, Palestine, 2005 - Nasser Ishtayeh
-        </div>
-
-        <!-- Email Content -->
-        <div class="content">
-            <p>Today, we're announcing our transition from US dollars in our finances and accounting.</p>
-            <p>Over the last year, we've been appalled by the continuation of ecocide and genocide in occupied Palestine despite overwhelming international condemnation. With thousands of American-made and funded bombs having been dropped on Gaza and the calls for ethnic cleansing only growing louder, the correlation between our own finances and the occupation became all too clear.</p>
-            <p>As a global organization, we receive funds and pay bills in various countries and currencies. We also have a principle of making our books publicly available. Seven years ago, when we set up our Open Books system on ecobricks.org, choosing USD seemed like a harmless and universal way to present our finances in a way that could be well understood by folks around the world.</p>
-            <p><strong>No more.</strong></p>
-            <p>Gaza, the West Bank and other ongoing conflicts, have been a shocking reminder of the correlation between Global North Currency and global oppression. US dollars are the currency by which both global petroleum is bought and the bombs in Palestine have been funded-- not to mention other wars and exploitations around the world.</p>
-            <p>It may be a drop in the ocean given the meager size of our accounts. However, there is no other way to stay true to our regenerative principles than to stop using the Global North currency most connected with the military-industrial complex and petro-capital economy behind the onslaught against the humans and ecosystems in Gaza.</p>
-            <p>After all, when we use a currency, we play a part in validating and energizing the system behind it.</p>
-
-            <p>It hasn't been easy. It has taken us a year of extricating ourselves from various accounts, systems, and services (and revamping our in-house accounting database!). However, as of now, we have ceased using any US-based financial platforms and accounts.</p>
-
-            <p>From now on, our <a href="https://ecobricks.org/en/open-books.php"open book finances</a> will be denominated in Indonesian Rupiahs.</p>
-
-            <p>To regeneration and beyond,</p>
-            <p><strong>Russell, Ani, Lucie, Paula, Fran, Setiadji, Rere & Aang</strong></p>
-            <p>GEA Center Circle</p>
-            <p><a href="https://ecobricks.org/en/open-books.php">Ecobricks.org/openbooks</a></p>
-
-            <p>P.S. And also... Directly connected to this, in 2025 <a href="https://earthen.io/gobrik-3-launch/">we let go of our use of corporate digital services based in the Global North.</a></p>
-        </div>
-        <br><br>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>Together we can be the transition to ever increasing harmony with the cycles of life.</p>
-            <p>Earthen © 2025 • <a href="$unsubscribe_link">Unsubscribe</a></p>
-            <p>Powered by <a href="https://ghost.org/">Ghost</a></p>
-        </div>
-
+    <div class="header">
+        <a href="https://earthen.io/">
+            <img src="https://earthen.io/content/images/size/w1200/2022/08/email-cover-1200px.jpg" alt="Earthen">
+        </a>
     </div>
+
+    <div class="post-title">
+        Equinox Recap: Spring update
+    </div>
+    <div class="post-meta">
+        By GEA Center Circle • 8 Apr 2025
+        <br>
+        <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/" style="color: #738a94; text-decoration: underline;">View in browser</a>
+    </div>
+
+    <div class="header">
+        <img src="https://earthen.io/content/images/size/w1200/2025/03/Screenshot-From-2025-03-21-09-29-34.png" alt="Feature Image">
+    </div>
+    <div class="image-caption">
+        Earth has now completed a quarter of its solar cycle since the December 21st Solstice (And Earth and Venus are in opposition too!) — Image: <a href="https://cycles.earthen.io/" style="color: #4B8501;">Earthcal</a>
+    </div>
+
+    <div class="content">
+        <p>Whether it's the onset of Fall or Spring for you, we've passed the 2025 Equinox, the Eid holiday and... it's time for our GEA Earthen quarterly update!</p>
+
+        <p>We're on to new ways of connecting ecobricks with bamboo to make geometric lattices! See the blog from Russell below...</p>
+
+        <p>As always, the medium is the most important message — and that's the case with this very newsletter!</p>
+
+        <p>The GEA has proudly completely ditched its reliance on corporate technologies platforms for 2025. This Earthen update is being sent using the open-source <a href="https://ghost.org/" style="color: #4B8501;">Ghost</a> newsletter platform hosted on our own server.</p>
+
+        <p>We've rebuilt GoBrik from the ground up to get off <s>Amazon</s> servers (we're now on <a href="https://dewaweb.com" style="color: #4B8501;">Dewaweb.com</a>). Our team ditched <s>WhatsApp</s> for Signal, <s>Dropbox/Google</s> for Nextcloud, and built the open-source Buwana account system — so you don't need <s>Facebook</s> or <s>Google</s> logins!</p>
+
+        <div class="bookmark-card">
+            <div class="bookmark-title"><a href="https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/" style="color: #15212A;">We’ve ditched big-tech for 2025</a></div>
+            <div class="bookmark-description">It’s 2025! And the urgency to get off our reliance on big tech has never been greater...</div>
+        </div>
+
+        <p>We've also fully disengaged our finances from the US dollar. Billions of dollars are used to fund the genocide and ecocide in occupied Palestine. Staying true to our principles, we’ve stopped using USD in any way — we no longer accept, hold, or use it for accounting.</p>
+
+        <div class="bookmark-card">
+            <div class="bookmark-title"><a href="https://earthen.io/were-ditching-the-us-dollar/" style="color: #15212A;">We’ve moved on from the US Dollar</a></div>
+            <div class="bookmark-description">Today we’re announcing our transition from US dollars in our finances and accounting.</div>
+        </div>
+
+        <p>Finally, a breakthrough! Russell Maier and our engineering team have discovered exciting ways to connect ecobricks using bamboo. The experiments show great promise.</p>
+
+        <div class="bookmark-card">
+            <div class="bookmark-title"><a href="https://earthen.io/a-new-way-to-connect-ecobricks-2/" style="color: #15212A;">New ways to connect ecobricks</a></div>
+            <div class="bookmark-description">How can used plastic be put to good use without relying on capital and industry?</div>
+        </div>
+
+        <p>Stay tuned. This year with GoBrik and Earthen updates, we’ll be sharing more regenerative news, events and stories in the plastic transition and Earthen movement.</p>
+    </div>
+
+    <div class="footer">
+        <p><em>Together we can be the transition to ever increasing harmony with the cycles of life.</em></p>
+        <p>Earthen © 2025 • <a href="$unsubscribe_link">Unsubscribe</a></p>
+        <p>Powered by <a href="https://ghost.org/">Ghost</a></p>
+    </div>
+</div>
 </body>
 </html>
-
 HTML;
+
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
