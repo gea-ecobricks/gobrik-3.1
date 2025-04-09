@@ -379,10 +379,24 @@ function sendEmail($to, $htmlBody) {
 }
 ?>
 
+
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
-<div class="form-container">
-    <h2>Ghost Newsletter Emailer</h2>
+
+
+<div class="splash-title-block"></div>
+<div id="splash-bar"></div>
+<div id="top-page-image" class="bug-reported top-page-image"></div>
+
+<!-- BUG REPORT FORM CONTENT -->
+<div id="form-submission-box" style="height:fit-content;margin-top: 110px;">
+    <div class="form-container">
+        <div id="greeting" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+            <h2 id="greeting" data-lang-id="1000-bug-report">Report a Bug</h2>
+            <p id="subgreeting" data-lang-id="002-bug-report-subtitle">GoBrik 3.0 has just launched. Help us catch all the bugs by reporting any problems you encounter. Messages go to our volunteer development team. Attach a screen shot if necessary.📸</p>
+        </div>
+
+
 
    <!-- Auto-send toggle -->
 <div style="margin: 10px 0;">
