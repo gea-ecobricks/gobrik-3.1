@@ -244,14 +244,11 @@ $email_template = <<<HTML
 
             <p>Whether it's the onset of Fall or Spring for you, we've passed the 2025 Equinox, the Eid holiday and... it's time for our GEA Earthen quarterly update!</p>
 
-            <img src="https://earthen.io/content/images/2025/03/1000001867-1-1.jpg" alt="Bamboo ecobrick experiments">
-            <p class="kg-card-figcaption">We’re on to new ways of connecting ecobricks with bamboo to make geometric lattices! See the blog from Russell below...</p>
-
             <p>As always, the medium is the most important message: and that's the case with this very newsletter! The GEA has proudly completely ditched its reliance on corporate technology platforms for 2025.</p>
 
             <div class="bookmark">
                 <a href="https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/">
-                    <img src="https://earthen.io/content/images/thumbnail/Screenshot-From-2025-02-16-11-24-38-1.png" alt="Ditching Big Tech">
+
                     <div style="padding: 10px;">
                         <strong>We’ve ditched big-tech for 2025</strong><br>
                         <span class="meta">Earthen • GEA Center Circle</span>
@@ -259,12 +256,12 @@ $email_template = <<<HTML
                 </a>
             </div>
 
-            <p>Second, we’re proud to announce that we've fully disengaged our finances from the US dollar. We no longer accept, hold, or denominate in USD.</p>
+            <p>Second, we’re proud to announce that process of disengaging our finances from the US dollar that we began a year ago, is complete.  After observing the direct connection between US support of the ecocide and genocide in Gaza, our GEA team decided to no longer accept, hold, or denominate our accounting in USD.  As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank against ecological and humanitarian principles, we stand by this decision as we move our organization's base to Indoneisa and Indonesian Rupiahs instead. </p>
 
-            <a href="https://news.un.org/en/story/2024/03/1147272">
+
                 <img src="https://earthen.io/content/images/2025/04/image.png" alt="UN condemns systematic destruction">
-            </a>
-            <p class="kg-card-figcaption">UN rights expert condemns ‘systematic’ war-time mass destruction of homes. UN.org</p>
+
+            <p class="kg-card-figcaption">UN rights expert condemns ‘systematic’ war-time mass destruction of homes.  <a href="https://news.un.org/en/story/2024/03/1147272">UN.org</a></p>
 
             <div class="bookmark">
                 <a href="https://earthen.io/were-ditching-the-us-dollar/">
