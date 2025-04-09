@@ -59,9 +59,7 @@ if (empty($first_name)) {
 }
 
 
-
-// STEP 1: Fetch community_id from users_tb
-$community_id = null;
+// PART 4: Fetch community_id from users_tb based on buwana_id
 $sql_ecobricker_community = "SELECT community_id FROM users_tb WHERE buwana_id = ?";
 $stmt_ecobricker_community = $buwana_conn->prepare($sql_ecobricker_community);
 
@@ -75,24 +73,23 @@ if ($stmt_ecobricker_community) {
     die('Error preparing statement for fetching community_id: ' . $buwana_conn->error);
 }
 
-// STEP 2: Fetch community_name from communities_tb
-$community_name = null;
-if ($community_id) {
-    $sql_get_community_name = "SELECT com_name FROM communities_tb WHERE id = ?";
-    $stmt_community_name = $buwana_conn->prepare($sql_get_community_name);
+// PART 4.5: Use the community_id to get the com_name from communities_tb
+$com_name = null;
 
-    if ($stmt_community_name) {
-        $stmt_community_name->bind_param('i', $community_id);
-        $stmt_community_name->execute();
-        $stmt_community_name->bind_result($community_name);
-        $stmt_community_name->fetch();
-        $stmt_community_name->close();
+if (!empty($community_id)) {
+    $sql_com_name = "SELECT com_name FROM communities_tb WHERE community_id = ?";
+    $stmt_com_name = $buwana_conn->prepare($sql_com_name);
+
+    if ($stmt_com_name) {
+        $stmt_com_name->bind_param('i', $community_id);
+        $stmt_com_name->execute();
+        $stmt_com_name->bind_result($com_name);
+        $stmt_com_name->fetch();
+        $stmt_com_name->close();
     } else {
-        die('Error preparing statement for fetching community name: ' . $buwana_conn->error);
+        die('Error preparing statement for fetching com_name: ' . $buwana_conn->error);
     }
 }
-
-// $community_name now holds the name string — or null if not found
 
 
 // PART 5: Fetch all communities from the communities_tb table in Buwana database
