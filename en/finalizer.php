@@ -58,11 +58,10 @@ if (empty($first_name)) {
     $first_name = 'User';
 }
 
-// PART 4: Fetch Ecobricker's community from GoBrik database
-require_once("../gobrikconn_env.php");
 
-$sql_ecobricker_community = "SELECT community FROM tb_ecobrickers WHERE buwana_id = ?";
-$stmt_ecobricker_community = $gobrik_conn->prepare($sql_ecobricker_community);
+
+$sql_ecobricker_community = "SELECT community_id FROM users_tbs WHERE buwana_id = ?";
+$stmt_ecobricker_community = $buwanak_conn->prepare($sql_ecobricker_community);
 
 if ($stmt_ecobricker_community) {
     $stmt_ecobricker_community->bind_param('i', $buwana_id);
