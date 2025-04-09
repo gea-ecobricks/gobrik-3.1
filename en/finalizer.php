@@ -355,7 +355,7 @@ $current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));
         <input type="submit" id="submit-button" value="👌 All done!" class="submit-button enabled">
 
     </div>
-<p class="form-caption" data-lang-id="022" style="text-align: center;margin-top: 20px;">Now you're ready to login! 🐵</p>
+<!--<p class="form-caption" data-lang-id="022" style="text-align: center;margin-top: 20px;">Now you're ready to login! 🐵</p>-->
 
 </form>
 
