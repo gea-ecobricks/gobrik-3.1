@@ -7,7 +7,6 @@ $version = '0.44';
 $page = 'activate';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-$is_logged_in = false; // Ensure not logged in for this page
 
 // Check if user is logged in and session active
 if ($is_logged_in) {
