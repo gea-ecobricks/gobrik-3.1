@@ -60,7 +60,40 @@ if (empty($first_name)) {
 
 
 
-$sql_ecobricker_community = $user_community_name;
+// Step 1: Get community_id for the user
+$sql_user_community = "SELECT community_id FROM users_tb WHERE buwana_id = ?";
+$stmt_user_community = $buwana_conn->prepare($sql_user_community);
+
+if ($stmt_user_community) {
+    $stmt_user_community->bind_param('i', $buwana_id);
+    $stmt_user_community->execute();
+    $stmt_user_community->bind_result($community_id);
+    $stmt_user_community->fetch();
+    $stmt_user_community->close();
+} else {
+    die('Error fetching community_id: ' . $buwana_conn->error);
+}
+
+// Step 2: Convert community_id to com_name
+$pre_community = null;
+
+if (!empty($community_id)) {
+    $sql_com_name = "SELECT com_name FROM communities_tb WHERE community_id = ?";
+    $stmt_com_name = $buwana_conn->prepare($sql_com_name);
+
+    if ($stmt_com_name) {
+        $stmt_com_name->bind_param('i', $community_id);
+        $stmt_com_name->execute();
+        $stmt_com_name->bind_result($com_name);
+        if ($stmt_com_name->fetch()) {
+            $pre_community = $com_name; // ✅ Now we have the name
+        }
+        $stmt_com_name->close();
+    } else {
+        die('Error fetching com_name: ' . $buwana_conn->error);
+    }
+}
+
 
 // PART 5: Fetch all communities from the communities_tb table in Buwana database
 $communities = [];
