@@ -267,6 +267,8 @@ $email_template = <<<HTML
 
             <p>As always, the medium is the most important message: and that's the case with this very newsletter! The GEA has proudly completely ditched its reliance on corporate technology platforms for 2025.</p>
 
+            <p>This Earthen update is being sent to using the opensource Ghost.org newsletter platform that we run on our own server. We've rebuilt our GoBrik app from the ground up to get off amazon servers (we're using Dewaweb.com's Jakarta based server). Our center circle has ditched whatsapp for signal. We're using nextcloud instead of dropbox and google for our documents. And our dev team has built our own open source Buwana account system so you don't have to sign into our services with a facebook or google!</p>
+
             <div class="bookmark">
                 <a href="https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/">
 
@@ -395,34 +397,10 @@ echo '<!DOCTYPE html>
 <div id="splash-bar"></div>
 <div id="top-page-image" class="message-birded top-page-image"></div>
 
-<!-- BUG REPORT FORM CONTENT -->
-<div id="form-submission-box" style="height:fit-content;margin-top: 110px;">
+<!-- SENDER FORM CONTENT -->
     <div class="form-container">
-        <div id="greeting" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-            <h2 id="greeting">Newsletter Sender</h2>
-            <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
-        </div>
 
-   <!-- Auto-send toggle -->
-<div style="margin: 10px 0;">
-    <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
-        <input type="checkbox" id="auto-send-toggle" style="transform: scale(1.2); margin-right: 8px;">
-        Enable Auto-Send
-    </label>
-    <p style="font-size: 13px; color: #666;">Uncheck this to prevent the email from sending automatically after countdown.</p>
-</div>
-
-<!-- Send one test email (hidden unless auto-send is off) -->
-<div id="test-email-container" style="margin: 10px 0; display: none;">
-    <label for="test-email-toggle" style="font-weight: bold; font-size: 16px;">
-        <input type="checkbox" id="test-email-toggle" style="transform: scale(1.2); margin-right: 8px;">
-        Send one test email
-    </label>
-    <p style="font-size: 13px; color: #666;">Will send this email once to russmaier@gmail.com</p>
-</div>
-
-
-    <?php if ($has_alerts): ?>
+        <?php if ($has_alerts): ?>
         <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
             <h3 style="color: red;">⚠️ Admin Alerts Found!</h3>
             <ul>
@@ -434,8 +412,35 @@ echo '<!DOCTYPE html>
         </div>
     <?php endif; ?>
 
-    <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
+        <div id="greeting" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+            <h2 id="greeting">Newsletter Sender</h2>
+            <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
+        </div>
+
+        <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
     <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
+
+
+           <!-- Auto-send toggle -->
+        <div style="margin: 10px 0;">
+            <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
+                <input type="checkbox" id="auto-send-toggle" style="transform: scale(1.2); margin-right: 8px;">
+                Enable Auto-Send
+            </label>
+            <p style="font-size: 13px; color: #666;">Uncheck this to prevent the email from sending automatically after countdown.</p>
+        </div>
+
+        <!-- Send one test email (hidden unless auto-send is off) -->
+        <div id="test-email-container" style="margin: 10px 0; display: none;">
+            <label for="test-email-toggle" style="font-weight: bold; font-size: 16px;">
+                <input type="checkbox" id="test-email-toggle" style="transform: scale(1.2); margin-right: 8px;">
+                Send one test email
+            </label>
+            <p style="font-size: 13px; color: #666;">Will send this email once to russmaier@gmail.com</p>
+        </div>
+
+
+
 
    <form id="email-form" method="POST">
     <label for="email_html">Newsletter HTML:</label>
