@@ -120,138 +120,95 @@ $unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlen
 // Default email HTML with dynamic unsubscribe link
 $email_template = <<<HTML
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Equinox Recap: Spring update</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            color: #15212A;
-            line-height: 1.5;
-            background-color: #ffffff;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background-color: #ffffff;
-        }
-        .header {
-            text-align: center;
-            padding-bottom: 20px;
-        }
-        .header img {
-            max-width: 100%;
-        }
-        .post-title {
-            font-size: 26px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .post-meta {
-            font-size: 14px;
-            color: #738a94;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .image-caption {
-            font-size: 13px;
-            color: #738a94;
-            text-align: center;
-            margin-top: 5px;
-        }
-        .content p {
-            margin-bottom: 16px;
-        }
-        .bookmark-card {
-            border: 1px solid #e0e7eb;
-            padding: 16px;
-            margin-bottom: 24px;
-            background-color: #f9f9f9;
-        }
-        .bookmark-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #15212A;
-        }
-        .bookmark-description {
-            font-size: 14px;
-            color: #73818c;
-            margin-top: 8px;
-        }
-        .footer {
-            text-align: center;
-            color: #73818c;
-            font-size: 12px;
-            margin-top: 30px;
-        }
-        .footer a {
-            color: #73818c;
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Earthen Equinox Recap</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      background-color: #ffffff;
+      color: #15212A;
+      margin: 0;
+      padding: 0;
+    }
+    a {
+      color: #4B8501;
+      text-decoration: none;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .caption {
+      text-align: center;
+      font-size: 13px;
+      color: #73818c;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
+  <div class="container">
+    <a href="https://earthen.io">
+      <img src="https://earthen.io/content/images/size/w1200/2022/08/email-cover-1200px.jpg" alt="Earthen Cover">
+    </a>
 
-    <div class="header">
-        <a href="https://earthen.io/">
-            <img src="https://earthen.io/content/images/size/w1200/2022/08/email-cover-1200px.jpg" alt="Earthen">
-        </a>
-    </div>
+    <h2>Earthen</h2>
+    <h1><a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/">Equinox Recap: Spring update</a></h1>
+    <p style="text-align: center; font-size: 14px;">By GEA Center Circle &bull; 9 Apr 2025</p>
 
-    <div class="post-title">
-        Equinox Recap: Spring update
-    </div>
-    <div class="post-meta">
-        By GEA Center Circle • 8 Apr 2025
-        <br>
-        <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/" style="color: #738a94; text-decoration: underline;">View in browser</a>
-    </div>
+    <img src="https://earthen.io/content/images/size/w1200/2025/03/Screenshot-From-2025-03-21-09-29-34.png" alt="Earth Equinox">
+    <p class="caption">
+      Earth has now completed a quarter of its solar cycle since the December 21st Solstice (And Earth and Venus are in opposition too!) - <a href="https://cycles.earthen.io/">Earthcal</a>
+    </p>
 
-    <div class="header">
-        <img src="https://earthen.io/content/images/size/w1200/2025/03/Screenshot-From-2025-03-21-09-29-34.png" alt="Feature Image">
-    </div>
-    <div class="image-caption">
-        Earth has now completed a quarter of its solar cycle since the December 21st Solstice (And Earth and Venus are in opposition too!) — Image: <a href="https://cycles.earthen.io/" style="color: #4B8501;">Earthcal</a>
-    </div>
+    <p>Whether it's the onset of Fall or Spring for you, we’ve passed the 2025 Equinox, the Eid holiday, and it's time for our quarterly update!</p>
 
-    <div class="content">
-        <p>Whether it's the onset of Fall or Spring for you, we've passed the 2025 Equinox, the Eid holiday and... it's time for our GEA Earthen quarterly update!</p>
+    <img src="https://earthen.io/content/images/2025/03/1000001867-1-1.jpg" alt="Ecobricks and bamboo">
+    <p class="caption">We’re exploring new ways of connecting ecobricks with bamboo to create geometric lattices! See Russell's blog post below.</p>
 
-        <p>We're on to new ways of connecting ecobricks with bamboo to make geometric lattices! See the blog from Russell below...</p>
+    <p>The GEA has fully transitioned away from corporate technology platforms in 2025. This newsletter is sent using the open-source Ghost.org platform hosted on our own server.</p>
 
-        <p>As always, the medium is the most important message — and that's the case with this very newsletter!</p>
+    <p>We’ve rebuilt GoBrik on <a href="https://dewaweb.com">Dewaweb</a> (Jakarta server), moved from WhatsApp to Signal, Dropbox/Google to Nextcloud, and built our own Buwana account system.</p>
 
-        <p>The GEA has proudly completely ditched its reliance on corporate technologies platforms for 2025. This Earthen update is being sent using the open-source <a href="https://ghost.org/" style="color: #4B8501;">Ghost</a> newsletter platform hosted on our own server.</p>
+    <a href="https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/">
+      <img src="https://earthen.io/content/images/thumbnail/Screenshot-From-2025-02-16-11-24-38-1.png" alt="Ditching Big Tech">
+    </a>
+    <p><strong>We’ve ditched Big Tech for 2025</strong></p>
 
-        <p>We've rebuilt GoBrik from the ground up to get off <s>Amazon</s> servers (we're now on <a href="https://dewaweb.com" style="color: #4B8501;">Dewaweb.com</a>). Our team ditched <s>WhatsApp</s> for Signal, <s>Dropbox/Google</s> for Nextcloud, and built the open-source Buwana account system — so you don't need <s>Facebook</s> or <s>Google</s> logins!</p>
+    <p>We've also fully disengaged from the US dollar due to its role in funding global conflict. From now on, GEA finances avoid the USD entirely.</p>
 
-        <div class="bookmark-card">
-            <div class="bookmark-title"><a href="https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/" style="color: #15212A;">We’ve ditched big-tech for 2025</a></div>
-            <div class="bookmark-description">It’s 2025! And the urgency to get off our reliance on big tech has never been greater...</div>
-        </div>
+    <a href="https://earthen.io/were-ditching-the-us-dollar/">
+      <img src="https://earthen.io/content/images/2025/04/image.png" alt="No USD Policy">
+    </a>
+    <p><strong>We’ve moved on from the US Dollar</strong></p>
 
-        <p>We've also fully disengaged our finances from the US dollar. Billions of dollars are used to fund the genocide and ecocide in occupied Palestine. Staying true to our principles, we’ve stopped using USD in any way — we no longer accept, hold, or use it for accounting.</p>
+    <img src="https://earthen.io/content/images/size/w1600/2025/04/image-1.png" alt="Bamboo lattice prototype">
+    <p>Russell Maier’s team is pioneering ways to connect ecobricks with bamboo into geometric constructions. Promising stuff!</p>
 
-        <div class="bookmark-card">
-            <div class="bookmark-title"><a href="https://earthen.io/were-ditching-the-us-dollar/" style="color: #15212A;">We’ve moved on from the US Dollar</a></div>
-            <div class="bookmark-description">Today we’re announcing our transition from US dollars in our finances and accounting.</div>
-        </div>
+    <a href="https://earthen.io/a-new-way-to-connect-ecobricks-2/">
+      <img src="https://earthen.io/content/images/thumbnail/1000001841.jpg" alt="Geometric ecobricks">
+    </a>
+    <p><strong>New ways to connect ecobricks</strong></p>
 
-        <p>Finally, a breakthrough! Russell Maier and our engineering team have discovered exciting ways to connect ecobricks using bamboo. The experiments show great promise.</p>
+    <p>Stay tuned — we'll be sharing more regenerative news and updates through our new GoBrik and Earthen newsletter platform.</p>
 
-        <div class="bookmark-card">
-            <div class="bookmark-title"><a href="https://earthen.io/a-new-way-to-connect-ecobricks-2/" style="color: #15212A;">New ways to connect ecobricks</a></div>
-            <div class="bookmark-description">How can used plastic be put to good use without relying on capital and industry?</div>
-        </div>
+    <hr style="margin-top: 40px; margin-bottom: 20px;">
 
-        <p>Stay tuned. This year with GoBrik and Earthen updates, we’ll be sharing more regenerative news, events and stories in the plastic transition and Earthen movement.</p>
-    </div>
+
+
 
     <div class="footer">
         <p><em>Together we can be the transition to ever increasing harmony with the cycles of life.</em></p>
