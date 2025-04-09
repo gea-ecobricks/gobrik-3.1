@@ -60,8 +60,8 @@ if (empty($first_name)) {
 
 
 
-$sql_ecobricker_community = "SELECT community_id FROM users_tbs WHERE buwana_id = ?";
-$stmt_ecobricker_community = $buwanak_conn->prepare($sql_ecobricker_community);
+$sql_ecobricker_community = "SELECT community_id FROM users_tb WHERE buwana_id = ?";
+$stmt_ecobricker_community = $buwana_conn->prepare($sql_ecobricker_community);
 
 if ($stmt_ecobricker_community) {
     $stmt_ecobricker_community->bind_param('i', $buwana_id);
