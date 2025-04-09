@@ -11,9 +11,26 @@ $version = '0.53';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-    // Close the database connections
-    $buwana_conn->close();
-    $gobrik_conn->close();
+
+startSecureSession(); // Start a secure session with regeneration to prevent session fixation
+
+
+// Check if user is logged in and session active
+if ($is_logged_in) {
+    $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
+
+    // Include database connections
+    require_once '../gobrikconn_env.php';
+    require_once '../buwanaconn_env.php';
+
+    // Fetch the user's location data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_roles = getUser_Role($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+
 } else {
     // Redirect to login page with the redirect parameter set to the current page
     echo '<script>
