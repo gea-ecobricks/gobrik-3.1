@@ -31,9 +31,6 @@ if ($is_logged_in) {
     $user_roles = getUser_Role($buwana_id);
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 
-    // Close the database connections
-    $buwana_conn->close();
-    $gobrik_conn->close();
 } else {
     // Redirect to login page with the redirect parameter set to the current page
     echo '<script>
