@@ -33,6 +33,7 @@ if (!$gea_status || stripos($gea_status, 'trainer') === false) {
 // PART 3: ✅ Fetch User Details
 require_once '../buwanaconn_env.php';
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
 $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
 $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);

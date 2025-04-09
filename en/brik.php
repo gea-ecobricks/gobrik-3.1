@@ -19,6 +19,7 @@ if ($is_logged_in) {
 
     // Fetch user data
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
     $gea_status = getGEA_status($buwana_id);
