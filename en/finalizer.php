@@ -59,8 +59,8 @@ if (empty($first_name)) {
 }
 
 
-$sql_ecobricker_community = $user_community_name
 
+$sql_ecobricker_community = $user_community_name;
 
 // PART 5: Fetch all communities from the communities_tb table in Buwana database
 $communities = [];
