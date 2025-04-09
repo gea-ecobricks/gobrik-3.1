@@ -377,8 +377,15 @@ function sendEmail($to, $htmlBody) {
         return false;
     }
 }
-?>
 
+
+// Output the HTML structure
+echo '<!DOCTYPE html>
+<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
+<head>
+<meta charset="UTF-8">
+';
+?>
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
@@ -392,11 +399,9 @@ function sendEmail($to, $htmlBody) {
 <div id="form-submission-box" style="height:fit-content;margin-top: 110px;">
     <div class="form-container">
         <div id="greeting" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-            <h2 id="greeting" data-lang-id="1000-bug-report">Newsletter Sender</h2>
-            <p id="subgreeting" data-lang-id="002-bug-report-subtitle">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
+            <h2 id="greeting">Newsletter Sender</h2>
+            <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
         </div>
-
-
 
    <!-- Auto-send toggle -->
 <div style="margin: 10px 0;">
