@@ -462,7 +462,7 @@ display: none;
         <div style="width:100%; display: flex; align-items: center;">
           <div style="color: var(--text-color); margin-left: 0px;">
               <span data-lang-id="1000-logged-user"></span>
-              <span><?php echo htmlspecialchars($first_name); ?></span>
+              <span><?php echo htmlspecialchars($earthling_emoji); ?> <?php echo htmlspecialchars($first_name); ?></span>
               <span style="color: var(--subdued);">
                 <?php
                 if ($gea_status !== null) {
