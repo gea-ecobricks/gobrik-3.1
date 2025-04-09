@@ -19,7 +19,8 @@ if ($is_logged_in) {
     require_once '../buwanaconn_env.php';
 
     // Fetch the user's location data
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $earthling_emoji = '';
+    $continent_icon = getUserContinent($buwana_conn, $buwana_id, $earthling_emoji);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
     $gea_status = getGEA_status($buwana_id);
