@@ -185,47 +185,69 @@ function getUserFullLocation($buwana_conn, $buwana_id) {
     return $location_full;
 }
 
+function getUserEarthlingEmoji($buwana_conn, $buwana_id) {
+    $earthling_emoji = '';
 
-function getUserContinent($buwana_conn, $buwana_id, &$earthling_emoji = '') {
-    $continent_code = '';
-    $country_icon = '';
-    $earthling_emoji = ''; // Default to empty
-
-    // Query to get the user's continent_code and earthling_emoji
-    $sql = "SELECT continent_code, earthling_emoji FROM users_tb WHERE buwana_id = ?";
+    $sql = "SELECT earthling_emoji FROM users_tb WHERE buwana_id = ?";
     $stmt = $buwana_conn->prepare($sql);
 
     if ($stmt) {
         $stmt->bind_param('i', $buwana_id);
         if ($stmt->execute()) {
-            $stmt->bind_result($continent_code, $emoji);
+            $stmt->bind_result($emoji);
             if ($stmt->fetch()) {
-                $earthling_emoji = $emoji ?? ''; // fallback to empty string if null
+                $earthling_emoji = $emoji ?? ''; // Use empty string if NULL
             }
-            $stmt->close();
+        }
+        $stmt->close();
+    }
+
+    return $earthling_emoji;
+}
+
+
+
+function getUserContinent($buwana_conn, $buwana_id) {
+    $continent_code = '';
+    $country_icon = '';
+
+    // Query to get the user's continent_code from users_tb
+    $sql_continent = "SELECT continent_code FROM users_tb WHERE buwana_id = ?";
+    $stmt_continent = $buwana_conn->prepare($sql_continent);
+
+    if ($stmt_continent) {
+        $stmt_continent->bind_param('i', $buwana_id);
+        if ($stmt_continent->execute()) {
+            $stmt_continent->bind_result($continent_code);
+            $stmt_continent->fetch();
+            $stmt_continent->close();
         }
     }
 
     // Determine the globe emoticon based on the continent_code
     switch (strtoupper($continent_code)) {
         case 'AF':
+            $country_icon = '🌍'; // Africa
+            break;
         case 'EU':
-            $country_icon = '🌍';
+            $country_icon = '🌍'; // Europe
             break;
         case 'AS':
-        case 'AU':
-        case 'OC':
-            $country_icon = '🌏';
+            $country_icon = '🌏'; // Asia
             break;
         case 'NA':
         case 'SA':
-            $country_icon = '🌎';
+            $country_icon = '🌎'; // North America, South America
+            break;
+        case 'AU':
+        case 'OC':
+            $country_icon = '🌏'; // Australia, Oceania
             break;
         case 'AN':
-            $country_icon = '❄️';
+            $country_icon = '❄️'; // Antarctica
             break;
         default:
-            $country_icon = '🌐'; // Default if continent is not recognized
+            $country_icon = '🌐'; // Default icon if continent is not recognized
             break;
     }
 
