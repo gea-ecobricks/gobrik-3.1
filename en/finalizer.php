@@ -60,18 +60,40 @@ if (empty($first_name)) {
 
 
 
+// STEP 1: Fetch community_id from users_tb
+$community_id = null;
 $sql_ecobricker_community = "SELECT community_id FROM users_tb WHERE buwana_id = ?";
 $stmt_ecobricker_community = $buwana_conn->prepare($sql_ecobricker_community);
 
 if ($stmt_ecobricker_community) {
     $stmt_ecobricker_community->bind_param('i', $buwana_id);
     $stmt_ecobricker_community->execute();
-    $stmt_ecobricker_community->bind_result($pre_community);
+    $stmt_ecobricker_community->bind_result($community_id);
     $stmt_ecobricker_community->fetch();
     $stmt_ecobricker_community->close();
 } else {
-    die('Error preparing statement for fetching ecobricker community: ' . $gobrik_conn->error);
+    die('Error preparing statement for fetching community_id: ' . $buwana_conn->error);
 }
+
+// STEP 2: Fetch community_name from communities_tb
+$community_name = null;
+if ($community_id) {
+    $sql_get_community_name = "SELECT com_name FROM communities_tb WHERE id = ?";
+    $stmt_community_name = $buwana_conn->prepare($sql_get_community_name);
+
+    if ($stmt_community_name) {
+        $stmt_community_name->bind_param('i', $community_id);
+        $stmt_community_name->execute();
+        $stmt_community_name->bind_result($community_name);
+        $stmt_community_name->fetch();
+        $stmt_community_name->close();
+    } else {
+        die('Error preparing statement for fetching community name: ' . $buwana_conn->error);
+    }
+}
+
+// $community_name now holds the name string — or null if not found
+
 
 // PART 5: Fetch all communities from the communities_tb table in Buwana database
 $communities = [];
