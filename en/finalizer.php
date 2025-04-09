@@ -40,24 +40,24 @@ if ($is_logged_in) {
 
 
 // PART 3: Look up user information using buwana_id provided in URL
-// require_once("../buwanaconn_env.php");
-//
-// $sql_user_info = "SELECT first_name FROM users_tb WHERE buwana_id = ?";
-// $stmt_user_info = $buwana_conn->prepare($sql_user_info);
-//
-// if ($stmt_user_info) {
-//     $stmt_user_info->bind_param('i', $buwana_id);
-//     $stmt_user_info->execute();
-//     $stmt_user_info->bind_result($first_name);
-//     $stmt_user_info->fetch();
-//     $stmt_user_info->close();
-// } else {
-//     die('Error preparing statement for fetching user info: ' . $buwana_conn->error);
-// }
-//
-// if (empty($first_name)) {
-//     $first_name = 'User';
-// }
+require_once("../buwanaconn_env.php");
+
+$sql_user_info = "SELECT first_name FROM users_tb WHERE buwana_id = ?";
+$stmt_user_info = $buwana_conn->prepare($sql_user_info);
+
+if ($stmt_user_info) {
+    $stmt_user_info->bind_param('i', $buwana_id);
+    $stmt_user_info->execute();
+    $stmt_user_info->bind_result($first_name);
+    $stmt_user_info->fetch();
+    $stmt_user_info->close();
+} else {
+    die('Error preparing statement for fetching user info: ' . $buwana_conn->error);
+}
+
+if (empty($first_name)) {
+    $first_name = 'User';
+}
 
 // PART 4: Fetch Ecobricker's community from GoBrik database
 require_once("../gobrikconn_env.php");
