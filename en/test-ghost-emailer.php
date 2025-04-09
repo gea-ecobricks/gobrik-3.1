@@ -284,7 +284,7 @@ $email_template = <<<HTML
 
             <p class="kg-card-figcaption">UN rights expert condemns ‘systematic’ war-time mass destruction of homes.  <a href="https://news.un.org/en/story/2024/03/1147272">UN.org</a></p>
 
-            <p>Second, we’re proud to announce that our process of disengaging our finances from the US dollar is complete.  Over a year ago, our GEA team made this decision. After observing the direct connection between US support of the ecocide and genocide in Gaza, we decided to no longer accept, hold, or denominate our accounting in USD.  As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank (as well as other places around the world) against ecological and humanitarian principles, we stand by this decision to disengage from the petrocaptical currency that is all too often is behind it all.  We've moved our accounting to Indonesian Rupiahs instead. </p>
+            <p>Second, we’re proud to announce that our process of disengaging our finances from the US dollar is complete.  Over a year ago, our GEA team made this decision. After observing the direct connection between US support of the ecocide and genocide in Gaza, we decided to no longer accept, hold, or denominate our accounting in USD.  As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank (as well as other places around the world) against ecological and humanitarian principles, we stand by this decision to disengage from the petrocaptical currency that is all too often is behind it all.  We've moved our accounting to Indonesian Rupiahs instead.</p>
 
             <div class="bookmark">
                 <a href="https://earthen.io/were-ditching-the-us-dollar/">
