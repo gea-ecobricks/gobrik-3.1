@@ -279,16 +279,15 @@ $email_template = <<<HTML
                 </a>
             </div>
 
-            <p>Second, we’re proud to announce that process of disengaging our finances from the US dollar that we began a year ago, is complete.  After observing the direct connection between US support of the ecocide and genocide in Gaza, our GEA team decided to no longer accept, hold, or denominate our accounting in USD.  As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank against ecological and humanitarian principles, we stand by this decision as we move our organization's base to Indoneisa and Indonesian Rupiahs instead. </p>
-
-
-                <img src="https://earthen.io/content/images/2025/04/image.png" alt="UN condemns systematic destruction">
+            <br><br>
+             <img src="https://earthen.io/content/images/2025/04/image.png" alt="UN condemns systematic destruction">
 
             <p class="kg-card-figcaption">UN rights expert condemns ‘systematic’ war-time mass destruction of homes.  <a href="https://news.un.org/en/story/2024/03/1147272">UN.org</a></p>
 
+            <p>Second, we’re proud to announce that process of disengaging our finances from the US dollar that we began a year ago, is complete.  After observing the direct connection between US support of the ecocide and genocide in Gaza, our GEA team decided to no longer accept, hold, or denominate our accounting in USD.  As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank against ecological and humanitarian principles, we stand by this decision as we move our organization's base to Indoneisa and Indonesian Rupiahs instead. </p>
+
             <div class="bookmark">
                 <a href="https://earthen.io/were-ditching-the-us-dollar/">
-                    <img src="https://earthen.io/content/images/thumbnail/Nasser-Ishtayeh---Nablus-Olive-Tree-cut-down-by-IDF.jpg" alt="Ditching USD">
                     <div style="padding: 10px;">
                         <strong>We’ve moved on from the US Dollar</strong><br>
                         <span class="meta">Earthen • GEA Center Circle</span>
@@ -296,12 +295,14 @@ $email_template = <<<HTML
                 </a>
             </div>
 
-            <p>Finally, we’re excited to share a breakthrough by Russell Maier and his team, working on bamboo-to-ecobrick connections.</p>
+            <br><br>
 
-            <img src="https://earthen.io/content/images/size/w1600/2025/04/image-1.png" alt="Bamboo build">
+<img src="https://earthen.io/content/images/size/w1600/2025/04/image-1.png" alt="Bamboo build">
+            <p>Finally, we're excited to share a breakthrough by Russell Maier, one of our founders and a lead developer on our center circle team. Russell and his engineering team has been working on bamboo to connect ecobricks in all sorts of new geometric ways! Their initial experiments are very promising! We're really excited to see where this goes.</p>
+
+
             <div class="bookmark">
                 <a href="https://earthen.io/a-new-way-to-connect-ecobricks-2/">
-                    <img src="https://earthen.io/content/images/thumbnail/1000001841.jpg" alt="New ecobrick lattice">
                     <div style="padding: 10px;">
                         <strong>New ways to connect ecobricks</strong><br>
                         <span class="meta">Earthen • Russell Maier</span>
