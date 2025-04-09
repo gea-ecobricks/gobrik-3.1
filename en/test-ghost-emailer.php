@@ -386,14 +386,14 @@ function sendEmail($to, $htmlBody) {
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
-<div id="top-page-image" class="bug-reported top-page-image"></div>
+<div id="top-page-image" class="message-birded top-page-image"></div>
 
 <!-- BUG REPORT FORM CONTENT -->
 <div id="form-submission-box" style="height:fit-content;margin-top: 110px;">
     <div class="form-container">
         <div id="greeting" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-            <h2 id="greeting" data-lang-id="1000-bug-report">Report a Bug</h2>
-            <p id="subgreeting" data-lang-id="002-bug-report-subtitle">GoBrik 3.0 has just launched. Help us catch all the bugs by reporting any problems you encounter. Messages go to our volunteer development team. Attach a screen shot if necessary.📸</p>
+            <h2 id="greeting" data-lang-id="1000-bug-report">Newsletter Sender</h2>
+            <p id="subgreeting" data-lang-id="002-bug-report-subtitle">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
         </div>
 
 
