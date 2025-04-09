@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.44';
-$page = 'activate';
+$page = 'finalize';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 
@@ -27,7 +27,6 @@ if ($is_logged_in) {
     // Run messenger code here
 
     // Close the database connections
-    $buwana_conn->close();
     $gobrik_conn->close();
 } else {
     // Redirect to login page with the redirect parameter set to the current page
