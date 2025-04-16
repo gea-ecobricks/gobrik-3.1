@@ -664,8 +664,8 @@ display: none;
 
                 <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages">🌐 <span data-lang-id="000-language-code">EN</span></div>
 
-                <button type="button" class="top-search-button"  onclick="openSearch()"  aria-label="Search site">
-                </button>
+                <!--<button type="button" class="top-search-button"  onclick="openSearch()"  aria-label="Search site">
+                </button>-->
 
                 <!--<button type="button" class="top-login-button" onclick="showLoginSelector()" aria-label="Login options"></button>
 
