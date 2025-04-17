@@ -161,7 +161,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 </div>
 
     <div style="font-size: medium; text-align: center; margin: auto; align-self: center;padding-top:40px;padding-bottom:50px;margin-top: 0px;">
-        <p style="font-size:medium;" data-lang-id="000-already-have-account">Already have an account? <a href="login.php">Login</a></p>
+        <p style="font-size:medium;" data-lang-id="000-already-have-account">Already have a Buwana account? <a href="login.php">Login</a></p>
     </div>
 
     </div><!--closes Landing content-->
