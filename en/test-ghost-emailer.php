@@ -264,7 +264,7 @@ $email_template = <<<HTML
                 And the planets align! This week Earth, Venus, Mercury, Jupiter and Neptune align - Image: <a href="https://cycles.earthen.io/">Earthcal</a>
             </p>
 
-            <p>Whether it's the onset of Fall or Spring for you, with the passing of Eid and the arrival of Easter... it's time for our GEA Earthen quarterly update!</p>
+            <p>Whether it's the onset of Fall or Spring for you, with the passing of the Equinox, Eid and the arrival of Easter... it's time for our GEA Earthen quarterly update!</p>
 
             <p>As always, the medium is the most important message: and that's the case with this very newsletter! The GEA has proudly completely ditched its reliance on corporate technology platforms for 2025.</p>
 
@@ -285,7 +285,9 @@ $email_template = <<<HTML
 
             <p class="kg-card-figcaption">UN rights expert condemns ‘systematic’ war-time mass destruction of homes.  <a href="https://news.un.org/en/story/2024/03/1147272">UN.org</a></p>
 
-            <p>Second, we’re proud to announce that our process of disengaging our finances from the US dollar is complete.  Over a year ago, our GEA team made this decision. After observing the direct connection between US support of the ecocide and genocide in Gaza, we decided to no longer accept, hold, or denominate our accounting in USD.  As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank (as well as other places around the world) against ecological and humanitarian principles, we stand by this decision to disengage from the petrocaptical currency that is all too often is behind it all.  We've moved our accounting to Indonesian Rupiahs instead.</p>
+            <p>Second, we’re proud to announce that our process of disengaging our finances from the US dollar is complete. Over a year ago, our GEA team made this decision. After observing the direct connection between US support of the ecocide and genocide in Gaza, we decided to no longer accept, hold, or denominate our accounting in USD.</p>
+
+            <p>As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank, we grieve and are deeply saddened.  This goes against all our  ecological and humanitarian principles.  The GEA stands by this decision to disengage from the petro-captical currency that is all too often is behind oppression and depletion, like we see in Gaza and else where around the world. We've thus moved our accounting to Indonesian Rupiahs instead.</p>
 
             <div class="bookmark">
                 <a href="https://earthen.io/were-ditching-the-us-dollar/">
@@ -366,9 +368,9 @@ function sendEmail($to, $htmlBody) {
          $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
         'auth' => ['api', $mailgunApiKey],
         'form_params' => [
-            'from' => '[E] Earthen <earthen@ecobricks.org>',
+            'from' => 'Earthen <earthen@ecobricks.org>',
             'to' => $to,
-            'subject' => 'Srping Earthen Update',
+            'subject' => 'Spring Earthen Update',
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
             'o:stop-retrying' => 'yes',  // Stops Mailgun from retrying if delivery fails
