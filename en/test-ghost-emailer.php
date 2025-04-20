@@ -259,7 +259,7 @@ $email_template = <<<HTML
         </div>
 
         <div class="post-content">
-            <img src="https://earthen.io/content/images/size/w2000/2025/04/Screenshot-From-2025-04-20-18-00-05-1.png" alt="Earthcal">
+            <img src="https://earthen.io/content/images/size/w2000/2025/04/easter-spring-update.png" alt="Earthcal">
             <p class="feature-image-caption">
                 And the planets align! This week Earth, Venus, Mercury, Jupiter and Neptune align - Image: <a href="https://cycles.earthen.io/">Earthcal</a>
             </p>
