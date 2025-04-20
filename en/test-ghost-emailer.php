@@ -366,9 +366,9 @@ function sendEmail($to, $htmlBody) {
          $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
         'auth' => ['api', $mailgunApiKey],
         'form_params' => [
-            'from' => '[Earthen] GEA Center Circle <earthen@ecobricks.org>',
+            'from' => '[E] Earthen <earthen@ecobricks.org>',
             'to' => $to,
-            'subject' => 'TEST send of Equinox newsletter',
+            'subject' => 'Srping Earthen Update',
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
             'o:stop-retrying' => 'yes',  // Stops Mailgun from retrying if delivery fails
