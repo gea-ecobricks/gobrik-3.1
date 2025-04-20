@@ -209,12 +209,22 @@
   }
 
 
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: var(--main-background);
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            background-color: var(--main-background);
-        }
+  /* Prevent scrolling overflow */
+  overflow-x: hidden;
+
+  /* Ensure it fills and limits the viewport */
+  max-width: 100vw;
+  max-height: 100vh;
+
+  /* Optional: smoother touch experience */
+  overscroll-behavior: contain;
+}
+
 
 
    /*     #header {
@@ -556,7 +566,9 @@ display:none;
   text-decoration: underline;
   color: var(--h1);
 }
-/* Main Menu Overlay Curtain */
+/* Main Menu
+
+Overlay Curtain */
 #main-menu-overlay {
   background-color: var(--side-overlays);
   color: var(--text-color);

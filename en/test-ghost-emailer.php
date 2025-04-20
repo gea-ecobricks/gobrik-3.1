@@ -250,7 +250,7 @@ $email_template = <<<HTML
         </div>
 
         <div class="post-title">
-            <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/">Equinox Recap: Spring update</a>
+            <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/">Earthen Spring Recap</a>
         </div>
 
         <div class="post-meta">
@@ -259,12 +259,12 @@ $email_template = <<<HTML
         </div>
 
         <div class="post-content">
-            <img src="https://earthen.io/content/images/size/w1200/2025/03/Screenshot-From-2025-03-21-09-29-34.png" alt="Earthcal">
+            <img src="https://earthen.io/content/images/size/w2000/2025/04/Screenshot-From-2025-04-20-18-00-05-1.png" alt="Earthcal">
             <p class="feature-image-caption">
-                Earth has now completed a quarter of its solar cycle since the December 21st Solstice (And Earth and Venus are in opposition too!) - Image: <a href="https://cycles.earthen.io/">Earthcal</a>
+                And the planets align! This week Earth, Venus, Mercury, Jupiter and Neptune align - Image: <a href="https://cycles.earthen.io/">Earthcal</a>
             </p>
 
-            <p>Whether it's the onset of Fall or Spring for you, we've passed the 2025 Equinox, the Eid holiday and... it's time for our GEA Earthen quarterly update!</p>
+            <p>Whether it's the onset of Fall or Spring for you, with the passing of Eid and the arrival of Easter... it's time for our GEA Earthen quarterly update!</p>
 
             <p>As always, the medium is the most important message: and that's the case with this very newsletter! The GEA has proudly completely ditched its reliance on corporate technology platforms for 2025.</p>
 

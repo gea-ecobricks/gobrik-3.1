@@ -2,11 +2,11 @@
 
  echo '
 
- <h1>Our Terms of Service</h1>
+ <h1>GoBrik Terms of Service</h1>
 
-    <p style="font-size:medium;">Last revised: July 23rd, 2024</p>
+    <p style="font-size:medium;">Last revised: April 18th, 2025</p>
 
-    <p>GoBrik is a web app managed by the Global Ecobrick Alliance Earth Enterprise (GEA). As an Earth Enterprise (EE), our mission is to serve and inspire local and global plastic transition. We, (the Global Ecobrick Alliance), are guided by our EE regenerative principles, mission, and vision (for a visual representation, see our Vision Landscape footer at the bottom of the app) as we manage, develop, and maintain the GoBrik platform (GoBrik) and Brikcoin Manual Blockchain (BMB) and these Terms of Use & Service to serve you. When you create a GoBrik account, we assume that you do so sharing this vision and a resonance with our principles as you use GoBrik. As you use GoBrik and as GoBrik serves you, we will strive to maintain the standards and protocols of privacy expressed below. We will refer to those who create accounts on the platform (such as you!) as Ecobrickers. "We" and "Us" refer to the GEA EE.</p>
+    <p>GoBrik is a web app managed by the Global Ecobrick Alliance Earth Enterprise (GEA). As an Earth Enterprise (EE), our mission is to serve and inspire local and global plastic transition. We, (the Global Ecobrick Alliance), are guided by our EE regenerative principles, mission, and vision (for a visual representation, see our Vision Landscape footer at the bottom of the app).  As we manage, develop, and maintain the GoBrik platform (GoBrik) and Brikcoin Manual Blockchain (BMB) we have created these Terms of Use & Service to serve and define our relationship to you, our esteemed app user. When you create a GoBrik account, we assume that you do so sharing this vision and a resonance with our principles as you use GoBrik. As you use GoBrik and as GoBrik serves you, we will strive to maintain the standards and protocols of privacy expressed below. We will refer to those who create accounts on the platform (such as you!) as Ecobrickers. "We" and "Us" refer to the GEA EE.</p>
 
     <h2>Our General Commitments to Service</h2>
     <ul>
