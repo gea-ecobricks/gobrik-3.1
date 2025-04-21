@@ -31,6 +31,7 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $gea_status = getGEA_status($buwana_id);
     $user_roles = getUser_Role($buwana_id);
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $first_name = getFirstName($buwana_conn, $buwana_id);
 
 } else {
     // Redirect to login page with the redirect parameter set to the current page
@@ -81,7 +82,7 @@ if ($result->num_rows > 0) {
 }
 
 // Fetch email stats
-$query = "SELECT COUNT(*) AS total_members, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count FROM ghost_test_email_tb";
+$query = "SELECT COUNT(*) AS total_members, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count FROM earthen_members_tb";
 $result = $buwana_conn->query($query);
 $row = $result->fetch_assoc();
 
@@ -90,12 +91,12 @@ $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
 // Fetch the 3 most recently sent emails
-$query_sent = "SELECT id, email, name, test_sent, test_sent_date_time FROM ghost_test_email_tb WHERE test_sent = 1 ORDER BY test_sent_date_time DESC LIMIT 3";
+$query_sent = "SELECT id, email, name, test_sent, test_sent_date_time FROM earthen_members_tb WHERE test_sent = 1 ORDER BY test_sent_date_time DESC LIMIT 3";
 $sent_result = $buwana_conn->query($query_sent);
 $sent_members = $sent_result->fetch_all(MYSQLI_ASSOC);
 
 // Fetch the next 7 pending emails
-$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time FROM ghost_test_email_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 7";
+$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time FROM earthen_members_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 7";
 $pending_result = $buwana_conn->query($query_pending);
 $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 
@@ -103,7 +104,7 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 $all_members = array_merge($sent_members, $pending_members);
 
 // Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
-$query = "SELECT id, email, name FROM ghost_test_email_tb
+$query = "SELECT id, email, name FROM earthen_members_tb
           WHERE test_sent = 0
 --           AND email NOT LIKE '%@outlook.%'
 --           AND email NOT LIKE '%@live.%'
@@ -336,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
     if (!empty($email_html) && !empty($recipient_email)) {
         if (sendEmail($recipient_email, $email_html)) {
             // ✅ Mark email as sent in the database
-            $updateQuery = "UPDATE ghost_test_email_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ?";
+            $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ?";
             $stmt = $buwana_conn->prepare($updateQuery);
             $stmt->bind_param("s", $recipient_email);
             $stmt->execute();
