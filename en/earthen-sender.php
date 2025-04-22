@@ -81,27 +81,6 @@ if ($result->num_rows > 0) {
     }
 }
 
-// Fetch email stats
-$query = "SELECT COUNT(*) AS total_members, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count FROM earthen_members_tb";
-$result = $buwana_conn->query($query);
-$row = $result->fetch_assoc();
-
-$total_members = intval($row['total_members'] ?? 0);
-$sent_count = intval($row['sent_count'] ?? 0);
-$sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
-
-// Fetch the 3 most recently sent emails
-$query_sent = "SELECT id, email, name, test_sent, test_sent_date_time FROM earthen_members_tb WHERE test_sent = 1 ORDER BY test_sent_date_time DESC LIMIT 3";
-$sent_result = $buwana_conn->query($query_sent);
-$sent_members = $sent_result->fetch_all(MYSQLI_ASSOC);
-
-// Fetch the next 7 pending emails
-$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time FROM earthen_members_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 7";
-$pending_result = $buwana_conn->query($query_pending);
-$pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
-
-// Merge sent and pending for display
-$all_members = array_merge($sent_members, $pending_members);
 
 
 require_once 'live-newsletter.php';  //the newsletter html
