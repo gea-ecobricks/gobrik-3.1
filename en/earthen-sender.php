@@ -104,35 +104,56 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 $all_members = array_merge($sent_members, $pending_members);
 
 // Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
-$query = "SELECT id, email, name FROM earthen_members_tb
-          WHERE test_sent = 0
---           AND email NOT LIKE '%@outlook.%'
---           AND email NOT LIKE '%@live.%'
-          AND email NOT LIKE '%@hotmail.%'
-          AND email NOT LIKE '%@comcast%'
-          ORDER BY id ASC LIMIT 1";
-$result = $buwana_conn->query($query);
-$subscriber = $result->fetch_assoc();
-
-// Initialize variables
 $subscriber_id = null;
 $recipient_email = null;
 
-if ($subscriber) {
-    $recipient_email = $subscriber['email']; // Use actual recipient from the database
-    $subscriber_id = $subscriber['id'];
+try {
+    // Start transaction
+    $buwana_conn->begin_transaction();
+
+    $stmt = $buwana_conn->prepare("
+        SELECT id, email, name FROM earthen_members_tb
+        WHERE test_sent = 0
+        AND email NOT LIKE '%@hotmail.%'
+        AND email NOT LIKE '%@comcast%'
+        ORDER BY id ASC
+        LIMIT 1
+        FOR UPDATE
+    ");
+
+    if (!$stmt) {
+        throw new Exception("Failed to prepare SELECT FOR UPDATE statement: " . $buwana_conn->error);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $subscriber = $result->fetch_assoc();
+    $stmt->close();
+
+    if ($subscriber) {
+        $recipient_email = $subscriber['email'];
+        $subscriber_id = $subscriber['id'];
+    }
+
+    // If no recipient found, rollback and stop
+    if (!$recipient_email) {
+        $buwana_conn->rollback();
+        die("No pending recipients found. Email sending process stopped.");
+    }
+
+    // Additional validation to avoid hotmail/comcast again
+//     if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+//         $buwana_conn->rollback();
+//         die("Skipping @outlook & @hotmail emails. No valid recipient found.");
+//     }
+
+    // If passed all checks, we stay in transaction until email is sent successfully.
+    // Final commit will occur **after** the email send and update.
+} catch (Exception $e) {
+    $buwana_conn->rollback();
+    die("Transaction error: " . $e->getMessage());
 }
 
-// Ensure there is always an email to send, otherwise stop the process
-if (!$recipient_email) {
-    die("No pending recipients found. Email sending process stopped.");
-}
-
-//Validate again before sending to avoid errors in form submission
-//strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false ||
-if ( strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-    die("Skipping @outlook & @hotmail emails. No valid recipient found.");
-}
 
 
 // Generate unsubscribe link
