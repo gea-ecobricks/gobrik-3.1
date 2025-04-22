@@ -122,26 +122,38 @@ $subscriber_id = null;
 $recipient_email = null;
 
 try {
-    // Start a transaction
     $buwana_conn->begin_transaction();
 
-    // Step 1: Lock the row to be processed
+    // Step 1: Lock and mark a row atomically
     $stmt = $buwana_conn->prepare("
-        SELECT id, email, name FROM earthen_members_tb
-        WHERE test_sent = 0 AND processing = 0
-        ORDER BY id ASC
-        LIMIT 1
-        FOR UPDATE
+        UPDATE earthen_members_tb
+        SET processing = 1
+        WHERE id = (
+            SELECT id FROM (
+                SELECT id FROM earthen_members_tb
+                WHERE test_sent = 0 AND processing = 0
+                ORDER BY id ASC
+                LIMIT 1
+            ) AS temp
+            FOR UPDATE
+        )
     ");
 
     if (!$stmt) {
-        throw new Exception("Failed to prepare SELECT FOR UPDATE: " . $buwana_conn->error);
+        throw new Exception("Failed to prepare atomic UPDATE: " . $buwana_conn->error);
     }
 
     $stmt->execute();
-    $result = $stmt->get_result();
-    $subscriber = $result->fetch_assoc();
     $stmt->close();
+
+    // Step 2: Now fetch the row marked as processing
+    $result = $buwana_conn->query("
+        SELECT id, email, name FROM earthen_members_tb
+        WHERE processing = 1 AND test_sent = 0
+        ORDER BY id ASC
+        LIMIT 1
+    ");
+    $subscriber = $result->fetch_assoc();
 
     if (!$subscriber) {
         $buwana_conn->rollback();
@@ -151,20 +163,10 @@ try {
     $subscriber_id = $subscriber['id'];
     $recipient_email = $subscriber['email'];
 
-    // Optional: add extra email domain filtering here again if needed
-
-    // Step 2: Mark the row as "processing"
-    $stmt = $buwana_conn->prepare("
-        UPDATE earthen_members_tb
-        SET processing = 1
-        WHERE id = ?
-    ");
-    $stmt->bind_param("i", $subscriber_id);
-    $stmt->execute();
-    $stmt->close();
-
-    // Commit now that processing = 1 has been safely set
+    // Step 3: Commit the lock
     $buwana_conn->commit();
+
+
 
 //     // Additional validation to avoid hotmail/comcast again
 //     if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
