@@ -255,7 +255,7 @@ $email_template = <<<HTML
         </div>
 
         <div class="post-meta">
-            By GEA Center Circle • 9 Apr 2025<br>
+            By the Global Ecobrick Alliance • 22 Apr 2025<br>
             <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/">View in browser</a>
         </div>
 
