@@ -115,7 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
         try {
             if (sendEmail($recipient_email, $email_html)) {
                 // ✅ Mark as sent
-                $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?");
+                $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ? AND test_sent = 0");
+
                 $stmt->bind_param("i", $subscriber_id);
                 $stmt->execute();
                 $stmt->close();
