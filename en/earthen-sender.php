@@ -127,10 +127,10 @@ try {
         SET processing = 1
         WHERE test_sent = 0
         AND processing = 0
-           AND email NOT LIKE '%@outlook.%'
-           AND email NOT LIKE '%@live.%'
-          AND email NOT LIKE '%@hotmail.%'
-          AND email NOT LIKE '%@comcast%'
+--            AND email NOT LIKE '%@outlook.%'
+--            AND email NOT LIKE '%@live.%'
+--           AND email NOT LIKE '%@hotmail.%'
+--           AND email NOT LIKE '%@comcast%'
         ORDER BY id ASC
         LIMIT 1
     ";
@@ -156,16 +156,16 @@ try {
         die("No pending recipients found. Email sending process stopped.");
     }
 
-    // Additional validation to avoid hotmail/comcast again
-    if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-        // Release lock before exit
-        $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET processing = 0 WHERE id = ?");
-        $stmt->bind_param("i", $subscriber_id);
-        $stmt->execute();
-        $stmt->close();
-
-        die("Skipping @outlook & @hotmail emails. No valid recipient found.");
-    }
+//     // Additional validation to avoid hotmail/comcast again
+//     if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+//         // Release lock before exit
+//         $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET processing = 0 WHERE id = ?");
+//         $stmt->bind_param("i", $subscriber_id);
+//         $stmt->execute();
+//         $stmt->close();
+//
+//         die("Skipping @outlook & @hotmail emails. No valid recipient found.");
+//     }
 
 } catch (Exception $e) {
     die("Transaction error: " . $e->getMessage());
