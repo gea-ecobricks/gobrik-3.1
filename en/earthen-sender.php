@@ -304,7 +304,7 @@ $(document).ready(function () {
     // 🟢 Fetch next recipient via AJAX
    function fetchNextRecipient() {
     $.ajax({
-        url: 'get_next_recipient.php',
+        url: '../scripts/get_next_recipient.php',
         type: 'GET',
         dataType: 'json',
         success: function (response) {
