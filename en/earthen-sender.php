@@ -205,17 +205,16 @@ echo '<!DOCTYPE html>
             <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
         </div>
 
-        <p>Total Members: <strong><?php echo $total_members; ?></strong></p>
-    <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
+<p>Total Members: <strong id="total-members"><?php echo $total_members; ?></strong></p>
+<p>Emails Sent: <strong id="sent-count"><?php echo $sent_count; ?></strong>
+( <span id="sent-percentage"><?php echo $sent_percentage; ?></span>% )</p>
 
 
 <!-- Auto-send toggle -->
 <div style="margin: 10px 0;">
   <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
     <input type="checkbox" id="auto-send-toggle" style="transform: scale(1.2); margin-right: 8px;">
-
-  <p style="font-size: 13px; color: #666;">
-    Uncheck this to prevent the email from sending automatically after countdown.
+  <p style="font-size: 13px;">Uncheck this to prevent the email from sending automatically after countdown.
   </p>
 </div>
 
@@ -325,7 +324,7 @@ $(document).ready(function () {
     // 🟢 Fetch next recipient via AJAX
     function fetchNextRecipient(thenAutoSend = false) {
         $.ajax({
-            url: 'get_next_recipient.php',
+            url: '../scripts/get_next_recipient.php',
             type: 'GET',
             dataType: 'json',
             success: function (response) {
@@ -391,8 +390,10 @@ $(document).ready(function () {
                     $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
                     console.log("📫 Sent to:", recipientEmail);
 
+
                     // Chain to next
-                    fetchNextRecipient(true); // fetch + auto-send next
+                       updateStats(); // 🔄 Update numbers!
+                        fetchNextRecipient(); // 🔁 Continue sending if needed
                 }
             },
             error: function () {
@@ -446,6 +447,22 @@ $(document).ready(function () {
         fetchNextRecipient(true); // Fetch on page load, and auto-send if toggled
     }
 });
+
+function updateStats() {
+    $.ajax({
+        url: '../scripts/get_newsletter_stats.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            if (data.success) {
+                $('#total-members').text(data.total_members);
+                $('#sent-count').text(data.sent_count);
+                $('#sent-percentage').text(data.sent_percentage);
+            }
+        }
+    });
+}
+
 </script>
 
 
