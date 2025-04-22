@@ -105,14 +105,15 @@ $all_members = array_merge($sent_members, $pending_members);
 
 
 // Begin a transaction to safely lock the next available recipient
+//     AND email NOT LIKE '%@hotmail.%'
+//    AND email NOT LIKE '%@comcast%'
+
 $buwana_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 
 $query = "
     SELECT id, email, name
     FROM earthen_members_tb
     WHERE test_sent = 0
-    AND email NOT LIKE '%@hotmail.%'
-    AND email NOT LIKE '%@comcast%'
     ORDER BY id ASC
     LIMIT 1
     FOR UPDATE
@@ -128,19 +129,15 @@ if ($result && $result->num_rows > 0) {
     $recipient_email = $subscriber['email'];
     $subscriber_id = $subscriber['id'];
 
-        // ✅ Store for next page reload
     $_SESSION['locked_subscriber_id'] = $subscriber_id;
+
+    // 🔍 Add to log file to track behavior
+    error_log("[EARTHEN] LOCKED: {$recipient_email} by " . session_id());
 } else {
-    $buwana_conn->commit(); // Release lock cleanly
+    $buwana_conn->commit();
     die("No pending recipients found. Email sending process stopped.");
 }
 
-// Optional: Double-check again (failsafe) — shouldn't hit, but nice insurance
-if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-    $buwana_conn->commit(); // Release lock
-    unset($_SESSION['locked_subscriber_id']);
-    die("Skipping @hotmail or @comcast emails. No valid recipient found.");
-}
 
 // Lock will be held until you call commit() after marking as sent
 
@@ -157,9 +154,7 @@ require_once 'live-newsletter.php';  //the newsletter html
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
-
-    // Fetch the locked subscriber ID again if needed
-    $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null; // Optional: use from session if passing through reloads
+    $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null;
 
     if (!empty($email_html) && !empty($recipient_email) && $subscriber_id) {
         try {
@@ -172,26 +167,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
                 $stmt->execute();
                 $stmt->close();
 
+                // ✅ Log success
+                error_log("[EARTHEN] ✅ COMMITTED: {$recipient_email} by " . session_id());
+
                 // ✅ COMMIT the transaction to release the lock
                 $buwana_conn->commit();
 
-                // ✅ Redirect to next recipient
+                unset($_SESSION['locked_subscriber_id']); // Clean up
                 header("Location: earthen-sender.php?sent=1");
                 exit();
             } else {
-                // ❌ Sending failed, rollback the lock
                 $buwana_conn->rollback();
+                error_log("[EARTHEN] ❌ Failed to send: {$recipient_email} by " . session_id());
                 echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
             }
         } catch (Exception $e) {
             $buwana_conn->rollback();
-            error_log("Exception during send/commit: " . $e->getMessage());
-            echo "<script>alert('❌ An error occurred. Email not sent.');</script>";
+            error_log("[EARTHEN] ❌ Exception: " . $e->getMessage());
+            echo "<script>alert('❌ Error occurred. Email not sent.');</script>";
         }
-    } else {
-        // In case of incomplete input or missing lock
-        $buwana_conn->rollback();
-        echo "<script>alert('❌ Missing recipient info. Email not sent.');</script>";
     }
 }
 
@@ -200,8 +194,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 if (!$recipient_email) {
     echo "<script>alert('✅ All emails have been sent! No more pending recipients.');</script>";
 }
-
-
 
 // Email sending function
 function sendEmail($to, $htmlBody) {
