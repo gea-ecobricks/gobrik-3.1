@@ -510,7 +510,7 @@ echo '<!DOCTYPE html>
 $(document).ready(function () {
     // Declare globally once
     let countdownTimer;
-    let countdown = 2;
+    let countdown = 1;
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
     const recipientEmail = $('#email_to').val().trim();
