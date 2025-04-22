@@ -126,6 +126,9 @@ if ($result && $result->num_rows > 0) {
     $subscriber = $result->fetch_assoc();
     $recipient_email = $subscriber['email'];
     $subscriber_id = $subscriber['id'];
+
+        // ✅ Store for next page reload
+    $_SESSION['locked_subscriber_id'] = $subscriber_id;
 } else {
     $buwana_conn->commit(); // Release lock cleanly
     die("No pending recipients found. Email sending process stopped.");
@@ -134,6 +137,7 @@ if ($result && $result->num_rows > 0) {
 // Optional: Double-check again (failsafe) — shouldn't hit, but nice insurance
 if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
     $buwana_conn->commit(); // Release lock
+    unset($_SESSION['locked_subscriber_id']);
     die("Skipping @hotmail or @comcast emails. No valid recipient found.");
 }
 
