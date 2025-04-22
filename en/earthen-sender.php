@@ -117,44 +117,54 @@ $all_members = array_merge($sent_members, $pending_members);
 
 
 // Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
+
 $subscriber_id = null;
 $recipient_email = null;
 
 try {
-    // Step 1: Lock a row by marking it as processing
-    $lockQuery = "
-        UPDATE earthen_members_tb
-        SET processing = 1
-        WHERE test_sent = 0
-        AND processing = 0
---            AND email NOT LIKE '%@outlook.%'
---            AND email NOT LIKE '%@live.%'
---           AND email NOT LIKE '%@hotmail.%'
---           AND email NOT LIKE '%@comcast%'
-        ORDER BY id ASC
-        LIMIT 1
-    ";
-    $buwana_conn->query($lockQuery);
+    // Start a transaction
+    $buwana_conn->begin_transaction();
 
-    // Step 2: Fetch the row that was just locked
-    $fetchQuery = "
+    // Step 1: Lock the row to be processed
+    $stmt = $buwana_conn->prepare("
         SELECT id, email, name FROM earthen_members_tb
-        WHERE test_sent = 0 AND processing = 1
+        WHERE test_sent = 0 AND processing = 0
         ORDER BY id ASC
         LIMIT 1
-    ";
-    $result = $buwana_conn->query($fetchQuery);
-    $subscriber = $result->fetch_assoc();
+        FOR UPDATE
+    ");
 
-    if ($subscriber) {
-        $recipient_email = $subscriber['email'];
-        $subscriber_id = $subscriber['id'];
+    if (!$stmt) {
+        throw new Exception("Failed to prepare SELECT FOR UPDATE: " . $buwana_conn->error);
     }
 
-    // If no recipient found, stop the process
-    if (!$recipient_email) {
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $subscriber = $result->fetch_assoc();
+    $stmt->close();
+
+    if (!$subscriber) {
+        $buwana_conn->rollback();
         die("No pending recipients found. Email sending process stopped.");
     }
+
+    $subscriber_id = $subscriber['id'];
+    $recipient_email = $subscriber['email'];
+
+    // Optional: add extra email domain filtering here again if needed
+
+    // Step 2: Mark the row as "processing"
+    $stmt = $buwana_conn->prepare("
+        UPDATE earthen_members_tb
+        SET processing = 1
+        WHERE id = ?
+    ");
+    $stmt->bind_param("i", $subscriber_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Commit now that processing = 1 has been safely set
+    $buwana_conn->commit();
 
 //     // Additional validation to avoid hotmail/comcast again
 //     if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
@@ -185,7 +195,7 @@ $email_template = <<<HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equinox Recap: Spring update</title>
+    <title>Spring Earthen Update</title>
     <style>
         body {
             background-color: #ffffff;
