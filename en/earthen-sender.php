@@ -552,7 +552,7 @@ $(document).ready(function () {
 
     // ✅ Restart countdown if saved autoSend
     if (savedAutoSend) {
-        countdown = 2;
+        countdown = 1;  // 1 SECOND
         startCountdown();
     } else {
         $('#countdown-timer').hide();
@@ -566,7 +566,7 @@ $(document).ready(function () {
         updateVisibleButton();
 
         if (isChecked) {
-            countdown = 2;
+            countdown = 1;  //1 SECOND
             startCountdown();
         } else {
             clearInterval(countdownTimer);
