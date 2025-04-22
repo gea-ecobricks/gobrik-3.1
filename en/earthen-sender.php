@@ -380,12 +380,25 @@ HTML;
 
 
 // Handle form submission
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
-    $recipient_email = $_POST['email_to'] ?? '';
-    $subscriber_id = intval($_POST['subscriber_id'] ?? 0);
+    $subscriber_id = intval($_POST['subscriber_id'] ?? 0);  // ✅ Must be before the DB query
 
-    if (!empty($email_html) && !empty($recipient_email) && $subscriber_id > 0) {
+    if (!empty($email_html) && $subscriber_id > 0) {
+        // Re-fetch email from DB using the subscriber_id (secure & current)
+        $lookupQuery = "SELECT email FROM earthen_members_tb WHERE id = ?";
+        $stmt = $buwana_conn->prepare($lookupQuery);
+        $stmt->bind_param("i", $subscriber_id);
+        $stmt->execute();
+        $stmt->bind_result($recipient_email);
+        $stmt->fetch();
+        $stmt->close();
+
+        if (empty($recipient_email)) {
+            exit("❌ Could not re-fetch email address.");
+        }
+
         // Start a transaction to ensure atomicity
         $buwana_conn->begin_transaction();
 
@@ -420,6 +433,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
         }
     }
 }
+
 
 
 // ✅ Handle case where no more recipients exist
