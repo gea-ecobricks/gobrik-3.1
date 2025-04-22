@@ -489,7 +489,7 @@ $(document).ready(function () {
                 $('#auto-send-button').text(`✅ Sent to ${recipientEmail}!`).prop('disabled', true);
                 localStorage.removeItem('autoSend');
                 localStorage.removeItem('testSend');
-                setTimeout(() => fetchNextRecipient(), 1000);
+                setTimeout(() => location.reload(), 1000);
             },
             error: function () {
                 alert("❌ Failed to send the email.");
@@ -540,30 +540,6 @@ $(document).ready(function () {
     }
 });
 
-function fetchNextRecipient() {
-    $.ajax({
-        url: 'get-next-recipient.php',
-        type: 'GET',
-        success: function(response) {
-            if (response.success && response.subscriber) {
-                const sub = response.subscriber;
-
-                // Update the form with new data
-                $('#email_to').val(sub.email);
-                $('#auto-send-button').text(`📨 Send to ${sub.email}`).prop('disabled', false);
-
-                countdown = 1;
-                startCountdown();
-            } else {
-                alert("✅ All emails have been sent.");
-                $('#countdown-timer').hide();
-            }
-        },
-        error: function() {
-            alert("❌ Failed to fetch next recipient.");
-        }
-    });
-}
 
 </script>
 
