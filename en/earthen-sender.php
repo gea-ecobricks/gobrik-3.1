@@ -344,7 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             $stmt->close();
 
             // ✅ Redirect to refresh and get the next recipient
-            header("Location: test-ghost-emailer.php");
+            header("Location: test-ghost-emailer.php?sent=1");
             exit();
         } else {
             echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
