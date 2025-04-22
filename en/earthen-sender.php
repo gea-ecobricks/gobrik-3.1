@@ -343,6 +343,7 @@ echo '<!DOCTYPE html>
 
 
 <script>
+
 $(document).ready(function () {
     // Declare globally once
     let countdownTimer;
@@ -449,12 +450,20 @@ $(document).ready(function () {
                     email_to: "russmaier@gmail.com",
                     email_html: emailBody
                 },
-                success: function () {
-                    $('#test-send-button').text("✅ Sent!").prop('disabled', true);
-                    localStorage.removeItem('autoSend');
-                    localStorage.removeItem('testSend');
-                    setTimeout(() => location.reload(), 1000);
-                },
+                success: function (response) {
+                console.log("✅ Email sent!");
+
+                // Optionally show message
+                $('#auto-send-button').text(`✅ Sent!`).prop('disabled', true);
+
+                // Immediately trigger next round if autoSend is enabled
+                if (autoSendEnabled()) {
+                    setTimeout(() => {
+                        location.href = window.location.href.split('?')[0] + '?next=1';
+                    }, 500);  // Give a slight breather
+                }
+            },
+
                 error: function () {
                     alert("❌ Failed to send the test email.");
                 }
