@@ -103,36 +103,42 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
-// Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
-$query = "SELECT id, email, name FROM earthen_members_tb
-          WHERE test_sent = 0
---           AND email NOT LIKE '%@outlook.%'
---           AND email NOT LIKE '%@live.%'
-          AND email NOT LIKE '%@hotmail.%'
-          AND email NOT LIKE '%@comcast%'
-          ORDER BY id ASC LIMIT 1";
-$result = $buwana_conn->query($query);
-$subscriber = $result->fetch_assoc();
+// Begin a transaction to safely lock the next available recipient
+$buwana_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 
-// Initialize variables
+$query = "
+    SELECT id, email, name
+    FROM earthen_members_tb
+    WHERE test_sent = 0
+    AND email NOT LIKE '%@hotmail.%'
+    AND email NOT LIKE '%@comcast%'
+    ORDER BY id ASC
+    LIMIT 1
+    FOR UPDATE
+";
+
+$result = $buwana_conn->query($query);
+
 $subscriber_id = null;
 $recipient_email = null;
 
-if ($subscriber) {
-    $recipient_email = $subscriber['email']; // Use actual recipient from the database
+if ($result && $result->num_rows > 0) {
+    $subscriber = $result->fetch_assoc();
+    $recipient_email = $subscriber['email'];
     $subscriber_id = $subscriber['id'];
-}
-
-// Ensure there is always an email to send, otherwise stop the process
-if (!$recipient_email) {
+} else {
+    $buwana_conn->commit(); // Release lock cleanly
     die("No pending recipients found. Email sending process stopped.");
 }
 
-//Validate again before sending to avoid errors in form submission
-//strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false ||
-if ( strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-    die("Skipping @outlook & @hotmail emails. No valid recipient found.");
+// Optional: Double-check again (failsafe) — shouldn't hit, but nice insurance
+if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+    $buwana_conn->commit(); // Release lock
+    die("Skipping @hotmail or @comcast emails. No valid recipient found.");
 }
+
+// Lock will be held until you call commit() after marking as sent
+
 
 
 // Generate unsubscribe link
@@ -331,26 +337,46 @@ HTML;
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
-    $email_html = $_POST['email_html'] ?? '';  // ✅ Use correct field name
-    $recipient_email = $_POST['email_to'] ?? '';    // ✅ Use correct variable
+    $email_html = $_POST['email_html'] ?? '';
+    $recipient_email = $_POST['email_to'] ?? '';
 
-    if (!empty($email_html) && !empty($recipient_email)) {
-        if (sendEmail($recipient_email, $email_html)) {
-            // ✅ Mark email as sent in the database
-            $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ?";
-            $stmt = $buwana_conn->prepare($updateQuery);
-            $stmt->bind_param("s", $recipient_email);
-            $stmt->execute();
-            $stmt->close();
+    // Fetch the locked subscriber ID again if needed
+    $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null; // Optional: use from session if passing through reloads
 
-            // ✅ Redirect to refresh and get the next recipient
-            header("Location: earthen-sender.php?sent=1");
-            exit();
-        } else {
-            echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
+    if (!empty($email_html) && !empty($recipient_email) && $subscriber_id) {
+        try {
+            if (sendEmail($recipient_email, $email_html)) {
+
+                // ✅ Mark email as sent
+                $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?";
+                $stmt = $buwana_conn->prepare($updateQuery);
+                $stmt->bind_param("i", $subscriber_id);
+                $stmt->execute();
+                $stmt->close();
+
+                // ✅ COMMIT the transaction to release the lock
+                $buwana_conn->commit();
+
+                // ✅ Redirect to next recipient
+                header("Location: earthen-sender.php?sent=1");
+                exit();
+            } else {
+                // ❌ Sending failed, rollback the lock
+                $buwana_conn->rollback();
+                echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
+            }
+        } catch (Exception $e) {
+            $buwana_conn->rollback();
+            error_log("Exception during send/commit: " . $e->getMessage());
+            echo "<script>alert('❌ An error occurred. Email not sent.');</script>";
         }
+    } else {
+        // In case of incomplete input or missing lock
+        $buwana_conn->rollback();
+        echo "<script>alert('❌ Missing recipient info. Email not sent.');</script>";
     }
 }
+
 
 // ✅ Handle case where no more recipients exist
 if (!$recipient_email) {
