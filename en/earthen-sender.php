@@ -103,82 +103,37 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
+$query = "SELECT id, email, name FROM earthen_members_tb
+          WHERE test_sent = 0
+--           AND email NOT LIKE '%@outlook.%'
+--           AND email NOT LIKE '%@live.%'
+          AND email NOT LIKE '%@hotmail.%'
+          AND email NOT LIKE '%@comcast%'
+          ORDER BY id ASC LIMIT 1";
+$result = $buwana_conn->query($query);
+$subscriber = $result->fetch_assoc();
 
+// Initialize variables
 $subscriber_id = null;
 $recipient_email = null;
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    try {
-        $buwana_conn->begin_transaction();
-
-        $stmt = $buwana_conn->prepare("
-            UPDATE earthen_members_tb
-            SET processing = 1
-            WHERE id = (
-                SELECT id FROM (
-                    SELECT id FROM earthen_members_tb
-                    WHERE test_sent = 0 AND processing = 0
-                    ORDER BY id ASC
-                    LIMIT 1
-                ) AS temp
-                FOR UPDATE
-            )
-        ");
-        $stmt->execute();
-        $stmt->close();
-
-        $result = $buwana_conn->query("
-            SELECT id, email, name FROM earthen_members_tb
-            WHERE processing = 1 AND test_sent = 0
-            ORDER BY id ASC
-            LIMIT 1
-        ");
-        $subscriber = $result->fetch_assoc();
-
-        if (!$subscriber) {
-            $buwana_conn->rollback();
-            die("No pending recipients found. Email sending process stopped.");
-        }
-
-        $subscriber_id = $subscriber['id'];
-        $recipient_email = $subscriber['email'];
-
-        $buwana_conn->commit();
-
-
-
-
-
-//     // Additional validation to avoid hotmail/comcast again
-//     if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-//         // Release lock before exit
-//         $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET processing = 0 WHERE id = ?");
-//         $stmt->bind_param("i", $subscriber_id);
-//         $stmt->execute();
-//         $stmt->close();
-//
-//         die("Skipping @outlook & @hotmail emails. No valid recipient found.");
-//     }
-
-} catch (Exception $e) {
-    die("Transaction error: " . $e->getMessage());
+if ($subscriber) {
+    $recipient_email = $subscriber['email']; // Use actual recipient from the database
+    $subscriber_id = $subscriber['id'];
 }
 
+// Ensure there is always an email to send, otherwise stop the process
+if (!$recipient_email) {
+    die("No pending recipients found. Email sending process stopped.");
 }
+
+//Validate again before sending to avoid errors in form submission
+//strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false ||
+if ( strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+    die("Skipping @outlook & @hotmail emails. No valid recipient found.");
+}
+
 
 // Generate unsubscribe link
 $unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email);
@@ -192,7 +147,7 @@ $email_template = <<<HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spring Earthen Update</title>
+    <title>Equinox Recap: Spring update</title>
     <style>
         body {
             background-color: #ffffff;
@@ -296,12 +251,12 @@ $email_template = <<<HTML
         </div>
 
         <div class="post-title">
-            <a href="https://earthen.io/equinox-recap-ditching-amazon-usd-and-connecting-ecobricks-with-bamboo/">Earthen Spring Recap</a>
+            <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/">Earthen Spring Recap</a>
         </div>
 
         <div class="post-meta">
             By the Global Ecobrick Alliance • 22 Apr 2025<br>
-            <a href="https://earthen.io/equinox-recap-ditching-amazon-usd-and-connecting-ecobricks-with-bamboo/">View in browser</a>
+            <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/">View in browser</a>
         </div>
 
         <div class="post-content">
@@ -375,61 +330,27 @@ HTML;
 
 
 // Handle form submission
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
-    $email_html = $_POST['email_html'] ?? '';
-    $subscriber_id = intval($_POST['subscriber_id'] ?? 0);  // ✅ Must be before the DB query
+    $email_html = $_POST['email_html'] ?? '';  // ✅ Use correct field name
+    $recipient_email = $_POST['email_to'] ?? '';    // ✅ Use correct variable
 
-    if (!empty($email_html) && $subscriber_id > 0) {
-        // Re-fetch email from DB using the subscriber_id (secure & current)
-        $lookupQuery = "SELECT email FROM earthen_members_tb WHERE id = ?";
-        $stmt = $buwana_conn->prepare($lookupQuery);
-        $stmt->bind_param("i", $subscriber_id);
-        $stmt->execute();
-        $stmt->bind_result($recipient_email);
-        $stmt->fetch();
-        $stmt->close();
-
-        if (empty($recipient_email)) {
-            exit("❌ Could not re-fetch email address.");
-        }
-
-        // Start a transaction to ensure atomicity
-        $buwana_conn->begin_transaction();
-
-        // Double-check this email hasn't already been sent
-        $checkQuery = "SELECT test_sent FROM earthen_members_tb WHERE id = ? FOR UPDATE";
-        $stmt = $buwana_conn->prepare($checkQuery);
-        $stmt->bind_param("i", $subscriber_id);
-        $stmt->execute();
-        $stmt->bind_result($alreadySent);
-        $stmt->fetch();
-        $stmt->close();
-
-        if ($alreadySent) {
-            $buwana_conn->rollback();
-            exit("⚠️ Already sent to this user. Skipping.");
-        }
-
+    if (!empty($email_html) && !empty($recipient_email)) {
         if (sendEmail($recipient_email, $email_html)) {
-            // ✅ Mark email as sent
-            $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 0 WHERE id = ?";
+            // ✅ Mark email as sent in the database
+            $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ?";
             $stmt = $buwana_conn->prepare($updateQuery);
-            $stmt->bind_param("i", $subscriber_id);
+            $stmt->bind_param("s", $recipient_email);
             $stmt->execute();
             $stmt->close();
 
-            $buwana_conn->commit();
+            // ✅ Redirect to refresh and get the next recipient
             header("Location: earthen-sender.php?sent=1");
             exit();
         } else {
-            $buwana_conn->rollback();
             echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
         }
     }
 }
-
-
 
 // ✅ Handle case where no more recipients exist
 if (!$recipient_email) {
@@ -535,8 +456,6 @@ echo '<!DOCTYPE html>
 
     <!-- Hidden field for recipient email -->
     <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
-
-    <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($subscriber_id); ?>">
 
     <br><br>
 <!-- Auto-send Button (hidden by default unless auto-send is enabled) -->
