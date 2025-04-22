@@ -37,8 +37,7 @@ try {
         SELECT id, email, name
         FROM earthen_members_tb
         WHERE test_sent = 0
-        AND email NOT LIKE '%@hotmail.%'
-        AND email NOT LIKE '%@comcast%'
+
         ORDER BY id ASC
         LIMIT 1
         FOR UPDATE
