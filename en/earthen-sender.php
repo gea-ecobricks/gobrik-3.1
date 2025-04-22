@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die("Transaction error: " . $e->getMessage());
 }
 
-
+}
 
 // Generate unsubscribe link
 $unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email);
