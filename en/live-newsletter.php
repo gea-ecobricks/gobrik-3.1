@@ -1,5 +1,7 @@
 
-// Default email HTML with dynamic unsubscribe link
+<?php
+
+ // Default email HTML with dynamic unsubscribe link
 $email_template = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -186,3 +188,5 @@ $email_template = <<<HTML
 </html>
 
 HTML;
+
+?>
