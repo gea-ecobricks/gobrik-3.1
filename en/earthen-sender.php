@@ -265,11 +265,11 @@ $email_template = <<<HTML
                 And the planets align! This week Earth, Venus, Mercury, Jupiter and Neptune align - Image: <a href="https://cycles.earthen.io/">Earthcal</a>
             </p>
 
-            <p>Whether it's the onset of Fall or Spring for you, with the passing of the Equinox, Eid and the arrival of Easter... it's time for our GEA Earthen quarterly update!</p>
+            <p>Happy Earth Day!  Whether it's the onset of Fall or Spring for you, with the passing of the Equinox, Eid and the arrival of Easter... it's time for our GEA Earthen quarterly update!</p>
 
-            <p>As always, the medium is the most important message: and that's the case with this very newsletter! The GEA has proudly completely ditched its reliance on corporate technology platforms for 2025.</p>
+            <p>In celebration of our planet, its crucial to remember, that the way something is said has more meaning than what is said.  And that's the case with this very newsletter! The GEA has proudly completely ditched its reliance on corporate technology platforms for 2025.</p>
 
-            <p>This Earthen update is being sent to using the opensource Ghost.org newsletter platform that we run on our own server. We've rebuilt our GoBrik app from the ground up to get off amazon servers (we're using Dewaweb.com's Jakarta based server). Our center circle has ditched whatsapp for signal. We're using nextcloud instead of dropbox and google for our documents. And our dev team has built our own open source Buwana account system so you don't have to sign into our services with a facebook or google!</p>
+            <p>This Earthen update is being sent to using the opensource Ghost.org newsletter platform that we run on our own server. We've rebuilt our GoBrik app from the ground up to get off amazon servers. Our center circle has ditched whatsapp for Signal. We're using Nextcloud instead of dropbox/google for our docs. And our dev team has built our own open source Buwana account system so you don't have to sign into our services with an apple or facebook account!</p>
 
             <div class="bookmark">
                 <a href="https://earthen.io/gobrik-2025-accounts-ditching-big-tech-2/">
@@ -286,9 +286,9 @@ $email_template = <<<HTML
 
             <p class="kg-card-figcaption">UN rights expert condemns ‘systematic’ war-time mass destruction of homes.  <a href="https://news.un.org/en/story/2024/03/1147272">UN.org</a></p>
 
-            <p>Second, we’re proud to announce that our process of disengaging our finances from the US dollar is complete. Over a year ago, our GEA team made this decision. After observing the direct connection between US support of the ecocide and genocide in Gaza, we decided to no longer accept, hold, or denominate our accounting in USD.</p>
+            <p>Second, we’re now USD free. Over a year ago, our GEA team, observing the direct connection between the US support of the ecocide and genocide in Gaza, we decided to no longer accept, hold, or denominate our accounting in USD.</p>
 
-            <p>As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank, we grieve and are deeply saddened.  This goes against all our  ecological and humanitarian principles.  The GEA stands by this decision to disengage from the petro-captical currency that is all too often is behind oppression and depletion, like we see in Gaza and else where around the world. We've thus moved our accounting to Indonesian Rupiahs instead.</p>
+            <p>As the occupation forces continue to wage destruction of homes and biomes in Gaza and the West Bank, we grieve and are deeply saddened.  This goes against all our  ecological and humanitarian principles.  The GEA stands by our decision to disengage from the petro-captical currency that is behind the social oppression and ecological depletion in Palestine (and other places around the world). We've thus moved our accounting to Indonesian Rupiahs instead.</p>
 
             <div class="bookmark">
                 <a href="https://earthen.io/were-ditching-the-us-dollar/">
@@ -302,7 +302,7 @@ $email_template = <<<HTML
             <br><br>
 
 <img src="https://earthen.io/content/images/size/w1600/2025/04/image-1.png" alt="Bamboo build">
-            <p>Finally, we're excited to share a breakthrough by Russell Maier, one of our founders and a lead developer on our center circle team. Russell and his engineering team has been working on bamboo to connect ecobricks in all sorts of new geometric ways! Their initial experiments are very promising! We're really excited to see where this goes.</p>
+            <p>Finally, we're excited to share a breakthrough by Russell Maier, one of our founders and a lead developer on the GEA team. Russell and his engineering team has been working on bamboo to connect ecobricks in all sorts of new geometric ways! Their initial experiments are very promising! We're really excited to see where this goes.</p>
 
 
             <div class="bookmark">
