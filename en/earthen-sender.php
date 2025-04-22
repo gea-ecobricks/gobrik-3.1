@@ -103,36 +103,74 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
-// Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
-$query = "SELECT id, email, name FROM earthen_members_tb
-          WHERE test_sent = 0
---           AND email NOT LIKE '%@outlook.%'
---           AND email NOT LIKE '%@live.%'
---          AND email NOT LIKE '%@hotmail.%'
---          AND email NOT LIKE '%@comcast%'
-          ORDER BY id ASC LIMIT 1";
-$result = $buwana_conn->query($query);
-$subscriber = $result->fetch_assoc();
 
-// Initialize variables
+
+
+
+
+
+
+
+
+
+
+
+
+// Get the next recipient who hasn't received the test email and is NOT using @outlook, comcast or hotmail
 $subscriber_id = null;
 $recipient_email = null;
 
-if ($subscriber) {
-    $recipient_email = $subscriber['email']; // Use actual recipient from the database
-    $subscriber_id = $subscriber['id'];
+try {
+    // Step 1: Lock a row by marking it as processing
+    $lockQuery = "
+        UPDATE earthen_members_tb
+        SET processing = 1
+        WHERE test_sent = 0
+        AND processing = 0
+           AND email NOT LIKE '%@outlook.%'
+           AND email NOT LIKE '%@live.%'
+          AND email NOT LIKE '%@hotmail.%'
+          AND email NOT LIKE '%@comcast%'
+        ORDER BY id ASC
+        LIMIT 1
+    ";
+    $buwana_conn->query($lockQuery);
+
+    // Step 2: Fetch the row that was just locked
+    $fetchQuery = "
+        SELECT id, email, name FROM earthen_members_tb
+        WHERE test_sent = 0 AND processing = 1
+        ORDER BY id ASC
+        LIMIT 1
+    ";
+    $result = $buwana_conn->query($fetchQuery);
+    $subscriber = $result->fetch_assoc();
+
+    if ($subscriber) {
+        $recipient_email = $subscriber['email'];
+        $subscriber_id = $subscriber['id'];
+    }
+
+    // If no recipient found, stop the process
+    if (!$recipient_email) {
+        die("No pending recipients found. Email sending process stopped.");
+    }
+
+    // Additional validation to avoid hotmail/comcast again
+    if (strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
+        // Release lock before exit
+        $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET processing = 0 WHERE id = ?");
+        $stmt->bind_param("i", $subscriber_id);
+        $stmt->execute();
+        $stmt->close();
+
+        die("Skipping @outlook & @hotmail emails. No valid recipient found.");
+    }
+
+} catch (Exception $e) {
+    die("Transaction error: " . $e->getMessage());
 }
 
-// Ensure there is always an email to send, otherwise stop the process
-if (!$recipient_email) {
-    die("No pending recipients found. Email sending process stopped.");
-}
-
-//Validate again before sending to avoid errors in form submission
-//strpos($recipient_email, '@live.') !== false || strpos($recipient_email, '@outlook.') !== false ||
-// if ( strpos($recipient_email, '@hotmail.') !== false || strpos($recipient_email, '@comcast.') !== false) {
-//     die("Skipping @outlook & @hotmail emails. No valid recipient found.");
-// }
 
 
 // Generate unsubscribe link
@@ -337,7 +375,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
     if (!empty($email_html) && !empty($recipient_email)) {
         if (sendEmail($recipient_email, $email_html)) {
             // ✅ Mark email as sent in the database
-            $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ?";
+            $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 0 WHERE email = ?";
             $stmt = $buwana_conn->prepare($updateQuery);
             $stmt->bind_param("s", $recipient_email);
             $stmt->execute();
