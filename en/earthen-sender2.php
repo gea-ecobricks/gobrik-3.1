@@ -212,9 +212,8 @@ echo '<!DOCTYPE html>
 <!-- Auto-send toggle -->
 <div style="margin: 10px 0;">
   <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
-    <input type="checkbox" id="auto-send-toggle" checked style="transform: scale(1.2); margin-right: 8px;">
-    Enable Auto-Send
-  </label>
+    <input type="checkbox" id="auto-send-toggle" style="transform: scale(1.2); margin-right: 8px;">
+
   <p style="font-size: 13px; color: #666;">
     Uncheck this to prevent the email from sending automatically after countdown.
   </p>
@@ -289,7 +288,6 @@ echo '<!DOCTYPE html>
         </tbody>
     </table>
 </div>
-
 <script>
 $(document).ready(function () {
     let recipientEmail = '';
@@ -298,14 +296,18 @@ $(document).ready(function () {
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
+    const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
 
     function updateVisibleButton() {
-        if (testSendEnabled()) {
-            $('#auto-send-button').hide();
+        if (testSendEnabled() && !autoSendEnabled()) {
+            $('#test-email-container').show();
             $('#test-send-button').show().html("📨 Send to russmaier@gmail.com");
+            $('#auto-send-button').hide();
         } else {
+            $('#test-email-container').hide();
             $('#test-send-button').hide();
+
             if (recipientEmail) {
                 $('#auto-send-button')
                     .show()
@@ -320,16 +322,8 @@ $(document).ready(function () {
         }
     }
 
-    function toggleTestCheckbox() {
-        if (!testSendEnabled()) {
-            $('#test-email-container').hide();
-        } else {
-            $('#test-email-container').show();
-        }
-    }
-
-    // 🟡 Load the next recipient via AJAX
-    function fetchNextRecipient() {
+    // 🟢 Fetch next recipient via AJAX
+    function fetchNextRecipient(thenAutoSend = false) {
         $.ajax({
             url: 'get_next_recipient.php',
             type: 'GET',
@@ -343,6 +337,10 @@ $(document).ready(function () {
 
                     $('#email_to').val(recipientEmail);
                     updateVisibleButton();
+
+                    if (autoSendEnabled() && thenAutoSend) {
+                        sendEmail(); // Auto-trigger
+                    }
                 } else {
                     recipientEmail = '';
                     recipientId = null;
@@ -357,18 +355,10 @@ $(document).ready(function () {
         });
     }
 
-    // 🔹 Manual Send Button Actions
-    $('#test-send-button, #auto-send-button').on('click', function (event) {
-        event.preventDefault();
-        $('#email-form').trigger('submit');
-    });
-
-    // 🔹 Submit handler
-    $('#email-form').on('submit', function (event) {
-        event.preventDefault();
-
+    // 🟢 Shared send function
+    function sendEmail() {
         const emailBody = $('#email_html').val().trim();
-        const isTestMode = testSendEnabled();
+        const isTestMode = testSendEnabled() && !autoSendEnabled();
 
         if (!emailBody) {
             alert("⚠️ Please fill out the email content before sending.");
@@ -382,11 +372,11 @@ $(document).ready(function () {
             return;
         }
 
-        // Sending state
+        // Show sending state
         $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
 
         $.ajax({
-            url: "", // Same page handles form submission
+            url: "", // Same page
             type: "POST",
             data: {
                 send_email: "1",
@@ -401,10 +391,8 @@ $(document).ready(function () {
                     $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
                     console.log("📫 Sent to:", recipientEmail);
 
-                    // Wait a bit, then fetch the next
-                    setTimeout(() => {
-                        fetchNextRecipient();
-                    }, 500);
+                    // Chain to next
+                    fetchNextRecipient(true); // fetch + auto-send next
                 }
             },
             error: function () {
@@ -412,6 +400,18 @@ $(document).ready(function () {
                 updateVisibleButton();
             }
         });
+    }
+
+    // 🔹 Form submission (manual trigger)
+    $('#email-form').on('submit', function (e) {
+        e.preventDefault();
+        sendEmail();
+    });
+
+    // 🔹 Manual click trigger
+    $('#test-send-button, #auto-send-button').on('click', function (e) {
+        e.preventDefault();
+        $('#email-form').trigger('submit');
     });
 
     // 🔹 Toggle listeners
@@ -420,20 +420,34 @@ $(document).ready(function () {
         updateVisibleButton();
     });
 
-    // 🔹 Init state
+    $('#auto-send-toggle').on('change', function () {
+        localStorage.setItem('autoSend', $(this).is(':checked'));
+        updateVisibleButton();
+
+        // If switched ON and a recipient is already loaded, auto-trigger
+        if (autoSendEnabled() && recipientEmail) {
+            sendEmail();
+        }
+    });
+
+    // 🔹 Initial state from localStorage
+    const savedAutoSend = localStorage.getItem('autoSend') === 'true';
     const savedTestSend = localStorage.getItem('testSend') === 'true';
+
+    $('#auto-send-toggle').prop('checked', savedAutoSend);
     $('#test-email-toggle').prop('checked', savedTestSend);
-    toggleTestCheckbox();
+
     updateVisibleButton();
 
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#auto-send-button, #test-send-button').prop('disabled', true);
     } else {
-        fetchNextRecipient();
+        fetchNextRecipient(true); // Fetch on page load, and auto-send if toggled
     }
 });
 </script>
+
 
 
 
