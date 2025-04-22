@@ -341,25 +341,21 @@ echo '<!DOCTYPE html>
     </table>
 </div>
 
-
 <script>
-
 $(document).ready(function () {
-    // Declare globally once
     let countdownTimer;
     let countdown = 1;
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
-    const recipientEmail = $('#email_to').val().trim();
+    const recipientEmail = () => $('#email_to').val().trim(); // ✅ Function, not static!
 
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
 
-    // 🟢 Button display handler
     function updateVisibleButton() {
         if (autoSendEnabled()) {
             $('#test-send-button').hide();
-            $('#auto-send-button').show().html(`📨 Send to ${recipientEmail || 'recipient'}`);
+            $('#auto-send-button').show().html(`📨 Send to ${recipientEmail() || 'recipient'}`);
         } else if (testSendEnabled()) {
             $('#auto-send-button').hide();
             $('#test-send-button').show().html("📨 Send to russmaier@gmail.com");
@@ -369,10 +365,9 @@ $(document).ready(function () {
         }
     }
 
-    // 🔹 Load localStorage
     const savedAutoSend = localStorage.getItem('autoSend') !== null
-  ? localStorage.getItem('autoSend') === 'true'
-  : $('#auto-send-toggle').is(':checked');
+        ? localStorage.getItem('autoSend') === 'true'
+        : $('#auto-send-toggle').is(':checked');
     const savedTestSend = localStorage.getItem('testSend') === 'true';
 
     $('#auto-send-toggle').prop('checked', savedAutoSend);
@@ -380,22 +375,19 @@ $(document).ready(function () {
     toggleTestCheckbox();
     updateVisibleButton();
 
-    // 🔹 Prevent send if alerts
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#auto-send-button, #test-send-button').prop('disabled', true);
         return;
     }
 
-    // ✅ Restart countdown if saved autoSend
     if (savedAutoSend) {
-        countdown = 1;  // 1 SECOND
+        countdown = 1;
         startCountdown();
     } else {
         $('#countdown-timer').hide();
     }
 
-    // 🔹 Toggle listeners
     $('#auto-send-toggle').on('change', function () {
         const isChecked = $(this).is(':checked');
         localStorage.setItem('autoSend', isChecked);
@@ -403,7 +395,7 @@ $(document).ready(function () {
         updateVisibleButton();
 
         if (isChecked) {
-            countdown = 1;  //1 SECOND
+            countdown = 1;
             startCountdown();
         } else {
             clearInterval(countdownTimer);
@@ -417,13 +409,11 @@ $(document).ready(function () {
         updateVisibleButton();
     });
 
-    // 🔹 Manual Send
     $('#test-send-button, #auto-send-button').on('click', function (event) {
         event.preventDefault();
         $('#email-form').trigger('submit');
     });
 
-    // 🔹 Submit handler
     $('#email-form').on('submit', function (event) {
         event.preventDefault();
 
@@ -435,11 +425,8 @@ $(document).ready(function () {
             return;
         }
 
-        // Visual sending state
         $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
-
-        // Prevent duplicate trigger
-        $('#email-form').off('submit');
+        $('#email-form').off('submit'); // Prevent dupes
 
         if (isTestMode) {
             $.ajax({
@@ -450,20 +437,12 @@ $(document).ready(function () {
                     email_to: "russmaier@gmail.com",
                     email_html: emailBody
                 },
-                success: function (response) {
-                console.log("✅ Email sent!");
-
-                // Optionally show message
-                $('#auto-send-button').text(`✅ Sent!`).prop('disabled', true);
-
-                // Immediately trigger next round if autoSend is enabled
-                if (autoSendEnabled()) {
-                    setTimeout(() => {
-                        location.href = window.location.href.split('?')[0] + '?next=1';
-                    }, 500);  // Give a slight breather
-                }
-            },
-
+                success: function () {
+                    $('#test-send-button').text("✅ Sent!").prop('disabled', true);
+                    localStorage.removeItem('autoSend');
+                    localStorage.removeItem('testSend');
+                    fetchNextRecipient(); // ✅ Use AJAX, no reload
+                },
                 error: function () {
                     alert("❌ Failed to send the test email.");
                 }
@@ -471,8 +450,7 @@ $(document).ready(function () {
             return;
         }
 
-        // Normal Send
-        if (!recipientEmail) {
+        if (!recipientEmail()) {
             alert("⚠️ No recipient found for regular sending.");
             return;
         }
@@ -482,14 +460,14 @@ $(document).ready(function () {
             type: "POST",
             data: {
                 send_email: "1",
-                email_to: recipientEmail,
+                email_to: recipientEmail(),
                 email_html: emailBody
             },
             success: function () {
-                $('#auto-send-button').text(`✅ Sent to ${recipientEmail}!`).prop('disabled', true);
+                $('#auto-send-button').text(`✅ Sent to ${recipientEmail()}!`).prop('disabled', true);
                 localStorage.removeItem('autoSend');
                 localStorage.removeItem('testSend');
-                setTimeout(() => location.reload(), 1000);
+                fetchNextRecipient(); // ✅ Load next recipient via AJAX
             },
             error: function () {
                 alert("❌ Failed to send the email.");
@@ -497,8 +475,8 @@ $(document).ready(function () {
         });
     });
 
-    // 🔹 Countdown timer logic
     function startCountdown() {
+        clearInterval(countdownTimer); // 🧼 Clean any previous timers
         $('#countdown-timer').show();
         $('#stop-timer-btn').show();
         updateCountdownText();
@@ -522,14 +500,12 @@ $(document).ready(function () {
         $('#countdown').text(countdown);
     }
 
-    // 🔹 Stop button
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownTimer);
         $('#countdown-timer').hide();
         $(this).hide();
     });
 
-    // 🔹 Toggle test checkbox visibility
     function toggleTestCheckbox() {
         if (!autoSendEnabled()) {
             $('#test-email-container').show();
@@ -539,7 +515,33 @@ $(document).ready(function () {
         }
     }
 });
+
+function fetchNextRecipient() {
+    $.ajax({
+        url: 'get-next-recipient.php',
+        type: 'GET',
+        success: function (response) {
+            if (response.success && response.subscriber) {
+                const sub = response.subscriber;
+
+                $('#email_to').val(sub.email);
+                $('#auto-send-button').text(`📨 Send to ${sub.email}`).prop('disabled', false);
+
+                clearInterval(countdownTimer); // 🧼 stop any active timer
+                countdown = 1;
+                startCountdown();
+            } else {
+                alert("✅ All emails have been sent.");
+                $('#countdown-timer').hide();
+            }
+        },
+        error: function () {
+            alert("❌ Failed to fetch next recipient.");
+        }
+    });
+}
 </script>
+
 
 
 
