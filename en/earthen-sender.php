@@ -289,12 +289,12 @@ $email_template = <<<HTML
         </div>
 
         <div class="post-title">
-            <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/">Earthen Spring Recap</a>
+            <a href="https://earthen.io/equinox-recap-ditching-amazon-usd-and-connecting-ecobricks-with-bamboo/">Earthen Spring Recap</a>
         </div>
 
         <div class="post-meta">
             By the Global Ecobrick Alliance • 22 Apr 2025<br>
-            <a href="https://earthen.io/p/99c9ba31-badb-4ba5-ba45-25c00a207c7f/">View in browser</a>
+            <a href="https://earthen.io/equinox-recap-ditching-amazon-usd-and-connecting-ecobricks-with-bamboo/">View in browser</a>
         </div>
 
         <div class="post-content">
