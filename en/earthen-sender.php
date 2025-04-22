@@ -381,26 +381,46 @@ HTML;
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
-    $email_html = $_POST['email_html'] ?? '';  // ✅ Use correct field name
-    $recipient_email = $_POST['email_to'] ?? '';    // ✅ Use correct variable
+    $email_html = $_POST['email_html'] ?? '';
+    $recipient_email = $_POST['email_to'] ?? '';
+    $subscriber_id = intval($_POST['subscriber_id'] ?? 0);
 
-    if (!empty($email_html) && !empty($recipient_email)) {
+    if (!empty($email_html) && !empty($recipient_email) && $subscriber_id > 0) {
+        // Start a transaction to ensure atomicity
+        $buwana_conn->begin_transaction();
+
+        // Double-check this email hasn't already been sent
+        $checkQuery = "SELECT test_sent FROM earthen_members_tb WHERE id = ? FOR UPDATE";
+        $stmt = $buwana_conn->prepare($checkQuery);
+        $stmt->bind_param("i", $subscriber_id);
+        $stmt->execute();
+        $stmt->bind_result($alreadySent);
+        $stmt->fetch();
+        $stmt->close();
+
+        if ($alreadySent) {
+            $buwana_conn->rollback();
+            exit("⚠️ Already sent to this user. Skipping.");
+        }
+
         if (sendEmail($recipient_email, $email_html)) {
-            // ✅ Mark email as sent in the database
-            $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 0 WHERE email = ?";
+            // ✅ Mark email as sent
+            $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 0 WHERE id = ?";
             $stmt = $buwana_conn->prepare($updateQuery);
-            $stmt->bind_param("s", $recipient_email);
+            $stmt->bind_param("i", $subscriber_id);
             $stmt->execute();
             $stmt->close();
 
-            // ✅ Redirect to refresh and get the next recipient
+            $buwana_conn->commit();
             header("Location: earthen-sender.php?sent=1");
             exit();
         } else {
+            $buwana_conn->rollback();
             echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
         }
     }
 }
+
 
 // ✅ Handle case where no more recipients exist
 if (!$recipient_email) {
@@ -506,6 +526,8 @@ echo '<!DOCTYPE html>
 
     <!-- Hidden field for recipient email -->
     <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
+
+    <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($subscriber_id); ?>">
 
     <br><br>
 <!-- Auto-send Button (hidden by default unless auto-send is enabled) -->
