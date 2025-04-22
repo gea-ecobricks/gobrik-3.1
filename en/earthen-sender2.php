@@ -142,12 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 }
 
 
-
-// ✅ Handle case where no more recipients exist
-if (!$recipient_email) {
-    echo "<script>alert('✅ All emails have been sent! No more pending recipients.');</script>";
-}
-
 // Email sending function
 function sendEmail($to, $htmlBody) {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
