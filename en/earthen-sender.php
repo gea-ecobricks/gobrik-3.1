@@ -213,9 +213,9 @@ echo '<!DOCTYPE html>
 
 <!-- Auto-send toggle -->
 <div style="margin: 10px 0;">
-  <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
+  <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;display:flex;">
     <input type="checkbox" id="auto-send-toggle" style="transform: scale(1.2); margin-right: 8px;">
-  <p style="font-size: 13px;">Uncheck this to prevent the email from sending automatically after countdown.
+  <p>Uncheck this to prevent the email from sending automatically after countdown.
   </p>
 </div>
 
