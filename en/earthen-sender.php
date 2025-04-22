@@ -96,74 +96,98 @@ $sent_result = $buwana_conn->query($query_sent);
 $sent_members = $sent_result->fetch_all(MYSQLI_ASSOC);
 
 // Fetch the next 7 pending emails
-$query_pending = "
-    SELECT id, email, name, test_sent, test_sent_date_time
-    FROM earthen_members_tb
-    WHERE test_sent = 0
-    ORDER BY id ASC
-    LIMIT 7
-";
+$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time FROM earthen_members_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 7";
 $pending_result = $buwana_conn->query($query_pending);
 $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
-// Generate unsubscribe link if you still need it on this page
-$unsubscribe_link = isset($recipient_email)
-    ? "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email)
-    : '';
 
-// Load newsletter HTML from external file
-$email_template = file_get_contents('live-newsletter.php');
+// Begin a transaction to safely lock the next available recipient
+//     AND email NOT LIKE '%@hotmail.%'
+//    AND email NOT LIKE '%@comcast%'
 
-// ✅ Handle AJAX form submission to send email
+$buwana_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
+
+$query = "
+    SELECT id, email, name
+    FROM earthen_members_tb
+    WHERE test_sent = 0
+    ORDER BY id ASC
+    LIMIT 1
+    FOR UPDATE
+";
+
+$result = $buwana_conn->query($query);
+
+$subscriber_id = null;
+$recipient_email = null;
+
+if ($result && $result->num_rows > 0) {
+    $subscriber = $result->fetch_assoc();
+    $recipient_email = $subscriber['email'];
+    $subscriber_id = $subscriber['id'];
+
+    $_SESSION['locked_subscriber_id'] = $subscriber_id;
+
+    // 🔍 Add to log file to track behavior
+    error_log("[EARTHEN] LOCKED: {$recipient_email} by " . session_id());
+} else {
+    $buwana_conn->commit();
+    die("No pending recipients found. Email sending process stopped.");
+}
+
+
+// Lock will be held until you call commit() after marking as sent
+
+
+
+// Generate unsubscribe link
+$unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email);
+
+
+require_once 'live-newsletter.php';  //the newsletter html
+
+
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
-    $email_html     = $_POST['email_html'] ?? '';
+    $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
-    $subscriber_id  = $_POST['subscriber_id'] ?? null;  // ✅ NEW: passed in via AJAX
+    $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null;
 
     if (!empty($email_html) && !empty($recipient_email) && $subscriber_id) {
         try {
             if (sendEmail($recipient_email, $email_html)) {
 
                 // ✅ Mark email as sent
-                $updateQuery = "
-                    UPDATE earthen_members_tb
-                    SET test_sent = 1, test_sent_date_time = NOW()
-                    WHERE id = ?
-                ";
+                $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?";
                 $stmt = $buwana_conn->prepare($updateQuery);
                 $stmt->bind_param("i", $subscriber_id);
                 $stmt->execute();
                 $stmt->close();
 
-                // ✅ Log the commit
+                // ✅ Log success
                 error_log("[EARTHEN] ✅ COMMITTED: {$recipient_email} by " . session_id());
 
-                $buwana_conn->commit(); // ✅ Complete transaction
+                // ✅ COMMIT the transaction to release the lock
+                $buwana_conn->commit();
 
-                // ✅ Respond for AJAX (if needed)
-                echo json_encode(['success' => true]);
-                exit;
+                unset($_SESSION['locked_subscriber_id']); // Clean up
+                header("Location: earthen-sender.php?sent=1");
+                exit();
             } else {
                 $buwana_conn->rollback();
                 error_log("[EARTHEN] ❌ Failed to send: {$recipient_email} by " . session_id());
-                echo json_encode(['success' => false, 'error' => 'Mailgun failure']);
-                exit;
+                echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
             }
         } catch (Exception $e) {
             $buwana_conn->rollback();
             error_log("[EARTHEN] ❌ Exception: " . $e->getMessage());
-            echo json_encode(['success' => false, 'error' => 'Server error']);
-            exit;
+            echo "<script>alert('❌ Error occurred. Email not sent.');</script>";
         }
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Missing data']);
-        exit;
     }
 }
-
 
 
 // ✅ Handle case where no more recipients exist
@@ -317,21 +341,25 @@ echo '<!DOCTYPE html>
     </table>
 </div>
 
+
 <script>
+
 $(document).ready(function () {
+    // Declare globally once
     let countdownTimer;
     let countdown = 1;
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
-    const recipientEmail = () => $('#email_to').val().trim(); // ✅ Function, not static!
+    const recipientEmail = $('#email_to').val().trim();
 
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
 
+    // 🟢 Button display handler
     function updateVisibleButton() {
         if (autoSendEnabled()) {
             $('#test-send-button').hide();
-            $('#auto-send-button').show().html(`📨 Send to ${recipientEmail() || 'recipient'}`);
+            $('#auto-send-button').show().html(`📨 Send to ${recipientEmail || 'recipient'}`);
         } else if (testSendEnabled()) {
             $('#auto-send-button').hide();
             $('#test-send-button').show().html("📨 Send to russmaier@gmail.com");
@@ -341,9 +369,10 @@ $(document).ready(function () {
         }
     }
 
+    // 🔹 Load localStorage
     const savedAutoSend = localStorage.getItem('autoSend') !== null
-        ? localStorage.getItem('autoSend') === 'true'
-        : $('#auto-send-toggle').is(':checked');
+  ? localStorage.getItem('autoSend') === 'true'
+  : $('#auto-send-toggle').is(':checked');
     const savedTestSend = localStorage.getItem('testSend') === 'true';
 
     $('#auto-send-toggle').prop('checked', savedAutoSend);
@@ -351,19 +380,22 @@ $(document).ready(function () {
     toggleTestCheckbox();
     updateVisibleButton();
 
+    // 🔹 Prevent send if alerts
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#auto-send-button, #test-send-button').prop('disabled', true);
         return;
     }
 
+    // ✅ Restart countdown if saved autoSend
     if (savedAutoSend) {
-        countdown = 1;
+        countdown = 1;  // 1 SECOND
         startCountdown();
     } else {
         $('#countdown-timer').hide();
     }
 
+    // 🔹 Toggle listeners
     $('#auto-send-toggle').on('change', function () {
         const isChecked = $(this).is(':checked');
         localStorage.setItem('autoSend', isChecked);
@@ -371,7 +403,7 @@ $(document).ready(function () {
         updateVisibleButton();
 
         if (isChecked) {
-            countdown = 1;
+            countdown = 1;  //1 SECOND
             startCountdown();
         } else {
             clearInterval(countdownTimer);
@@ -385,11 +417,13 @@ $(document).ready(function () {
         updateVisibleButton();
     });
 
+    // 🔹 Manual Send
     $('#test-send-button, #auto-send-button').on('click', function (event) {
         event.preventDefault();
         $('#email-form').trigger('submit');
     });
 
+    // 🔹 Submit handler
     $('#email-form').on('submit', function (event) {
         event.preventDefault();
 
@@ -401,8 +435,11 @@ $(document).ready(function () {
             return;
         }
 
+        // Visual sending state
         $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
-        $('#email-form').off('submit'); // Prevent dupes
+
+        // Prevent duplicate trigger
+        $('#email-form').off('submit');
 
         if (isTestMode) {
             $.ajax({
@@ -413,12 +450,20 @@ $(document).ready(function () {
                     email_to: "russmaier@gmail.com",
                     email_html: emailBody
                 },
-                success: function () {
-                    $('#test-send-button').text("✅ Sent!").prop('disabled', true);
-                    localStorage.removeItem('autoSend');
-                    localStorage.removeItem('testSend');
-                    fetchNextRecipient(); // ✅ Use AJAX, no reload
-                },
+                success: function (response) {
+                console.log("✅ Email sent!");
+
+                // Optionally show message
+                $('#auto-send-button').text(`✅ Sent!`).prop('disabled', true);
+
+                // Immediately trigger next round if autoSend is enabled
+                if (autoSendEnabled()) {
+                    setTimeout(() => {
+                        location.href = window.location.href.split('?')[0] + '?next=1';
+                    }, 500);  // Give a slight breather
+                }
+            },
+
                 error: function () {
                     alert("❌ Failed to send the test email.");
                 }
@@ -426,7 +471,8 @@ $(document).ready(function () {
             return;
         }
 
-        if (!recipientEmail()) {
+        // Normal Send
+        if (!recipientEmail) {
             alert("⚠️ No recipient found for regular sending.");
             return;
         }
@@ -436,14 +482,14 @@ $(document).ready(function () {
             type: "POST",
             data: {
                 send_email: "1",
-                email_to: recipientEmail(),
+                email_to: recipientEmail,
                 email_html: emailBody
             },
             success: function () {
-                $('#auto-send-button').text(`✅ Sent to ${recipientEmail()}!`).prop('disabled', true);
+                $('#auto-send-button').text(`✅ Sent to ${recipientEmail}!`).prop('disabled', true);
                 localStorage.removeItem('autoSend');
                 localStorage.removeItem('testSend');
-                fetchNextRecipient(); // ✅ Load next recipient via AJAX
+                setTimeout(() => fetchNextRecipient(), 1000);
             },
             error: function () {
                 alert("❌ Failed to send the email.");
@@ -451,8 +497,8 @@ $(document).ready(function () {
         });
     });
 
+    // 🔹 Countdown timer logic
     function startCountdown() {
-        clearInterval(countdownTimer); // 🧼 Clean any previous timers
         $('#countdown-timer').show();
         $('#stop-timer-btn').show();
         updateCountdownText();
@@ -476,12 +522,14 @@ $(document).ready(function () {
         $('#countdown').text(countdown);
     }
 
+    // 🔹 Stop button
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownTimer);
         $('#countdown-timer').hide();
         $(this).hide();
     });
 
+    // 🔹 Toggle test checkbox visibility
     function toggleTestCheckbox() {
         if (!autoSendEnabled()) {
             $('#test-email-container').show();
@@ -496,14 +544,14 @@ function fetchNextRecipient() {
     $.ajax({
         url: 'get-next-recipient.php',
         type: 'GET',
-        success: function (response) {
+        success: function(response) {
             if (response.success && response.subscriber) {
                 const sub = response.subscriber;
 
+                // Update the form with new data
                 $('#email_to').val(sub.email);
                 $('#auto-send-button').text(`📨 Send to ${sub.email}`).prop('disabled', false);
 
-                clearInterval(countdownTimer); // 🧼 stop any active timer
                 countdown = 1;
                 startCountdown();
             } else {
@@ -511,13 +559,13 @@ function fetchNextRecipient() {
                 $('#countdown-timer').hide();
             }
         },
-        error: function () {
+        error: function() {
             alert("❌ Failed to fetch next recipient.");
         }
     });
 }
-</script>
 
+</script>
 
 
 
