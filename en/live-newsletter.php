@@ -1,4 +1,3 @@
-
 <?php
 
  // Default email HTML with dynamic unsubscribe link
