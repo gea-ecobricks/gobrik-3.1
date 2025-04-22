@@ -1,13 +1,12 @@
 <?php
 require_once '../buwanaconn_env.php';
 header('Content-Type: application/json');
-session_start(); // ✅ Required if using session
-
-
+session_start();
 
 try {
     $buwana_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 
+    // Get the next recipient
     $query = "
         SELECT id, email, name
         FROM earthen_members_tb
@@ -21,34 +20,40 @@ try {
 
     $result = $buwana_conn->query($query);
 
+    $subscriber = null;
+
     if ($result && $result->num_rows > 0) {
         $subscriber = $result->fetch_assoc();
-
-        // Optional: Log lock for debugging
+        $_SESSION['locked_subscriber_id'] = $subscriber['id'];
         error_log("[EARTHEN] LOCKED: {$subscriber['email']} via get-next-recipient");
-
-        $_SESSION['locked_subscriber_id'] = $subscriber['id']; // optional session storage
-
-        // ✅ COMMIT the lock immediately so other sessions can proceed
-        $buwana_conn->commit();
-
-        echo json_encode([
-            'success' => true,
-            'subscriber' => $subscriber
-        ]);
-    } else {
-        $buwana_conn->commit(); // Cleanly end transaction
-        echo json_encode([
-            'success' => false,
-            'message' => 'No more recipients'
-        ]);
     }
+
+    $buwana_conn->commit();
+
+    // Get updated stats
+    $statsQuery = "SELECT COUNT(*) AS total_members, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count FROM earthen_members_tb";
+    $statsResult = $buwana_conn->query($statsQuery);
+    $stats = $statsResult->fetch_assoc();
+
+    $total_members = intval($stats['total_members'] ?? 0);
+    $sent_count = intval($stats['sent_count'] ?? 0);
+    $sent_percentage = $total_members > 0 ? round(($sent_count / $total_members) * 100, 2) : 0;
+
+    echo json_encode([
+        'success' => true,
+        'subscriber' => $subscriber,
+        'stats' => [
+            'total' => $total_members,
+            'sent' => $sent_count,
+            'percentage' => $sent_percentage
+        ]
+    ]);
 
 } catch (Exception $e) {
     $buwana_conn->rollback();
     error_log("[EARTHEN] ❌ ERROR in get-next-recipient: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'message' => 'Error fetching recipient'
+        'message' => 'Server error'
     ]);
 }

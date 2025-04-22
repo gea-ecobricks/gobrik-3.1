@@ -206,8 +206,9 @@ echo '<!DOCTYPE html>
         </div>
 
 <p>Total Members: <strong id="total-members"><?php echo $total_members; ?></strong></p>
-<p>Emails Sent: <strong id="sent-count"><?php echo $sent_count; ?></strong>
-( <span id="sent-percentage"><?php echo $sent_percentage; ?></span>% )</p>
+<p>Emails Sent: <strong id="sent-count"><?php echo $sent_count; ?></strong> (
+    <span id="sent-percentage"><?php echo number_format($sent_percentage, 2); ?></span>%)</p>
+
 
 
 <!-- Auto-send toggle -->
@@ -322,37 +323,43 @@ $(document).ready(function () {
     }
 
     // 🟢 Fetch next recipient via AJAX
-    function fetchNextRecipient(thenAutoSend = false) {
-        $.ajax({
-            url: '../scripts/get_next_recipient.php',
-            type: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) {
-                    const sub = response.subscriber;
-                    recipientEmail = sub.email;
-                    recipientName = sub.name;
-                    recipientId = sub.id;
+   function fetchNextRecipient() {
+    $.ajax({
+        url: 'get_next_recipient.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                // 🎯 Set recipient
+                const sub = response.subscriber;
+                recipientEmail = sub?.email || '';
+                recipientName = sub?.name || '';
+                recipientId = sub?.id || null;
 
-                    $('#email_to').val(recipientEmail);
-                    updateVisibleButton();
+                $('#email_to').val(recipientEmail);
 
-                    if (autoSendEnabled() && thenAutoSend) {
-                        sendEmail(); // Auto-trigger
-                    }
-                } else {
-                    recipientEmail = '';
-                    recipientId = null;
-                    $('#email_to').val('');
-                    $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
-                    console.log("✅ All recipients processed.");
+                // 📊 Update stats
+                if (response.stats) {
+                    $('#total-members').text(response.stats.total);
+                    $('#sent-count').text(response.stats.sent);
+                    $('#sent-percentage').text(response.stats.percentage.toFixed(2));
                 }
-            },
-            error: function () {
-                alert("❌ Failed to fetch next recipient.");
+
+                updateVisibleButton();
+            } else {
+                // No more recipients
+                recipientEmail = '';
+                recipientId = null;
+                $('#email_to').val('');
+                $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
             }
-        });
-    }
+        },
+        error: function () {
+            alert("❌ Failed to fetch next recipient.");
+        }
+    });
+}
+
 
     // 🟢 Shared send function
     function sendEmail() {
