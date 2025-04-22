@@ -323,7 +323,7 @@ $(document).ready(function () {
     }
 
     // 🟢 Fetch next recipient via AJAX
-   function fetchNextRecipient() {
+  function fetchNextRecipient() {
     $.ajax({
         url: '../scripts/get_next_recipient.php',
         type: 'GET',
@@ -346,8 +346,16 @@ $(document).ready(function () {
                 }
 
                 updateVisibleButton();
+
+                // 🟢 Auto-send the next email if enabled
+                if ($('#auto-send-toggle').is(':checked')) {
+                    setTimeout(() => {
+                        sendEmail();
+                    }, 200); // small buffer for DOM update
+                }
+
             } else {
-                // No more recipients
+                // ✅ All done
                 recipientEmail = '';
                 recipientId = null;
                 $('#email_to').val('');
@@ -359,6 +367,7 @@ $(document).ready(function () {
         }
     });
 }
+
 
 
     // 🟢 Shared send function
