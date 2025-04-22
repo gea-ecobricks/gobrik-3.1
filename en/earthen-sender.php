@@ -344,7 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             $stmt->close();
 
             // ✅ Redirect to refresh and get the next recipient
-            header("Location: test-ghost-emailer.php?sent=1");
+            header("Location: earthen-sender.php?sent=1");
             exit();
         } else {
             echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
@@ -472,7 +472,7 @@ echo '<!DOCTYPE html>
 </form>
 
 <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
-    <p>Email will send in <span id="countdown">2</span> seconds...</p>
+    <p>Email will send in <span id="countdown">1</span> seconds...</p>
     <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
 
@@ -617,7 +617,7 @@ $(document).ready(function () {
                     $('#test-send-button').text("✅ Sent!").prop('disabled', true);
                     localStorage.removeItem('autoSend');
                     localStorage.removeItem('testSend');
-                    setTimeout(() => location.reload(), 2000);
+                    setTimeout(() => location.reload(), 1000);
                 },
                 error: function () {
                     alert("❌ Failed to send the test email.");
