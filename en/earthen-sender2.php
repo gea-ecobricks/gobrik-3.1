@@ -250,8 +250,9 @@ echo '<!DOCTYPE html>
     <br><br>
 <!-- Auto-send Button (hidden by default unless auto-send is enabled) -->
 <button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
-    📨 Send to <?php echo htmlspecialchars($recipient_email); ?>
+    📨 Send
 </button>
+
 
 <!-- Test Send Button (visible by default when auto-send is off) -->
 <button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
