@@ -121,50 +121,45 @@ $all_members = array_merge($sent_members, $pending_members);
 $subscriber_id = null;
 $recipient_email = null;
 
-try {
-    $buwana_conn->begin_transaction();
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    try {
+        $buwana_conn->begin_transaction();
 
-    // Step 1: Lock and mark a row atomically
-    $stmt = $buwana_conn->prepare("
-        UPDATE earthen_members_tb
-        SET processing = 1
-        WHERE id = (
-            SELECT id FROM (
-                SELECT id FROM earthen_members_tb
-                WHERE test_sent = 0 AND processing = 0
-                ORDER BY id ASC
-                LIMIT 1
-            ) AS temp
-            FOR UPDATE
-        )
-    ");
+        $stmt = $buwana_conn->prepare("
+            UPDATE earthen_members_tb
+            SET processing = 1
+            WHERE id = (
+                SELECT id FROM (
+                    SELECT id FROM earthen_members_tb
+                    WHERE test_sent = 0 AND processing = 0
+                    ORDER BY id ASC
+                    LIMIT 1
+                ) AS temp
+                FOR UPDATE
+            )
+        ");
+        $stmt->execute();
+        $stmt->close();
 
-    if (!$stmt) {
-        throw new Exception("Failed to prepare atomic UPDATE: " . $buwana_conn->error);
-    }
+        $result = $buwana_conn->query("
+            SELECT id, email, name FROM earthen_members_tb
+            WHERE processing = 1 AND test_sent = 0
+            ORDER BY id ASC
+            LIMIT 1
+        ");
+        $subscriber = $result->fetch_assoc();
 
-    $stmt->execute();
-    $stmt->close();
+        if (!$subscriber) {
+            $buwana_conn->rollback();
+            die("No pending recipients found. Email sending process stopped.");
+        }
 
-    // Step 2: Now fetch the row marked as processing
-    $result = $buwana_conn->query("
-        SELECT id, email, name FROM earthen_members_tb
-        WHERE processing = 1 AND test_sent = 0
-        ORDER BY id ASC
-        LIMIT 1
-    ");
-    $subscriber = $result->fetch_assoc();
+        $subscriber_id = $subscriber['id'];
+        $recipient_email = $subscriber['email'];
 
-    if (!$subscriber) {
-        $buwana_conn->rollback();
-        die("No pending recipients found. Email sending process stopped.");
-    }
+        $buwana_conn->commit();
 
-    $subscriber_id = $subscriber['id'];
-    $recipient_email = $subscriber['email'];
 
-    // Step 3: Commit the lock
-    $buwana_conn->commit();
 
 
 
