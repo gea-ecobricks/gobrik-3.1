@@ -8,7 +8,8 @@ $row = $result->fetch_assoc();
 
 $total = intval($row['total_members'] ?? 0);
 $sent = intval($row['sent_count'] ?? 0);
-$percentage = ($total > 0) ? round(($sent / $total) * 100, 2) : 0;
+$percentage = ($total > 0) ? number_format(($sent / $total) * 100, 2, '.', '') : '0.00';
+
 
 echo json_encode([
     'success' => true,

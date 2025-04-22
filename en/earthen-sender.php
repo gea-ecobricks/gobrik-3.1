@@ -389,12 +389,20 @@ $(document).ready(function () {
                 } else {
                     $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
                     console.log("📫 Sent to:", recipientEmail);
-                    // Chain to next
 
-                       fetchNextRecipient(); //  Continue sending if needed
-                       updateStats(); // Update numbers!
+                    // 🔁 Update stats
+                    updateStats();
+
+                    // 🔁 Fetch next and trigger again if auto-send is enabled
+                    setTimeout(() => {
+                        fetchNextRecipient();
+                        if ($('#auto-send-toggle').is(':checked')) {
+                            setTimeout(() => $('#email-form').trigger('submit'), 400); // small buffer
+                        }
+                    }, 500);
                 }
-            },
+            }
+
             error: function () {
                 alert("❌ Failed to send the email.");
                 updateVisibleButton();
