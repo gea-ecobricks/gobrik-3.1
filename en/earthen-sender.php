@@ -354,61 +354,52 @@ $(document).ready(function () {
         });
     }
 
-   // 🟢 Shared send function
-function sendEmail() {
-    const emailBody = $('#email_html').val().trim();
-    const isTestMode = testSendEnabled() && !autoSendEnabled();
+    // 🟢 Shared send function
+    function sendEmail() {
+        const emailBody = $('#email_html').val().trim();
+        const isTestMode = testSendEnabled() && !autoSendEnabled();
 
-    if (!emailBody) {
-        alert("⚠️ Please fill out the email content before sending.");
-        return;
-    }
-
-    const targetEmail = isTestMode ? "russmaier@gmail.com" : recipientEmail;
-
-    if (!targetEmail) {
-        alert("❌ No recipient available.");
-        return;
-    }
-
-    // Show sending state
-    $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
-
-    $.ajax({
-        url: "", // Same page
-        type: "POST",
-        data: {
-            send_email: "1",
-            email_to: targetEmail,
-            email_html: emailBody
-        },
-        success: function () {
-            if (isTestMode) {
-                $('#test-send-button').text("✅ Sent!").prop('disabled', true);
-                localStorage.removeItem('testSend');
-            } else {
-                $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
-                console.log("📫 Sent to:", recipientEmail);
-
-                // 🔁 Update stats
-                updateStats();
-
-                // 🔁 Fetch next and trigger again if auto-send is enabled
-                setTimeout(() => {
-                    fetchNextRecipient();
-                    if ($('#auto-send-toggle').is(':checked')) {
-                        setTimeout(() => $('#email-form').trigger('submit'), 400); // small buffer
-                    }
-                }, 500);
-            }
-        },
-        error: function () {
-            alert("❌ Failed to send the email.");
-            updateVisibleButton();
+        if (!emailBody) {
+            alert("⚠️ Please fill out the email content before sending.");
+            return;
         }
-    });
-}
 
+        const targetEmail = isTestMode ? "russmaier@gmail.com" : recipientEmail;
+
+        if (!targetEmail) {
+            alert("❌ No recipient available.");
+            return;
+        }
+
+        // Show sending state
+        $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
+
+        $.ajax({
+            url: "", // Same page
+            type: "POST",
+            data: {
+                send_email: "1",
+                email_to: targetEmail,
+                email_html: emailBody
+            },
+            success: function () {
+                if (isTestMode) {
+                    $('#test-send-button').text("✅ Sent!").prop('disabled', true);
+                    localStorage.removeItem('testSend');
+                } else {
+                    $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
+                    console.log("📫 Sent to:", recipientEmail);
+
+                    // Chain to next
+                    fetchNextRecipient(true); // fetch + auto-send next
+                }
+            },
+            error: function () {
+                alert("❌ Failed to send the email.");
+                updateVisibleButton();
+            }
+        });
+    }
 
     // 🔹 Form submission (manual trigger)
     $('#email-form').on('submit', function (e) {
@@ -455,20 +446,6 @@ function sendEmail() {
     }
 });
 
-function updateStats() {
-    $.ajax({
-        url: '../scripts/get_newsletter_stats.php',
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            if (data.success) {
-                $('#total-members').text(data.total_members);
-                $('#sent-count').text(data.sent_count);
-                $('#sent-percentage').text(data.sent_percentage);
-            }
-        }
-    });
-}
 
 </script>
 
