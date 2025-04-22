@@ -426,14 +426,17 @@ echo '<!DOCTYPE html>
     <p>Emails Sent: <strong><?php echo $sent_count; ?></strong> (<?php echo $sent_percentage; ?>%)</p>
 
 
-           <!-- Auto-send toggle -->
-        <div style="margin: 10px 0;">
-            <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
-                <input type="checkbox" id="auto-send-toggle" style="transform: scale(1.2); margin-right: 8px;">
-                Enable Auto-Send
-            </label>
-            <p style="font-size: 13px; color: #666;">Uncheck this to prevent the email from sending automatically after countdown.</p>
-        </div>
+<!-- Auto-send toggle -->
+<div style="margin: 10px 0;">
+  <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;">
+    <input type="checkbox" id="auto-send-toggle" checked style="transform: scale(1.2); margin-right: 8px;">
+    Enable Auto-Send
+  </label>
+  <p style="font-size: 13px; color: #666;">
+    Uncheck this to prevent the email from sending automatically after countdown.
+  </p>
+</div>
+
 
         <!-- Send one test email (hidden unless auto-send is off) -->
         <div id="test-email-container" style="margin: 10px 0; display: none;">
@@ -530,7 +533,9 @@ $(document).ready(function () {
     }
 
     // 🔹 Load localStorage
-    const savedAutoSend = localStorage.getItem('autoSend') === 'true';
+    const savedAutoSend = localStorage.getItem('autoSend') !== null
+  ? localStorage.getItem('autoSend') === 'true'
+  : $('#auto-send-toggle').is(':checked');
     const savedTestSend = localStorage.getItem('testSend') === 'true';
 
     $('#auto-send-toggle').prop('checked', savedAutoSend);
