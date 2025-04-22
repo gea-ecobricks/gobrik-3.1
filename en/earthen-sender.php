@@ -96,98 +96,74 @@ $sent_result = $buwana_conn->query($query_sent);
 $sent_members = $sent_result->fetch_all(MYSQLI_ASSOC);
 
 // Fetch the next 7 pending emails
-$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time FROM earthen_members_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 7";
+$query_pending = "
+    SELECT id, email, name, test_sent, test_sent_date_time
+    FROM earthen_members_tb
+    WHERE test_sent = 0
+    ORDER BY id ASC
+    LIMIT 7
+";
 $pending_result = $buwana_conn->query($query_pending);
 $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 
 // Merge sent and pending for display
 $all_members = array_merge($sent_members, $pending_members);
 
+// Generate unsubscribe link if you still need it on this page
+$unsubscribe_link = isset($recipient_email)
+    ? "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email)
+    : '';
 
-// Begin a transaction to safely lock the next available recipient
-//     AND email NOT LIKE '%@hotmail.%'
-//    AND email NOT LIKE '%@comcast%'
+// Load newsletter HTML from external file
+$email_template = file_get_contents('live-newsletter.php');
 
-$buwana_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
-
-$query = "
-    SELECT id, email, name
-    FROM earthen_members_tb
-    WHERE test_sent = 0
-    ORDER BY id ASC
-    LIMIT 1
-    FOR UPDATE
-";
-
-$result = $buwana_conn->query($query);
-
-$subscriber_id = null;
-$recipient_email = null;
-
-if ($result && $result->num_rows > 0) {
-    $subscriber = $result->fetch_assoc();
-    $recipient_email = $subscriber['email'];
-    $subscriber_id = $subscriber['id'];
-
-    $_SESSION['locked_subscriber_id'] = $subscriber_id;
-
-    // 🔍 Add to log file to track behavior
-    error_log("[EARTHEN] LOCKED: {$recipient_email} by " . session_id());
-} else {
-    $buwana_conn->commit();
-    die("No pending recipients found. Email sending process stopped.");
-}
-
-
-// Lock will be held until you call commit() after marking as sent
-
-
-
-// Generate unsubscribe link
-$unsubscribe_link = "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email);
-
-
-require_once 'live-newsletter.php';  //the newsletter html
-
-
-// Handle form submission
+// ✅ Handle AJAX form submission to send email
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
-    $email_html = $_POST['email_html'] ?? '';
+    $email_html     = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
-    $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null;
+    $subscriber_id  = $_POST['subscriber_id'] ?? null;  // ✅ NEW: passed in via AJAX
 
     if (!empty($email_html) && !empty($recipient_email) && $subscriber_id) {
         try {
             if (sendEmail($recipient_email, $email_html)) {
 
                 // ✅ Mark email as sent
-                $updateQuery = "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?";
+                $updateQuery = "
+                    UPDATE earthen_members_tb
+                    SET test_sent = 1, test_sent_date_time = NOW()
+                    WHERE id = ?
+                ";
                 $stmt = $buwana_conn->prepare($updateQuery);
                 $stmt->bind_param("i", $subscriber_id);
                 $stmt->execute();
                 $stmt->close();
 
-                // ✅ Log success
+                // ✅ Log the commit
                 error_log("[EARTHEN] ✅ COMMITTED: {$recipient_email} by " . session_id());
 
-                // ✅ COMMIT the transaction to release the lock
-                $buwana_conn->commit();
+                $buwana_conn->commit(); // ✅ Complete transaction
 
-                unset($_SESSION['locked_subscriber_id']); // Clean up
-                header("Location: earthen-sender.php?sent=1");
-                exit();
+                // ✅ Respond for AJAX (if needed)
+                echo json_encode(['success' => true]);
+                exit;
             } else {
                 $buwana_conn->rollback();
                 error_log("[EARTHEN] ❌ Failed to send: {$recipient_email} by " . session_id());
-                echo "<script>alert('❌ Email failed to send! Check logs.');</script>";
+                echo json_encode(['success' => false, 'error' => 'Mailgun failure']);
+                exit;
             }
         } catch (Exception $e) {
             $buwana_conn->rollback();
             error_log("[EARTHEN] ❌ Exception: " . $e->getMessage());
-            echo "<script>alert('❌ Error occurred. Email not sent.');</script>";
+            echo json_encode(['success' => false, 'error' => 'Server error']);
+            exit;
         }
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Missing data']);
+        exit;
     }
 }
+
 
 
 // ✅ Handle case where no more recipients exist
