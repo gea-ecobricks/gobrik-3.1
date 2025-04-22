@@ -1,5 +1,10 @@
 <?php
 
+$unsubscribe_link = isset($recipient_email)
+    ? "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email)
+    : '';
+
+
  // Default email HTML with dynamic unsubscribe link
 $email_template = <<<HTML
 <!DOCTYPE html>
