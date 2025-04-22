@@ -389,11 +389,10 @@ $(document).ready(function () {
                 } else {
                     $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
                     console.log("📫 Sent to:", recipientEmail);
-
-
                     // Chain to next
-                       updateStats(); // 🔄 Update numbers!
-                        fetchNextRecipient(); // 🔁 Continue sending if needed
+
+                       fetchNextRecipient(); //  Continue sending if needed
+                       updateStats(); // Update numbers!
                 }
             },
             error: function () {
