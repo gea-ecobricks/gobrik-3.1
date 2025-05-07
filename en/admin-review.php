@@ -151,7 +151,7 @@ echo '<!DOCTYPE html>
                 "url": "../api/fetch_newest_briks.php",
                 "type": "POST"
             },
-            "pageLength": 10, // Set default number of rows per page to 10
+            "pageLength": 25, // Set default number of rows per page to 10
             "language": {
                 "emptyTable": "It looks like no ecobricks have been logged yet!",
                 "info": "Showing _START_ to _END_ of _TOTAL_ ecobricks",
