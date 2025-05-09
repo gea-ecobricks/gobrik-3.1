@@ -271,7 +271,7 @@ $emoji_options = [
 
   <!-- COMMUNITY FIELD -->
 <div class="form-item" id="community-section" style="margin-top:20px;">
-    <label for="community_name" data-lang-id="012-community-name-x">Buwana accounts are all about connecting us with our local and global communities.  Select your primary local community:</label><br>
+    <label for="community_name" data-lang-id="012-community-name-x">👥 Buwana accounts are all about connecting us with our local and global communities.  Select your primary local community:</label><br>
     <input type="text" id="community_name" name="community_name" aria-label="Community Name" list="community_list"
            placeholder="Type your community" style="width: 100%; padding: 10px;"
            value="<?php echo htmlspecialchars($pre_community ?? '', ENT_QUOTES, 'UTF-8'); ?>">
