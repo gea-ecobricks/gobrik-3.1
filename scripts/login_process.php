@@ -1,6 +1,11 @@
 <?php
 session_start();
-include '../buwana_env.php'; // Adjust path as needed
+include '../buwana_env.php'; // Gobrik DB connection
+include '../buwanaconn_env.php'; // Buwana DB connection
+
+// Constants
+$client_id = 'gbrk_f2c61a85a4cd4b8b89a7'; // GoBrik client_id
+$lang = $_POST['lang'] ?? 'en'; // Fallback language
 
 // Retrieve form data
 $credential_value = $_POST['credential_value'] ?? '';
@@ -12,7 +17,7 @@ if (empty($credential_value) || empty($password)) {
     exit();
 }
 
-// Prepare and execute query to check if the email exists and if legacy_unactivated is set to yes
+// Check if legacy activation is needed
 $sql_check_email = "SELECT user_id, legacy_unactivated FROM users_tb WHERE email = ?";
 $stmt_check_email = $conn->prepare($sql_check_email);
 
@@ -32,14 +37,11 @@ if ($stmt_check_email) {
 
         $stmt_check_email->close();
     } else {
-        // If email does not exist, continue with credential validation
         $stmt_check_email->close();
     }
-} else {
-    die('Error preparing statement for checking email: ' . $conn->error);
 }
 
-// Prepare and execute query to check credentials
+// Check credentials
 $sql_credential = "SELECT user_id FROM credentials_tb WHERE credential_key = ?";
 $stmt_credential = $conn->prepare($sql_credential);
 
@@ -53,7 +55,7 @@ if ($stmt_credential) {
         $stmt_credential->fetch();
         $stmt_credential->close();
 
-        // Now retrieve the password hash from users_tb
+        // Fetch password hash
         $sql_user = "SELECT password_hash FROM users_tb WHERE user_id = ?";
         $stmt_user = $conn->prepare($sql_user);
 
@@ -66,9 +68,41 @@ if ($stmt_credential) {
                 $stmt_user->bind_result($password_hash);
                 $stmt_user->fetch();
 
-                // Verify password
                 if (password_verify($password, $password_hash)) {
                     $_SESSION['user_id'] = $user_id;
+
+                    // 🔍 Lookup buwana_id from GoBrik users_tb
+                    $sql_buwana = "SELECT buwana_id FROM users_tb WHERE user_id = ?";
+                    $stmt_buwana = $conn->prepare($sql_buwana);
+                    if ($stmt_buwana) {
+                        $stmt_buwana->bind_param('i', $user_id);
+                        $stmt_buwana->execute();
+                        $stmt_buwana->bind_result($buwana_id);
+                        $stmt_buwana->fetch();
+                        $stmt_buwana->close();
+                    }
+
+                    // ✅ Gatekeeper: check if user is already connected in Buwana
+                    $check_sql = "SELECT 1 FROM user_app_connections_tb WHERE buwana_id = ? AND client_id = ? LIMIT 1";
+                    $check_stmt = $buwana_conn->prepare($check_sql);
+                    if ($check_stmt) {
+                        $check_stmt->bind_param('is', $buwana_id, $client_id);
+                        $check_stmt->execute();
+                        $check_stmt->store_result();
+
+                        if ($check_stmt->num_rows === 0) {
+                            $check_stmt->close();
+
+                            // 🚪 Not connected → Redirect to Buwana connection page
+                            $connect_url = "https://buwana.ecobricks.org/app-connect.php?id=" . urlencode($buwana_id) . "&client_id=" . urlencode($client_id);
+                            header("Location: $connect_url");
+                            exit();
+                        }
+
+                        $check_stmt->close();
+                    }
+
+                    // ✅ All clear: redirect to dashboard
                     header("Location: ../$lang/dashboard.php");
                     exit();
                 } else {
@@ -79,16 +113,17 @@ if ($stmt_credential) {
                 header("Location: ../$lang/login.php?error=invalid_user");
                 exit();
             }
+
             $stmt_user->close();
         } else {
-            die('Error preparing statement for users_tb: ' . $conn->error);
+            die('Error preparing user lookup: ' . $conn->error);
         }
     } else {
         header("Location: ../$lang/login.php?error=invalid_credential");
         exit();
     }
 } else {
-    die('Error preparing statement for credentials_tb: ' . $conn->error);
+    die('Error preparing credential lookup: ' . $conn->error);
 }
 
 $conn->close();
