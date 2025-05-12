@@ -4,6 +4,10 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 // Start a secure session with regeneration to prevent session fixation
 startSecureSession();
 
+
+// Constants
+$client_id = 'gbrk_f2c61a85a4cd4b8b89a7'; // GoBrik client_id
+
 // PART 1: Grab user credentials from the login form submission
 $credential_key = $_POST['credential_key'] ?? '';
 $password = $_POST['password'] ?? '';
