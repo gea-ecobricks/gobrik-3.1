@@ -4,10 +4,6 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 // Start a secure session with regeneration to prevent session fixation
 startSecureSession();
 
-
-// Constants
-$client_id = 'gbrk_f2c61a85a4cd4b8b89a7'; // GoBrik client_id
-
 // PART 1: Grab user credentials from the login form submission
 $credential_key = $_POST['credential_key'] ?? '';
 $password = $_POST['password'] ?? '';
@@ -84,41 +80,6 @@ if ($stmt_credential) {
 
                 // Verify the password entered by the user
                 if (password_verify($password, $password_hash)) {
-
-                 // ✅ Gatekeeper: check if user is already connected in Buwana
-                    // ✅ Gatekeeper: check if user is already connected in Buwana
-                    if (empty($client_id)) {
-                        die("❌ Missing client_id during Gatekeeper validation.");
-                    }
-
-                    $check_sql = "SELECT 1 FROM user_app_connections_tb WHERE buwana_id = ? AND client_id = ? LIMIT 1";
-                    $check_stmt = $buwana_conn->prepare($check_sql);
-
-                    if ($check_stmt) {
-                        $check_stmt->bind_param('is', $buwana_id, $client_id);
-                        $check_stmt->execute();
-                        $check_stmt->store_result();
-
-                        if ($check_stmt->num_rows === 0) {
-                            $check_stmt->close();
-
-                            $connect_url = "https://buwana.ecobricks.org/en/app-connect.php?id=" . urlencode($buwana_id) . "&client_id=" . urlencode($client_id);
-                            header("Location: $connect_url");
-                            exit();
-                        }
-
-                        $check_stmt->close();
-                        $_SESSION['app_connection_verified'] = true;
-                    } else {
-                        error_log("❌ Gatekeeper DB check prepare failed: " . $buwana_conn->error);
-                        die("Unexpected error. Please try again later.");
-                    }
-
-
-                    // ✅ All clear: proceed with login.
-
-
-
 
                     // PART 4: If login successfull Update Buwana Account
                     $sql_update_user = "UPDATE users_tb SET last_login = NOW(), login_count = login_count + 1 WHERE buwana_id = ?";
