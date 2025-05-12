@@ -81,6 +81,31 @@ if ($stmt_credential) {
                 // Verify the password entered by the user
                 if (password_verify($password, $password_hash)) {
 
+                 // ✅ Gatekeeper: check if user is already connected in Buwana
+                    $check_sql = "SELECT 1 FROM user_app_connections_tb WHERE buwana_id = ? AND client_id = ? LIMIT 1";
+                    $check_stmt = $buwana_conn->prepare($check_sql);
+                    if ($check_stmt) {
+                        $check_stmt->bind_param('is', $buwana_id, $client_id);
+                        $check_stmt->execute();
+                        $check_stmt->store_result();
+
+                        if ($check_stmt->num_rows === 0) {
+                            $check_stmt->close();
+
+                            // 🚪 Not connected → Redirect to Buwana connection page
+                            $connect_url = "https://buwana.ecobricks.org/app-connect.php?id=" . urlencode($buwana_id) . "&client_id=" . urlencode($client_id);
+                            header("Location: $connect_url");
+                            exit();
+                        }
+
+                        $check_stmt->close();
+                    }
+
+                    // ✅ All clear: proceed with login.
+
+
+
+
                     // PART 4: If login successfull Update Buwana Account
                     $sql_update_user = "UPDATE users_tb SET last_login = NOW(), login_count = login_count + 1 WHERE buwana_id = ?";
                     $stmt_update_user = $buwana_conn->prepare($sql_update_user);
