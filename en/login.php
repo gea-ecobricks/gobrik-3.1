@@ -168,7 +168,9 @@ echo '</script>';
     </div>
 
  <div style="font-size: medium; text-align: center; margin: auto; align-self: center;padding-top:40px;padding-bottom:50px;margin-top: 0px;height:100%;">
-        <p style="font-size:medium;" data-lang-id="000-no-account-yet">Don't have an account yet? <a href="signup.php">Signup!</a></p>
+     <p style="font-size:medium;" data-lang-id="000-no-account-yet">Buwana accounts power regenerative apps like GoBrik. <a href="https://buwana.ecobricks.org/en/signup-1.php?gbrk_f2c61a85a4cd4b8b89a7">Get yours.</a></p>
+
+        <p style="font-size:medium;" data-lang-id="000-no-account-yet">Buwana accounts power regenerative apps like GoBrik. <a href="signup.php">Get yours!</a></p>
     </div>
 
 </div>

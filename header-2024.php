@@ -653,41 +653,72 @@ display: none;
 
         </div>
 
-        <div id="function-icons" style="display: flex;flex-flow:row;margin:auto 10px auto auto;">
 
+  <!-- Right Settings Buttons -->
+  <div id="function-icons">
+    <div id="settings-buttons" aria-label="App Settings Panel">
+      <button type="button"
+              id="top-settings-button"
+              aria-label="Toggle settings menu"
+              aria-expanded="false"
+              aria-controls="language-menu-slider login-menu-slider"
+              onclick="toggleSettingsMenu()">
+      </button>
 
-        <!--<button type="button" class="top-search-button"  onclick="openSearch()"  aria-label="Search site">
-                </button>-->
+      <!-- Language Switch -->
+      <div id="language-code"
+           onclick="showLangSelector()"
+           role="button"
+           tabindex="0"
+           aria-haspopup="true"
+           aria-expanded="false"
+           aria-controls="language-menu-slider"
+           aria-label="Switch language">
+        🌐 <span data-lang-id="000-language-code">EN</span>
+      </div>
 
-            <div id="settings-buttons">
+      <!-- Login Services -->
+      <button type="button"
+              class="top-login-button"
+              onclick="showLoginSelector()"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="login-menu-slider"
+              aria-label="Login Services">
+      </button>
 
-                <button type="button" id="top-settings-button"  aria-label="Open site settings"></button>
-
-                <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages">🌐 <span data-lang-id="000-language-code">EN</span></div>
-
-                <!--<button type="button" class="top-search-button"  onclick="openSearch()"  aria-label="Search site">
-                </button>-->
-
-                <!--<button type="button" class="top-login-button" onclick="showLoginSelector()" aria-label="Login options"></button>
-
-                <button type="button" class="top-lang-button" onclick="showLangSelector()" aria-label="Switch languages"></button>
--->
-                <dark-mode-toggle
-                id="dark-mode-toggle-5" style="min-width:82px;margin-top:-5px;margin-bottom:-15px;"
-                class="slider"
-                appearance="toggle">
-                </dark-mode-toggle>
-            </div>
-        </div>
+      <!-- Dark Mode Toggle -->
+      <dark-mode-toggle
+        id="dark-mode-toggle-5"
+        class="slider"
+        style="min-width:82px;margin-top:-5px;margin-bottom:-15px;"
+        appearance="toggle">
+      </dark-mode-toggle>
     </div>
+  </div>
+</div>
 
 
-    <div id="language-menu-slider">
+<!-- LANGUAGE SELECTOR -->
+<div id="language-menu-slider" class="top-slider-menu" tabindex="-1" role="menu">
   <div class="lang-selector-box">
-    <button type="button" class="lang-selector" onclick="navigateTo('../id/<?php echo ($page); ?>.php')" aria-label="Buka versi bahasa Indonesia">🇮🇩 IN</button>
-    <button type="button" class="lang-selector" onclick="navigateTo('../es/<?php echo ($page); ?>.php')" aria-label="Ir a la versión en español">🇪🇸 ES</button>
-    <button type="button" class="lang-selector" onclick="navigateTo('../fr/<?php echo ($page); ?>.php')" aria-label="Aller à la version française">🇫🇷 FR</button>
-    <button type="button" class="lang-selector" onclick="navigateTo('../en/<?php echo ($page); ?>.php')" aria-label="Go to English version">🇬🇧 EN</button>
+    <button onclick="navigateTo('../id/<?php echo $active_url; ?>')">🇮🇩 IN</button>
+    <button onclick="navigateTo('../es/<?php echo $active_url; ?>')">🇪🇸 ES</button>
+    <button onclick="navigateTo('../fr/<?php echo $active_url; ?>')">🇫🇷 FR</button>
+    <button onclick="navigateTo('../en/<?php echo $active_url; ?>')">🇬🇧 EN</button>
+    <button onclick="navigateTo('../ar/<?php echo $active_url; ?>')">🇸🇦 AR</button>
+    <button onclick="navigateTo('../zh/<?php echo $active_url; ?>')">🇨🇳 中文</button>
+    <button onclick="navigateTo('../de/<?php echo $active_url; ?>')">🇩🇪 DE</button>
+  </div>
+</div>
+
+
+
+<!-- LOGIN SELECTOR -->
+<div id="login-menu-slider" class="top-slider-menu" tabindex="-1" role="menu">
+  <div class="login-selector-box">
+    <a class="login-selector" target="_blank" href="https://buwana.ecobricks.org/en/signup-1.php?gbrk_f2c61a85a4cd4b8b89a7">🌍 GoBrik</a>
+    <a class="login-selector" target="_blank" href="https://buwana.ecobricks.org/en/signup-1.php?app=ecal_7f3da821d0a54f8a9b58">🌒 EarthCal</a>
   </div>
 </div>
 

@@ -122,94 +122,272 @@ function modalCloseCurtains ( e ) {
 //
 
 
+//
+///* ---------- ------------------------------
+//LANGUAGE SELECTOR
+//-------------------------------------------*/
+//
+//function showLangSelector() {
+//    hideLoginSelector();
+//
+//    var slider = document.getElementById('language-menu-slider');
+//    var currentMarginTop = window.getComputedStyle(slider).marginTop;
+//    slider.style.display = 'flex';
+//    slider.style.marginTop = currentMarginTop === '70px' ? '0px' : '70px';
+//
+//    // Set zIndex of top-page-image
+//    var topPageImage = document.querySelector('.top-page-image');
+//    if (topPageImage) {
+//        topPageImage.style.zIndex = '25';
+//    }
+//
+//    // Prevent event from bubbling to document
+//    event.stopPropagation();
+//
+//    // Add named event listener for click on the document
+//    document.addEventListener('click', documentClickListener);
+//}
+//
+//function hideLangSelector() {
+//    var slider = document.getElementById('language-menu-slider');
+//    slider.style.marginTop = '0px'; // Reset margin-top to 0px
+//
+//    // Set zIndex of top-page-image
+//    var topPageImage = document.querySelector('.top-page-image');
+//    if (topPageImage) {
+//        topPageImage.style.zIndex = '35';
+//    }
+//
+//    // Remove the named event listener from the document
+//    document.removeEventListener('click', documentClickListener);
+//}
+//
+//// Named function to be used as an event listener
+//function documentClickListener() {
+//    hideLangSelector();
+//}
+//
+///* ---------- ------------------------------
+//SERVICE SELECTOR
+//-------------------------------------------*/
+//
+//function showLoginSelector() {
+//    hideLangSelector();
+//
+//    var slider = document.getElementById('login-menu-slider');
+//    var currentMarginTop = window.getComputedStyle(slider).marginTop;
+//    slider.style.display = 'flex';
+//    slider.style.marginTop = currentMarginTop === '70px' ? '0px' : '70px';
+//
+//    // Set zIndex of top-page-image
+//    var topPageImage = document.querySelector('.top-page-image');
+//    if (topPageImage) {
+//        topPageImage.style.zIndex = '25';
+//    }
+//
+//    // Prevent event from bubbling to document
+//    event.stopPropagation();
+//
+//    // Add named event listener for click on the document
+//    document.addEventListener('click', documentClickListenerLogin);
+//}
+//
+//function hideLoginSelector() {
+//    var slider = document.getElementById('login-menu-slider');
+//    slider.style.marginTop = '0px'; // Reset margin-top to 0px
+//
+//    // Set zIndex of top-page-image
+//    var topPageImage = document.querySelector('.top-page-image');
+//    if (topPageImage) {
+//        topPageImage.style.zIndex = '35';
+//    }
+//
+//    // Remove the named event listener from the document
+//    document.removeEventListener('click', documentClickListenerLogin);
+//}
+//
+//// Named function to be used as an event listener
+//function documentClickListenerLogin() {
+//    hideLoginSelector();
+//}
 
-/* ---------- ------------------------------
-LANGUAGE SELECTOR
--------------------------------------------*/
 
-function showLangSelector() {
-    hideLoginSelector();
 
-    var slider = document.getElementById('language-menu-slider');
-    var currentMarginTop = window.getComputedStyle(slider).marginTop;
-    slider.style.display = 'flex';
-    slider.style.marginTop = currentMarginTop === '70px' ? '0px' : '70px';
 
-    // Set zIndex of top-page-image
-    var topPageImage = document.querySelector('.top-page-image');
-    if (topPageImage) {
-        topPageImage.style.zIndex = '25';
+
+
+// 2025 TOP RIGHT SETTINGS PANEL
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const settingsButton = document.getElementById('top-settings-button');
+    const settingsPanel = document.getElementById('settings-buttons');
+    const langMenu = document.getElementById('language-menu-slider');
+    const loginMenu = document.getElementById('login-menu-slider');
+    const header = document.getElementById('header');
+
+    let settingsOpen = false;
+
+    // 🔄 Update header background and z-index based on menu visibility
+    function updateHeaderVisuals() {
+        const langVisible = langMenu.classList.contains('menu-slider-visible');
+        const loginVisible = loginMenu.classList.contains('menu-slider-visible');
+
+        if (langVisible || loginVisible) {
+            header.style.background = 'var(--top-header)';
+            header.style.zIndex = '36';
+
+            if (langVisible) {
+                langMenu.style.zIndex = '35';
+            } else {
+                langMenu.style.zIndex = '18'; // reset if not visible
+            }
+
+            if (loginVisible) {
+                loginMenu.style.zIndex = '35';
+            } else {
+                loginMenu.style.zIndex = '19'; // reset if not visible
+            }
+
+        } else {
+            header.style.background = 'none';
+            header.style.zIndex = '20';
+            langMenu.style.zIndex = '18';
+            loginMenu.style.zIndex = '19';
+        }
     }
 
-    // Prevent event from bubbling to document
-    event.stopPropagation();
 
-    // Add named event listener for click on the document
-    document.addEventListener('click', documentClickListener);
-}
 
+    // 🔁 Toggle settings panel
+    window.toggleSettingsMenu = () => {
+        settingsOpen = !settingsOpen;
+        settingsPanel.classList.toggle('open', settingsOpen);
+        settingsButton.setAttribute('aria-expanded', settingsOpen ? 'true' : 'false');
+
+        hideLangSelector();
+        hideLoginSelector();
+    };
+
+    // 🌐 Toggle language selector
+    window.showLangSelector = () => {
+        const isVisible = langMenu.classList.contains('menu-slider-visible');
+        hideLoginSelector();
+
+        if (isVisible) {
+            hideLangSelector();
+        } else {
+            langMenu.classList.add('menu-slider-visible');
+            langMenu.style.maxHeight = '400px'; // or whatever max height fits your menu
+            langMenu.style.overflow = 'hidden';
+            langMenu.style.transition = 'max-height 0.4s ease';
+
+            document.addEventListener('click', documentClickListenerLang);
+            updateHeaderVisuals(); // ✅ Apply background and z-index
+        }
+    };
+
+    window.hideLangSelector = () => {
+        langMenu.classList.remove('menu-slider-visible');
+        document.removeEventListener('click', documentClickListenerLang);
+        updateHeaderVisuals(); // ✅ Update visuals
+    };
+
+    function documentClickListenerLang(e) {
+        if (!langMenu.contains(e.target) && e.target.id !== 'language-code') {
+            hideLangSelector();
+        }
+    }
+
+    // 🔐 Toggle login selector
+    window.showLoginSelector = () => {
+        const isVisible = loginMenu.classList.contains('menu-slider-visible');
+        hideLangSelector();
+
+        if (isVisible) {
+            hideLoginSelector();
+        } else {
+            loginMenu.classList.add('menu-slider-visible');
+            loginMenu.style.maxHeight = '400px';
+            loginMenu.style.overflow = 'hidden';
+            loginMenu.style.transition = 'max-height 0.4s ease';
+
+            document.addEventListener('click', documentClickListenerLogin);
+            updateHeaderVisuals(); // ✅ Apply background and z-index
+        }
+    };
+
+    window.hideLoginSelector = () => {
+        if (loginMenu.classList.contains('menu-slider-visible')) {
+            loginMenu.classList.remove('menu-slider-visible');
+            document.removeEventListener('click', documentClickListenerLogin);
+            updateHeaderVisuals(); // ✅ Update visuals when hidden
+        }
+    };
+
+    function documentClickListenerLogin(e) {
+        if (!loginMenu.contains(e.target) && !e.target.classList.contains('top-login-button')) {
+            hideLoginSelector();
+        }
+    }
+
+
+    // ✋ Click outside to close settings
+    document.addEventListener('click', (e) => {
+        if (!settingsPanel.contains(e.target) && e.target !== settingsButton) {
+            settingsPanel.classList.remove('open');
+            settingsOpen = false;
+            settingsButton.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Prevent menu closure on internal click
+    settingsPanel.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+});
+
+// 🔻 Hide dropdowns on scroll
+window.addEventListener('scroll', () => {
+    hideLangSelector();
+    hideLoginSelector();
+});
+
+
+
+// 🌐 Hide language selector with a slide-up animation
 function hideLangSelector() {
-    var slider = document.getElementById('language-menu-slider');
-    slider.style.marginTop = '0px'; // Reset margin-top to 0px
+    if (!langMenu) return;
 
-    // Set zIndex of top-page-image
-    var topPageImage = document.querySelector('.top-page-image');
-    if (topPageImage) {
-        topPageImage.style.zIndex = '35';
+    if (langMenu.classList.contains('menu-slider-visible')) {
+        langMenu.style.maxHeight = '0';
+        langMenu.style.overflow = 'hidden';
+        langMenu.style.transition = 'max-height 0.4s ease';
+
+        setTimeout(() => {
+            langMenu.classList.remove('menu-slider-visible');
+            langMenu.style.removeProperty('max-height');
+            langMenu.style.removeProperty('overflow');
+            langMenu.style.removeProperty('transition');
+            updateHeaderVisuals(); // ✅ Update after animation
+        }, 400);
     }
 
-    // Remove the named event listener from the document
-    document.removeEventListener('click', documentClickListener);
+    document.removeEventListener('click', documentClickListenerLang);
 }
 
-// Named function to be used as an event listener
-function documentClickListener() {
-    hideLangSelector();
-}
 
-/* ---------- ------------------------------
-SERVICE SELECTOR
--------------------------------------------*/
 
-function showLoginSelector() {
-    hideLangSelector();
 
-    var slider = document.getElementById('login-menu-slider');
-    var currentMarginTop = window.getComputedStyle(slider).marginTop;
-    slider.style.display = 'flex';
-    slider.style.marginTop = currentMarginTop === '70px' ? '0px' : '70px';
+// 2024 FUNCTIONS
 
-    // Set zIndex of top-page-image
-    var topPageImage = document.querySelector('.top-page-image');
-    if (topPageImage) {
-        topPageImage.style.zIndex = '25';
-    }
 
-    // Prevent event from bubbling to document
-    event.stopPropagation();
 
-    // Add named event listener for click on the document
-    document.addEventListener('click', documentClickListenerLogin);
-}
 
-function hideLoginSelector() {
-    var slider = document.getElementById('login-menu-slider');
-    slider.style.marginTop = '0px'; // Reset margin-top to 0px
 
-    // Set zIndex of top-page-image
-    var topPageImage = document.querySelector('.top-page-image');
-    if (topPageImage) {
-        topPageImage.style.zIndex = '35';
-    }
 
-    // Remove the named event listener from the document
-    document.removeEventListener('click', documentClickListenerLogin);
-}
 
-// Named function to be used as an event listener
-function documentClickListenerLogin() {
-    hideLoginSelector();
-}
+
 
 function goBack() {
     window.history.back();
