@@ -6,9 +6,6 @@
 	if (strcmp($name, "welcome.php") == 0)
   $name = "";
 
-	;?>
-
-	<?php
     // Get full request URI (e.g. "/en/signup-1.php?gbrk_...")
     $requestUri = $_SERVER['REQUEST_URI'];
 
