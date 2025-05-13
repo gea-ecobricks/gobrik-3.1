@@ -706,9 +706,6 @@ display: none;
     <button onclick="navigateTo('../es/<?php echo $active_url; ?>')">🇪🇸 ES</button>
     <button onclick="navigateTo('../fr/<?php echo $active_url; ?>')">🇫🇷 FR</button>
     <button onclick="navigateTo('../en/<?php echo $active_url; ?>')">🇬🇧 EN</button>
-    <button onclick="navigateTo('../ar/<?php echo $active_url; ?>')">🇸🇦 AR</button>
-    <button onclick="navigateTo('../zh/<?php echo $active_url; ?>')">🇨🇳 中文</button>
-    <button onclick="navigateTo('../de/<?php echo $active_url; ?>')">🇩🇪 DE</button>
   </div>
 </div>
 

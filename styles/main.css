@@ -505,6 +505,7 @@
     /*overflow: hidden;*/
     transition: max-height 0.4s ease;
     max-height: 0; /* Default collapsed */
+    max-height: 500px !important;
 }
 
 .menu-slider-visible {
