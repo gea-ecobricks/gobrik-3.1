@@ -74,7 +74,7 @@ $lang = isset($path_segments[0]) ? $path_segments[0] : 'en'; // Default to Engli
 
 	<!--FOOTER STARTS HERE-->
 
-	<?php require_once ("../footer-2024.php");?>
+	<?php require_once ("../footer-2025.php");?>
 
 
 </div>

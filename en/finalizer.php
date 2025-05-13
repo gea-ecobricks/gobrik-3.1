@@ -367,7 +367,7 @@ $current_lang_dir = basename(dirname($_SERVER['SCRIPT_NAME']));
 </div>
 </div>
 <!-- FOOTER STARTS HERE -->
-<?php require_once ("../footer-2024.php"); ?>
+<?php require_once ("../footer-2025.php"); ?>
 
 
 <!-- place at the bottom of your HTML page -->

@@ -274,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     <!-- FOOTER -->
-    <?php require_once("../footer-2024.php"); ?>
+    <?php require_once("../footer-2025.php"); ?>
 
 
 <script>

@@ -166,7 +166,7 @@ $gobrik_conn->close();
     </div>
 </div>
 </div>
-<?php require_once("../footer-2024.php"); ?>
+<?php require_once("../footer-2025.php"); ?>
 
 
 

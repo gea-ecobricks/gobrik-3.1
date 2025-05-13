@@ -137,7 +137,7 @@ echo '<!DOCTYPE html>
 
 
     <!-- FOOTER -->
-    <?php require_once("../footer-2024.php"); ?>
+    <?php require_once("../footer-2025.php"); ?>
 
 <script>
     $(document).ready(function() {

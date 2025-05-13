@@ -946,7 +946,7 @@ function addCommunity2Buwana(event) {
     </div> <!--closes main-->
 
     <!--FOOTER STARTS HERE-->
-    <?php require_once ("../footer-2024.php");?>
+    <?php require_once ("../footer-2025.php");?>
     </div>
 
     </body>

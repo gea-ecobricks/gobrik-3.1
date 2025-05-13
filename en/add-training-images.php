@@ -398,7 +398,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 </div>
 
     <!--FOOTER STARTS HERE-->
-    <?php require_once ("../footer-2024.php");?>
+    <?php require_once ("../footer-2025.php");?>
     </div>
 
     <script>

@@ -108,7 +108,7 @@ echo '
 </div>
 </div>';
 
-require_once ("../footer-2024.php");
+require_once ("../footer-2025.php");
 
 echo '
 

@@ -140,7 +140,7 @@ $subject = "Please activate your 2025 GoBrik account";
 
 
 <!--FOOTER STARTS HERE-->
-<?php require_once ("../footer-2024.php"); ?>
+<?php require_once ("../footer-2025.php"); ?>
 
 
 
