@@ -98,7 +98,7 @@
 
             <div id="wcb" class="carbonbadge wcb-d"></div>
 
-            <div class="footer-conclusion" data-lang-id="419x-conclusion-disclosure">We track and disclose our net-green ecological impact.  See our <a href="https://ecobricks.org/en/regenreports.php" target="_blank">Regen Reporting</a> for 2024.</a>
+            <div class="footer-conclusion" data-lang-id="419x-conclusion-disclosure">We track and disclose our net-green ecological impact.  See our <a href="https://ecobricks.org/en/regenreports.php" target="_blank">Regen Reporting</a> for 2025.</a>
             </div>
 
             <div class="footer-conclusion" data-lang-id="420-conclusion-contribute">
@@ -106,7 +106,7 @@
             </div>
 
             <div class="footer-conclusion">
-            ↳ <a href="https://github.com/gea-ecobricks/ecobricks-org/blob/main/<?php echo ($lang); ;?>/<?php echo ($name); ;?>" target="_blank">github.com/gea-ecobricks/gobrik-3.0/blob/main/<?php echo ($lang); ;?>/<?php echo ($name); ;?></a>
+            ↳ <a href="https://github.com/gea-ecobricks/gobrik-3.1/blob/main/<?php echo ($lang); ;?>/<?php echo ($name); ;?>" target="_blank">github.com/gea-ecobricks/gobrik-3.1/blob/main/<?php echo ($lang); ;?>/<?php echo ($name); ;?></a>
             </div>
 
             <div style="margin-top:15px">
