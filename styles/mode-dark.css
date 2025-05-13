@@ -722,3 +722,8 @@ background: url(../svgs/gea-logo-top-night.svg) no-repeat center;
       background: url(../svgs/gobrik-login-banner-night.svg) no-repeat center;
       background-size: contain;
       }
+
+  gobrik-app-logo {
+      background: url(../svgs/gobrik-logo-dark.svg) no-repeat center;
+      background-size: contain;
+      }

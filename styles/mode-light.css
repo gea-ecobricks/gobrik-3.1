@@ -617,4 +617,11 @@ background: url(../svgs/gea-logo-top-day.svg) no-repeat center;
       background-size: contain;
       }
 
+
+
+  gobrik-app-logo {
+      background: url(../svgs/gobrik-logo-light.svg) no-repeat center;
+      background-size: contain;
+      }
+
 /* Light mode pastel colors */

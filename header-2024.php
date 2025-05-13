@@ -466,6 +466,12 @@ display: none;
 <div id="main-menu-overlay" class="overlay-settings" style="display:none;">
   <button type="button" onclick="closeSettings()" aria-label="Click to close settings page" class="x-button"></button>
   <div class="overlay-content-settings">
+
+
+
+      <div class="gobrik-app-logo" style="margin-bottom: 20px;width:175px;height:175px;"></div>
+
+
     <!-- Check if the user is logged in before displaying the logged-in status box : earthen values set by earthenAuth_helper-->
     <?php if ($is_logged_in): ?>
       <div class="menu-page-item" style="display: flex; flex-direction: column; align-items: flex-start; cursor:unset;">
