@@ -69,7 +69,6 @@ echo '<!DOCTYPE html>
 <html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
 ';
 
 // JavaScript variables for dynamic use
@@ -83,11 +82,6 @@ echo '</script>';
 ?>
 
 
-
-
-
-
-
 <!-- Include necessary scripts and styles -->
 <?php require_once ("../includes/login-inc.php");?>
 
@@ -95,7 +89,7 @@ echo '</script>';
 <div id="splash-bar"></div>
 
 <!-- PAGE CONTENT -->
-<div id="top-page-image" class="earth-community top-page-image"></div>
+<div id="top-page-image" class="login-top top-page-image"></div>
 
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container">
@@ -194,11 +188,11 @@ echo '</script>';
     /* auto run the language switcher
 
     is this needed?!*/
-
-        var siteName = 'gobrik.com';
-    var currentLanguage = '<?php echo ($lang); ?>'; // Default language code
-    switchLanguage(currentLanguage);
-
+//
+//         var siteName = 'gobrik.com';
+//     var currentLanguage = '<?php echo ($lang); ?>'; // Default language code
+//     switchLanguage(currentLanguage);
+//
 
 
 /* Code entry and processing for 2FA */

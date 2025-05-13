@@ -716,3 +716,9 @@ background: url(../webps/brikchain-450px.webp) no-repeat center;
 background: url(../svgs/gea-logo-top-night.svg) no-repeat center;
       background-size: contain;
   }
+
+
+  .login-top {
+      background: url(../svgs/gobrik-login-banner-night.svg) no-repeat center;
+      background-size: contain;
+      }

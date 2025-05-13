@@ -1,4 +1,4 @@
-<title>Login | GoBrik 3.0</title>
+<title>Login | GoBrik 3.1</title>
 
 <meta name="keywords" content="login, gobrik, ecobrick app, signup, sign up, sign, up">
 <meta name="description" content="Login to the Gobrik app to manage your ecobrick, plastic and projects.">
