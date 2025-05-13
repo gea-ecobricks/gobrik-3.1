@@ -175,7 +175,7 @@
 
 
 
-<script src="../scripts/language-switcher.js?v=<?php echo ($version); ;?>"></script>
+<script src="../scripts/language-switcher.js?v=2<?php echo ($version); ;?>"></script>
 
 <script>
 

@@ -24,15 +24,7 @@ function switchLanguage(langCode) {
         case 'id':
             currentTranslations = { ...id_Translations, ...id_Page_Translations, ...id_buwana_terms };
             break;
-        case 'ar':
-            currentTranslations = { ...ar_Translations, ...ar_Page_Translations, ...ar_buwana_terms };
-            break;
-        case 'zh':
-            currentTranslations = { ...zh_Translations, ...zh_Page_Translations, ...zh_buwana_terms };
-            break;
-        case 'de':
-            currentTranslations = { ...de_Translations, ...de_Page_Translations, ...de_buwana_terms };
-            break;
+
         default:
             console.warn(`No translations found for language: ${langCode}`);
             return;
