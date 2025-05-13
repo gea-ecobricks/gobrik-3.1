@@ -619,7 +619,7 @@ background: url(../svgs/gea-logo-top-day.svg) no-repeat center;
 
 
 
-  gobrik-app-logo {
+  .gobrik-app-logo {
       background: url(../svgs/gobrik-logo-light.svg) no-repeat center;
       background-size: contain;
       }

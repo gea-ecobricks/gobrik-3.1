@@ -469,7 +469,7 @@ display: none;
 
 
 
-      <div class="gobrik-app-logo" style="margin-bottom: 20px;width:175px;height:175px;"></div>
+      <div class="gobrik-app-logo" style="margin-right: auto;margin-left: auto;margin-bottom: 20px;width:175px;height:175px;"></div>
 
 
     <!-- Check if the user is logged in before displaying the logged-in status box : earthen values set by earthenAuth_helper-->
@@ -576,14 +576,14 @@ display: none;
   <a href="index.php" data-lang-id="1000-landing-page">
     Home page
   </a>
-  <span class="status-circle" style="background-color: FUSCIA;" title="Deployed. Working well!"></span>
+  <span class="status-circle" style="background-color: fuchsia;" title="Deployed. Working well!"></span>
 </div>
 
 
     <!-- GoBrik Tour at the bottom -->
     <div class="menu-page-item">
       <a data-lang-id="1001-gobrik-tour" onclick="closeSettings(); setTimeout(guidedTour, 500);">GoBrik Tour</a>
-      <span class="status-circle" style="background-color: SKYBLUE;" title="Working. Not translated."></span>
+      <span class="status-circle" style="background-color: #00B5FF;" title="Working. Not translated."></span>
     </div>
   </div> <!-- close overlay-content-settings -->
 </div> <!-- close main menu -->
