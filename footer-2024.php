@@ -148,8 +148,6 @@
     <script src="https://unpkg.com/website-carbon-badges@1.1.3/b.min.js" defer></script>
 
 
-<script>
-
 
 <script>
   const lang = '<?php echo $lang; ?>';
@@ -159,7 +157,7 @@
   loadTranslationScripts(lang, page, () => {
     switchLanguage(lang); // Or your language rendering logic
   });
-</script>
+
 
 //
 // var siteName = 'gobrik.com';
