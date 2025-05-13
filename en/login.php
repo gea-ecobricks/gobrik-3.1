@@ -549,7 +549,7 @@ document.addEventListener("DOMContentLoaded", function () {
             firsttime: {
                 en: {
                     main: "Your Buwana Account is Created! 🎉",
-                    sub: `And your Earthen subscriptions are confirmed.  Now${firstName ? ' ' + firstName : ''}, please login again with your new account credentials.`
+                    sub: `And your Earthen subscriptions are confirmed.  Now${firstName ? ' ' + firstName : ''}, please login with your new account credentials.`
                 },
                 fr: {
                     main: "Votre compte Buwana est créé ! 🎉",
@@ -564,22 +564,41 @@ document.addEventListener("DOMContentLoaded", function () {
                     sub: `Ahora${firstName ? ' ' + firstName : ''}, por favor inicia sesión con tus nuevas credenciales.`
                 }
             },
+
+        connected: {
+                en: {
+                    main: "Your Buwana Account is Connected! 🎉",
+                    sub: `And your Earthen subscriptions are confirmed.  Now${firstName ? ' ' + firstName : ''}, please login with your Buwana account credentials.`
+                },
+                fr: {
+                    main: "Votre compte Buwana est connecté ! 🎉",
+                    sub: `Maintenant${firstName ? ' ' + firstName : ''}, connectez-vous avec vos Buwana identifiants.`
+                },
+                id: {
+                    main: "Akun Buwana Anda sudah berkoneksi! 🎉",
+                    sub: `Sekarang${firstName ? ' ' + firstName : ''}, silakan masuk dengan kredensial Buwana Anda.`
+                },
+                es: {
+                    main: "¡Tu cuenta de Buwana está connectada! 🎉",
+                    sub: `Ahora${firstName ? ' ' + firstName : ''}, por favor inicia sesión con tus credenciales Buwana.`
+                }
+            },
             default: {
                 en: {
                     main: "Welcome back!",
-                    sub: `Please login again with your account credentials.`
+                    sub: `Please login with your Buwana account credentials.`
                 },
                 fr: {
                     main: "Bon retour !",
-                    sub: `Veuillez vous reconnecter avec vos identifiants.`
+                    sub: `Veuillez vous reconnecter avec vos identifiants Buwana.`
                 },
                 id: {
                     main: "Selamat datang kembali!",
-                    sub: `Silakan masuk lagi dengan kredensial akun Anda.`
+                    sub: `Silakan masuk lagi dengan kredensial Buwana Anda.`
                 },
                 es: {
                     main: "¡Bienvenido de nuevo!",
-                    sub: `Por favor inicia sesión de nuevo con tus credenciales.`
+                    sub: `Por favor inicia sesión de nuevo con tus credenciales Buwana.`
                 }
             }
         };

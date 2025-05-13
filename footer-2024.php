@@ -131,7 +131,7 @@
 
 
 
-<!-- Translation variable files for the languageSwitcher-->
+<!-- Translation variable files for the languageSwitcher
 <script src="../translations/core-texts-en.js?v=<?php echo ($version); ;?>"></script>
 <script src="../translations/core-texts-fr.js?v=<?php echo ($version); ;?>"></script>
 <script src="../translations/core-texts-id.js?v=<?php echo ($version); ;?>"></script>
@@ -140,7 +140,7 @@
 <script src="../translations/<?php echo ($page); ;?>-en.js?v=<?php echo ($version); ;?>"></script>
 <script src="../translations/<?php echo ($page); ;?>-fr.js?v=<?php echo ($version); ;?>"></script>
 <script src="../translations/<?php echo ($page); ;?>-id.js?v=<?php echo ($version); ;?>1"></script>
-<script src="../translations/<?php echo ($page); ;?>-es.js?v=<?php echo ($version); ;?>"></script>
+<script src="../translations/<?php echo ($page); ;?>-es.js?v=<?php echo ($version); ;?>"></script>-->
 
 <!--
     <script src="../scripts/website-carbon-badges@1.1.3/b.min.js" defer></script>
@@ -151,46 +151,57 @@
 <script>
 
 
-var siteName = 'gobrik.com';
-var currentLanguage = '<?php echo ($lang); ?>'; // Default language code
-switchLanguage(currentLanguage);
+<script>
+  const lang = '<?php echo $lang; ?>';
+  const page = '<?php echo $page; ?>';
+  const version = '<?php echo $version; ?>';
 
+  loadTranslationScripts(lang, page, () => {
+    switchLanguage(lang); // Or your language rendering logic
+  });
+</script>
 
-document.getElementById('top-settings-button').addEventListener('touchstart', function(event) {
-  if (window.matchMedia("(max-width: 700px)").matches) {
-    var settingsButtons = document.getElementById('settings-buttons');
-    settingsButtons.classList.toggle('settings-buttons-expanded');
-    event.stopPropagation(); // Prevents the event from bubbling up to the document
-  }
-});
-
-document.addEventListener('touchstart', function(event) {
-  var settingsButtons = document.getElementById('settings-buttons');
-  if (!settingsButtons.contains(event.target)) {
-    settingsButtons.classList.remove('settings-buttons-expanded');
-  }
-});
-
-
-// Add event listeners to each button inside the language-menu-slider
-var langButtons = document.querySelectorAll('#language-menu-slider');
-langButtons.forEach(function(button) {
-    button.addEventListener('click', function() {
-        // Hide the slider after 1 second when a language button is clicked
-        setTimeout(hideLangSelector, 3000);
-    });
-});
-
-// Prevent hiding when clicking inside the slider
-document.getElementById('language-menu-slider').addEventListener('click', function(event) {
-    event.stopPropagation();
-});
-
-
-// Prevent hiding when clicking inside the slider
-document.getElementById('login-menu-slider').addEventListener('click', function(event) {
-    event.stopPropagation();
-});
+//
+// var siteName = 'gobrik.com';
+// var currentLanguage = '<?php echo ($lang); ?>'; // Default language code
+// switchLanguage(currentLanguage);
+//
+//
+// document.getElementById('top-settings-button').addEventListener('touchstart', function(event) {
+//   if (window.matchMedia("(max-width: 700px)").matches) {
+//     var settingsButtons = document.getElementById('settings-buttons');
+//     settingsButtons.classList.toggle('settings-buttons-expanded');
+//     event.stopPropagation(); // Prevents the event from bubbling up to the document
+//   }
+// });
+//
+// document.addEventListener('touchstart', function(event) {
+//   var settingsButtons = document.getElementById('settings-buttons');
+//   if (!settingsButtons.contains(event.target)) {
+//     settingsButtons.classList.remove('settings-buttons-expanded');
+//   }
+// });
+//
+//
+// // Add event listeners to each button inside the language-menu-slider
+// var langButtons = document.querySelectorAll('#language-menu-slider');
+// langButtons.forEach(function(button) {
+//     button.addEventListener('click', function() {
+//         // Hide the slider after 1 second when a language button is clicked
+//         setTimeout(hideLangSelector, 3000);
+//     });
+// });
+//
+// // Prevent hiding when clicking inside the slider
+// document.getElementById('language-menu-slider').addEventListener('click', function(event) {
+//     event.stopPropagation();
+// });
+//
+//
+// // Prevent hiding when clicking inside the slider
+// document.getElementById('login-menu-slider').addEventListener('click', function(event) {
+//     event.stopPropagation();
+// });
 
 
 
