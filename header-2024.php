@@ -505,14 +505,14 @@ display: none;
       </div>
       <div class="menu-page-item">
         <a href="dashboard.php" aria-label="Log" data-lang-id="1000-dashboard">Dashboard</a>
-        <span class="status-circle" style="background-color: green;" title="Working. Under development"></span>
+        <span class="status-circle" style="background-color: LIMEGREEN;" title="Working. Under development"></span>
       </div>
     <?php else: ?>
       <!-- If the user is not logged in, show the login/signup options -->
       <div class="menu-page-item">
         <a href="login.php" data-lang-id="1000-login" style="margin-right:10px; min-width: 65px;width:75px;">Log in</a> |
         <a href="signup.php" data-lang-id="1000-sign-up" style="margin-left:10px">Sign up</a>
-        <span class="status-circle" style="background-color: limegreen;" title="Deployed. Under beta testing."></span>
+        <span class="status-circle" style="background-color: LIMEGREEN;" title="Deployed. Under beta testing."></span>
       </div>
     <?php endif; ?>
 
@@ -522,17 +522,15 @@ display: none;
 <div class="menu-page-item">
   <a href="log.php" data-lang-id="1000-log-ecobricks">
     Log Ecobricks
-
   </a>
-  <span class="status-circle" style="background-color: green;" title="Working.  Being tested."></span>
+  <span class="status-circle" style="background-color: YELLOW;" title="Working.  Being tested."></span>
 </div>
 
 <div class="menu-page-item">
   <a href="newest-briks.php" data-lang-id="1000-latest-ecobricks">
     Latest Ecobricks
-
   </a>
-  <span class="status-circle" style="background-color: green;" title="Working well."></span>
+  <span class="status-circle" style="background-color: ORANGE;" title="Working well."></span>
 </div>
 
 <!-- Uncommented for demonstration purposes
@@ -561,9 +559,8 @@ display: none;
 <div class="menu-page-item">
   <a href="bug-report.php" data-lang-id="1000-bug-report">
     Report a Bug
-
   </a>
-  <span class="status-circle" style="background-color: green;" title="Working."></span>
+  <span class="status-circle" style="background-color: RED;" title="Working."></span>
 </div>
 
 <!--
@@ -578,16 +575,15 @@ display: none;
 <div class="menu-page-item">
   <a href="index.php" data-lang-id="1000-landing-page">
     Home page
-
   </a>
-  <span class="status-circle" style="background-color: green;" title="Deployed. Working well!"></span>
+  <span class="status-circle" style="background-color: FUSCIA;" title="Deployed. Working well!"></span>
 </div>
 
 
     <!-- GoBrik Tour at the bottom -->
     <div class="menu-page-item">
       <a data-lang-id="1001-gobrik-tour" onclick="closeSettings(); setTimeout(guidedTour, 500);">GoBrik Tour</a>
-      <span class="status-circle" style="background-color: yellow;" title="Working. Not translated."></span>
+      <span class="status-circle" style="background-color: SKYBLUE;" title="Working. Not translated."></span>
     </div>
   </div> <!-- close overlay-content-settings -->
 </div> <!-- close main menu -->
