@@ -6,8 +6,24 @@
 	if (strcmp($name, "welcome.php") == 0)
   $name = "";
 
-
 	;?>
+
+	<?php
+    // Get full request URI (e.g. "/en/signup-1.php?gbrk_...")
+    $requestUri = $_SERVER['REQUEST_URI'];
+
+    // Extract the path after the first language directory
+    // This assumes the URL structure is always /[lang]/[page]
+    $uriParts = explode('/', $requestUri, 3);
+
+    // Set default in case something goes wrong
+    $active_url = isset($uriParts[2]) ? $uriParts[2] : '';
+
+      $login_url = "login.php?app=" . urlencode($client_id);
+      if ($buwana_id) {
+          $login_url .= "&id=" . urlencode($buwana_id);
+      }
+    ?>
 
 
 	<link rel="canonical" href="https://gobrik.com/<?php echo ($lang); ;?>/<?php echo ($name); ;?>">
