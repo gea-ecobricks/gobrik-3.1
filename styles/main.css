@@ -334,13 +334,14 @@
 
 }
 
+/*
 #settings-buttons {
     display: flex;
   flex-flow: row;
   width: fit-content;
   background-color: var(--settings-background);
   padding: 12px 43px 10px 12px;
-  /* border: 1px solid var(--settings-border); */
+  *//* border: 1px solid var(--settings-border); *//*
   border-radius: 12px;
   cursor: pointer;
   transition: 0.4s;
@@ -454,7 +455,189 @@
   cursor:pointer;
   height:30px;
   width:30px;
+}*/
+
+
+
+
+
+
+/* SETTINGS BUTTON BLOCK */
+#function-icons {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
 }
+
+#settings-buttons {
+    position: absolute;
+    top: 10px;
+    right: -245px;
+    display: flex;
+    align-items: center;
+    background-color: var(--settings-background);
+    padding: 12px 43px 10px 12px;
+    border-radius: 12px;
+    transition: right 0.4s ease;
+    z-index: 38;
+    will-change: right;
+}
+
+/* Slide in */
+#settings-buttons.open {
+    right: 10px;
+}
+
+/* Button styles */
+#top-settings-button,
+.top-login-button {
+    height: 30px;
+    width: 30px;
+    margin-right: 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Language switcher */
+
+#language-menu-slider {
+    /*overflow: hidden;*/
+    transition: max-height 0.4s ease;
+    max-height: 0; /* Default collapsed */
+}
+
+.menu-slider-visible {
+    max-height: 500px !important; /* or whatever fits your menu content */
+}
+
+
+
+#language-code {
+    font-size: 1.1em;
+    padding: 6px 10px;
+    background: var(--darker);
+    color: var(--subdued-text);
+    border-radius: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-family: 'Mulish', sans-serif;
+}
+
+/* Base state (hidden but in layout) */
+#language-menu-slider,
+#login-menu-slider {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    background-color: var(--settings-background);
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0s linear 0.3s;
+    z-index: 19;
+    display: flex;
+    flex-direction: column;
+    margin-right: -10px;
+    cursor: pointer;
+}
+
+/* When menu is visible */
+.menu-slider-visible {
+    transform: translateY(0);
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition-delay: 0s;
+    display: flex !important;
+    top: 18px !important;
+}
+
+
+
+/* Selector Containers */
+.lang-selector-box,
+.login-selector-box {
+    display: flex;
+    flex-direction: column;
+    gap: normal;
+    justify-content: center;
+    padding-top: 39px;
+    font-size: 14px;
+}
+
+/* Buttons/Links */
+.lang-selector-box button,
+.login-selector-box a {
+    background: none;
+    border: none;
+    font-size: 1em;
+    padding: 8px 12px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-color);
+    font-family: 'Mulish', sans-serif;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+@media screen and (max-width: 700px) {
+    /* Buttons/Links */
+    .lang-selector-box button,
+    .login-selector-box a {
+
+        font-size: 0.9em;
+        padding: 8px 10px;
+    }
+}
+
+/* Hover states */
+.lang-selector-box button:hover,
+.login-selector-box a:hover {
+    background-color: var(--hover-bg);
+    color: var(--h1);
+}
+
+
+/* Optional alt (fancier) animation if desired) */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-slider-visible {
+    animation: fadeSlideIn 0.3s ease forwards;
+    visibility: visible;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .top-toggle  {
   border: none;
