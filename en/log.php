@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Now, lookup the community ID based on the name provided
         $sql_community = "SELECT community_id FROM communities_tb WHERE com_name = ?";
-        $stmt_community = $gobrik_conn->prepare($sql_community);
+        $stmt_community = $buwana_conn->prepare($sql_community);
 
         if ($stmt_community) {
             $stmt_community->bind_param("s", $community_name);

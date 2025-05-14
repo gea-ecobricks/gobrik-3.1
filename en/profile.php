@@ -108,7 +108,12 @@ if ($result_languages && $result_languages->num_rows > 0) {
         }
     }
 
-
+// 📋 Fetch communities
+$communities = [];
+$result_communities = $buwana_conn->query("SELECT com_name FROM communities_tb");
+while ($row = $result_communities->fetch_assoc()) {
+    $communities[] = $row['com_name'];
+}
 
 
 
