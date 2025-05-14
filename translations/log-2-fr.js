@@ -2,26 +2,6 @@
 TEXT TRANSLATION SNIPPETS FOR GOBRIK.com
 -----------------------------------*/
 
-// Ampersand (&): Should be escaped as &amp; because it starts HTML character references.
-// Less-than (<): Should be escaped as &lt; because it starts an HTML tag.
-// Greater-than (>): Should be escaped as &gt; because it ends an HTML tag.
-// Double quote ("): Should be escaped as &quot; when inside attribute values.
-// Single quote/apostrophe ('): Should be escaped as &#39; or &apos; when inside attribute values.
-// Backslash (\): Should be escaped as \\ in JavaScript strings to prevent ending the string prematurely.
-// Forward slash (/): Should be escaped as \/ in </script> tags to prevent prematurely closing a script.
-
-
-/*-----------------------------------
-EXTRAITS DE TRADUCTION DE TEXTE POUR GOBRIK.com
------------------------------------*/
-
-// Esperluette (&) : Doit être échappée en &amp; car elle commence les références de caractères HTML.
-// Inférieur à (<) : Doit être échappé en &lt; car il commence une balise HTML.
-// Supérieur à (>) : Doit être échappé en &gt; car il termine une balise HTML.
-// Guillemet double (") : Doit être échappé en &quot; lorsqu'il est à l'intérieur des valeurs d'attributs.
-// Guillemet simple/apostrophe (') : Doit être échappé en &#39; ou &apos; lorsqu'il est à l'intérieur des valeurs d'attributs.
-// Barre oblique inversée (\) : Doit être échappée en \\ dans les chaînes JavaScript pour éviter de terminer prématurément la chaîne.
-// Barre oblique (/) : Doit être échappée en \/ dans les balises </script> pour éviter de fermer prématurément un script.
 
 
 const fr_Page_Translations = {
