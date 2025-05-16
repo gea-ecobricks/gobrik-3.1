@@ -114,7 +114,7 @@ require_once ("../includes/log-inc.php");
         <div id="defaults-loaded" style="display:none;font-family:'Mulish',sans-serif; font-size:1.1em;color:green; text-align:center;margin-top:15px" data-lang-id="035-your-defaults-loaded">Your Defaults have been loaded. 🫡</div>
             <!--LOG FORM-->
 
-            <form id="submit-form" method="post" action="" enctype="multipart/form-data" novalidate>
+<form id="submit-form" method="post" action="log_process.php" enctype="multipart/form-data" novalidate>
 
                 <div class="form-item" style="margin-top: 25px;">
                     <label for="ecobricker_maker" data-lang-id="005-ecobricker-maker">Who made this ecobrick?</label><br>
