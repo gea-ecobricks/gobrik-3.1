@@ -280,7 +280,9 @@ require_once ("../includes/log-inc.php");
 
                     <p data-lang-id="111-localization-explanation">When you log an ecobrick it is tagged with your own Buwana account localization.  You can edit these defaults here:</p>
 
-                     <div class="form-item">
+
+
+                    <div class="form-item">
                         <label for="community_select" data-lang-id="032-community-tag">Community:</label><br>
                         <div class="input-container">
                             <input type="text" id="community_select" name="community_select"
@@ -288,8 +290,10 @@ require_once ("../includes/log-inc.php");
                                    placeholder="Start typing your community..." required style="padding-left:45px;">
                             <div id="community-pin" class="pin-icon">📌</div>
                         </div>
+                        <input type="hidden" id="community_id" name="community_id" value="<?= htmlspecialchars($user_community_id, ENT_QUOTES); ?>">
                         <div id="community-suggestions" class="suggestions-box"></div>
                     </div>
+
 
                     <div class="form-item">
                         <label for="location_full" data-lang-id="033-location-tag">Location:</label><br>
@@ -555,11 +559,10 @@ document.getElementById('submit-form').addEventListener('submit', function(event
 
 
 
-
-
-    //community functions
+// Community autocomplete functions
 document.addEventListener('DOMContentLoaded', function() {
     const communitySelect = document.getElementById('community_select');
+    const hiddenIdInput = document.getElementById('community_id'); // Hidden input for community_id
 
     // Log the current community name for debugging
     console.log('Current community pre-set value:', communitySelect.value);
@@ -568,16 +571,20 @@ document.addEventListener('DOMContentLoaded', function() {
     communitySelect.addEventListener('input', function() {
         const query = this.value;
 
+        // Clear existing community_id when typing begins
+        if (hiddenIdInput) {
+            hiddenIdInput.value = '';
+        }
+
         // If the user has typed at least 3 characters, trigger the AJAX search
         if (query.length >= 3) {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '../api/search_communities.php', true);  // Assume you have a separate PHP file for searching
+            xhr.open('POST', '../api/search_communities.php', true); // PHP endpoint to search
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
-                    // Handle response, for example, show a list of matching communities
                     showCommunitySuggestions(response);
                 }
             };
@@ -588,22 +595,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to display the community suggestions
     function showCommunitySuggestions(communities) {
-        // Clear previous suggestions
         const suggestionsBox = document.getElementById('community-suggestions');
-        suggestionsBox.innerHTML = '';
+        suggestionsBox.innerHTML = ''; // Clear previous suggestions
 
         communities.forEach(function(community) {
             const suggestionItem = document.createElement('div');
             suggestionItem.textContent = community.com_name;
-            suggestionItem.classList.add('suggestion-item'); // Add class for styling
+            suggestionItem.classList.add('suggestion-item');
+
             suggestionItem.addEventListener('click', function() {
+                // Set the visible name
                 communitySelect.value = community.com_name;
-                suggestionsBox.innerHTML = '';  // Clear suggestions once a community is selected
+
+                // Set the hidden ID
+                if (hiddenIdInput) {
+                    hiddenIdInput.value = community.community_id;
+                }
+
+                suggestionsBox.innerHTML = ''; // Clear suggestions once selected
             });
+
             suggestionsBox.appendChild(suggestionItem);
         });
     }
 });
+
 
 
 //Watershed
