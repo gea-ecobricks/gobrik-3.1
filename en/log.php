@@ -115,6 +115,10 @@ require_once ("../includes/log-inc.php");
             <!--LOG FORM-->
 
 <form id="submit-form" method="post" action="log_process.php" enctype="multipart/form-data" novalidate>
+                <?php if (!empty($ecobrick_unique_id)) : ?>
+                    <input type="hidden" name="retry_id" value="<?= (int)$ecobrick_unique_id ?>">
+                <?php endif; ?>
+
 
                 <div class="form-item" style="margin-top: 25px;">
                     <label for="ecobricker_maker" data-lang-id="005-ecobricker-maker">Who made this ecobrick?</label><br>

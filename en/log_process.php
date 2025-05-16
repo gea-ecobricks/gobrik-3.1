@@ -100,12 +100,12 @@ try {
                 WHERE ecobrick_unique_id=?";
         $stmt = $gobrik_conn->prepare($sql);
         $stmt->bind_param(
-            "siissssddsssidsdsssssiiis",
+            "siissssddsssidsdsssssiisi",
             $ecobricker_maker, $volume_ml, $weight_g, $sequestration_type,
             $plastic_from, $location_full, $bottom_colour, $location_lat, $location_long,
             $brand_name, $owner, $status, $universal_volume_ml, $density, $date_logged_ts,
             $CO2_kg, $last_ownership_change, $actual_maker_name, $brik_notes, $date_published_ts,
-            $location_watershed, $community_id, $country_id, $ecobrick_unique_id, $community_name,
+            $location_watershed, $community_id, $country_id, $community_name, $ecobrick_unique_id,
         );
     } else {
         // INSERT
