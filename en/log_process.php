@@ -42,7 +42,7 @@ try {
     $location_long = (float)trim($_POST['longitude']);
     $location_watershed = trim($_POST['location_watershed']);
     $community_name = trim($_POST['community_select']);
-    $community_id = (int)$_POST['community_id'];
+    $community_id = isset($_POST['community_id']) ? (int)$_POST['community_id'] : 0;
 
 
     // STEP 3: Derived values
@@ -73,21 +73,9 @@ try {
         $stmt_country->close();
     }
 
-// STEP 5: Get community_id directly from the form, fallback to DB lookup if missing
-$community_id = isset($_POST['community_id']) ? (int)$_POST['community_id'] : 0;
 
-if ($community_id === 0 && !empty($community_name)) {
-    $stmt_community = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE com_name = ?");
-    if ($stmt_community) {
-        $stmt_community->bind_param("s", $community_name);
-        $stmt_community->execute();
-        $stmt_community->bind_result($fetched_id);
-        if ($stmt_community->fetch()) {
-            $community_id = $fetched_id;
-        }
-        $stmt_community->close();
-    }
-}
+
+
 
 
 

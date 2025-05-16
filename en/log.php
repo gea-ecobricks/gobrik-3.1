@@ -720,10 +720,11 @@ function saveEcobrickDefaults() {
         const bottomColor = document.getElementById('bottom_colour').value;
         const sequestrationType = document.getElementById('sequestration_type').value;
         const plasticFrom = document.getElementById('plastic_from').value;
-        const community = document.getElementById('community_select').value;
         const locationFull = document.getElementById('location_full').value;
         const watershed = document.getElementById('location_watershed').value;
-        const communityId = document.getElementById('community_id').value;
+        const community = document.getElementById('community_select').value; // name
+        const communityId = document.getElementById('community_id').value; // numeric ID
+
 
 
         const defaults = {
@@ -763,6 +764,7 @@ function restoreEcobrickDefaults() {
 //         document.getElementById('location_watershed').value = defaults.watershed || '';
 document.getElementById('community_select').value = defaults.community || '';
 document.getElementById('community_id').value = defaults.communityId || '';
+
 
         // Show the "Defaults loaded" message
         document.getElementById('defaults-loaded').style.display = 'block';
