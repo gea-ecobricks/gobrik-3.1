@@ -258,14 +258,15 @@ function getUserContinent($buwana_conn, $buwana_id) {
 
 
 
-
 function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
     $ecobrick_unique_id = intval($ecobrick_unique_id);
 
+    // ✅ Now also select community_name from the record
     $sql = "SELECT ecobricker_maker, volume_ml, weight_g, sequestration_type, plastic_from, brand_name,
-                   community_id, location_full, bottom_colour, location_lat, location_long, location_watershed,
-                   country_id, status
+                   community_id, community_name, location_full, bottom_colour, location_lat, location_long,
+                   location_watershed, country_id, status
             FROM tb_ecobricks WHERE ecobrick_unique_id = ?";
+
     $stmt = $gobrik_conn->prepare($sql);
 
     if ($stmt) {
@@ -273,13 +274,14 @@ function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
         $stmt->execute();
         $stmt->bind_result(
             $ecobricker_maker, $volume_ml, $weight_g, $sequestration_type, $plastic_from,
-            $brand_name, $community_id, $location_full, $bottom_colour, $location_lat, $location_long,
+            $brand_name, $community_id, $community_name, $location_full, $bottom_colour, $location_lat, $location_long,
             $location_watershed, $country_id, $status
         );
 
         if ($stmt->fetch()) {
             $stmt->close();
 
+            // Prevent retrying authenticated ecobricks
             if ($status === "authenticated") {
                 echo "<script>
                         alert('Ecobrick is authenticated. You cannot edit an authenticated ecobrick. Retry function skipped.');
@@ -288,19 +290,7 @@ function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
                 return;
             }
 
-            // Fetch community name from ID
-            $community_name = "";
-            if (!empty($community_id)) {
-                $stmt_com = $gobrik_conn->prepare("SELECT com_name FROM communities_tb WHERE community_id = ?");
-                if ($stmt_com) {
-                    $stmt_com->bind_param("i", $community_id);
-                    $stmt_com->execute();
-                    $stmt_com->bind_result($community_name);
-                    $stmt_com->fetch();
-                    $stmt_com->close();
-                }
-            }
-
+            // ✅ Inject all values (community_name now included directly)
             echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('ecobricker_maker').value = '" . htmlspecialchars($ecobricker_maker, ENT_QUOTES) . "';
@@ -317,7 +307,7 @@ function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
                     document.getElementById('location_watershed').value = '" . htmlspecialchars($location_watershed, ENT_QUOTES) . "';
                     document.getElementById('country_id').value = '" . htmlspecialchars($country_id, ENT_QUOTES) . "';
 
-                    // Set the selected option for the bottom_colour dropdown
+                    // Set bottom color dropdown selection
                     const bottomColorSelect = document.getElementById('bottom_colour');
                     const bottomColorValue = '" . htmlspecialchars($bottom_colour, ENT_QUOTES) . "';
                     for (let i = 0; i < bottomColorSelect.options.length; i++) {
@@ -338,6 +328,7 @@ function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
         echo "<script>alert('An error occurred while fetching the ecobrick data. Please try again later.'); window.location.href = 'log.php';</script>";
     }
 }
+
 
 
 
