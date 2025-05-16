@@ -558,7 +558,6 @@ document.getElementById('submit-form').addEventListener('submit', function(event
 
 
 
-
 // Community autocomplete functions
 document.addEventListener('DOMContentLoaded', function() {
     const communitySelect = document.getElementById('community_select');
@@ -579,17 +578,26 @@ document.addEventListener('DOMContentLoaded', function() {
         // If the user has typed at least 3 characters, trigger the AJAX search
         if (query.length >= 3) {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '../api/search_communities.php', true); // PHP endpoint to search
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.open('GET', '../api/search_communities.php?query=' + encodeURIComponent(query), true);
 
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    showCommunitySuggestions(response);
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        showCommunitySuggestions(response);
+                    } catch (e) {
+                        console.error("Failed to parse JSON from community search response:", e);
+                    }
+                } else {
+                    console.error("Error loading community suggestions:", xhr.status);
                 }
             };
 
-            xhr.send('query=' + encodeURIComponent(query));
+            xhr.onerror = function() {
+                console.error("Network error while fetching community suggestions.");
+            };
+
+            xhr.send();
         }
     });
 
@@ -619,6 +627,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
 
 
 
