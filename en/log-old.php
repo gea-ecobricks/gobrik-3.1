@@ -11,13 +11,13 @@ startSecureSession(); // Start a secure session with regeneration to prevent ses
 
 // PART 2: Check if user is logged in and session active
 if ($is_logged_in) {
-    $buwana_id = $_SESSION['buwana_id'];
+    $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
 
-    // Include database connections
+    // Include database connection
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch user meta and location data
+    // Fetch the user's location data
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
     $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
@@ -25,13 +25,13 @@ if ($is_logged_in) {
     $gea_status = getGEA_status($buwana_id);
     $user_ecobricker_id = getEcobrickerID($buwana_id);
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
-    $user_community_id = null;
-    $ecobrick_unique_id = 0;
+    $ecobrick_unique_id = '0';
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
     // Fetch location latitude and longitude from users_tb
     $sql_location = "SELECT location_lat, location_long FROM users_tb WHERE buwana_id = ?";
     $stmt_location = $buwana_conn->prepare($sql_location);
+
     if ($stmt_location) {
         $stmt_location->bind_param("i", $buwana_id);
         $stmt_location->execute();
@@ -42,60 +42,266 @@ if ($is_logged_in) {
         error_log("Error fetching location data: " . $buwana_conn->error);
     }
 
-    // Fetch community_id from community name
-    if (!empty($user_community_name)) {
-        $stmt_com = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE com_name = ?");
-        if ($stmt_com) {
-            $stmt_com->bind_param("s", $user_community_name);
-            $stmt_com->execute();
-            $stmt_com->bind_result($user_community_id);
-            $stmt_com->fetch();
-            $stmt_com->close();
-        }
-    }
-
-    // Check if retry parameter is passed in the URL
-    if (isset($_GET['retry']) && is_numeric($_GET['retry'])) {
-        $ecobrick_unique_id = (int)$_GET['retry'];
+        // Check if retry parameter is set in the URL and call retry function
+    if (isset($_GET['retry'])) {
+        $ecobrick_unique_id = isset($_GET['retry']) ? (int)$_GET['retry'] : null; // Check if retry is passed
         retryEcobrick($gobrik_conn, $ecobrick_unique_id);
     }
 
+   // PART 3: POST ECOBRICK DATA to GOBRIK DATABASE
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    try {
+        // Generate serial and unique ID
+        $ids = setSerialNumber($gobrik_conn, $ecobrick_unique_id);
+        $ecobrick_unique_id = $ids['ecobrick_unique_id'];
+        $serial_no = $ids['serial_no'];
+        error_log("Inserting ecobrick with ID: $ecobrick_unique_id, Serial No: $serial_no");
+
+        // Gather form data
+        $ecobricker_maker = trim($_POST['ecobricker_maker']);
+        $volume_ml = (int)trim($_POST['volume_ml']);
+        $weight_g = (int)trim($_POST['weight_g']);
+        $sequestration_type = trim($_POST['sequestration_type']);
+        $plastic_from = trim($_POST['plastic_from']);
+        $brand_name = trim($_POST['brand_name']);
+        $location_full = trim($_POST['location_full']);
+        $bottom_colour = trim($_POST['bottom_colour']);
+        $location_lat = (float)trim($_POST['latitude']);
+        $location_long = (float)trim($_POST['longitude']);
+        $location_watershed = trim($_POST['location_watershed']);
+        // Background set variables
+        $maker_id = $user_ecobricker_id;
+        $owner = $ecobricker_maker;
+        $status = "not ready";
+        $universal_volume_ml = $volume_ml;
+        $density = $weight_g / $volume_ml;
+        $date_logged_ts = date("Y-m-d H:i:s");
+        $CO2_kg = ($weight_g * 6.1) / 1000;
+        $last_ownership_change = date("Y-m-d");
+        $actual_maker_name = $ecobricker_maker;
+        $brik_notes = "Directly logged on beta.GoBrik.com";
+        $date_published_ts = date("Y-m-d H:i:s");
+
+        // Extract country name from location_full (e.g., "Ottawa, Ontario, Canada")
+        $location_parts = explode(',', $location_full);
+        $country_name = trim(end($location_parts)); // Get the last part, which is the country name
+        // Query the database to get the country_id based on the country_name
+        $country_id = null; // Default if no match is found
+        $country_sql = "SELECT country_id FROM countries_tb WHERE country_name = ?";
+        if ($stmt_country = $gobrik_conn->prepare($country_sql)) {
+            $stmt_country->bind_param('s', $country_name);
+            $stmt_country->execute();
+            $stmt_country->bind_result($fetched_country_id);
+            if ($stmt_country->fetch()) {
+                $country_id = $fetched_country_id;
+                error_log("Country '$country_name' found with ID: $country_id");
+            } else {
+                error_log("Country '$country_name' not found in countries_tb");
+            }
+            $stmt_country->close();
+        }
+
+        $community_id = null; // Initialize community_id with null or a default value
+        // Retrieve the community name from the POST data
+        $community_name = trim($_POST['community_select']);
+
+        // Now, lookup the community ID based on the name provided
+        $sql_community = "SELECT community_id FROM communities_tb WHERE com_name = ?";
+        $stmt_community = $buwana_conn->prepare($sql_community);
+
+        if ($stmt_community) {
+            $stmt_community->bind_param("s", $community_name);
+            $stmt_community->execute();
+            $stmt_community->bind_result($community_id);
+            $stmt_community->fetch();
+            $stmt_community->close();
+
+            // Check if we got a valid community_id
+            if (!empty($community_id)) {
+                error_log("Community ID found: $community_id for community name: $community_name");
+            } else {
+                error_log("No community found for the name: $community_name");
+                $community_id = 0; // Optionally set it to a default value like 0 or handle the error accordingly
+            }
+        } else {
+            error_log("Error preparing community SQL: " . $gobrik_conn->error);
+        }
+
+        // Log form data
+        error_log("Values being inserted into tb_ecobricks: ");
+        error_log("Unique ID: $ecobrick_unique_id, Serial No: $serial_no, Maker: $ecobricker_maker, Volume: $volume_ml, Weight: $weight_g");
+        error_log("Sequestration: $sequestration_type, Plastic From: $plastic_from, Location: $location_full, Bottom colour: $bottom_colour, Lat: $location_lat, Long: $location_long");
+        error_log("Brand Name: $brand_name, Watershed: $location_watershed, Community ID: $community_id, Country ID: $country_id");
+
+        error_log("Owner: $owner, Status: $status, Universal Volume: $universal_volume_ml ml, Density: $density g/ml");
+        error_log("Date Logged: $date_logged_ts, CO2 Sequestration: $CO2_kg kg, Last Ownership Change: $last_ownership_change");
+        error_log("Actual Maker Name: $actual_maker_name, Brik Notes: $brik_notes, Date Published: $date_published_ts");
+
+        // Check if an ecobrick with the same ID already exists
+        $check_sql = "SELECT COUNT(*) FROM tb_ecobricks WHERE ecobrick_unique_id = ?";
+        $check_stmt = $gobrik_conn->prepare($check_sql);
+        $check_stmt->bind_param("i", $ecobrick_unique_id);
+        $check_stmt->execute();
+        $check_stmt->bind_result($existing_count);
+        $check_stmt->fetch();
+        $check_stmt->close();
+
+        // If exists, Update the record, else insert
+        if ($existing_count > 0) {
+            error_log("An ecobrick with ecobrick_unique_id $ecobrick_unique_id already exists.");
+            $sql = "UPDATE tb_ecobricks
+                    SET ecobricker_maker = ?, volume_ml = ?, weight_g = ?, sequestration_type = ?,
+                        plastic_from = ?, location_full = ?, bottom_colour = ?, location_lat = ?, location_long = ?,
+                        brand_name = ?, owner = ?, status = ?, universal_volume_ml = ?, density = ?,
+                        date_logged_ts = ?, CO2_kg = ?, last_ownership_change = ?, actual_maker_name = ?,
+                        brik_notes = ?, date_published_ts = ?, location_watershed = ?, community_id = ?, country_id = ?
+                    WHERE ecobrick_unique_id = ?";
+            if ($stmt = $gobrik_conn->prepare($sql)) {
+                // Bind parameters for UPDATE (23 variables + WHERE clause)
+                $stmt->bind_param(
+                    "siissssddsssidsdsssssiii",
+                    $ecobricker_maker, $volume_ml, $weight_g, $sequestration_type,
+                    $plastic_from, $location_full, $bottom_colour, $location_lat, $location_long,
+                    $brand_name, $owner, $status, $universal_volume_ml, $density, $date_logged_ts,
+                    $CO2_kg, $last_ownership_change, $actual_maker_name, $brik_notes, $date_published_ts,
+                    $location_watershed, $community_id, $country_id, $ecobrick_unique_id
+                );
+            }
+        } else {
+            // Insert a new record
+            $sql = "INSERT INTO tb_ecobricks (
+                    ecobrick_unique_id, serial_no, ecobricker_maker, volume_ml, weight_g, sequestration_type,
+                    plastic_from, location_full, bottom_colour, location_lat, location_long, brand_name, owner, status,
+                    universal_volume_ml, density, date_logged_ts, CO2_kg, last_ownership_change,
+                    actual_maker_name, brik_notes, date_published_ts, location_watershed, community_id, country_id, maker_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            if ($stmt = $gobrik_conn->prepare($sql)) {
+                    // Bind parameters for INSERT
+                    $stmt->bind_param(
+                        "issiissssddsssidsdsssssiis",
+                        $ecobrick_unique_id, $serial_no, $ecobricker_maker, $volume_ml, $weight_g,
+                        $sequestration_type, $plastic_from, $location_full, $bottom_colour, $location_lat, $location_long,
+                        $brand_name, $owner, $status, $universal_volume_ml, $density, $date_logged_ts,
+                        $CO2_kg, $last_ownership_change, $actual_maker_name, $brik_notes, $date_published_ts,
+                        $location_watershed, $community_id, $country_id, $maker_id
+                    );
+            }
+        }
+
+        // Prepare and execute the SQL statement
+        if (isset($sql)) { // Ensure $sql is set properly
+            if ($stmt === false) {
+                // Log and output the error if prepare() fails
+                throw new Exception("Error preparing statement: " . $gobrik_conn->error);
+            } else {
+                // Bind parameters and execute the statement
+                if ($stmt->execute()) {
+                    error_log("SQL query: $sql");
+                    error_log("Statement executed successfully. Affected rows: " . $stmt->affected_rows);
+                    if ($stmt->affected_rows > 0) {
+                        error_log("New ecobrick record inserted successfully.");
+                        $stmt->close();
+                        $gobrik_conn->close();
+                        echo "<script>window.location.href = 'log-2.php?id=" . $serial_no . "';</script>";
+                    } else {
+                        error_log("Insert/Update executed but no rows were affected.");
+                        $warnings = $gobrik_conn->query("SHOW WARNINGS");
+                        if ($warnings) {
+                            while ($warning = $warnings->fetch_assoc()) {
+                                error_log("MySQL Warning: " . print_r($warning, true));
+                            }
+                        } else {
+                            error_log("No MySQL warnings or warnings query failed.");
+                        }
+                    }
+                } else {
+                    throw new Exception("Error executing statement: " . $stmt->error);
+                }
+            }
+        }
+
+    } catch (Exception $e) {
+        // Catch any exceptions and log the error
+        error_log("Error: " . $e->getMessage());
+        echo "Error: " . $e->getMessage();
+    }
+}
 } else {
     header('Location: login.php?redirect=' . urlencode($page));
     exit();
 }
 
-// Set flag for missing last name modal
-$show_lastname_modal = false;
 
-// Fetch first and last name for display and autofill
-$sql_user = "SELECT first_name, last_name FROM users_tb WHERE buwana_id = ?";
-$stmt_user = $buwana_conn->prepare($sql_user);
-if ($stmt_user) {
-    $stmt_user->bind_param("s", $buwana_id);
-    $stmt_user->execute();
-    $stmt_user->bind_result($first_name, $last_name);
-    $stmt_user->fetch();
-    $stmt_user->close();
 
-    $log_full_name = $first_name . ' ' . $last_name;
-    $show_lastname_modal = empty($last_name);
 
-    echo "<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('ecobricker_maker').value = '" . htmlspecialchars($log_full_name, ENT_QUOTES) . "';
-        });
-    </script>";
-} else {
-    echo "Error fetching user information: " . $buwana_conn->error;
-}
 
-// Close connections
-if ($buwana_conn) $buwana_conn->close();
-if ($gobrik_conn) $gobrik_conn->close();
+
+
+
+
+echo '<!DOCTYPE html>
+<html lang="' . $lang . '">
+<head>
+<meta charset="UTF-8">
+';
+
+ // Fetch first and last name from the Buwana database
+    $sql_user = "SELECT first_name, last_name FROM users_tb WHERE buwana_id = ?";
+    $stmt_user = $buwana_conn->prepare($sql_user);
+
+    if ($stmt_user) {
+        $stmt_user->bind_param("s", $buwana_id); // Assuming buwana_id is a string
+        $stmt_user->execute();
+        $stmt_user->bind_result($first_name, $last_name);
+        $stmt_user->fetch();
+        $stmt_user->close();
+
+        $log_full_name = $first_name . ' ' . $last_name;
+
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('ecobricker_maker').value = '" . htmlspecialchars($log_full_name, ENT_QUOTES) . "';
+            });
+        </script>";
+
+        if (empty($last_name)) {
+            echo "<script>
+                setTimeout(function() {
+                    const modal = document.getElementById('form-modal-message');
+                    const messageContainer = modal.querySelector('.modal-message');
+                    messageContainer.innerHTML = `
+                        <h3 style=\"text-align:center;\">Oops! We're missing your last name.</h3>
+                        <p style=\"text-align:center;\">Looks like your GoBrik account is missing your last name. Ecobricks are best logged with your full name for posterity. Please save your last name here to make ecobrick logging faster:</p>
+                        <form id='update-name-form' method='post' action='update_last_name.php'>
+                            <label for='first_name'>First Name:</label>
+                            <input type='text' id='first_name' name='first_name' value='" . htmlspecialchars($first_name, ENT_QUOTES) . "' required><br>
+                            <label for='last_name'>Last Name:</label>
+                            <input type='text' id='last_name' name='last_name' required><br>
+                            <input type='checkbox' id='update_buwana' name='update_buwana' checked>
+                            <label for='update_buwana' style=\"font-size:0.9em\">Update my Buwana account too</label><br>
+                            <div style=\"text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;\">
+                                <button type='submit' class=\"submit-button enabled\">Save</button>
+                                <button type='button' onclick='closeInfoModal()' class=\"submit-button cancel\">Cancel</button>
+                            </div>
+                        </form>
+                    `;
+                    modal.style.display = 'flex';
+                    document.getElementById('page-content').classList.add('blurred');
+                    document.getElementById('footer-full').classList.add('blurred');
+                    document.body.classList.add('modal-open');
+                }, 5000);
+            </script>";
+        }  // This displays the last name modal after 5 seconds
+    } else {
+        echo "Error fetching user information: " . $buwana_conn->error;
+    }
+    // Close the Buwana connection
+    if ($buwana_conn) $buwana_conn->close();
 
 require_once ("../includes/log-inc.php");
 ?>
+
+
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
@@ -362,37 +568,6 @@ require_once ("../includes/log-inc.php");
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-<?php if (!empty($show_lastname_modal)): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(function () {
-        const modal = document.getElementById('form-modal-message');
-        const messageContainer = modal.querySelector('.modal-message');
-        messageContainer.innerHTML = `
-            <h3 style="text-align:center;">Oops! We're missing your last name.</h3>
-            <p style="text-align:center;">Looks like your GoBrik account is missing your last name. Ecobricks are best logged with your full name for posterity. Please save your last name here to make ecobrick logging faster:</p>
-            <form id='update-name-form' method='post' action='update_last_name.php'>
-                <label for='first_name'>First Name:</label>
-                <input type='text' id='first_name' name='first_name' value="<?php echo htmlspecialchars($first_name, ENT_QUOTES); ?>" required><br>
-                <label for='last_name'>Last Name:</label>
-                <input type='text' id='last_name' name='last_name' required><br>
-                <input type='checkbox' id='update_buwana' name='update_buwana' checked>
-                <label for='update_buwana' style="font-size:0.9em">Update my Buwana account too</label><br>
-                <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                    <button type='submit' class="submit-button enabled">Save</button>
-                    <button type='button' onclick='closeInfoModal()' class="submit-button cancel">Cancel</button>
-                </div>
-            </form>
-        `;
-        modal.style.display = 'flex';
-        document.getElementById('page-content').classList.add('blurred');
-        document.getElementById('footer-full').classList.add('blurred');
-        document.body.classList.add('modal-open');
-    }, 5000);
-});
-</script>
-<?php endif; ?>
 
 
 
