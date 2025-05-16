@@ -88,44 +88,43 @@ try {
     $stmt_check->fetch();
     $stmt_check->close();
 
-   // STEP 7: Update or insert
-if ($existing_count > 0) {
-    // UPDATE
-    $sql = "UPDATE tb_ecobricks
-            SET ecobricker_maker=?, volume_ml=?, weight_g=?, sequestration_type=?,
-                plastic_from=?, location_full=?, bottom_colour=?, location_lat=?, location_long=?,
-                brand_name=?, owner=?, status=?, universal_volume_ml=?, density=?, date_logged_ts=?,
-                CO2_kg=?, last_ownership_change=?, actual_maker_name=?, brik_notes=?, date_published_ts=?,
-                location_watershed=?, community_name=?, community_id=?, country_id=?
-            WHERE ecobrick_unique_id=?";
-    $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param(
-        "siissssddsssidsdsssssiii",
-        $ecobricker_maker, $volume_ml, $weight_g, $sequestration_type,
-        $plastic_from, $location_full, $bottom_colour, $location_lat, $location_long,
-        $brand_name, $owner, $status, $universal_volume_ml, $density, $date_logged_ts,
-        $CO2_kg, $last_ownership_change, $actual_maker_name, $brik_notes, $date_published_ts,
-        $location_watershed, $community_name, $community_id, $country_id, $ecobrick_unique_id
-    );
-} else {
-    // INSERT
-    $sql = "INSERT INTO tb_ecobricks (
-                ecobrick_unique_id, serial_no, ecobricker_maker, volume_ml, weight_g, sequestration_type,
-                plastic_from, location_full, bottom_colour, location_lat, location_long, brand_name, owner, status,
-                universal_volume_ml, density, date_logged_ts, CO2_kg, last_ownership_change,
-                actual_maker_name, brik_notes, date_published_ts, location_watershed, community_name, community_id, country_id, maker_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param(
-        "issiissssddsssidsdsssssiis",
-        $ecobrick_unique_id, $serial_no, $ecobricker_maker, $volume_ml, $weight_g,
-        $sequestration_type, $plastic_from, $location_full, $bottom_colour, $location_lat, $location_long,
-        $brand_name, $owner, $status, $universal_volume_ml, $density, $date_logged_ts,
-        $CO2_kg, $last_ownership_change, $actual_maker_name, $brik_notes, $date_published_ts,
-        $location_watershed, $community_name, $community_id, $country_id, $maker_id
-    );
-}
-
+    // STEP 7: Update or insert
+    if ($existing_count > 0) {
+        // UPDATE
+        $sql = "UPDATE tb_ecobricks
+                SET ecobricker_maker=?, volume_ml=?, weight_g=?, sequestration_type=?,
+                    plastic_from=?, location_full=?, bottom_colour=?, location_lat=?, location_long=?,
+                    brand_name=?, owner=?, status=?, universal_volume_ml=?, density=?, date_logged_ts=?,
+                    CO2_kg=?, last_ownership_change=?, actual_maker_name=?, brik_notes=?, date_published_ts=?,
+                    location_watershed=?, community_id=?, country_id=?
+                WHERE ecobrick_unique_id=?";
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param(
+            "siissssddsssidsdsssssiii",
+            $ecobricker_maker, $volume_ml, $weight_g, $sequestration_type,
+            $plastic_from, $location_full, $bottom_colour, $location_lat, $location_long,
+            $brand_name, $owner, $status, $universal_volume_ml, $density, $date_logged_ts,
+            $CO2_kg, $last_ownership_change, $actual_maker_name, $brik_notes, $date_published_ts,
+            $location_watershed, $community_id, $country_id, $ecobrick_unique_id
+        );
+    } else {
+        // INSERT
+        $sql = "INSERT INTO tb_ecobricks (
+                    ecobrick_unique_id, serial_no, ecobricker_maker, volume_ml, weight_g, sequestration_type,
+                    plastic_from, location_full, bottom_colour, location_lat, location_long, brand_name, owner, status,
+                    universal_volume_ml, density, date_logged_ts, CO2_kg, last_ownership_change,
+                    actual_maker_name, brik_notes, date_published_ts, location_watershed, community_id, country_id, maker_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $gobrik_conn->prepare($sql);
+        $stmt->bind_param(
+            "issiissssddsssidsdsssssiis",
+            $ecobrick_unique_id, $serial_no, $ecobricker_maker, $volume_ml, $weight_g,
+            $sequestration_type, $plastic_from, $location_full, $bottom_colour, $location_lat, $location_long,
+            $brand_name, $owner, $status, $universal_volume_ml, $density, $date_logged_ts,
+            $CO2_kg, $last_ownership_change, $actual_maker_name, $brik_notes, $date_published_ts,
+            $location_watershed, $community_id, $country_id, $maker_id
+        );
+    }
 
     // STEP 8: Execute query
     if ($stmt === false) {

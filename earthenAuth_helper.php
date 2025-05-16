@@ -254,48 +254,39 @@ function getUserContinent($buwana_conn, $buwana_id) {
     return $country_icon;
 }
 
+
+// Function to fetch ecobrick data for retry
 function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
+    // Ensure ecobrick_unique_id is an integer
     $ecobrick_unique_id = intval($ecobrick_unique_id);
 
-    $sql = "SELECT ecobricker_maker, volume_ml, weight_g, sequestration_type, plastic_from, brand_name,
-                   community_id, location_full, bottom_colour, location_lat, location_long, location_watershed,
-                   country_id, status
-            FROM tb_ecobricks WHERE ecobrick_unique_id = ?";
+    // Fetch the ecobrick data from the database, including the status
+    $sql = "SELECT ecobricker_maker, volume_ml, weight_g, sequestration_type, plastic_from, brand_name, community_id, location_full, bottom_colour, location_lat, location_long, location_watershed, country_id, status FROM tb_ecobricks WHERE ecobrick_unique_id = ?";
     $stmt = $gobrik_conn->prepare($sql);
 
     if ($stmt) {
         $stmt->bind_param("i", $ecobrick_unique_id);
         $stmt->execute();
+
+        // Bind the results to variables, including status
         $stmt->bind_result(
             $ecobricker_maker, $volume_ml, $weight_g, $sequestration_type, $plastic_from,
             $brand_name, $community_id, $location_full, $bottom_colour, $location_lat, $location_long,
             $location_watershed, $country_id, $status
         );
 
+        // Fetch the data and check the status
         if ($stmt->fetch()) {
-            $stmt->close();
-
-            if ($status === "authenticated") {
+            // If status is "authenticated", show an alert and redirect the user
+            if ($status == "authenticated") {
                 echo "<script>
                         alert('Ecobrick is authenticated. You cannot edit an authenticated ecobrick. Retry function skipped.');
-                        window.location.href = 'log.php';
+                        window.location.href = 'log.php'; // Redirect after the user clicks OK
                       </script>";
-                return;
+                return;  // Quit the function early if status is "authenticated"
             }
 
-            // Fetch community name from ID
-            $community_name = "";
-            if (!empty($community_id)) {
-                $stmt_com = $gobrik_conn->prepare("SELECT com_name FROM communities_tb WHERE community_id = ?");
-                if ($stmt_com) {
-                    $stmt_com->bind_param("i", $community_id);
-                    $stmt_com->execute();
-                    $stmt_com->bind_result($community_name);
-                    $stmt_com->fetch();
-                    $stmt_com->close();
-                }
-            }
-
+            // Output JavaScript to populate the form if status is not "authenticated"
             echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('ecobricker_maker').value = '" . htmlspecialchars($ecobricker_maker, ENT_QUOTES) . "';
@@ -304,8 +295,7 @@ function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
                     document.getElementById('sequestration_type').value = '" . htmlspecialchars($sequestration_type, ENT_QUOTES) . "';
                     document.getElementById('plastic_from').value = '" . htmlspecialchars($plastic_from, ENT_QUOTES) . "';
                     document.getElementById('brand_name').value = '" . htmlspecialchars($brand_name, ENT_QUOTES) . "';
-                    document.getElementById('community_select').value = '" . htmlspecialchars($community_name, ENT_QUOTES) . "';
-                    document.getElementById('community_id').value = '" . htmlspecialchars($community_id, ENT_QUOTES) . "';
+                    document.getElementById('community_select').value = '" . htmlspecialchars($community_id, ENT_QUOTES) . "';
                     document.getElementById('location_full').value = '" . htmlspecialchars($location_full, ENT_QUOTES) . "';
                     document.getElementById('lat').value = '" . htmlspecialchars($location_lat, ENT_QUOTES) . "';
                     document.getElementById('lon').value = '" . htmlspecialchars($location_long, ENT_QUOTES) . "';
@@ -324,16 +314,15 @@ function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
                 });
             </script>";
         } else {
-            $stmt->close();
             echo "<script>alert('No ecobrick found with this unique ID.'); window.location.href = 'log.php';</script>";
         }
 
+        $stmt->close();
     } else {
         error_log("Error preparing retryEcobrick statement: " . $gobrik_conn->error);
         echo "<script>alert('An error occurred while fetching the ecobrick data. Please try again later.'); window.location.href = 'log.php';</script>";
     }
 }
-
 
 
 
