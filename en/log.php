@@ -723,19 +723,22 @@ function saveEcobrickDefaults() {
         const community = document.getElementById('community_select').value;
         const locationFull = document.getElementById('location_full').value;
         const watershed = document.getElementById('location_watershed').value;
+        const communityId = document.getElementById('community_id').value;
+
 
         const defaults = {
-            ecobrickerMaker,
-            volume,
-            weight,
-            brandName,
-            bottomColor,
-            sequestrationType,
-            plasticFrom,
-            community,
-            locationFull,
-            watershed
-        };
+    ecobrickerMaker,
+    volume,
+    weight,
+    brandName,
+    bottomColor,
+    sequestrationType,
+    plasticFrom,
+    community,
+    communityId,
+    locationFull,
+    watershed
+};
 
         localStorage.setItem('ecobrickDefaults', JSON.stringify(defaults));
         console.log('Ecobrick defaults saved.');
@@ -756,9 +759,10 @@ function restoreEcobrickDefaults() {
         document.getElementById('bottom_colour').value = defaults.bottomColor || '';
         document.getElementById('sequestration_type').value = defaults.sequestrationType || '';
         document.getElementById('plastic_from').value = defaults.plasticFrom || '';
-//         document.getElementById('community_select').value = defaults.community || '';
 //         document.getElementById('location_full').value = defaults.locationFull || '';
 //         document.getElementById('location_watershed').value = defaults.watershed || '';
+document.getElementById('community_select').value = defaults.community || '';
+document.getElementById('community_id').value = defaults.communityId || '';
 
         // Show the "Defaults loaded" message
         document.getElementById('defaults-loaded').style.display = 'block';
