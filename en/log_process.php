@@ -42,6 +42,8 @@ try {
     $location_long = (float)trim($_POST['longitude']);
     $location_watershed = trim($_POST['location_watershed']);
     $community_name = trim($_POST['community_select']);
+    $community_id = (int)$_POST['community_id'];
+
 
     // STEP 3: Derived values
     $user_ecobricker_id = getEcobrickerID($buwana_id);
@@ -86,6 +88,7 @@ if ($community_id === 0 && !empty($community_name)) {
         $stmt_community->close();
     }
 }
+
 
 
     // STEP 6: Check for existing ecobrick
