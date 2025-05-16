@@ -61,7 +61,7 @@ if ($is_logged_in) {
     }
 
 } else {
-    header('Location: login.php?redirect=' . urlencode($page));
+    header('Location: login.php?redirect=' . urlencode($page)).php;
     exit();
 }
 
