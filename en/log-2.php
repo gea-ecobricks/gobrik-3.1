@@ -494,13 +494,11 @@ function showDensityConfirmation(density, volume, weight) {
     modal.style.display = 'flex';
 }
 
-
 function generateModalContent(density, volume, weight, lang, ecobrickId) {
-    // Dynamically access the correct translation object
-    const translations = window[`${lang}_Page_Translations`]; // fallback to English
+    const translations = window.translations;
 
     if (!translations) {
-        console.error(`Translation object for language "${lang}" not found.`);
+        console.error(`Translation object not initialized. Make sure switchLanguage('${lang}') was called before this.`);
         return '<p>Error: Missing translation data.</p>';
     }
 
@@ -546,6 +544,7 @@ function generateModalContent(density, volume, weight, lang, ecobrickId) {
         `;
     }
 }
+
 
 
 
