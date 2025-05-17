@@ -61,16 +61,16 @@ function switchLanguage(langCode) {
 }
 
 
-function loadTranslationScripts(lang, page, callback) {
-    const totalScripts = 3;
-    let loadedScripts = 0;
+function loadTranslationScripts(lang, page) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = `/translations/${lang}/${page}.js?v=${version}`;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
 
-    function scriptLoaded() {
-        loadedScripts++;
-        if (loadedScripts === totalScripts) {
-            callback(); // All scripts loaded
-        }
-    }
 
     // Core UI translations
     const coreScript = document.createElement('script');

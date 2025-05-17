@@ -371,14 +371,20 @@ display: none;
 
 
 <script>
-      const lang = '<?php echo $lang; ?>';
+  const lang = '<?php echo $lang; ?>';
   const page = '<?php echo $page; ?>';
   const version = '<?php echo $version; ?>';
 
-  loadTranslationScripts(lang, page, () => {
-    switchLanguage(lang); // Or your language rendering logic
-  });
+  loadTranslationScripts(lang, page)
+    .then(() => {
+      console.log("✅ Language script loaded successfully.");
+      switchLanguage(lang); // now it's safe!
+    })
+    .catch(err => {
+      console.error("❌ Failed to load translation script:", err);
+    });
 </script>
+
 
 
 </HEAD>
