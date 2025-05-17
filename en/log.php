@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // PART 1: Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.545';
+$version = '0.546';
 $page = 'log';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
