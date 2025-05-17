@@ -370,7 +370,15 @@ display: none;
 </style>
 
 
+<script>
+      const lang = '<?php echo $lang; ?>';
+  const page = '<?php echo $page; ?>';
+  const version = '<?php echo $version; ?>';
 
+  loadTranslationScripts(lang, page, () => {
+    switchLanguage(lang); // Or your language rendering logic
+  });
+</script>
 
 
 </HEAD>
