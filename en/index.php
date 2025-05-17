@@ -79,7 +79,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
 
             <div>
-                <button type="button" aria-label="Sign up" onclick="location.href='signup.php'" class="sign-uppp" style="cursor:pointer;">
+                <button type="button" aria-label="Sign up" onclick="location.href='https://buwana.ecobricks.org/en/signup-1.php?gbrk_f2c61a85a4cd4b8b89a7" class="sign-uppp" style="cursor:pointer;">
                 <i style="background: url(../svgs/strike-icon.svg) no-repeat; width:20px; height:26px;display: inline-block;background-size:contain;margin-bottom: -5px;margin-left:4px;"></i><span data-lang-id="003-sign-up">Sign up</span></button>
             </div>
 

@@ -131,7 +131,7 @@
 
 
 
-<!-- Translation variable files for the languageSwitcher-->
+<!-- Translation variable files for the languageSwitcher
 <script src="../translations/core-texts-en.js?v=<?php echo ($version); ;?>"></script>
 <script src="../translations/core-texts-fr.js?v=<?php echo ($version); ;?>"></script>
 <script src="../translations/core-texts-id.js?v=<?php echo ($version); ;?>"></script>
@@ -140,7 +140,7 @@
 <script src="../translations/<?php echo ($page); ;?>-en.js?v=<?php echo ($version); ;?>"></script>
 <script src="../translations/<?php echo ($page); ;?>-fr.js?v=<?php echo ($version); ;?>"></script>
 <script src="../translations/<?php echo ($page); ;?>-id.js?v=<?php echo ($version); ;?>1"></script>
-<script src="../translations/<?php echo ($page); ;?>-es.js?v=<?php echo ($version); ;?>"></script>
+<script src="../translations/<?php echo ($page); ;?>-es.js?v=<?php echo ($version); ;?>"></script>-->
 
 <!--
   <script src="https://unpkg.com/website-carbon-badges@1.1.3/b.min.js" defer></script>
