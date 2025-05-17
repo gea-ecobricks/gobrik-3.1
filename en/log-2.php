@@ -494,13 +494,15 @@ function showDensityConfirmation(density, volume, weight) {
     modal.style.display = 'flex';
 }
 
-// Function to generate modal content based on density
+
 function generateModalContent(density, volume, weight, lang, ecobrickId) {
-    // Determine the translation object based on the selected language
-    const translations = lang === 'fr' ? fr_Page_Translations :
-                         lang === 'es' ? es_Page_Translations :
-                         lang === 'id' ? id_Page_Translations :
-                         en_Page_Translations; // Default to English if no match
+    // Dynamically access the correct translation object
+    const translations = window[`${lang}_Page_Translations`] || en_Page_Translations; // fallback to English
+
+    if (!translations) {
+        console.error(`Translation object for language "${lang}" not found.`);
+        return '<p>Error: Missing translation data.</p>';
+    }
 
     if (density < 0.33) {
         return `
@@ -527,7 +529,12 @@ function generateModalContent(density, volume, weight, lang, ecobrickId) {
         return `
             <h1 style="text-align:center;">⚠️</h1>
             <h4 style="text-align:center;">${translations.highDensityTitle}</h4>
-            <div class="preview-text" style="text-align:center;">${translations.highDensityMessage.replace('${density}', density).replace('${volume}', volume).replace('${weight}', weight)}</div>
+            <div class="preview-text" style="text-align:center;">
+                ${translations.highDensityMessage
+                    .replace('${density}', density)
+                    .replace('${volume}', volume)
+                    .replace('${weight}', weight)}
+            </div>
             <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${translations.nextRegisterSerial}</a>
         `;
     } else {
@@ -539,6 +546,7 @@ function generateModalContent(density, volume, weight, lang, ecobrickId) {
         `;
     }
 }
+
 
 
     // Function to toggle visibility of "x-button" elements
