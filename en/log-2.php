@@ -478,7 +478,7 @@ function showFormModal(message) {
 <script>
 
 
-showDensityConfirmation(density, volume, weight);
+// showDensityConfirmation(density, volume, weight);
 
 </script>
 
