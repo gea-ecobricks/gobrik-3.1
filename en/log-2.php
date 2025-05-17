@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.584';
+$version = '0.585';
 $page = 'log-2';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -497,7 +497,7 @@ function showDensityConfirmation(density, volume, weight) {
 
 function generateModalContent(density, volume, weight, lang, ecobrickId) {
     // Dynamically access the correct translation object
-    const translations = window[`${lang}_Page_Translations`] || en_Page_Translations; // fallback to English
+    const translations = window[`${lang}_Page_Translations`]; // fallback to English
 
     if (!translations) {
         console.error(`Translation object for language "${lang}" not found.`);
