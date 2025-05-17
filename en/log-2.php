@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.585';
+$version = '0.586';
 $page = 'log-2';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -476,111 +476,10 @@ function showFormModal(message) {
 </script>
 
 <script>
-  // Function to show the density confirmation modal
-function showDensityConfirmation(density, volume, weight) {
-    const modal = document.getElementById('form-modal-message');
-    const messageContainer = modal.querySelector('.modal-message');
 
-    // Hide all buttons with class "x-button"
-    toggleButtonsVisibility(false);
-
-    // Pass the language and ecobrick ID into the generateModalContent function
-    const content = generateModalContent(density, volume, weight, '<?php echo ($lang); ?>', '<?php echo $ecobrick_unique_id; ?>');
-
-    // Update modal content
-    messageContainer.innerHTML = content;
-
-    // Show the modal
-    modal.style.display = 'flex';
-}
-
-function generateModalContent(density, volume, weight, lang, ecobrickId) {
-    const translations = window.translations;
-
-    if (!translations) {
-        console.error(`Translation object not initialized. Make sure switchLanguage('${lang}') was called before this.`);
-        return '<p>Error: Missing translation data.</p>';
-    }
-
-    if (density < 0.33) {
-        return `
-            <h1 style="text-align:center;">⛔</h1>
-            <h2 style="text-align:center;">${translations.underDensityTitle}</h2>
-            <p>${translations.underDensityMessage.replace('${density}', density)}</p>
-            <a class="preview-btn" href="log.php?retry=${ecobrickId}">${translations.geaStandardsLinkText}</a>
-        `;
-    } else if (density >= 0.33 && density < 0.36) {
-        return `
-            <h1 style="text-align:center;">⚠️</h1>
-            <h2 style="text-align:center;">${translations.lowDensityTitle}</h2>
-            <p>${translations.lowDensityMessage.replace('${density}', density)}</p>
-            <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${translations.nextRegisterSerial}</a>
-        `;
-    } else if (density >= 0.36 && density < 0.65) {
-        return `
-            <h1 style="text-align:center;">👍</h1>
-            <h2 style="text-align:center;">${translations.greatJobTitle}</h2>
-            <p style="text-align:center;">${translations.greatJobMessage.replace('${density}', density)}</p>
-            <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${translations.nextRegisterSerial}</a>
-        `;
-    } else if (density >= 0.65 && density < 0.73) {
-        return `
-            <h1 style="text-align:center;">⚠️</h1>
-            <h4 style="text-align:center;">${translations.highDensityTitle}</h4>
-            <div class="preview-text" style="text-align:center;">
-                ${translations.highDensityMessage
-                    .replace('${density}', density)
-                    .replace('${volume}', volume)
-                    .replace('${weight}', weight)}
-            </div>
-            <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${translations.nextRegisterSerial}</a>
-        `;
-    } else {
-        return `
-            <h1 style="text-align:center;">⛔</h1>
-            <h4 style="text-align:center;">${translations.overMaxDensityTitle}</h4>
-            <div class="preview-text">${translations.overMaxDensityMessage.replace('${density}', density)}</div>
-            <a class="preview-btn" href="log.php">${translations.goBack}</a>
-        `;
-    }
-}
-
-
-
-
-    // Function to toggle visibility of "x-button" elements
-    function toggleButtonsVisibility(visible) {
-        const xButtons = document.querySelectorAll('.x-button');
-        xButtons.forEach(button => button.style.display = visible ? 'inline-block' : 'none');
-    }
-
-// Function to close the density confirmation modal
-function closeDensityModal() {
-    const modal = document.getElementById('form-modal-message');
-    modal.style.display = 'none';
-
-    // Reset blur effect directly with higher specificity
-    document.getElementById('page-content').style.filter = 'none'; // Set to 'none' to remove blur
-
-    // Re-enable body scrolling
-    document.body.style.overflow = 'auto'; // Set overflow back to auto to enable scrolling
-
-    // Remove any modal state class if needed
-    document.body.classList.remove('modal-open');
-
-    // Show all buttons with class "x-button" again
-    toggleButtonsVisibility(true);
-}
 
 showDensityConfirmation(density, volume, weight);
 
-
-// var ecobrickStatus = "<?php echo $status; ?>";
-//     // Show the modal on page load
-//    if (ecobrickStatus !== "not ready") {
-//     // Show the modal on page load if status is not "basic data logged"
-//     showDensityConfirmation(density, volume, weight);
-// }
 </script>
 
 
