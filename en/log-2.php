@@ -476,128 +476,117 @@ function showFormModal(message) {
 </script>
 
 <script>
+(function() {
+  const lang = '<?php echo $lang; ?>';
+  const ecobrickId = '<?php echo $ecobrick_unique_id; ?>';
 
-
-  // Function to show the density confirmation modal
-function showDensityConfirmation(density, volume, weight) {
+  // Central modal handler
+  function showDensityConfirmation(density, volume, weight) {
     const modal = document.getElementById('form-modal-message');
     const messageContainer = modal.querySelector('.modal-message');
 
-    // Hide all buttons with class "x-button"
+    // Hide all "x-button" elements
     toggleButtonsVisibility(false);
 
-    // Pass the language and ecobrick ID into the generateModalContent function
-    const content = generateModalContent(density, volume, weight, '<?php echo ($lang); ?>', '<?php echo $ecobrick_unique_id; ?>');
-
-    // Update modal content
+    // Generate modal content based on density and translations
+    const content = generateModalContent(density, volume, weight, ecobrickId);
     messageContainer.innerHTML = content;
 
-    // Show the modal
+    // Show modal
     modal.style.display = 'flex';
-}
+  }
 
-
-
-function generateModalContent(density, volume, weight, lang, ecobrickId) {
-    const translations = window.translations;
-
-    if (!translations) {
-        console.error(`Translation object not initialized. Make sure switchLanguage('${lang}') was called before this.`);
-        return '<p>Error: Missing translation data.</p>';
+  // Generate translated HTML based on density
+  function generateModalContent(density, volume, weight, ecobrickId) {
+    const t = window.translations;
+    if (!t) {
+      console.error(`⛔ Translation object not initialized.`);
+      return '<p>Error: Missing translation data.</p>';
     }
 
     if (density < 0.33) {
-        return `
-            <h1 style="text-align:center;">⛔</h1>
-            <h2 style="text-align:center;">${translations.underDensityTitle}</h2>
-            <p>${translations.underDensityMessage.replace('${density}', density)}</p>
-            <a class="preview-btn" href="log.php?retry=${ecobrickId}">${translations.geaStandardsLinkText}</a>
-        `;
-    } else if (density >= 0.33 && density < 0.36) {
-        return `
-            <h1 style="text-align:center;">⚠️</h1>
-            <h2 style="text-align:center;">${translations.lowDensityTitle}</h2>
-            <p>${translations.lowDensityMessage.replace('${density}', density)}</p>
-            <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${translations.nextRegisterSerial}</a>
-        `;
-    } else if (density >= 0.36 && density < 0.65) {
-        return `
-            <h1 style="text-align:center;">👍</h1>
-            <h2 style="text-align:center;">${translations.greatJobTitle}</h2>
-            <p style="text-align:center;">${translations.greatJobMessage.replace('${density}', density)}</p>
-            <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${translations.nextRegisterSerial}</a>
-        `;
-    } else if (density >= 0.65 && density < 0.73) {
-        return `
-            <h1 style="text-align:center;">⚠️</h1>
-            <h4 style="text-align:center;">${translations.highDensityTitle}</h4>
-            <div class="preview-text" style="text-align:center;">
-                ${translations.highDensityMessage
-                    .replace('${density}', density)
-                    .replace('${volume}', volume)
-                    .replace('${weight}', weight)}
-            </div>
-            <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${translations.nextRegisterSerial}</a>
-        `;
+      return `
+        <h1 style="text-align:center;">⛔</h1>
+        <h2 style="text-align:center;">${t.underDensityTitle}</h2>
+        <p>${t.underDensityMessage.replace('${density}', density)}</p>
+        <a class="preview-btn" href="log.php?retry=${ecobrickId}">${t.geaStandardsLinkText}</a>
+      `;
+    } else if (density < 0.36) {
+      return `
+        <h1 style="text-align:center;">⚠️</h1>
+        <h2 style="text-align:center;">${t.lowDensityTitle}</h2>
+        <p>${t.lowDensityMessage.replace('${density}', density)}</p>
+        <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${t.nextRegisterSerial}</a>
+      `;
+    } else if (density < 0.65) {
+      return `
+        <h1 style="text-align:center;">👍</h1>
+        <h2 style="text-align:center;">${t.greatJobTitle}</h2>
+        <p style="text-align:center;">${t.greatJobMessage.replace('${density}', density)}</p>
+        <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${t.nextRegisterSerial}</a>
+      `;
+    } else if (density < 0.73) {
+      return `
+        <h1 style="text-align:center;">⚠️</h1>
+        <h4 style="text-align:center;">${t.highDensityTitle}</h4>
+        <div class="preview-text" style="text-align:center;">
+          ${t.highDensityMessage
+              .replace('${density}', density)
+              .replace('${volume}', volume)
+              .replace('${weight}', weight)}
+        </div>
+        <a class="preview-btn" onclick="closeDensityModal()" aria-label="Click to close modal">${t.nextRegisterSerial}</a>
+      `;
     } else {
-        return `
-            <h1 style="text-align:center;">⛔</h1>
-            <h4 style="text-align:center;">${translations.overMaxDensityTitle}</h4>
-            <div class="preview-text">${translations.overMaxDensityMessage.replace('${density}', density)}</div>
-            <a class="preview-btn" href="log.php">${translations.goBack}</a>
-        `;
+      return `
+        <h1 style="text-align:center;">⛔</h1>
+        <h4 style="text-align:center;">${t.overMaxDensityTitle}</h4>
+        <div class="preview-text">${t.overMaxDensityMessage.replace('${density}', density)}</div>
+        <a class="preview-btn" href="log.php">${t.goBack}</a>
+      `;
     }
-}
+  }
 
+  // Show or hide all elements with class "x-button"
+  function toggleButtonsVisibility(visible) {
+    document.querySelectorAll('.x-button').forEach(btn => {
+      btn.style.display = visible ? 'inline-block' : 'none';
+    });
+  }
 
-
-
-    // Function to toggle visibility of "x-button" elements
-    function toggleButtonsVisibility(visible) {
-        const xButtons = document.querySelectorAll('.x-button');
-        xButtons.forEach(button => button.style.display = visible ? 'inline-block' : 'none');
-    }
-
-// Function to close the density confirmation modal
-function closeDensityModal() {
+  // Close modal and reset UI state
+  window.closeDensityModal = function() {
     const modal = document.getElementById('form-modal-message');
     modal.style.display = 'none';
 
-    // Reset blur effect directly with higher specificity
-    document.getElementById('page-content').style.filter = 'none'; // Set to 'none' to remove blur
-
-    // Re-enable body scrolling
-    document.body.style.overflow = 'auto'; // Set overflow back to auto to enable scrolling
-
-    // Remove any modal state class if needed
+    document.getElementById('page-content').style.filter = 'none';
+    document.body.style.overflow = 'auto';
     document.body.classList.remove('modal-open');
 
-    // Show all buttons with class "x-button" again
     toggleButtonsVisibility(true);
-}
+  };
 
-
-
-function waitForTranslationsAndShowModal(density, volume, weight, timeout = 3000) {
+  // Wait for translations to load before showing the modal
+  function waitForTranslationsAndShowModal(density, volume, weight, timeout = 3000) {
     const start = Date.now();
 
     (function check() {
-        if (window.translations) {
-            showDensityConfirmation(density, volume, weight);
-        } else if (Date.now() - start > timeout) {
-            console.error("⛔ Timeout waiting for translations.");
-            // Optionally fallback:
-            showDensityConfirmation(density, volume, weight); // will fail gracefully with error message
-        } else {
-            setTimeout(check, 50);
-        }
+      if (window.translations) {
+        showDensityConfirmation(density, volume, weight);
+      } else if (Date.now() - start > timeout) {
+        console.error("⛔ Timeout waiting for translations.");
+        showDensityConfirmation(density, volume, weight); // fallback anyway
+      } else {
+        setTimeout(check, 50);
+      }
     })();
-}
+  }
 
-// Call this instead of directly calling showDensityConfirmation
-waitForTranslationsAndShowModal(density, volume, weight);
-
+  // Call this only once translations are expected to load externally
+  waitForTranslationsAndShowModal(density, volume, weight);
+})();
 </script>
+
 
 
 
