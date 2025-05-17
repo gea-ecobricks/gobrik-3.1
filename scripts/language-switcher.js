@@ -61,35 +61,71 @@ function switchLanguage(langCode) {
 }
 
 
+
 function loadTranslationScripts(lang, page) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = `/translations/${lang}/${page}.js?v=${version}`;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
+    return new Promise((resolve, reject) => {
+        const totalScripts = 3;
+        let loadedScripts = 0;
+
+        function scriptLoaded() {
+            loadedScripts++;
+            if (loadedScripts === totalScripts) {
+                resolve(); // ✅ All scripts loaded
+            }
+        }
+
+        function handleError(scriptName) {
+            return () => reject(new Error(`Failed to load ${scriptName}`));
+        }
+
+        const versioned = (name) => `../translations/${name}-${lang}.js?v=${version}`;
+
+        const scripts = [
+            { src: versioned('core-texts'), name: 'core-texts' },
+            { src: versioned(page), name: page },
+            { src: versioned('buwana-terms'), name: 'buwana-terms' }
+        ];
+
+        scripts.forEach(({ src, name }) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = scriptLoaded;
+            script.onerror = handleError(name);
+            document.head.appendChild(script);
+        });
+    });
 }
 
-
-    // Core UI translations
-    const coreScript = document.createElement('script');
-    coreScript.src = `../translations/core-texts-${lang}.js?v=${version}`;
-    coreScript.onload = scriptLoaded;
-    document.head.appendChild(coreScript);
-
-    // Page-specific translations
-    const pageScript = document.createElement('script');
-    pageScript.src = `../translations/${page}-${lang}.js?v=${version}`;
-    pageScript.onload = scriptLoaded;
-    document.head.appendChild(pageScript);
-
-    // Buwana-specific terms and policies
+//
+//function loadTranslationScripts(lang, page, callback) {
+//    const totalScripts = 3;
+//    let loadedScripts = 0;
+//
+//    function scriptLoaded() {
+//        loadedScripts++;
+//        if (loadedScripts === totalScripts) {
+//            callback(); // All scripts loaded
+//        }
+//    }
+//
+//    // Core UI translations
+//    const coreScript = document.createElement('script');
+//    coreScript.src = `../translations/core-texts-${lang}.js?v=${version}`;
+//    coreScript.onload = scriptLoaded;
+//    document.head.appendChild(coreScript);
+//
+//    // Page-specific translations
+//    const pageScript = document.createElement('script');
+//    pageScript.src = `../translations/${page}-${lang}.js?v=${version}`;
+//    pageScript.onload = scriptLoaded;
+//    document.head.appendChild(pageScript);
+//
+//    // Buwana-specific terms and policies
 //    const buwanaScript = document.createElement('script');
 //    buwanaScript.src = `../translations/buwana-terms-${lang}.js?v=${version}`;
 //    buwanaScript.onload = scriptLoaded;
 //    document.head.appendChild(buwanaScript);
-}
+//}
 
 
 
