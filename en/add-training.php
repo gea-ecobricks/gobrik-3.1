@@ -349,10 +349,10 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <!-- "Add a new community" text link -->
     <p class="form-caption" data-lang-id="008-community-trained">
         What community was this training for?  Start typing to see and select a GoBrik community.
-        <a href="#" onclick="openAddCommunityModal(); return false;"
-           style="color: #007BFF; text-decoration: underline;">
-            Don't see your community? Add it.
-        </a>
+          <!-- <a href="#" onclick="openAddCommunityModal(); return false;"
+             style="color: #007BFF; text-decoration: underline;">
+              Don't see your community? Add it.
+          </a> -->
     </p>
 <div id="community-error-required" class="form-field-error" data-lang-id="000-field-too-long-error">A community must be selected</div>
                 </div>
@@ -538,8 +538,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
 
-    <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+<!--     <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
+<!--     <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
 
 <div>
     <input type="submit" value="Next: Upload Photos ➡️" data-lang-id="100-submit-report-1">
