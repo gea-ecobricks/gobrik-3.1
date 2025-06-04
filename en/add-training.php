@@ -94,7 +94,7 @@ while ($row = $result->fetch_assoc()) {
 // ✅ Fetch Community Name if Exists
 $community_name = '';
 if (!empty($community_id)) {
-    $stmt = $gobrik_conn->prepare("SELECT com_name FROM communities_tb WHERE community_id = ?");
+    $stmt = $buwana_conn->prepare("SELECT com_name FROM communities_tb WHERE community_id = ?");
     $stmt->bind_param("i", $community_id);
     $stmt->execute();
     $stmt->bind_result($community_name);
