@@ -346,14 +346,15 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div id="community_results" class="autocomplete-results"></div>
 
-    <!-- "Add a new community" text link -->
+    <!-- "Add a new community" text link
     <p class="form-caption" data-lang-id="008-community-trained">
         What community was this training for?  Start typing to see and select a GoBrik community.
-          <!-- <a href="#" onclick="openAddCommunityModal(); return false;"
+         <a href="#" onclick="openAddCommunityModal(); return false;"
              style="color: #007BFF; text-decoration: underline;">
               Don't see your community? Add it.
-          </a> -->
-    </p>
+          </a>
+    </p>-->
+
 <div id="community-error-required" class="form-field-error" data-lang-id="000-field-too-long-error">A community must be selected</div>
                 </div>
 
