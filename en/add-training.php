@@ -50,7 +50,7 @@ if ($result_languages && $result_languages->num_rows > 0) {
     }
 }
 
-$buwana_conn->close(); // Close the database connection
+
 
 require_once '../gobrikconn_env.php';
 
@@ -102,117 +102,8 @@ if (!empty($community_id)) {
     $stmt->close();
 }
 
-// ✅ Process Form Submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    include '../scripts/photo-functions.php';
-
-    // ✅ Capture & Validate Form Data
-    $training_id = isset($_POST['training_id']) ? intval($_POST['training_id']) : 0;
-    $editing = ($training_id > 0); // Ensure proper update detection
-
-    $training_title = trim($_POST['training_title'] ?? '');
-    $lead_trainer = trim($_POST['lead_trainer'] ?? '');
-    $training_date = trim($_POST['training_date'] ?? '');
-
-    // ✅ Ensure valid `training_date`
-    if (!empty($training_date)) {
-        if (strlen($training_date) == 10) { // Only date (YYYY-MM-DD) provided
-            $training_date .= "T12:00"; // Append default time
-        }
-        $training_date = date("Y-m-d H:i:s", strtotime($training_date));
-    } else {
-        die(json_encode(['success' => false, 'error' => 'Training date is required.']));
-    }
-
-    $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
-    $moodle_url = trim($_POST['moodle_url'] ?? '');
-    $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
-    $featured_description = trim($_POST['featured_description'] ?? '');
-    $training_summary = trim($_POST['training_summary'] ?? '');
-    $training_agenda = trim($_POST['training_agenda'] ?? '');
-    $training_success = trim($_POST['training_success'] ?? '');
-    $training_challenges = trim($_POST['training_challenges'] ?? '');
-    $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
-    $training_location = trim($_POST['training_location'] ?? '');
-    $training_type = trim($_POST['training_type'] ?? '');
-
-    // ✅ Convert Numeric Fields
-    $no_participants = filter_var($_POST['no_participants'], FILTER_VALIDATE_INT) ?? 0;
-    $briks_made = filter_var($_POST['briks_made'], FILTER_VALIDATE_INT) ?? 0;
-    $avg_brik_weight = filter_var($_POST['avg_brik_weight'], FILTER_VALIDATE_INT) ?? 0;
-    $country_id = filter_var($_POST['country_id'], FILTER_VALIDATE_INT) ?? null;
-    $community_id = filter_var($_POST['community_id'], FILTER_VALIDATE_INT) ?? null;
-
-    // ✅ Validate Community ID
-    if ($community_id !== null) {
-        $stmt = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE community_id = ?");
-        $stmt->bind_param("i", $community_id);
-        $stmt->execute();
-        if ($stmt->get_result()->num_rows === 0) {
-            $community_id = null;
-        }
-        $stmt->close();
-    }
-
-    if ($editing) {
-        // ✅ UPDATE existing training report
-        $sql = "UPDATE tb_trainings SET
-            training_title=?, lead_trainer=?, country_id=?, training_date=?,
-            no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
-            location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?,
-            training_success=?, training_challenges=?, training_lessons_learned=?,
-            youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
-            WHERE training_id=?";
-
-        $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("ssisisiiddssssssssisii",
-            $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-            $training_summary, $training_agenda, $training_success, $training_challenges,
-            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-            $featured_description, $community_id, $training_id
-        );
-
-        if ($stmt->execute()) {
-            $new_training_id = $training_id; // Keep the same ID on update
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Update failed.']);
-            exit();
-        }
-    } else {
-        // ✅ INSERT new training report
-        $sql = "INSERT INTO tb_trainings
-            (training_title, lead_trainer, country_id, training_date, no_participants,
-            training_type, briks_made, avg_brik_weight, location_lat, location_long,
-            training_location, training_summary, training_agenda, training_success, training_challenges,
-            training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = $gobrik_conn->prepare($sql);
-        $stmt->bind_param("ssisisiiddssssssssisi",
-            $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-            $training_summary, $training_agenda, $training_success, $training_challenges,
-            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
-        );
-
-        if ($stmt->execute()) {
-            $new_training_id = $gobrik_conn->insert_id; // Get the last inserted ID
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Insert failed.']);
-            exit();
-        }
-    }
-
-    // ✅ Return JSON response with the correct `training_id`
-    echo json_encode(['success' => true, 'training_id' => $new_training_id]);
-    exit();
-}
 
 ?>
-
-
-
 
 <!--PART 4 GENERATE META TAGS-->
 
@@ -289,17 +180,17 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 
  <!-- PART 6 THE FORM -->
-<form id="submit-form" method="post" action="" enctype="multipart/form-data" novalidate>
+<form id="submit-form" method="post" action="add-training_process.php" enctype="multipart/form-data" novalidate>
 
     <div class="form-item" style="margin-top: 25px;">
         <label for="training_title" data-lang-id="005-title-title">Training Title:</label><br>
         <input type="text" id="training_title" name="training_title"
             value="<?php echo htmlspecialchars($training_title ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            aria-label="Training Title" required>
+            aria-label="Training Title" >
              <p class="form-caption" data-lang-id="005-training-give-title">Give your training a title.  This will be how your report is featured.</p>
  <!--ERRORS-->
-                    <div id="title-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
-                    <div id="title-error-long" class="form-field-error" data-lang-id="000-title-field-too-long-error">Your training title is too long. Max 50 characters.</div>
+                    <div id="title-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+                    <div id="title-error-long" class="form-field-error" data-lang-id="000-title-field-too-long-error">Your training title is too long. Max 500 characters.</div>
                     <div id="title-error-invalid" class="form-field-error" data-lang-id="005b-training-title-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs please.</div>
         </div>
 
@@ -308,19 +199,19 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <label for="training_date" datal-lang-id="006-title-date">Training Date:</label><br>
     <input type="datetime-local" id="training_date" name="training_date"
     value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
-    aria-label="Training Date" required class="form-field-style">
+    aria-label="Training Date"  class="form-field-style">
     <p class="form-caption" data-lang-id="006-training-date">On what date and time did this training run?</p>
-    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is required.</div>
+    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is .</div>
 
 </div>
 
     <div class="form-item">
         <label for="no_participants" data-lang-id="007-title-participants">Number of Participants:</label><br>
-        <input type="number" id="no_participants" name="no_participants" min="1" max="5000" required
+        <input type="number" id="no_participants" name="no_participants" min="1" max="5000" 
             value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             <p class="form-caption" data-lang-id="007-training-count">How many people participated (including trainers)?</p>
             <!--ERRORS-->
-                    <div id="participants-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="participants-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                     <div id="participants-error-range" class="form-field-error" data-lang-id="000-field-participants-number-error">A number (between 1 and 5000).</div>
              </div>
 
@@ -328,10 +219,10 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         <label for="lead_trainer" data-lang-id="008-lead-trainer">Lead Trainer:</label><br>
         <input type="text" id="lead_trainer" name="lead_trainer"
             value="<?php echo htmlspecialchars($lead_trainer ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            aria-label="Lead Trainer" required>
+            aria-label="Lead Trainer" >
             <p class="form-caption" data-lang-id="008-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
              <!--ERRORS-->
-                    <div id="trainer-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="trainer-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                 </div>
 
 
@@ -362,7 +253,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div class="form-item">
     <label for="training_type" data-lang-id="010-title-type">What type of training was this?</label><br>
-    <select id="training_type" name="training_type" required class="form-field-style">
+    <select id="training_type" name="training_type"  class="form-field-style">
         <option value="" disabled selected>Select training type...</option>
 
         <?php foreach ($training_types as $type): ?>
@@ -374,23 +265,23 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </select>
    <p class="form-caption" data-lang-id="010-training-type">Please categorize this training.</p>
    <!--ERROR-->
-                    <div id="type-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="type-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                 </div>
 
 
   <div class="form-item">
     <label for="briks_made" data-lang-id="011-title-how-many">How many ecobricks were made?</label><br>
-    <input type="number" id="briks_made" name="briks_made" min="0" max="5000" required
+    <input type="number" id="briks_made" name="briks_made" min="0" max="5000" 
         value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
     <p class="form-caption" data-lang-id="011-how-many-briks">No ecobricks made in this training? Just set at "0" then.</p>
     <!--ERRORS-->
-                    <div id="briks-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="briks-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                     <div id="briks-error-range" class="form-field-error" data-lang-id="000-field-brik-number-error">Just a number (between 1 and 5000).</div>
                 </div>
 
 <div class="form-item">
     <label for="avg_brik_weight" data-lang-id="012-title-average">Average Brik Weight (grams):</label><br>
-    <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" required
+    <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" 
         value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
         <p class="form-caption" data-lang-id="012-training-average">No ecobricks made in this training? Just set at "0" then.</p>
          <!--ERRORS-->
@@ -399,7 +290,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 <div class="form-item">
     <label for="country_id" data-lang-id="013-title-country">Country:</label><br>
-    <select id="country_id" name="country_id" required class="form-field-style">
+    <select id="country_id" name="country_id"  class="form-field-style">
         <!-- ✅ Ensures placeholder is selected when no country is set -->
         <option value="" disabled <?php echo empty($country_id) ? 'selected' : ''; ?>>
             Select a country...
@@ -417,7 +308,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         Where was this training run? If it was an online training, select the country of the lead trainer.
     </p>
 <!--ERRORS-->
-                    <div id="country-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="country-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                 </div>
 
 
@@ -429,7 +320,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
               rows="5"><?php echo htmlspecialchars($featured_description ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
     <p class="form-caption" data-lang-id="014-training-description">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
 <!--ERRORS-->
-                    <div id="featured-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="featured-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                     <div id="featured-error-long" class="form-field-error" data-lang-id="000-field-summary-too-long-error">Your training summary is too long. Max 255 characters.</div>
                     <div id="featured-error-invalid" class="form-field-error" data-lang-id="005b-training-summary-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
                 </div>
@@ -451,10 +342,10 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div class="form-item">
         <label for="training_summary" data-lang-id="017-title-summary">Training Summary:</label><br>
-        <textarea id="training_summary" name="training_summary" required><?php echo htmlspecialchars($training_summary ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <textarea id="training_summary" name="training_summary" ><?php echo htmlspecialchars($training_summary ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         <p class="form-caption" data-lang-id="017-training-summary">Provide a summary of the training. Max 150 words. Avoid special characters..</p>
     <!--ERRORS-->
-                    <div id="summary-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="summary-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                     <div id="summary-error-long" class="form-field-error" data-lang-id="000-field-summary-too-long-error">Your training summary is too long. Max 255 characters.</div>
                     <div id="summary-error-invalid" class="form-field-error" data-lang-id="005b-training-summary-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
                 </div>
@@ -462,21 +353,21 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div class="form-item">
         <label for="training_success" data-lang-id="018-title-successes">Training Successes:</label><br>
-        <textarea id="training_success" name="training_success" required><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <textarea id="training_success" name="training_success" ><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
       <p class="form-caption" data-lang-id="018-training-success">Share the successes of the training. Max 500 words. Avoid special characters..</p>
    <!--ERRORS-->
-                    <div id="success-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="success-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                     <div id="success-error-long" class="form-field-error" data-lang-id="000-field-success-too-long-error">Your entry is too long. Max 2000 characters.</div>
                     <div id="success-error-invalid" class="form-field-error" data-lang-id="005b-training-success-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
                 </div>
 
     <div class="form-item">
         <label for="training_challenges" data-lang-id="019-title-challenges">Training Challenges:</label><br>
-        <textarea id="training_challenges" name="training_challenges" required><?php echo htmlspecialchars($training_challenges ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <textarea id="training_challenges" name="training_challenges" ><?php echo htmlspecialchars($training_challenges ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
               <p class="form-caption" data-lang-id="019-training-challenges">Share the challenges you faced leading your training. Max 500 words. Avoid special characters.</p>
 
             <!--ERRORS-->
-                    <div id="challenges-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="challenges-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                     <div id="challenges-error-long" class="form-field-error" data-lang-id="000-field-challenges-too-long-error">Your entry is too long. Max 1500 characters.</div>
                     <div id="challenges-error-invalid" class="form-field-error" data-lang-id="005b-training-challenges-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
                 </div>
@@ -484,24 +375,24 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div class="form-item">
         <label for="training_lessons_learned" data-lang-id="020-title-lessons">Lessons Learned:</label><br>
-        <textarea id="training_lessons_learned" name="training_lessons_learned" required><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <textarea id="training_lessons_learned" name="training_lessons_learned" ><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         <p class="form-caption" data-lang-id="020-training-lessons">Share the lessons learned from leading your training. Max 1000 words. Avoid special characters.</p>
  <!--ERRORS-->
-                    <div id="lessons-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+                    <div id="lessons-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                     <div id="lessons-error-long" class="form-field-error" data-lang-id="000-field-lessons-too-long-error">Your lessons learned are too long. Max 3000 characters.</div>
                     <div id="lessons-error-invalid" class="form-field-error" data-lang-id="005b-training-lessons-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
                 </div>
 
 <div class="form-item">
     <label for="training_location" data-lang-id="021-title-location">Training Location:</label><br>
-    <input type="text" id="training_location" name="training_location" aria-label="Training Location" required
+    <input type="text" id="training_location" name="training_location" aria-label="Training Location" 
         value="<?php echo htmlspecialchars($training_location ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     <p class="form-caption" data-lang-id="020-location-caption">
         Please provide the general location where the training was conducted.
     </p>
 
      <!--ERRORS-->
-             <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
+             <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                 </div>
 
 
@@ -650,80 +541,80 @@ document.getElementById('submit-form').addEventListener('submit', function(event
         return invalidChars.test(value);
     }
 
-    // 🔹 1. Training Title (Required, Max 50 chars)
+    // 🔹 1. Training Title (Max 500 chars)
     var trainingTitle = document.getElementById('training_title').value.trim();
-    displayError('title-error-required', trainingTitle === '');
-    displayError('title-error-long', trainingTitle.length > 50);
+//     displayError('title-error-required', trainingTitle === '');
+    displayError('title-error-long', trainingTitle.length > 500);
     displayError('title-error-invalid', hasInvalidChars(trainingTitle));
 
     // 🔹 2. Training Date (Required)
     var trainingDate = document.getElementById('training_date').value.trim();
-    displayError('date-error-required', trainingDate === '');
+//     displayError('date-error-required', trainingDate === '');
 
     // 🔹 3. Number of Participants (Required, 1 - 5000)
     var noParticipants = parseInt(document.getElementById('no_participants').value, 10);
     if (isNaN(noParticipants) || noParticipants === '') {
-        displayError('participants-error-required', true);
+//         displayError('participants-error-required', true);
         displayError('participants-error-range', false);
     } else if (noParticipants < 1 || noParticipants > 5000) {
-        displayError('participants-error-required', false);
+//         displayError('participants-error-required', false);
         displayError('participants-error-range', true);
     } else {
-        displayError('participants-error-required', false);
+//         displayError('participants-error-required', false);
         displayError('participants-error-range', false);
     }
 
     // 🔹 4. Lead Trainer (Required)
     var leadTrainer = document.getElementById('lead_trainer').value.trim();
-    displayError('trainer-error-required', leadTrainer === '');
+//     displayError('trainer-error-required', leadTrainer === '');
 
     // 🔹 5. Training Community (Required)
     var communityId = document.getElementById('community_id').value.trim();
-    displayError('community-error-required', communityId === '');
+//     displayError('community-error-required', communityId === '');
 
     // 🔹 6. Training Type (Required)
     var trainingType = document.getElementById('training_type').value;
-    displayError('type-error-required', trainingType === "");
+//     displayError('type-error-required', trainingType === "");
 
     // 🔹 7. Briks Made (Min 0)
     var briksMade = parseInt(document.getElementById('briks_made').value, 10);
-    displayError('briks-error-required', isNaN(briksMade) || briksMade < 0 || briksMade > 5000);
+//     displayError('briks-error-required', isNaN(briksMade) || briksMade < 0 || briksMade > 5000);
 
     // 🔹 8. Average Brik Weight (Min 0)
     var avgBrikWeight = parseInt(document.getElementById('avg_brik_weight').value, 10);
-    displayError('weight-error-required', isNaN(avgBrikWeight) || avgBrikWeight < 0 || avgBrikWeight > 2000);
+//     displayError('weight-error-required', isNaN(avgBrikWeight) || avgBrikWeight < 0 || avgBrikWeight > 2000);
 
     // 🔹 9. Training Country (Required)
     var trainingCountry = document.getElementById('country_id').value.trim();
-    displayError('country-error-required', trainingCountry === '');
+//     displayError('country-error-required', trainingCountry === '');
 
     // 🔹 10. Training Summary (Required, Max 2000 chars)
     var trainingSummary = document.getElementById('training_summary').value.trim();
-    displayError('summary-error-required', trainingSummary === '');
+//     displayError('summary-error-required', trainingSummary === '');
     displayError('summary-error-long', trainingSummary.length > 2000);
     displayError('summary-error-invalid', hasInvalidChars(trainingSummary));
 
     // 🔹 11. Training Success (Required, Max 2000 chars)
     var trainingSuccess = document.getElementById('training_success').value.trim();
-    displayError('success-error-required', trainingSuccess === '');
+//     displayError('success-error-required', trainingSuccess === '');
     displayError('success-error-long', trainingSuccess.length > 2000);
     displayError('success-error-invalid', hasInvalidChars(trainingSuccess));
 
     // 🔹 12. Training Challenges (Required, Max 2000 chars)
     var trainingChallenges = document.getElementById('training_challenges').value.trim();
-    displayError('challenges-error-required', trainingChallenges === '');
+//     displayError('challenges-error-required', trainingChallenges === '');
     displayError('challenges-error-long', trainingChallenges.length > 2000);
     displayError('challenges-error-invalid', hasInvalidChars(trainingChallenges));
 
     // 🔹 13. Lessons Learned (Required, Max 2000 chars)
     var trainingLessons = document.getElementById('training_lessons_learned').value.trim();
-    displayError('lessons-error-required', trainingLessons === '');
+//     displayError('lessons-error-required', trainingLessons === '');
     displayError('lessons-error-long', trainingLessons.length > 2000);
     displayError('lessons-error-invalid', hasInvalidChars(trainingLessons));
 
     // 🔹 14. Training Location (Required)
     var trainingLocation = document.getElementById('training_location').value.trim();
-    displayError('location-error-required', trainingLocation === '');
+//     displayError('location-error-required', trainingLocation === '');
 
     // 🔹 15. Featured Description (Optional, Max 255 chars)
     var featuredDescription = document.getElementById('featured_description').value.trim();
@@ -864,10 +755,10 @@ document.getElementById('submit-form').addEventListener('submit', function(event
 
         <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
             <label for="newCommunityName">Name of Community:</label>
-            <input type="text" id="newCommunityName" name="newCommunityName" required>
+            <input type="text" id="newCommunityName" name="newCommunityName" >
 
             <label for="newCommunityType">Type of Community:</label>
-            <select id="newCommunityType" name="newCommunityType" required>
+            <select id="newCommunityType" name="newCommunityType" >
                 <option value="">Select Type</option>
                 <option value="neighborhood">Neighborhood</option>
                 <option value="city">City</option>
@@ -876,7 +767,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
             </select>
 
             <label for="communityCountry">Country:</label>
-            <select id="communityCountry" name="communityCountry" required>
+            <select id="communityCountry" name="communityCountry" >
                 <option value="">Select Country</option>
                 <?php foreach ($countries as $country) : ?>
                     <option value="<?php echo $country['country_id']; ?>">
@@ -886,7 +777,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
             </select>
 
             <label for="communityLanguage">Preferred Language:</label>
-            <select id="communityLanguage" name="communityLanguage" required>
+            <select id="communityLanguage" name="communityLanguage" >
                 <option value="">Select Language</option>
                 <?php foreach ($languages as $language) : ?>
                     <option value="<?php echo $language['language_id']; ?>">
