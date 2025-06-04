@@ -145,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // ✅ Validate Community ID
     if ($community_id !== null) {
-        $stmt = $gobrik_conn->prepare("SELECT community_id FROM communities_tb WHERE community_id = ?");
+        $stmt = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE community_id = ?");
         $stmt->bind_param("i", $community_id);
         $stmt->execute();
         if ($stmt->get_result()->num_rows === 0) {
