@@ -130,7 +130,7 @@ if ($editing) {
     $fields = [];
     $values = [];
     $types = '';
-    for ($i = 1; $i <= 2; $i++) {
+    for ($i = 1; $i <= 3; $i++) {
         $name = "feature_photo{$i}_main";
         if (isset($_FILES[$name]) && $_FILES[$name]['error'] == UPLOAD_ERR_OK) {
             $file = "training-{$new_training_id}-feature{$i}.webp";
@@ -183,7 +183,7 @@ if ($editing) {
     $fields = [];
     $values = [];
     $types = '';
-    for ($i = 1; $i <= 2; $i++) {
+    for ($i = 1; $i <= 3; $i++) {
         $name = "feature_photo{$i}_main";
         if (isset($_FILES[$name]) && $_FILES[$name]['error'] == UPLOAD_ERR_OK) {
             $file = "training-{$new_training_id}-feature{$i}.webp";
