@@ -9,7 +9,7 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in
 
 // Define training ID at the top
-$training_id = 818; // Ensure this is defined before any queries
+$training_id = 913; // Ensure this is defined before any queries
 
 // Initialize training variables
 $training_title = $training_date = $lead_trainer = "";
