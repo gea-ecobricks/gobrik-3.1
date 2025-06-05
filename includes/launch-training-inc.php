@@ -258,6 +258,7 @@ input[type="submit"]:hover {
   z-index: 20;
   font-family: "Mulish", sans-serif;
   position: relative;
+  padding-top: 0px;
 
 }
 
