@@ -178,6 +178,9 @@ if (!empty($community_id)) {
 
 
 
+<div style="text-align:right; margin:10px 0;">
+    <button type="button" id="starterPresetBtn" class="confirm-button">Start Workshop Presets</button>
+</div>
  <!-- PART 6 THE FORM -->
 <form id="submit-form" method="post" action="launch-training_process.php" enctype="multipart/form-data" novalidate>
 
@@ -796,6 +799,77 @@ function addCommunity2Buwana(event) {
         console.error('Error:', error);
     });
 }
+
+// Preset fields for the Starter Workshop
+function setFileInputFromUrl(inputId, url) {
+    fetch(url)
+        .then(res => res.blob())
+        .then(blob => {
+            const file = new File([blob], url.split('/').pop(), { type: blob.type });
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.files = dt.files;
+            }
+        });
+}
+
+function presetForStarterWorkshop() {
+    document.getElementById('training_title').value = 'Plastic, the Biosphere & Ecobricks: An Introduction';
+    document.getElementById('no_participants').value = 30;
+    document.getElementById('community_search').value = 'Global Ecobrick Movement';
+
+    const typeSelect = document.getElementById('training_type');
+    if (typeSelect) {
+        for (let opt of typeSelect.options) {
+            if (opt.text.trim() === 'Online Starter Workshop' || opt.value === 'Online Starter Workshop') {
+                typeSelect.value = opt.value;
+                break;
+            }
+        }
+    }
+
+    const countrySelect = document.getElementById('country_id');
+    if (countrySelect) {
+        for (let opt of countrySelect.options) {
+            if (opt.text.trim() === 'Earth' || opt.value === 'Earth') {
+                countrySelect.value = opt.value;
+                break;
+            }
+        }
+    }
+
+    document.getElementById('featured_description').value = `Just getting started ecobricking? Curious what it ecobricking is all about?  Want to be sure you are on the right track?  This basic, 1.5 our course will get you started right.  You’ll learn a lot more than just how to pack a bottle!
+
+In this introduction to ecobricks we will cover not just how to make an ecobrick, but why.  We’ll cover the context of ayyew and Earthen ethics and we’ll go through the illusions and daners surrounding plastic.  We'll take a look at modern plastic solutions and why ecobricking is as relevant as ever.  Finally, we'll go over correct ecobrick technique, best practices and building possibilities.`;
+
+    document.getElementById('training_agenda').value = `What you will learn:
+
+1. The primordial Earthen origins of plastic
+2. How we can follow Earth’s example with our plastic
+3. The modern context of plastic
+4.  The shortcomings of recycling and industrial waste management
+5.  The dangers of plastic when it gets into the environment
+6.  The spiral green principle behind ecobricking
+7.  How to Ecobrick
+8.  Using the GoBrik app
+9.  Using ecobricks for Modules and Earth Building
+
+Schedule
+• 40 minutes of science and theory
+• 20 minutes of ecobrick technique and best practices
+• 10 minutes on ecobrick applications
+• 20 minutes of questions and discussion.`;
+
+    const regScope = document.getElementById('registration_scope');
+    if (regScope) regScope.value = 'anyone';
+
+    setFileInputFromUrl('feature_photo1_main', 'https://gobrik.com/webps/starter-workshop-feature-1-en.webp');
+    setFileInputFromUrl('feature_photo2_main', 'https://gobrik.com/webps/starter-workshop-feature-2-en.webp');
+}
+
+document.getElementById('starterPresetBtn')?.addEventListener('click', presetForStarterWorkshop);
 
 
 
