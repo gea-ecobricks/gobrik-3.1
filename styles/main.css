@@ -2266,6 +2266,23 @@ input[type="date"] {
     background-color: #00000015;
 }
 
+.form-row {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+}
+
+.form-row .toggle-info {
+    flex: 1;
+}
+
+.form-row .toggle-slider {
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .form-item label,
 .form-item input,
 .form-item .form-caption {

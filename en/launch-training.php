@@ -62,6 +62,7 @@ $zoom_link = '';
 $zoom_link_full = '';
 $feature_photo1_main = '';
 $feature_photo2_main = '';
+$feature_photo3_main = '';
 $registration_scope = '';
 $trainer_contact_email = '';
 
@@ -71,7 +72,7 @@ if ($editing) {
                   training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
-                  zoom_link, zoom_link_full, feature_photo1_main, feature_photo2_main, registration_scope, trainer_contact_email
+                  zoom_link, zoom_link_full, feature_photo1_main, feature_photo2_main, feature_photo3_main, registration_scope, trainer_contact_email
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -81,7 +82,7 @@ if ($editing) {
                             $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
-                            $zoom_link, $zoom_link_full, $feature_photo1_main, $feature_photo2_main, $registration_scope, $trainer_contact_email);
+                            $zoom_link, $zoom_link_full, $feature_photo1_main, $feature_photo2_main, $feature_photo3_main, $registration_scope, $trainer_contact_email);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
@@ -384,9 +385,15 @@ if (!empty($community_id)) {
     </div>
 
     <div class="form-item">
-        <label for="feature_photo2_main">Set a secondary training photo</label><br>
+        <label for="feature_photo2_main">Set a second training feature photo</label><br>
         <input type="file" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style">
         <p class="form-caption">This image will be visible in the training registration page.</p>
+    </div>
+
+    <div class="form-item">
+        <label for="feature_photo3_main">Set a third training feature photo</label><br>
+        <input type="file" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style">
+        <p class="form-caption">This image will also be visible in the training registration page.</p>
     </div>
 
     <div class="form-item">
@@ -406,15 +413,18 @@ if (!empty($community_id)) {
     </div>
 
     <!-- Ready to Show -->
-    <div class="form-item">
-
-        <label class="toggle-switch">
-            <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
-                   <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
-            <span class="slider"></span>
-        </label>
-        <label class="toggle-description" for="ready_to_show" data-lang-id="024-title-show">Launch this training</label><br>
-        <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
+    <div class="form-row ready-field">
+        <div class="toggle-info">
+            <label class="toggle-description" for="ready_to_show" data-lang-id="024-title-show">Launch this training</label>
+            <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
+        </div>
+        <div class="toggle-slider">
+            <label class="toggle-switch">
+                <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
+                       <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+                <span class="slider"></span>
+            </label>
+        </div>
     </div>
 <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
@@ -870,6 +880,7 @@ Schedule
 
     setFileInputFromUrl('feature_photo1_main', 'https://gobrik.com/webps/starter-workshop-feature-1-en.webp');
     setFileInputFromUrl('feature_photo2_main', 'https://gobrik.com/webps/starter-workshop-feature-2-en.webp');
+    setFileInputFromUrl('feature_photo3_main', 'https://gobrik.com/webps/starter-workshop-feature-3-en.webp');
 }
 
 document.getElementById('starterPresetBtn')?.addEventListener('click', presetForStarterWorkshop);
