@@ -414,8 +414,8 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 1 ======================= -->
     <div class="form-item">
         <label for="feature_photo1_main">Set Feature Photo</label><br>
-        <div id="feature_photo1_preview" style="background:#ccc;max-width:350px;max-height:200px;margin-bottom:5px;display:none;">
-            <img id="feature_photo1_preview_img" src="" style="max-width:350px;max-height:200px;" alt="Feature Photo 1 Preview">
+        <div id="feature_photo1_preview" style="background:#ccc;width:350px;height:200px;margin-bottom:5px;display:none;">
+            <img id="feature_photo1_preview_img" src="" style="max-width:100%;max-height:100%;object-fit:contain;" alt="Feature Photo 1 Preview">
         </div>
         <input type="url" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo1_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
@@ -426,8 +426,8 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 2 ======================= -->
     <div class="form-item">
         <label for="feature_photo2_main">Set a Second Training Feature Photo</label><br>
-        <div id="feature_photo2_preview" style="background:#ccc;max-width:350px;max-height:200px;margin-bottom:5px;display:none;">
-            <img id="feature_photo2_preview_img" src="" style="max-width:350px;max-height:200px;" alt="Feature Photo 2 Preview">
+        <div id="feature_photo2_preview" style="background:#ccc;width:350px;height:200px;margin-bottom:5px;display:none;">
+            <img id="feature_photo2_preview_img" src="" style="max-width:100%;max-height:100%;object-fit:contain;" alt="Feature Photo 2 Preview">
         </div>
         <input type="url" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo2_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
@@ -438,8 +438,8 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 3 ======================= -->
     <div class="form-item">
         <label for="feature_photo3_main">Set a Third Training Feature Photo</label><br>
-        <div id="feature_photo3_preview" style="background:#ccc;max-width:350px;max-height:200px;margin-bottom:5px;display:none;">
-            <img id="feature_photo3_preview_img" src="" style="max-width:350px;max-height:200px;" alt="Feature Photo 3 Preview">
+        <div id="feature_photo3_preview" style="background:#ccc;width:350px;height:200px;margin-bottom:5px;display:none;">
+            <img id="feature_photo3_preview_img" src="" style="max-width:100%;max-height:100%;object-fit:contain;" alt="Feature Photo 3 Preview">
         </div>
         <input type="url" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo3_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
@@ -861,6 +861,9 @@ function setFileInputFromUrl(inputId, url) {
     const input = document.getElementById(inputId);
     if (input) {
         input.value = url;
+        const imgId = inputId + '_preview_img';
+        const containerId = inputId + '_preview';
+        updateImagePreview(inputId, imgId, containerId);
     }
 }
 
