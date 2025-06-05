@@ -162,25 +162,20 @@ if (!empty($community_id)) {
 
     <div id="form-submission-box">
         <div class="form-container">
-            <div class="form-top-header" style="display:flex;flex-flow:row;">
-                <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
-                    <img src="../svgs/step1-log-project.svg" style="height:25px;">
-                </div>
-                <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages">🌐<span data-lang-id="000-language-code"> EN</span></div>
-            </div>
 
             <div class="splash-form-content-block">
                 <div class="splash-box">
                     <div class="splash-heading" data-lang-id="001-splash-title-post">Launch a GEA Training</div>
+                    <div class="lead-page-paragraph">
+                                    <p data-lang-id="004-form-description-post">Use this form to launch a training, workshop or community event on GoBrik.</p>
+                                </div>
                 </div>
                 <div class="splash-image" data-lang-id="003-splash-image-alt">
                     <img src="../svgs/shanti.svg" style="width:65%" alt="GEA trainer in action: File a GEA training report">
                 </div>
             </div>
 
-            <div class="lead-page-paragraph">
-                <p data-lang-id="004-form-description-post">Use this form to launch a training, workshop or community event on GoBrik.</p>
-            </div>
+
 
 
  <!-- PART 6 THE FORM -->
@@ -418,11 +413,8 @@ if (!empty($community_id)) {
 <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
 
-<!--     <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
-<!--     <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
-
 <div>
-    <input type="submit" value="Save Training" data-lang-id="100-submit-report-1">
+    <input type="submit" value="💾 Save Training" data-lang-id="100-submit-report-1">
 </div>
 
 
@@ -433,13 +425,6 @@ if (!empty($community_id)) {
     </div>
 
 
-<!--                <div class="form-item">-->
-<!--                    <label for="connected_ecobricks">The serials of ecobricks used in your project:</label><br>-->
-<!--                    <input type="text" id="connected_ecobricks" name="connected_ecobricks" aria-label="Connected Ecobricks" placeholder="Enter serials...">-->
-<!--                    <div id="serial-select"><ul id="autocomplete-results" ></ul></div>-->
-<!--                    <p class="form-caption">Optional: Enter the serial numbers of ecobricks connected to this project. Separate multiple serial numbers with commas.</p>-->
-<!--                </div>-->
-
 
 
 
@@ -448,11 +433,7 @@ if (!empty($community_id)) {
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
-<!--
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
--->
+
 
 <script>
 var preselectedTrainers = <?php echo json_encode($selected_trainers_data); ?>;
@@ -696,71 +677,6 @@ document.getElementById('submit-form').addEventListener('submit', function(event
 
 
 
-
-
-        // Autocomplete serials of ecobricks entered in form
-        $(document).ready(function() {
-            var $serialInput = $('#connected_ecobricks');
-            var $autocompleteResults = $('#autocomplete-results'); // Ensure this UL exists in your HTML
-            var $serialSelect = $('#serial-select'); // Div that contains the autocomplete results
-
-            function performSearch(inputVal) {
-                if (inputVal.length >= 4) { // Ensure there are at least 4 characters to start search
-                    $.ajax({
-                        url: '../get-serials.php',
-                        type: 'GET',
-                        data: { search: inputVal },
-                        success: function(data) {
-                            $autocompleteResults.empty();
-                            if (data.length) {
-                                data.forEach(function(item) {
-                                    $autocompleteResults.append($('<li>').text(item.serial_no));
-                                });
-                                $serialSelect.show(); // Show the suggestions box if there are results
-                            } else {
-                                $autocompleteResults.append($('<li>').text("No results found"));
-                                $serialSelect.hide(); // Hide if no results
-                            }
-                        }
-                    });
-                } else {
-                    $autocompleteResults.empty();
-                    $serialSelect.hide(); // Hide suggestions if less than 4 characters
-                }
-            }
-
-            $serialInput.on('input', function() {
-                var currentValue = $(this).val();
-                var lastTerm = currentValue.split(',').pop().trim(); // Get the last term after a comma
-                performSearch(lastTerm);
-            });
-
-            $autocompleteResults.on('click', 'li', function() {
-                var selectedSerial = $(this).text();
-                var currentInput = $serialInput.val();
-                var lastCommaIndex = currentInput.lastIndexOf(',');
-
-                if (lastCommaIndex === -1) {
-                    // This is the first serial number entry
-                    $serialInput.val(selectedSerial + ', ');
-                } else {
-                    // Replace the last term after the last comma with the selected serial number
-                    var base = currentInput.substring(0, lastCommaIndex + 1);
-                    $serialInput.val(base + ' ' + selectedSerial + ', ');
-                }
-
-                $autocompleteResults.empty();
-                $serialInput.focus(); // Set focus back to input for further entries
-                $serialSelect.hide(); // Hide the autocomplete suggestions box after selection
-            });
-
-            // Optionally hide the autocomplete box when the input loses focus
-            $serialInput.blur(function() {
-                setTimeout(function() { // Timeout to allow click event on suggestions to occur
-                    $serialSelect.hide();
-                }, 200);
-            });
-        });
 
 
 function showTrainingSavedModal(trainingId) {
