@@ -1,0 +1,43 @@
+/*-----------------------------------
+
+English SNIPPETS FOR launch-training page on GoBrik
+
+-----------------------------------*/
+const en_Page_Translations = {
+    "000-language-code": "EN",
+    "000-field-required-error":"This field is required.",
+    "001-splash-title-post": "Launch a GEA Training",
+    "003-splash-image-alt":'<img src="../svgs/shanti.svg" style="width:65%" alt="GEA trainer in action: File a GEA training report">',
+    "004-form-description-post": "Use this form to launch a training, workshop or community event on GoBrik.",
+    "005-title-title":"Training Title:",
+    "005-training-give-title": "Give your training a title.  This will be how your report is featured.",
+    "006-title-date":"Training Date:",
+    "006-training-date":"On what date and time will this training run?",
+    "007-title-participants": "Number of Participants:",
+    "007-training-count": "How many people are expected to participate (including trainers)?",
+    "008-lead-trainer": "Lead Trainer:",
+    "008-training-trainers": "Who will lead the training? You can write multiple names here if you want. i.e. Lucie Mann and Ani Himawati",
+    "009-title-community": "Trained Community:",
+    "008-community-trained": "What community is this training for? Start typing to see and select a GoBrik community. <a href=\"#\" onclick=\"openAddCommunityModal(); return false;\" style=\"color: #007BFF; text-decoration: underline;\">Don't see your community? Add it.</a>",
+    "010-title-type": "What type of training is this?",
+    "010-training-type": "Please categorize this training.",
+    "011-title-how-many": "How many ecobricks will be made?",
+    "011-how-many-briks": "No ecobricks planned? Just set at \"0\" then.",
+    "012-title-average": "Average Brik Weight (grams):",
+    "012-training-average": "No ecobricks planned? Just set at \"0\" then.",
+    "013-title-country": "Country:",
+    "013-training-country": "Where will this training run? If it is an online training, select the country of the lead trainer.",
+    "014-feature-description": "Featured Description:",
+    "014-training-description": "This text is shown on the registration page to describe the training. Basic HTML formatting allowed.",
+    "015-training-title-agenda": "Training Agenda:",
+    "015-training-agenda": "Optional: Please layout the agenda that your training will follow. Max 1000 words. Basic HTML formatting allowed.",
+    "021-title-location": "Training Location:",
+    "020-location-caption": "Please provide the general location where the training will be conducted.",
+    "022-title-moodle": "Moodle Course URL:",
+    "022-moodle-caption": "Was there a Moodle course created for this training on learning.ecobricks.org? If so, include the URL here.",
+    "023-title-youtube": "YouTube Video URL:",
+    "023-training-youtube": "Is there a YouTube video for this training? If so, include the URL here please.",
+    "024-title-show": "🚀 Publish this training publicly?",
+    "022-training-show": "Is this training ready to be displayed on ecobricks.org?  If so, we'll post the listing once submitted. Don't worry you can always come back here to edit!",
+    "100-submit-report-1": "Next: Upload Photos ➡️"
+};
