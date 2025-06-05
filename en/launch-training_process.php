@@ -21,7 +21,6 @@ $training_id = isset($_POST['training_id']) ? intval($_POST['training_id']) : 0;
 $editing = ($training_id > 0);
 
 $training_title = trim($_POST['training_title'] ?? '');
-$lead_trainer = trim($_POST['lead_trainer'] ?? '');
 $training_date = trim($_POST['training_date'] ?? '');
 if (!empty($training_date)) {
     if (strlen($training_date) == 10) {
@@ -50,6 +49,41 @@ $avg_brik_weight = filter_var($_POST['avg_brik_weight'], FILTER_VALIDATE_INT) ??
 $country_id = filter_var($_POST['country_id'], FILTER_VALIDATE_INT) ?? null;
 $community_id = filter_var($_POST['community_id'], FILTER_VALIDATE_INT) ?? null;
 $trainers = isset($_POST['trainers']) && is_array($_POST['trainers']) ? array_map('intval', $_POST['trainers']) : [];
+
+function buildLeadTrainerString($conn, $trainerIds, $language) {
+    if (empty($trainerIds)) return '';
+
+    $names = [];
+    $stmt = $conn->prepare("SELECT full_name FROM tb_ecobrickers WHERE ecobricker_id = ?");
+    foreach ($trainerIds as $id) {
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->bind_result($name);
+        if ($stmt->fetch()) {
+            $names[] = $name;
+        }
+        $stmt->reset();
+    }
+    $stmt->close();
+
+    $andWord = 'and';
+    if ($language === 'fr') {
+        $andWord = 'et';
+    } elseif ($language === 'es') {
+        $andWord = 'y';
+    } elseif ($language === 'id') {
+        $andWord = 'dan';
+    }
+
+    $count = count($names);
+    if ($count === 1) return $names[0];
+    if ($count === 2) return $names[0] . ' ' . $andWord . ' ' . $names[1];
+
+    $last = array_pop($names);
+    return implode(', ', $names) . ' ' . $andWord . ' ' . $last;
+}
+
+$lead_trainer = buildLeadTrainerString($gobrik_conn, $trainers, $training_language);
 
 if ($community_id !== null) {
     $stmt = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE community_id = ?");

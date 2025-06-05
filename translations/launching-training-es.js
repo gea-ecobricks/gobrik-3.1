@@ -15,7 +15,7 @@ const es_Page_Translations = {
     "005b-trainers-caption": "Selecciona uno o más formadores de la lista.",
     "006-title-date": "Fecha de la capacitación:",
     "006-training-date": "¿En qué fecha y hora será esta capacitación?",
-    "007-title-participants": "Número de participantes:",
+    "007-title-participants": "¿Cuál es la cantidad máxima de participantes para esta capacitación?",
     "007-training-count": "¿Cuántas personas participarán (incluidos los formadores)?",
     "008-lead-trainer": "Formador principal:",
     "008-training-trainers": "¿Quién dirigirá la capacitación? Puedes escribir varios nombres aquí si es necesario, por ejemplo, Lucie Mann y Ani Himawati.",

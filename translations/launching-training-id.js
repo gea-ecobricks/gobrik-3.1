@@ -15,7 +15,7 @@ const id_Page_Translations = {
     "005b-trainers-caption": "Pilih satu atau lebih pelatih dari daftar.",
     "006-title-date": "Tanggal Pelatihan:",
     "006-training-date": "Pada tanggal dan waktu berapa pelatihan ini berlangsung?",
-    "007-title-participants": "Jumlah Peserta:",
+    "007-title-participants": "Berapa jumlah maksimum peserta untuk pelatihan ini?",
     "007-training-count": "Berapa banyak orang yang akan berpartisipasi (termasuk pelatih)?",
     "008-lead-trainer": "Pelatih Utama:",
     "008-training-trainers": "Siapa yang memimpin pelatihan? Anda dapat menuliskan beberapa nama di sini jika diperlukan, misalnya, Lucie Mann dan Ani Himawati.",
