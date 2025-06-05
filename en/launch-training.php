@@ -170,6 +170,9 @@ if (!empty($community_id)) {
                     <div class="lead-page-paragraph">
                                     <p data-lang-id="004-form-description-post">Use this form to launch a training, workshop or community event on GoBrik.</p>
                                 </div>
+                            <div style="text-align:right; margin:10px 0;">
+                                <button type="button" id="starterPresetBtn">Starter Workshop Presets</button>
+                            </div>
                 </div>
                 <div class="splash-image" data-lang-id="003-splash-image-alt">
                     <img src="../svgs/shanti.svg" style="width:65%" alt="GEA trainer in action: File a GEA training report">
@@ -179,9 +182,7 @@ if (!empty($community_id)) {
 
 
 
-<div style="text-align:right; margin:10px 0;">
-    <button type="button" id="starterPresetBtn" class="confirm-button">Start Workshop Presets</button>
-</div>
+
  <!-- PART 6 THE FORM -->
 <form id="submit-form" method="post" action="launch-training_process.php" enctype="multipart/form-data" novalidate>
 
