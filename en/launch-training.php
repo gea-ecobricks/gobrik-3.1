@@ -41,7 +41,7 @@ $first_name = getFirstName($buwana_conn, $buwana_id);
 
 // Fetch all languages
 $languages = [];
-$sql_languages = "SELECT language_id, languages_native_name FROM languages_tb ORDER BY languages_native_name ASC";
+$sql_languages = "SELECT language_id, language_name_en, languages_native_name FROM languages_tb ORDER BY language_name_en ASC";
 $result_languages = $buwana_conn->query($sql_languages);
 
 if ($result_languages && $result_languages->num_rows > 0) {
@@ -57,11 +57,12 @@ require_once '../gobrikconn_env.php';
 // ✅ Get training_id from URL (for editing)
 $training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
 $editing = ($training_id > 0);
+$training_language = 'en';
 
 // ✅ If editi   ng, fetch existing training details
 if ($editing) {
     $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
-                  training_type, briks_made, avg_brik_weight, location_lat, location_long, training_location,
+                  training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, featured_description, community_id
                   FROM tb_trainings WHERE training_id = ?";
@@ -70,7 +71,7 @@ if ($editing) {
     $stmt_fetch->bind_param("i", $training_id);
     $stmt_fetch->execute();
     $stmt_fetch->bind_result($training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-                            $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
+                            $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id);
     $stmt_fetch->fetch();
@@ -215,6 +216,19 @@ if (!empty($community_id)) {
     <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is .</div>
 
 </div>
+
+    <div class="form-item">
+        <label for="training_language" data-lang-id="006b-title-language">What language will this training be in?</label><br>
+        <select id="training_language" name="training_language" class="form-field-style">
+            <?php foreach ($languages as $language): ?>
+                <option value="<?php echo htmlspecialchars($language['language_id'], ENT_QUOTES, 'UTF-8'); ?>"
+                    <?php echo ($training_language === $language['language_id']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($language['language_name_en'], ENT_QUOTES, 'UTF-8'); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="form-caption" data-lang-id="006b-language-caption">What language will this training be in?</p>
+    </div>
 
     <div class="form-item">
         <label for="no_participants" data-lang-id="007-title-participants">Number of Participants:</label><br>
