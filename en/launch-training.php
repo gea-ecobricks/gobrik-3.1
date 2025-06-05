@@ -171,7 +171,7 @@ if (!empty($community_id)) {
                                     <p data-lang-id="004-form-description-post">Use this form to launch a training, workshop or community event on GoBrik.</p>
                                 </div>
                             <div style="text-align:right; margin:10px 0;">
-                                <button type="button" id="starterPresetBtn">Starter Workshop Presets</button>
+                                <button type="button" id="starterPresetBtn" style="padding:7px">Starter Workshop Presets</button>
                             </div>
                 </div>
                 <div class="splash-image" data-lang-id="003-splash-image-alt">
@@ -408,6 +408,9 @@ if (!empty($community_id)) {
 
    <br><hr><br>
 
+   <h4>Training Feature Images</h4>
+   <p>These images will be added to your course listing.  These images are separate from the photos you will upload later for your final training report.</p>
+
     <!-- ======================= Feature Photo 1 ======================= -->
     <div class="form-item">
         <label for="feature_photo1_main">Set Feature Photo</label><br>
@@ -447,16 +450,22 @@ if (!empty($community_id)) {
 
 
     <!-- ======================= Ready to Show Toggle ======================= -->
-    <div class="form-row">
-        <label class="toggle-description" for="ready_to_show" data-lang-id="024-title-show">Launch this training</label>
-        <label class="toggle-switch">
+    <div class="form-row" style="display:flex;flex-flow:row;width:100%">
+        <div id="left-colum">
+            <h4>Launch Training</h4>
+            <p class="form-caption" data-lang-id="022-training-show">
+                        Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don’t worry — you can always come back to edit the listing!
+            </p>
+        </div>
+
+        <div id="right-column" style="width:60px; justify-content:center;">
+            <label class="toggle-switch">
             <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
                    <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
             <span class="slider"></span>
+        </div>
         </label>
-        <p class="form-caption" data-lang-id="022-training-show">
-            Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don’t worry — you can always come back to edit the listing!
-        </p>
+
     </div>
 
     <!-- Hidden Training ID -->
