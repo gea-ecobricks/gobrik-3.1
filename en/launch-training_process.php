@@ -42,6 +42,10 @@ $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
 $training_location = trim($_POST['training_location'] ?? '');
 $training_type = trim($_POST['training_type'] ?? '');
 $training_language = trim($_POST['training_language'] ?? 'en');
+$zoom_link = trim($_POST['zoom_link'] ?? '');
+$zoom_link_full = trim($_POST['zoom_link_full'] ?? '');
+$registration_scope = trim($_POST['registration_scope'] ?? '');
+$trainer_contact_email = trim($_POST['trainer_contact_email'] ?? '');
 
 $no_participants = filter_var($_POST['no_participants'], FILTER_VALIDATE_INT) ?? 0;
 $briks_made = filter_var($_POST['briks_made'], FILTER_VALIDATE_INT) ?? 0;
@@ -101,15 +105,17 @@ if ($editing) {
             no_participants=?, training_type=?, training_language=?, briks_made=?, avg_brik_weight=?,
             location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?,
             training_success=?, training_challenges=?, training_lessons_learned=?,
-            youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
+            youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?,
+            zoom_link=?, zoom_link_full=?, registration_scope=?, trainer_contact_email=?
             WHERE training_id=?";
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisissiiddssssssssisii",
+    $stmt->bind_param("ssisissiiddssssssssisissssi",
         $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
-        $featured_description, $community_id, $training_id
+        $featured_description, $community_id, $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email,
+        $training_id
     );
     if ($stmt->execute()) {
         $new_training_id = $training_id;
@@ -118,19 +124,51 @@ if ($editing) {
         exit();
     }
     $stmt->close();
+
+    $upload_dir = '../trainings/photos/';
+    $thumbnail_dir = '../trainings/tmbs/';
+    $fields = [];
+    $values = [];
+    $types = '';
+    for ($i = 1; $i <= 2; $i++) {
+        $name = "feature_photo{$i}_main";
+        if (isset($_FILES[$name]) && $_FILES[$name]['error'] == UPLOAD_ERR_OK) {
+            $file = "training-{$new_training_id}-feature{$i}.webp";
+            $target = $upload_dir . $file;
+            if (resizeAndConvertToWebP($_FILES[$name]['tmp_name'], $target, 1000, 88)) {
+                createTrainingThumbnail($target, $thumbnail_dir . $file, 250, 250, 77);
+                $fields[] = "$name=?";
+                $fields[] = str_replace('_main','_tmb',$name) . "=?";
+                $values[] = $target;
+                $values[] = $thumbnail_dir . $file;
+                $types .= 'ss';
+            }
+        }
+    }
+    if (!empty($fields)) {
+        $fields_sql = implode(',', $fields);
+        $values[] = $new_training_id;
+        $types .= 'i';
+        $up = $gobrik_conn->prepare("UPDATE tb_trainings SET $fields_sql WHERE training_id=?");
+        $up->bind_param($types, ...$values);
+        $up->execute();
+        $up->close();
+    }
 } else {
     $sql = "INSERT INTO tb_trainings
             (training_title, lead_trainer, country_id, training_date, no_participants,
             training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long,
             training_location, training_summary, training_agenda, training_success, training_challenges,
-            training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
+            zoom_link, zoom_link_full, registration_scope, trainer_contact_email)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisissiiddssssssssisi",
+    $stmt->bind_param("ssisissiiddssssssssisissss",
         $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
+        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
+        $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email
     );
     if ($stmt->execute()) {
         $new_training_id = $gobrik_conn->insert_id;
@@ -139,6 +177,36 @@ if ($editing) {
         exit();
     }
     $stmt->close();
+
+    $upload_dir = '../trainings/photos/';
+    $thumbnail_dir = '../trainings/tmbs/';
+    $fields = [];
+    $values = [];
+    $types = '';
+    for ($i = 1; $i <= 2; $i++) {
+        $name = "feature_photo{$i}_main";
+        if (isset($_FILES[$name]) && $_FILES[$name]['error'] == UPLOAD_ERR_OK) {
+            $file = "training-{$new_training_id}-feature{$i}.webp";
+            $target = $upload_dir . $file;
+            if (resizeAndConvertToWebP($_FILES[$name]['tmp_name'], $target, 1000, 88)) {
+                createTrainingThumbnail($target, $thumbnail_dir . $file, 250, 250, 77);
+                $fields[] = "$name=?";
+                $fields[] = str_replace('_main','_tmb',$name) . "=?";
+                $values[] = $target;
+                $values[] = $thumbnail_dir . $file;
+                $types .= 'ss';
+            }
+        }
+    }
+    if (!empty($fields)) {
+        $fields_sql = implode(',', $fields);
+        $values[] = $new_training_id;
+        $types .= 'i';
+        $up = $gobrik_conn->prepare("UPDATE tb_trainings SET $fields_sql WHERE training_id=?");
+        $up->bind_param($types, ...$values);
+        $up->execute();
+        $up->close();
+    }
 }
 
 // ✅ Update trainers association

@@ -58,13 +58,20 @@ require_once '../gobrikconn_env.php';
 $training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
 $editing = ($training_id > 0);
 $training_language = 'en';
+$zoom_link = '';
+$zoom_link_full = '';
+$feature_photo1_main = '';
+$feature_photo2_main = '';
+$registration_scope = '';
+$trainer_contact_email = '';
 
 // ✅ If editi   ng, fetch existing training details
 if ($editing) {
     $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
                   training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
-                  youtube_result_video, moodle_url, ready_to_show, featured_description, community_id
+                  youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
+                  zoom_link, zoom_link_full, feature_photo1_main, feature_photo2_main, registration_scope, trainer_contact_email
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -73,7 +80,8 @@ if ($editing) {
     $stmt_fetch->bind_result($training_title, $lead_trainer, $country_id, $training_date, $no_participants,
                             $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
-                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id);
+                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
+                            $zoom_link, $zoom_link_full, $feature_photo1_main, $feature_photo2_main, $registration_scope, $trainer_contact_email);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
@@ -244,7 +252,7 @@ if (!empty($community_id)) {
 
 
 <div class="form-item">
-    <label for="community_search" data-lang-id="009-title-community">Trained Community:</label><br>
+    <label for="community_search" data-lang-id="009-title-community">What community is this training targeting?</label><br>
     <input type="text" id="community_search" name="community_search"
            placeholder="Start typing..." autocomplete="off"
            value="<?php echo htmlspecialchars($community_name ?? '', ENT_QUOTES, 'UTF-8'); ?>">
@@ -254,14 +262,7 @@ if (!empty($community_id)) {
 
     <div id="community_results" class="autocomplete-results"></div>
 
-    <!-- "Add a new community" text link
-    <p class="form-caption" data-lang-id="008-community-trained">
-        What community was this training for?  Start typing to see and select a GoBrik community.
-         <a href="#" onclick="openAddCommunityModal(); return false;"
-             style="color: #007BFF; text-decoration: underline;">
-              Don't see your community? Add it.
-          </a>
-    </p>-->
+    <p class="form-caption">For general course select the Global Ecobrick Movement community.</p>
 
 <div id="community-error-required" class="form-field-error" data-lang-id="000-field-too-long-error">A community must be selected</div>
                 </div>
@@ -269,7 +270,7 @@ if (!empty($community_id)) {
 
 
     <div class="form-item">
-    <label for="training_type" data-lang-id="010-title-type">What type of training was this?</label><br>
+    <label for="training_type" data-lang-id="010-title-type">What type of training will this be?</label><br>
     <select id="training_type" name="training_type"  class="form-field-style">
         <option value="" disabled selected>Select training type...</option>
 
@@ -290,7 +291,7 @@ if (!empty($community_id)) {
   <input type="hidden" id="avg_brik_weight" name="avg_brik_weight" value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
 
 <div class="form-item">
-    <label for="country_id" data-lang-id="013-title-country">Country:</label><br>
+    <label for="country_id" data-lang-id="013-title-country">What country is this course targeting?</label><br>
     <select id="country_id" name="country_id"  class="form-field-style">
         <!-- ✅ Ensures placeholder is selected when no country is set -->
         <option value="" disabled <?php echo empty($country_id) ? 'selected' : ''; ?>>
@@ -306,7 +307,7 @@ if (!empty($community_id)) {
     </select>
 
     <p class="form-caption" data-lang-id="013-training-country">
-        Where was this training run? If it was an online training, select the country of the lead trainer.
+        For global course, leave blank or select "Earth"
     </p>
 <!--ERRORS-->
                     <div id="country-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
@@ -366,6 +367,46 @@ if (!empty($community_id)) {
 
     <input type="hidden" id="youtube_result_video" name="youtube_result_video" value="<?php echo htmlspecialchars($youtube_result_video ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
+    <div class="form-item">
+        <label for="zoom_link">Zoom Link:</label><br>
+        <input type="url" id="zoom_link" name="zoom_link" class="form-field-style" value="<?php echo htmlspecialchars($zoom_link ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <p class="form-caption">Set the Zoom link if this is an online course with just the URL for the event.</p>
+    </div>
+
+    <div class="form-item">
+        <label for="zoom_link_full">Zoom Link full:</label><br>
+        <textarea id="zoom_link_full" name="zoom_link_full" class="form-field-style"><?php echo htmlspecialchars($zoom_link_full ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <p class="form-caption">Paste the full Zoom link with as much accompagning text as you think appropriate.</p>
+    </div>
+
+    <div class="form-item">
+        <label for="feature_photo1_main">Set feature photo</label><br>
+        <input type="file" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style">
+        <p class="form-caption">This is the image that will be use to list your photo on GoBrik.</p>
+    </div>
+
+    <div class="form-item">
+        <label for="feature_photo2_main">Set a secondary training photo</label><br>
+        <input type="file" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style">
+        <p class="form-caption">This image will be visible in the training registration page.</p>
+    </div>
+
+    <div class="form-item">
+        <label for="registration_scope">Registration scope</label><br>
+        <select id="registration_scope" name="registration_scope" class="form-field-style">
+            <option value="trainers" <?php echo (isset($registration_scope) && $registration_scope=='trainers') ? 'selected' : ''; ?>>Trainers only</option>
+            <option value="ecobrickers" <?php echo (isset($registration_scope) && $registration_scope=='ecobrickers') ? 'selected' : ''; ?>>Ecobrickers (All GoBrikers)</option>
+            <option value="anyone" <?php echo (isset($registration_scope) && $registration_scope=='anyone') ? 'selected' : ''; ?>>Anyone (all Earthen subscribers)</option>
+        </select>
+        <p class="form-caption">select the target audience for your course.</p>
+    </div>
+
+    <div class="form-item">
+        <label for="trainer_contact_email">Trainer contact email</label><br>
+        <input type="email" id="trainer_contact_email" name="trainer_contact_email" class="form-field-style" value="<?php echo htmlspecialchars($trainer_contact_email ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <p class="form-caption">Set the contact email for this course that folks can reply to.</p>
+    </div>
+
     <!-- Ready to Show -->
     <div class="form-item">
 
@@ -381,7 +422,7 @@ if (!empty($community_id)) {
 <!--     <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
 
 <div>
-    <input type="submit" value="Next: Upload Photos ➡️" data-lang-id="100-submit-report-1">
+    <input type="submit" value="Save Training" data-lang-id="100-submit-report-1">
 </div>
 
 
@@ -636,7 +677,9 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     .then(data => {
         if (data.success) {
             var newTrainingId = data.training_id || trainingId; // Use returned ID or existing one
-            window.location.href = "add-training-images.php?training_id=" + newTrainingId;
+            showTrainingSavedModal(newTrainingId);
+            submitButton.value = originalButtonText;
+            submitButton.disabled = false;
         } else {
             alert("Error: " + (data.error || "An unknown error occurred."));
             submitButton.value = originalButtonText;
@@ -720,6 +763,25 @@ document.getElementById('submit-form').addEventListener('submit', function(event
         });
 
 
+function showTrainingSavedModal(trainingId) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    modalBox.innerHTML = `
+        <h1>Training saved!</h1>
+        <p>You can view the course listing or keeping editing the page</p>
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;">
+            <a href="launch-training.php?training_id=${trainingId}" class="confirm-button enabled" style="margin:10px;">Keep Editing</a>
+            <a href="register.php?training_id=${trainingId}" class="confirm-button enabled" style="margin:10px;">View Listing</a>
+        </div>
+    `;
+}
 
 
 
