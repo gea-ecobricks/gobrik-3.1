@@ -112,6 +112,14 @@ if ($editing) {
     $stmt_tr->close();
 }
 
+// Build array with selected trainer details for pre-population
+$selected_trainers_data = [];
+foreach ($trainers_list as $trainer) {
+    if (in_array($trainer['ecobricker_id'], $selected_trainers)) {
+        $selected_trainers_data[] = $trainer;
+    }
+}
+
 // ✅ Fetch Community Name if Exists
 $community_name = '';
 if (!empty($community_id)) {
@@ -216,16 +224,20 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         </div>
 
     <div class="form-item">
-        <label for="trainers" data-lang-id="005b-title-trainers">Who are the trainers leading this training?</label><br>
-        <select id="trainers" name="trainers[]" multiple class="form-field-style">
-            <?php foreach ($trainers_list as $trainer): ?>
-                <option value="<?php echo $trainer['ecobricker_id']; ?>" <?php echo in_array($trainer['ecobricker_id'], $selected_trainers ?? []) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($trainer['full_name'], ENT_QUOTES, 'UTF-8'); ?>
-                </option>
+        <label for="trainer_search" data-lang-id="005b-title-trainers">Who are the trainers leading this training?</label><br>
+        <input type="text" id="trainer_search" placeholder="Type to search..." autocomplete="off" class="form-field-style">
+        <div id="trainer_results" class="autocomplete-results"></div>
+        <div id="selected_trainers" class="trainer-tag-container">
+            <?php foreach ($selected_trainers_data as $trainer): ?>
+                <div class="trainer-tag-box" data-id="<?php echo $trainer['ecobricker_id']; ?>">
+                    <span class="remove-trainer">&times;</span>
+                    <span><?php echo htmlspecialchars($trainer['full_name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <input type="hidden" name="trainers[]" value="<?php echo $trainer['ecobricker_id']; ?>" id="trainer-hidden-<?php echo $trainer['ecobricker_id']; ?>">
+                </div>
             <?php endforeach; ?>
-        </select>
-        <p class="form-caption" data-lang-id="005b-trainers-caption">Select the trainers leading this training.</p>
         </div>
+        <p class="form-caption" data-lang-id="005b-trainers-caption">Select the trainers leading this training.</p>
+    </div>
 
 
     <div class="form-item">
@@ -302,24 +314,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                 </div>
 
 
-  <div class="form-item">
-    <label for="briks_made" data-lang-id="011-title-how-many">How many ecobricks were made?</label><br>
-    <input type="number" id="briks_made" name="briks_made" min="0" max="5000" 
-        value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
-    <p class="form-caption" data-lang-id="011-how-many-briks">No ecobricks made in this training? Just set at "0" then.</p>
-    <!--ERRORS-->
-                    <div id="briks-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                    <div id="briks-error-range" class="form-field-error" data-lang-id="000-field-brik-number-error">Just a number (between 1 and 5000).</div>
-                </div>
-
-<div class="form-item">
-    <label for="avg_brik_weight" data-lang-id="012-title-average">Average Brik Weight (grams):</label><br>
-    <input type="number" id="avg_brik_weight" name="avg_brik_weight" min="0" max="2000" 
-        value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
-        <p class="form-caption" data-lang-id="012-training-average">No ecobricks made in this training? Just set at "0" then.</p>
-         <!--ERRORS-->
-                    <div id="weight-error-range" class="form-field-error" data-lang-id="000-field-weight-number-error">Your estimated average brick weight (in grams) must be a number between 100 and 2000.</div>
-                </div>
+  <input type="hidden" id="briks_made" name="briks_made" value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
+  <input type="hidden" id="avg_brik_weight" name="avg_brik_weight" value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
 
 <div class="form-item">
     <label for="country_id" data-lang-id="013-title-country">Country:</label><br>
@@ -396,16 +392,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     </div>
 
-    <!-- YouTube Result Video -->
-    <div class="form-item">
-        <label for="youtube_result_video" data-lang-id="023-title-youtube">YouTube Video URL:</label><br>
-        <input type="url" id="youtube_result_video" name="youtube_result_video"
-               value="<?php echo htmlspecialchars($youtube_result_video ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-               placeholder="Enter YouTube Video URL" class="form-field-style">
-         <p class="form-caption" data-lang-id="023-training-youtube">
-        Was a Youtube video of this training posted?  If so include the URL here pleas.
-    </p>
-    </div>
+    <input type="hidden" id="youtube_result_video" name="youtube_result_video" value="<?php echo htmlspecialchars($youtube_result_video ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
     <!-- Ready to Show -->
     <div class="form-item">
@@ -455,7 +442,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 -->
 
 <script>
-
+var preselectedTrainers = <?php echo json_encode($selected_trainers_data); ?>;
 
 document.addEventListener("DOMContentLoaded", function() {
     const communityInput = document.getElementById("community_search");
@@ -503,6 +490,82 @@ document.addEventListener("DOMContentLoaded", function() {
             resultsDiv.innerHTML = "";
         }
     });
+
+    // Trainer search autocomplete
+    const trainerInput = document.getElementById("trainer_search");
+    const trainerResults = document.getElementById("trainer_results");
+    const trainerContainer = document.getElementById("selected_trainers");
+
+    function fetchTrainers(query) {
+        if (query.length >= 3) {
+            fetch(`../api/search_trainers.php?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    trainerResults.innerHTML = "";
+                    if (data.length === 0) {
+                        trainerResults.innerHTML = "<div class='autocomplete-item' style='color: gray;'>No results found</div>";
+                    } else {
+                        data.forEach(trainer => {
+                            let div = document.createElement("div");
+                            div.textContent = trainer.full_name;
+                            div.dataset.id = trainer.ecobricker_id;
+                            div.classList.add("autocomplete-item");
+                            div.addEventListener("mousedown", function(event) {
+                                event.preventDefault();
+                                addTrainer(trainer.ecobricker_id, trainer.full_name);
+                                trainerInput.value = "";
+                                trainerResults.innerHTML = "";
+                            });
+                            trainerResults.appendChild(div);
+                        });
+                    }
+                });
+        } else {
+            trainerResults.innerHTML = "";
+        }
+    }
+
+    function addTrainer(id, name) {
+        if (document.getElementById('trainer-hidden-' + id)) return;
+        let box = document.createElement('div');
+        box.className = 'trainer-tag-box';
+        box.dataset.id = id;
+
+        let remove = document.createElement('span');
+        remove.className = 'remove-trainer';
+        remove.textContent = '\u00D7';
+        remove.addEventListener('click', function() {
+            box.remove();
+        });
+
+        let text = document.createElement('span');
+        text.textContent = name;
+
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'trainers[]';
+        hidden.value = id;
+        hidden.id = 'trainer-hidden-' + id;
+
+        box.appendChild(remove);
+        box.appendChild(text);
+        box.appendChild(hidden);
+        trainerContainer.appendChild(box);
+    }
+
+    trainerInput.addEventListener('input', function() {
+        fetchTrainers(trainerInput.value.trim());
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!trainerInput.contains(event.target) && !trainerResults.contains(event.target)) {
+            trainerResults.innerHTML = '';
+        }
+    });
+
+    if (preselectedTrainers && Array.isArray(preselectedTrainers)) {
+        preselectedTrainers.forEach(tr => addTrainer(tr.ecobricker_id, tr.full_name));
+    }
 });
 
 
@@ -564,13 +627,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     var trainingType = document.getElementById('training_type').value;
 //     displayError('type-error-required', trainingType === "");
 
-    // 🔹 7. Briks Made (Min 0)
-    var briksMade = parseInt(document.getElementById('briks_made').value, 10);
-//     displayError('briks-error-required', isNaN(briksMade) || briksMade < 0 || briksMade > 5000);
 
-    // 🔹 8. Average Brik Weight (Min 0)
-    var avgBrikWeight = parseInt(document.getElementById('avg_brik_weight').value, 10);
-//     displayError('weight-error-required', isNaN(avgBrikWeight) || avgBrikWeight < 0 || avgBrikWeight > 2000);
 
     // 🔹 9. Training Country (Required)
     var trainingCountry = document.getElementById('country_id').value.trim();

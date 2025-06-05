@@ -395,6 +395,29 @@ input[type="submit"]:hover {
     animation: spin 1s linear infinite;
 }
 
+.trainer-tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.trainer-tag-box {
+    display: flex;
+    align-items: center;
+    background: #ccc;
+    border-radius: 15px;
+    padding: 2px 8px;
+    margin: 2px;
+    font-size: 0.9em;
+}
+
+.trainer-tag-box .remove-trainer {
+    margin-right: 6px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); translateY(-50%); }
     100% { transform: rotate(360deg); translateY(-50%); }
