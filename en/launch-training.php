@@ -91,6 +91,27 @@ while ($row = $result->fetch_assoc()) {
     $countries[] = $row;
 }
 
+// ✅ Fetch Trainer Options
+$trainers_list = [];
+$result_trainers = $gobrik_conn->query("SELECT ecobricker_id, full_name FROM tb_ecobrickers WHERE gea_status LIKE '%trainer%' ORDER BY full_name ASC");
+if ($result_trainers) {
+    while ($row = $result_trainers->fetch_assoc()) {
+        $trainers_list[] = $row;
+    }
+}
+
+$selected_trainers = [];
+if ($editing) {
+    $stmt_tr = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_training_trainers WHERE training_id = ?");
+    $stmt_tr->bind_param("i", $training_id);
+    $stmt_tr->execute();
+    $res_tr = $stmt_tr->get_result();
+    while ($row = $res_tr->fetch_assoc()) {
+        $selected_trainers[] = $row['ecobricker_id'];
+    }
+    $stmt_tr->close();
+}
+
 // ✅ Fetch Community Name if Exists
 $community_name = '';
 if (!empty($community_id)) {
@@ -180,18 +201,30 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 
  <!-- PART 6 THE FORM -->
-<form id="submit-form" method="post" action="add-training_process.php" enctype="multipart/form-data" novalidate>
+<form id="submit-form" method="post" action="launch-training_process.php" enctype="multipart/form-data" novalidate>
 
     <div class="form-item" style="margin-top: 25px;">
-        <label for="training_title" data-lang-id="005-title-title">Training Title:</label><br>
+        <label for="training_title" data-lang-id="005-title-title">What is the title of your training?</label><br>
         <input type="text" id="training_title" name="training_title"
             value="<?php echo htmlspecialchars($training_title ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             aria-label="Training Title" >
              <p class="form-caption" data-lang-id="005-training-give-title">Give your training a title.  This will be how your report is featured.</p>
- <!--ERRORS-->
+            <!--ERRORS-->
                     <div id="title-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
                     <div id="title-error-long" class="form-field-error" data-lang-id="000-title-field-too-long-error">Your training title is too long. Max 500 characters.</div>
                     <div id="title-error-invalid" class="form-field-error" data-lang-id="005b-training-title-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs please.</div>
+        </div>
+
+    <div class="form-item">
+        <label for="trainers" data-lang-id="005b-title-trainers">Who are the trainers leading this training?</label><br>
+        <select id="trainers" name="trainers[]" multiple class="form-field-style">
+            <?php foreach ($trainers_list as $trainer): ?>
+                <option value="<?php echo $trainer['ecobricker_id']; ?>" <?php echo in_array($trainer['ecobricker_id'], $selected_trainers ?? []) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($trainer['full_name'], ENT_QUOTES, 'UTF-8'); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="form-caption" data-lang-id="005b-trainers-caption">Select the trainers leading this training.</p>
         </div>
 
 
