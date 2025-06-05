@@ -385,13 +385,14 @@ if (!empty($community_id)) {
     </div>
 
     <div class="form-item">
-        <label for="feature_photo2_main">Set a secondary training photo</label><br>
+        <label for="feature_photo2_main">Set a second training feature photo</label><br>
         <input type="file" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style">
         <p class="form-caption">This image will be visible in the training registration page.</p>
     </div>
 
     <div class="form-item">
-        <label for="feature_photo3_main">Set a third training photo</label><br>
+        <label for="feature_photo3_main">Set a third training feature photo</label><br>
+
         <input type="file" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style">
         <p class="form-caption">This image will also be visible in the training registration page.</p>
     </div>
@@ -413,6 +414,7 @@ if (!empty($community_id)) {
     </div>
 
     <!-- Ready to Show -->
+
     <div class="form-item form-row">
         <div class="toggle-left">
             <label class="toggle-switch">
@@ -421,6 +423,7 @@ if (!empty($community_id)) {
                 <span class="slider"></span>
             </label>
         </div>
+
         <div class="toggle-right">
             <label class="toggle-description" for="ready_to_show" data-lang-id="024-title-show">Launch this training</label>
             <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>

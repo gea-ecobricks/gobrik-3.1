@@ -2272,12 +2272,14 @@ input[type="date"] {
     align-items: center;
 }
 
+.toggle-slider {
 .form-row .toggle-left {
     width: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 
 .form-row .toggle-right {
     flex: 1;
