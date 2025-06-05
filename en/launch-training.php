@@ -405,9 +405,12 @@ if (!empty($community_id)) {
     <!-- Ready to Show -->
     <div class="form-item">
 
-        <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
-               <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
-               <label for="ready_to_show" data-lang-id="024-title-show">🚀 Publish this training publicly?</label><br>
+        <label class="toggle-switch">
+            <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
+                   <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+            <span class="slider"></span>
+        </label>
+        <label class="toggle-description" for="ready_to_show" data-lang-id="024-title-show">Launch this training</label><br>
         <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
     </div>
 <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
