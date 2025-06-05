@@ -453,7 +453,7 @@ if (!empty($community_id)) {
     <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
         <div id="left-colum">
             <label>🚀 Launch Training</label>
-            <p class="form-caption" data-lang-id="022-training-show">
+            <p class="form-caption" data-lang-id="022-training-show" style="margin-top:10px;">
                         Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don’t worry — you can always come back to edit the listing!
             </p>
         </div>

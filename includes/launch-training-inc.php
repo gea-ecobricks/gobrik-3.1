@@ -70,7 +70,9 @@
   display: none;
 }
 
-.splash-image {display:flex;}
+.splash-image {display:flex;
+  margin-right: auto !important;
+  margin-left: auto;}
 
 .splash-image img {margin-right: auto; margin-left: 0px;}
 
