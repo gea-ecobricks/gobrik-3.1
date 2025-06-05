@@ -125,24 +125,15 @@ if ($editing) {
     }
     $stmt->close();
 
-    $upload_dir = '../trainings/photos/';
-    $thumbnail_dir = '../trainings/tmbs/';
     $fields = [];
     $values = [];
     $types = '';
     for ($i = 1; $i <= 3; $i++) {
         $name = "feature_photo{$i}_main";
-        if (isset($_FILES[$name]) && $_FILES[$name]['error'] == UPLOAD_ERR_OK) {
-            $file = "training-{$new_training_id}-feature{$i}.webp";
-            $target = $upload_dir . $file;
-            if (resizeAndConvertToWebP($_FILES[$name]['tmp_name'], $target, 1000, 88)) {
-                createTrainingThumbnail($target, $thumbnail_dir . $file, 250, 250, 77);
-                $fields[] = "$name=?";
-                $fields[] = str_replace('_main','_tmb',$name) . "=?";
-                $values[] = $target;
-                $values[] = $thumbnail_dir . $file;
-                $types .= 'ss';
-            }
+        if (!empty($_POST[$name])) {
+            $fields[] = "$name=?";
+            $values[] = trim($_POST[$name]);
+            $types .= 's';
         }
     }
     if (!empty($fields)) {
@@ -178,24 +169,15 @@ if ($editing) {
     }
     $stmt->close();
 
-    $upload_dir = '../trainings/photos/';
-    $thumbnail_dir = '../trainings/tmbs/';
     $fields = [];
     $values = [];
     $types = '';
     for ($i = 1; $i <= 3; $i++) {
         $name = "feature_photo{$i}_main";
-        if (isset($_FILES[$name]) && $_FILES[$name]['error'] == UPLOAD_ERR_OK) {
-            $file = "training-{$new_training_id}-feature{$i}.webp";
-            $target = $upload_dir . $file;
-            if (resizeAndConvertToWebP($_FILES[$name]['tmp_name'], $target, 1000, 88)) {
-                createTrainingThumbnail($target, $thumbnail_dir . $file, 250, 250, 77);
-                $fields[] = "$name=?";
-                $fields[] = str_replace('_main','_tmb',$name) . "=?";
-                $values[] = $target;
-                $values[] = $thumbnail_dir . $file;
-                $types .= 'ss';
-            }
+        if (!empty($_POST[$name])) {
+            $fields[] = "$name=?";
+            $values[] = trim($_POST[$name]);
+            $types .= 's';
         }
     }
     if (!empty($fields)) {

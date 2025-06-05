@@ -184,7 +184,7 @@ if (!empty($community_id)) {
 
 
  <!-- PART 6 THE FORM -->
-<form id="submit-form" method="post" action="launch-training_process.php" enctype="multipart/form-data" novalidate>
+<form id="submit-form" method="post" action="launch-training_process.php" novalidate>
 
     <!-- ======================= Training Title ======================= -->
     <div class="form-item" style="margin-top: 25px;">
@@ -414,7 +414,7 @@ if (!empty($community_id)) {
         <?php if (!empty($feature_photo1_main)) : ?>
             <img src="<?php echo htmlspecialchars($feature_photo1_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:350px;max-height:200px;" alt="Feature Photo 1 Preview"><br>
         <?php endif; ?>
-        <input type="file" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style">
+        <input type="url" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo1_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
             This is the image that will be used to list your training on GoBrik.
         </p>
@@ -426,7 +426,7 @@ if (!empty($community_id)) {
         <?php if (!empty($feature_photo2_main)) : ?>
             <img src="<?php echo htmlspecialchars($feature_photo2_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:350px;max-height:200px;" alt="Feature Photo 2 Preview"><br>
         <?php endif; ?>
-        <input type="file" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style">
+        <input type="url" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo2_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
             This image will be visible on the training registration page.
         </p>
@@ -438,7 +438,7 @@ if (!empty($community_id)) {
         <?php if (!empty($feature_photo3_main)) : ?>
             <img src="<?php echo htmlspecialchars($feature_photo3_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:350px;max-height:200px;" alt="Feature Photo 3 Preview"><br>
         <?php endif; ?>
-        <input type="file" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style">
+        <input type="url" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo3_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
             This image will also be visible on the training registration page.
         </p>
@@ -849,17 +849,10 @@ function addCommunity2Buwana(event) {
 
 // Preset fields for the Starter Workshop
 function setFileInputFromUrl(inputId, url) {
-    fetch(url)
-        .then(res => res.blob())
-        .then(blob => {
-            const file = new File([blob], url.split('/').pop(), { type: blob.type });
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            const input = document.getElementById(inputId);
-            if (input) {
-                input.files = dt.files;
-            }
-        });
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.value = url;
+    }
 }
 
 function presetForStarterWorkshop() {
