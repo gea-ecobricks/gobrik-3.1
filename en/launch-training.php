@@ -96,7 +96,7 @@ while ($row = $result->fetch_assoc()) {
 
 // ✅ Fetch List of Countries
 $countries = [];
-$result = $gobrik_conn->query("SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC");
+$result = $buwana_conn->query("SELECT country_id, country_name FROM countries_tb ORDER BY country_name ASC");
 while ($row = $result->fetch_assoc()) {
     $countries[] = $row;
 }
@@ -946,17 +946,23 @@ function updateImagePreview(inputId, imgId, containerId) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+function initFeatureImagePreviews() {
     ['feature_photo1_main','feature_photo2_main','feature_photo3_main'].forEach(function(id) {
         const imgId = id + '_preview_img';
         const containerId = id + '_preview';
         const input = document.getElementById(id);
         if (input) {
-            input.addEventListener('input', function() { updateImagePreview(id, imgId, containerId); });
+            input.addEventListener('input', () => updateImagePreview(id, imgId, containerId));
             updateImagePreview(id, imgId, containerId); // initial
         }
     });
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFeatureImagePreviews);
+} else {
+    initFeatureImagePreviews();
+}
 
 
 
