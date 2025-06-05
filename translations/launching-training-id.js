@@ -1,0 +1,43 @@
+/*-----------------------------------
+
+Indonesian SNIPPETS FOR launch-training page on GoBrik
+
+-----------------------------------*/
+const id_Page_Translations = {
+    "000-language-code": "ID",
+    "000-field-required-error": "Kolom ini wajib diisi.",
+    "001-splash-title-post": "Luncurkan Pelatihan GEA",
+    "003-splash-image-alt": '<img src="../svgs/shanti.svg" style="width:65%" alt="Pelatih GEA dalam aksi: Unggah laporan pelatihan GEA">',
+    "004-form-description-post": "Gunakan formulir ini untuk meluncurkan pelatihan, lokakarya atau acara komunitas di GoBrik.",
+    "005-title-title": "Judul Pelatihan:",
+    "005-training-give-title": "Beri judul pada pelatihan Anda. Ini akan menjadi cara laporan Anda ditampilkan.",
+    "006-title-date": "Tanggal Pelatihan:",
+    "006-training-date": "Pada tanggal dan waktu berapa pelatihan ini berlangsung?",
+    "007-title-participants": "Jumlah Peserta:",
+    "007-training-count": "Berapa banyak orang yang akan berpartisipasi (termasuk pelatih)?",
+    "008-lead-trainer": "Pelatih Utama:",
+    "008-training-trainers": "Siapa yang memimpin pelatihan? Anda dapat menuliskan beberapa nama di sini jika diperlukan, misalnya, Lucie Mann dan Ani Himawati.",
+    "009-title-community": "Komunitas yang Dilatih:",
+    "008-community-trained": "Komunitas mana yang mengikuti pelatihan ini? Mulai mengetik untuk melihat dan memilih komunitas GoBrik. <a href=\"#\" onclick=\"openAddCommunityModal(); return false;\" style=\"color: #007BFF; text-decoration: underline;\">Tidak melihat komunitas Anda? Tambahkan.</a>",
+    "010-title-type": "Jenis Pelatihan:",
+    "010-training-type": "Silakan kategorikan jenis pelatihan ini.",
+    "011-title-how-many": "Berapa banyak ecobrick yang akan dibuat?",
+    "011-how-many-briks": "Tidak ada ecobrick yang dibuat? Atur ke \"0\" saja.",
+    "012-title-average": "Berat Rata-rata Brik (gram):",
+    "012-training-average": "Tidak ada ecobrick yang dibuat? Atur ke \"0\" saja.",
+    "013-title-country": "Negara:",
+    "013-training-country": "Di mana pelatihan ini dilaksanakan? Jika ini adalah pelatihan online, pilih negara pelatih utama.",
+    "014-feature-description": "Deskripsi Unggulan:",
+    "014-training-description": "Teks ini ditampilkan di halaman pendaftaran untuk mendeskripsikan pelatihan. Format HTML dasar diperbolehkan.",
+    "015-training-title-agenda": "Agenda Pelatihan:",
+    "015-training-agenda": "Opsional: Harap susun agenda yang diikuti dalam pelatihan Anda. Maksimal 1000 kata. Format HTML dasar diperbolehkan.",
+    "021-title-location": "Lokasi Pelatihan:",
+    "020-location-caption": "Harap berikan lokasi umum di mana pelatihan ini diadakan.",
+    "022-title-moodle": "URL Kursus Moodle:",
+    "022-moodle-caption": "Apakah ada kursus Moodle untuk pelatihan ini di learning.ecobricks.org? Jika ada, masukkan URL di sini.",
+    "023-title-youtube": "URL Video YouTube:",
+    "023-training-youtube": "Apakah ada video YouTube untuk pelatihan ini? Jika ada, silakan masukkan URL di sini.",
+    "024-title-show": "Publikasikan pelatihan ini secara publik?",
+    "022-training-show": "Apakah pelatihan ini siap ditampilkan di ecobricks.org? Jika ya, kami akan mempublikasikan daftar tersebut setelah dikirim. Jangan khawatir, Anda selalu dapat kembali untuk mengeditnya!",
+    "100-submit-report-1": "Lanjut: Unggah Foto ➡️"
+};
