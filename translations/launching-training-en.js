@@ -15,7 +15,7 @@ const en_Page_Translations = {
     "005b-trainers-caption": "Select one or more trainers from the list.",
     "006-title-date":"Training Date:",
     "006-training-date":"On what date and time will this training run?",
-    "007-title-participants": "Number of Participants:",
+    "007-title-participants": "What is the maximum amount of participants for this training?",
     "007-training-count": "How many people are expected to participate (including trainers)?",
     "008-lead-trainer": "Lead Trainer:",
     "008-training-trainers": "Who will lead the training? You can write multiple names here if you want. i.e. Lucie Mann and Ani Himawati",

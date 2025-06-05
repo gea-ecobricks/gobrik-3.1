@@ -231,7 +231,7 @@ if (!empty($community_id)) {
     </div>
 
     <div class="form-item">
-        <label for="no_participants" data-lang-id="007-title-participants">Number of Participants:</label><br>
+        <label for="no_participants" data-lang-id="007-title-participants">What is the maximum amount of participants for this training?</label><br>
         <input type="number" id="no_participants" name="no_participants" min="1" max="5000" 
             value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             <p class="form-caption" data-lang-id="007-training-count">How many people participated (including trainers)?</p>
@@ -240,15 +240,7 @@ if (!empty($community_id)) {
                     <div id="participants-error-range" class="form-field-error" data-lang-id="000-field-participants-number-error">A number (between 1 and 5000).</div>
              </div>
 
-    <div class="form-item">
-        <label for="lead_trainer" data-lang-id="008-lead-trainer">Lead Trainer:</label><br>
-        <input type="text" id="lead_trainer" name="lead_trainer"
-            value="<?php echo htmlspecialchars($lead_trainer ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            aria-label="Lead Trainer" >
-            <p class="form-caption" data-lang-id="008-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
-             <!--ERRORS-->
-                    <div id="trainer-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                </div>
+    
 
 
 <div class="form-item">
@@ -595,9 +587,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
         displayError('participants-error-range', false);
     }
 
-    // 🔹 4. Lead Trainer (Required)
-    var leadTrainer = document.getElementById('lead_trainer').value.trim();
-//     displayError('trainer-error-required', leadTrainer === '');
+
 
     // 🔹 5. Training Community (Required)
     var communityId = document.getElementById('community_id').value.trim();
