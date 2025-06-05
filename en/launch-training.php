@@ -450,9 +450,9 @@ if (!empty($community_id)) {
 
 
     <!-- ======================= Ready to Show Toggle ======================= -->
-    <div class="form-row" style="display:flex;flex-flow:row;width:100%;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;">
+    <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
         <div id="left-colum">
-            <label>Launch Training</label
+            <label>🚀 Launch Training</label>
             <p class="form-caption" data-lang-id="022-training-show">
                         Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don’t worry — you can always come back to edit the listing!
             </p>
@@ -473,7 +473,7 @@ if (!empty($community_id)) {
 
     <!-- ======================= Submit Button ======================= -->
     <div>
-        <input type="submit" value="<?php echo $editing ? '💾 Save Changes to Training' : 'Create Training!'; ?>" data-lang-id="100-submit-report-1">
+        <input type="submit" value="<?php echo $editing ? '💾 Save Changes to Training' : '➕ Create Training!'; ?>" data-lang-id="100-submit-report-1">
     </div>
 
 </form>
