@@ -42,6 +42,7 @@ $training_challenges = trim($_POST['training_challenges'] ?? '');
 $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
 $training_location = trim($_POST['training_location'] ?? '');
 $training_type = trim($_POST['training_type'] ?? '');
+$training_language = trim($_POST['training_language'] ?? 'en');
 
 $no_participants = filter_var($_POST['no_participants'], FILTER_VALIDATE_INT) ?? 0;
 $briks_made = filter_var($_POST['briks_made'], FILTER_VALIDATE_INT) ?? 0;
@@ -63,15 +64,15 @@ if ($community_id !== null) {
 if ($editing) {
     $sql = "UPDATE tb_trainings SET
             training_title=?, lead_trainer=?, country_id=?, training_date=?,
-            no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
+            no_participants=?, training_type=?, training_language=?, briks_made=?, avg_brik_weight=?,
             location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?,
             training_success=?, training_challenges=?, training_lessons_learned=?,
             youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?
             WHERE training_id=?";
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiddssssssssisii",
+    $stmt->bind_param("ssisissiiddssssssssisii",
         $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
+        $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
         $featured_description, $community_id, $training_id
@@ -86,14 +87,14 @@ if ($editing) {
 } else {
     $sql = "INSERT INTO tb_trainings
             (training_title, lead_trainer, country_id, training_date, no_participants,
-            training_type, briks_made, avg_brik_weight, location_lat, location_long,
+            training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long,
             training_location, training_summary, training_agenda, training_success, training_challenges,
             training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("ssisisiiddssssssssisi",
+    $stmt->bind_param("ssisissiiddssssssssisi",
         $training_title, $lead_trainer, $country_id, $training_date, $no_participants,
-        $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
+        $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id
     );
