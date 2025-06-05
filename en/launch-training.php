@@ -411,6 +411,9 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 1 ======================= -->
     <div class="form-item">
         <label for="feature_photo1_main">Set Feature Photo</label><br>
+        <?php if (!empty($feature_photo1_main)) : ?>
+            <img src="<?php echo htmlspecialchars($feature_photo1_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:350px;max-height:200px;" alt="Feature Photo 1 Preview"><br>
+        <?php endif; ?>
         <input type="file" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style">
         <p class="form-caption">
             This is the image that will be used to list your training on GoBrik.
@@ -420,6 +423,9 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 2 ======================= -->
     <div class="form-item">
         <label for="feature_photo2_main">Set a Second Training Feature Photo</label><br>
+        <?php if (!empty($feature_photo2_main)) : ?>
+            <img src="<?php echo htmlspecialchars($feature_photo2_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:350px;max-height:200px;" alt="Feature Photo 2 Preview"><br>
+        <?php endif; ?>
         <input type="file" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style">
         <p class="form-caption">
             This image will be visible on the training registration page.
@@ -429,6 +435,9 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 3 ======================= -->
     <div class="form-item">
         <label for="feature_photo3_main">Set a Third Training Feature Photo</label><br>
+        <?php if (!empty($feature_photo3_main)) : ?>
+            <img src="<?php echo htmlspecialchars($feature_photo3_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:350px;max-height:200px;" alt="Feature Photo 3 Preview"><br>
+        <?php endif; ?>
         <input type="file" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style">
         <p class="form-caption">
             This image will also be visible on the training registration page.
@@ -439,20 +448,15 @@ if (!empty($community_id)) {
 
     <!-- ======================= Ready to Show Toggle ======================= -->
     <div class="form-row">
-
-        <div class="toggle-left">
-            <label class="toggle-description" for="ready_to_show" data-lang-id="024-title-show">Launch this training</label>
-            <p class="form-caption" data-lang-id="022-training-show">
-                Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don’t worry — you can always come back to edit the listing!
-            </p>
-        </div>
-     <div class="toggle-right">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
-                           <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
-                    <span class="slider"></span>
-                </label>
-            </div>
+        <label class="toggle-description" for="ready_to_show" data-lang-id="024-title-show">Launch this training</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
+                   <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+            <span class="slider"></span>
+        </label>
+        <p class="form-caption" data-lang-id="022-training-show">
+            Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don’t worry — you can always come back to edit the listing!
+        </p>
     </div>
 
     <!-- Hidden Training ID -->
@@ -460,7 +464,7 @@ if (!empty($community_id)) {
 
     <!-- ======================= Submit Button ======================= -->
     <div>
-        <input type="submit" value="💾 Save Training" data-lang-id="100-submit-report-1">
+        <input type="submit" value="<?php echo $editing ? '💾 Save Changes to Training' : 'Create Training!'; ?>" data-lang-id="100-submit-report-1">
     </div>
 
 </form>
