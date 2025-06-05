@@ -185,22 +185,26 @@ if (!empty($community_id)) {
  <!-- PART 6 THE FORM -->
 <form id="submit-form" method="post" action="launch-training_process.php" enctype="multipart/form-data" novalidate>
 
+    <!-- ======================= Training Title ======================= -->
     <div class="form-item" style="margin-top: 25px;">
         <label for="training_title" data-lang-id="005-title-title">What is the title of your training?</label><br>
         <input type="text" id="training_title" name="training_title"
-            value="<?php echo htmlspecialchars($training_title ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            aria-label="Training Title" >
-             <p class="form-caption" data-lang-id="005-training-give-title">Give your training a title.  This will be how your report is featured.</p>
-            <!--ERRORS-->
-                    <div id="title-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                    <div id="title-error-long" class="form-field-error" data-lang-id="000-title-field-too-long-error">Your training title is too long. Max 500 characters.</div>
-                    <div id="title-error-invalid" class="form-field-error" data-lang-id="005b-training-title-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs please.</div>
-        </div>
+               value="<?php echo htmlspecialchars($training_title ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+               aria-label="Training Title">
+        <p class="form-caption" data-lang-id="005-training-give-title">Give your training a title. This will be how your report is featured.</p>
 
+        <!-- Errors -->
+        <div id="title-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+        <div id="title-error-long" class="form-field-error" data-lang-id="000-title-field-too-long-error">Your training title is too long. Max 500 characters.</div>
+        <div id="title-error-invalid" class="form-field-error" data-lang-id="005b-training-title-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs please.</div>
+    </div>
+
+    <!-- ======================= Trainers ======================= -->
     <div class="form-item">
         <label for="trainer_search" data-lang-id="005b-title-trainers">Who are the trainers leading this training?</label><br>
         <input type="text" id="trainer_search" placeholder="Type to search..." autocomplete="off" class="form-field-style">
         <div id="trainer_results" class="autocomplete-results"></div>
+
         <div id="selected_trainers" class="trainer-tag-container">
             <?php foreach ($selected_trainers_data as $trainer): ?>
                 <div class="trainer-tag-box" data-id="<?php echo $trainer['ecobricker_id']; ?>">
@@ -213,17 +217,17 @@ if (!empty($community_id)) {
         <p class="form-caption" data-lang-id="005b-trainers-caption">Select the trainers leading this training.</p>
     </div>
 
-
+    <!-- ======================= Training Date ======================= -->
     <div class="form-item">
-    <label for="training_date" datal-lang-id="006-title-date">Training Date:</label><br>
-    <input type="datetime-local" id="training_date" name="training_date"
-    value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
-    aria-label="Training Date"  class="form-field-style">
-    <p class="form-caption" data-lang-id="006-training-date">On what date and time did this training run?</p>
-    <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error" style="display: hidden;">This field is .</div>
+        <label for="training_date" data-lang-id="006-title-date">Training Date:</label><br>
+        <input type="datetime-local" id="training_date" name="training_date"
+               value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
+               aria-label="Training Date" class="form-field-style">
+        <p class="form-caption" data-lang-id="006-training-date">On what date and time did this training run?</p>
+        <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+    </div>
 
-</div>
-
+    <!-- ======================= Training Language ======================= -->
     <div class="form-item">
         <label for="training_language" data-lang-id="006b-title-language">What language will this training be in?</label><br>
         <select id="training_language" name="training_language" class="form-field-style">
@@ -237,207 +241,229 @@ if (!empty($community_id)) {
         <p class="form-caption" data-lang-id="006b-language-caption">What language will this training be in?</p>
     </div>
 
+
+
+
+    <!-- ======================= Training Type ======================= -->
     <div class="form-item">
-        <label for="no_participants" data-lang-id="007-title-participants">What is the maximum amount of participants for this training?</label><br>
-        <input type="number" id="no_participants" name="no_participants" min="1" max="5000" 
-            value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-            <p class="form-caption" data-lang-id="007-training-count">How many people participated (including trainers)?</p>
-            <!--ERRORS-->
-                    <div id="participants-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                    <div id="participants-error-range" class="form-field-error" data-lang-id="000-field-participants-number-error">A number (between 1 and 5000).</div>
-             </div>
+        <label for="training_type" data-lang-id="010-title-type">What type of training will this be?</label><br>
+        <select id="training_type" name="training_type" class="form-field-style">
+            <option value="" disabled selected>Select training type...</option>
+            <?php foreach ($training_types as $type): ?>
+                <option value="<?php echo htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?>"
+                    <?php echo (isset($training_type) && $training_type === $type) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="form-caption" data-lang-id="010-training-type">Please categorize this training.</p>
+        <div id="type-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+    </div>
 
-    
+    <!-- Hidden Fields for Briks -->
+    <input type="hidden" id="briks_made" name="briks_made" value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
+    <input type="hidden" id="avg_brik_weight" name="avg_brik_weight" value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
+
+       <!-- ======================= Featured Description ======================= -->
+       <div class="form-item">
+           <label for="featured_description" data-lang-id="014-feature-description">Featured Description:</label><br>
+           <textarea id="featured_description" name="featured_description" rows="5"
+                     placeholder="Write a compelling description for this training..."><?php echo htmlspecialchars($featured_description ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+           <p class="form-caption" data-lang-id="014-training-description">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
+
+           <div id="featured-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+           <div id="featured-error-long" class="form-field-error" data-lang-id="000-field-summary-too-long-error">Your training summary is too long. Max 255 characters.</div>
+           <div id="featured-error-invalid" class="form-field-error" data-lang-id="005b-training-summary-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
+       </div>
+
+       <!-- ======================= Training Agenda ======================= -->
+       <div class="form-item">
+           <label for="training_agenda" data-lang-id="015-title-training-agenda">Training Agenda:</label><br>
+           <textarea id="training_agenda" name="training_agenda"><?php echo htmlspecialchars($training_agenda ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+           <p class="form-caption" data-lang-id="015-training-agenda">Optional: Layout the agenda your training followed. Max 1000 words.</p>
+           <div id="agenda-error-long" class="form-field-error" data-lang-id="000-long-field-too-long-error">Your training agenda is too long. Maximum 2000 characters.</div>
+       </div>
+
+       <!-- ======================= Registration Scope ======================= -->
+       <div class="form-item">
+           <label for="registration_scope">Registration Scope</label><br>
+           <select id="registration_scope" name="registration_scope" class="form-field-style">
+               <option value="trainers" <?php echo (isset($registration_scope) && $registration_scope=='trainers') ? 'selected' : ''; ?>>Trainers only</option>
+               <option value="ecobrickers" <?php echo (isset($registration_scope) && $registration_scope=='ecobrickers') ? 'selected' : ''; ?>>Ecobrickers (All GoBrikers)</option>
+               <option value="anyone" <?php echo (isset($registration_scope) && $registration_scope=='anyone') ? 'selected' : ''; ?>>Anyone (all Earthen subscribers)</option>
+           </select>
+           <p class="form-caption">
+               Select the target audience for your course.
+           </p>
+       </div>
 
 
-<div class="form-item">
-    <label for="community_search" data-lang-id="009-title-community">What community is this training targeting?</label><br>
-    <input type="text" id="community_search" name="community_search"
-           placeholder="Start typing..." autocomplete="off"
-           value="<?php echo htmlspecialchars($community_name ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
-    <input type="hidden" id="community_id" name="community_id"
-       value="<?php echo isset($community_id) ? htmlspecialchars($community_id, ENT_QUOTES, 'UTF-8') : ''; ?>">
+       <!-- ======================= Number of Participants ======================= -->
+       <div class="form-item">
+           <label for="no_participants" data-lang-id="007-title-participants">What is the maximum amount of participants for this training?</label><br>
+           <input type="number" id="no_participants" name="no_participants" min="1" max="5000"
+                  value="<?php echo htmlspecialchars($no_participants ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+           <p class="form-caption" data-lang-id="007-training-count">How many people participated (including trainers)?</p>
 
-    <div id="community_results" class="autocomplete-results"></div>
-
-    <p class="form-caption">For general course select the Global Ecobrick Movement community.</p>
-
-<div id="community-error-required" class="form-field-error" data-lang-id="000-field-too-long-error">A community must be selected</div>
-                </div>
+           <!-- Errors -->
+           <div id="participants-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+           <div id="participants-error-range" class="form-field-error" data-lang-id="000-field-participants-number-error">A number (between 1 and 5000).</div>
+       </div>
 
 
 
+    <!-- ======================= Community Selection ======================= -->
+       <div class="form-item">
+           <label for="community_search" data-lang-id="009-title-community">What community is this training targeting?</label><br>
+           <input type="text" id="community_search" name="community_search"
+                  placeholder="Start typing..." autocomplete="off"
+                  value="<?php echo htmlspecialchars($community_name ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+
+           <input type="hidden" id="community_id" name="community_id"
+                  value="<?php echo isset($community_id) ? htmlspecialchars($community_id, ENT_QUOTES, 'UTF-8') : ''; ?>">
+
+           <div id="community_results" class="autocomplete-results"></div>
+
+           <p class="form-caption">For general course select the Global Ecobrick Movement community.</p>
+
+           <div id="community-error-required" class="form-field-error" data-lang-id="000-field-too-long-error">A community must be selected</div>
+       </div>
+
+   <!-- ======================= Country ======================= -->
     <div class="form-item">
-    <label for="training_type" data-lang-id="010-title-type">What type of training will this be?</label><br>
-    <select id="training_type" name="training_type"  class="form-field-style">
-        <option value="" disabled selected>Select training type...</option>
-
-        <?php foreach ($training_types as $type): ?>
-            <option value="<?php echo htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?>"
-                <?php echo (isset($training_type) && $training_type === $type) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-   <p class="form-caption" data-lang-id="010-training-type">Please categorize this training.</p>
-   <!--ERROR-->
-                    <div id="type-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                </div>
-
-
-  <input type="hidden" id="briks_made" name="briks_made" value="<?php echo isset($briks_made) ? htmlspecialchars($briks_made, ENT_QUOTES, 'UTF-8') : 0; ?>">
-  <input type="hidden" id="avg_brik_weight" name="avg_brik_weight" value="<?php echo isset($avg_brik_weight) ? htmlspecialchars($avg_brik_weight, ENT_QUOTES, 'UTF-8') : 0; ?>">
-
-<div class="form-item">
-    <label for="country_id" data-lang-id="013-title-country">What country is this course targeting?</label><br>
-    <select id="country_id" name="country_id"  class="form-field-style">
-        <!-- ✅ Ensures placeholder is selected when no country is set -->
-        <option value="" disabled <?php echo empty($country_id) ? 'selected' : ''; ?>>
-            Select a country...
-        </option>
-
-        <?php foreach ($countries as $country): ?>
-            <option value="<?php echo htmlspecialchars($country['country_id'], ENT_QUOTES, 'UTF-8'); ?>"
-                <?php echo (!empty($country_id) && $country_id == $country['country_id']) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-
-    <p class="form-caption" data-lang-id="013-training-country">
-        For global course, leave blank or select "Earth"
-    </p>
-<!--ERRORS-->
-                    <div id="country-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                </div>
+        <label for="country_id" data-lang-id="013-title-country">What country is this course targeting?</label><br>
+        <select id="country_id" name="country_id" class="form-field-style">
+            <option value="" disabled <?php echo empty($country_id) ? 'selected' : ''; ?>>Select a country...</option>
+            <?php foreach ($countries as $country): ?>
+                <option value="<?php echo htmlspecialchars($country['country_id'], ENT_QUOTES, 'UTF-8'); ?>"
+                    <?php echo (!empty($country_id) && $country_id == $country['country_id']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="form-caption" data-lang-id="013-training-country">For global course, leave blank or select "Earth"</p>
+        <div id="country-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+    </div>
 
 
 
-<div class="form-item">
-    <label for="featured_description" data-lang-id="014-feature-description">Featured Description:</label><br>
-    <textarea id="featured_description" name="featured_description"
-              placeholder="Write a compelling description for this training..."
-              rows="5"><?php echo htmlspecialchars($featured_description ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-    <p class="form-caption" data-lang-id="014-training-description">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
-<!--ERRORS-->
-                    <div id="featured-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                    <div id="featured-error-long" class="form-field-error" data-lang-id="000-field-summary-too-long-error">Your training summary is too long. Max 255 characters.</div>
-                    <div id="featured-error-invalid" class="form-field-error" data-lang-id="005b-training-summary-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
-                </div>
-
-
+    <!-- ======================= Training Location ======================= -->
     <div class="form-item">
-        <label for="training_agenda" data-lang-id="015-title-training-agenda">Training Agenda:</label><br>
-        <textarea id="training_agenda" name="training_agenda"><?php echo htmlspecialchars($training_agenda ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-            <p class="form-caption" data-lang-id="015-training-agenda">Optional: Please layout the agenda that your training followed. Max 1000 words. You may not need to update this field as it was shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
-<!--ERRORS-->
-                    <div id="agenda-error-long" class="form-field-error" data-lang-id="000-long-field-too-long-error">Your training agenda is too long. Maximum 2000 characters.</div>
-                </div>
+        <label for="training_location" data-lang-id="021-title-location">Training Location:</label><br>
+        <input type="text" id="training_location" name="training_location" aria-label="Training Location"
+               value="<?php echo htmlspecialchars($training_location ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <p class="form-caption" data-lang-id="020-location-caption">
+            Please provide the general location where the training was conducted.
+        </p>
 
-<br><br>
-<hr>
-<br>
+        <!-- Errors -->
+        <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+    </div>
 
-<div class="form-item">
-    <label for="training_location" data-lang-id="021-title-location">Training Location:</label><br>
-    <input type="text" id="training_location" name="training_location" aria-label="Training Location" 
-        value="<?php echo htmlspecialchars($training_location ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <p class="form-caption" data-lang-id="020-location-caption">
-        Please provide the general location where the training was conducted.
-    </p>
-
-     <!--ERRORS-->
-             <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                </div>
-
-
-<!-- Moodle URL -->
+    <!-- ======================= Moodle Course URL ======================= -->
     <div class="form-item">
         <label for="moodle_url" data-lang-id="022-title-moodle">Moodle Course URL:</label><br>
         <input type="url" id="moodle_url" name="moodle_url"
                value="<?php echo htmlspecialchars($moodle_url ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                placeholder="Enter Moodle Course Link" class="form-field-style">
         <p class="form-caption" data-lang-id="022-moodle-caption">
-        Was there a moodle course created for this training on learning.ecobricks.org?  If so, include the URL here.
-    </p>
-
+            Was there a Moodle course created for this training on learning.ecobricks.org? If so, include the URL here.
+        </p>
     </div>
 
-    <input type="hidden" id="youtube_result_video" name="youtube_result_video" value="<?php echo htmlspecialchars($youtube_result_video ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <!-- Hidden: YouTube Result Video -->
+    <input type="hidden" id="youtube_result_video" name="youtube_result_video"
+           value="<?php echo htmlspecialchars($youtube_result_video ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
+    <!-- ======================= Zoom Link ======================= -->
     <div class="form-item">
         <label for="zoom_link">Zoom Link:</label><br>
-        <input type="url" id="zoom_link" name="zoom_link" class="form-field-style" value="<?php echo htmlspecialchars($zoom_link ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-        <p class="form-caption">Set the Zoom link if this is an online course with just the URL for the event.</p>
+        <input type="url" id="zoom_link" name="zoom_link" class="form-field-style"
+               value="<?php echo htmlspecialchars($zoom_link ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <p class="form-caption">
+            Set the Zoom link if this is an online course with just the URL for the event.
+        </p>
     </div>
 
+    <!-- ======================= Full Zoom Link + Notes ======================= -->
     <div class="form-item">
-        <label for="zoom_link_full">Zoom Link full:</label><br>
+        <label for="zoom_link_full">Zoom Link Full:</label><br>
         <textarea id="zoom_link_full" name="zoom_link_full" class="form-field-style"><?php echo htmlspecialchars($zoom_link_full ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-        <p class="form-caption">Paste the full Zoom link with as much accompagning text as you think appropriate.</p>
+        <p class="form-caption">
+            Paste the full Zoom link with as much accompanying text as you think appropriate.
+        </p>
     </div>
 
+       <!-- ======================= Trainer Contact Email ======================= -->
+       <div class="form-item">
+           <label for="trainer_contact_email">Trainer Contact Email</label><br>
+           <input type="email" id="trainer_contact_email" name="trainer_contact_email" class="form-field-style"
+                  value="<?php echo htmlspecialchars($trainer_contact_email ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+           <p class="form-caption">
+               Set the contact email for this course that folks can reply to.
+           </p>
+       </div>
+
+   <br><hr><br>
+
+    <!-- ======================= Feature Photo 1 ======================= -->
     <div class="form-item">
-        <label for="feature_photo1_main">Set feature photo</label><br>
+        <label for="feature_photo1_main">Set Feature Photo</label><br>
         <input type="file" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style">
-        <p class="form-caption">This is the image that will be use to list your photo on GoBrik.</p>
+        <p class="form-caption">
+            This is the image that will be used to list your training on GoBrik.
+        </p>
     </div>
 
+    <!-- ======================= Feature Photo 2 ======================= -->
     <div class="form-item">
-        <label for="feature_photo2_main">Set a second training feature photo</label><br>
+        <label for="feature_photo2_main">Set a Second Training Feature Photo</label><br>
         <input type="file" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style">
-        <p class="form-caption">This image will be visible in the training registration page.</p>
+        <p class="form-caption">
+            This image will be visible on the training registration page.
+        </p>
     </div>
 
+    <!-- ======================= Feature Photo 3 ======================= -->
     <div class="form-item">
-        <label for="feature_photo3_main">Set a third training feature photo</label><br>
-
+        <label for="feature_photo3_main">Set a Third Training Feature Photo</label><br>
         <input type="file" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style">
-        <p class="form-caption">This image will also be visible in the training registration page.</p>
+        <p class="form-caption">
+            This image will also be visible on the training registration page.
+        </p>
     </div>
 
-    <div class="form-item">
-        <label for="registration_scope">Registration scope</label><br>
-        <select id="registration_scope" name="registration_scope" class="form-field-style">
-            <option value="trainers" <?php echo (isset($registration_scope) && $registration_scope=='trainers') ? 'selected' : ''; ?>>Trainers only</option>
-            <option value="ecobrickers" <?php echo (isset($registration_scope) && $registration_scope=='ecobrickers') ? 'selected' : ''; ?>>Ecobrickers (All GoBrikers)</option>
-            <option value="anyone" <?php echo (isset($registration_scope) && $registration_scope=='anyone') ? 'selected' : ''; ?>>Anyone (all Earthen subscribers)</option>
-        </select>
-        <p class="form-caption">select the target audience for your course.</p>
-    </div>
 
-    <div class="form-item">
-        <label for="trainer_contact_email">Trainer contact email</label><br>
-        <input type="email" id="trainer_contact_email" name="trainer_contact_email" class="form-field-style" value="<?php echo htmlspecialchars($trainer_contact_email ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-        <p class="form-caption">Set the contact email for this course that folks can reply to.</p>
-    </div>
 
-    <!-- Ready to Show -->
+    <!-- ======================= Ready to Show Toggle ======================= -->
+    <div class="form-row">
 
-    <div class="form-item form-row">
         <div class="toggle-left">
-            <label class="toggle-switch">
-                <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
-                       <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
-                <span class="slider"></span>
-            </label>
-        </div>
-
-        <div class="toggle-right">
             <label class="toggle-description" for="ready_to_show" data-lang-id="024-title-show">Launch this training</label>
-            <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
+            <p class="form-caption" data-lang-id="022-training-show">
+                Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don’t worry — you can always come back to edit the listing!
+            </p>
         </div>
+     <div class="toggle-right">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
+                           <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+                    <span class="slider"></span>
+                </label>
+            </div>
     </div>
-<input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
+    <!-- Hidden Training ID -->
+    <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
-<div>
-    <input type="submit" value="💾 Save Training" data-lang-id="100-submit-report-1">
-</div>
-
+    <!-- ======================= Submit Button ======================= -->
+    <div>
+        <input type="submit" value="💾 Save Training" data-lang-id="100-submit-report-1">
+    </div>
 
 </form>
+
 
 
         </div>

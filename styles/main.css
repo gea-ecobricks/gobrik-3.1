@@ -2273,7 +2273,7 @@ input[type="date"] {
 }
 
 .toggle-slider {
-.form-row .toggle-left {
+.form-row .toggle-right {
     width: 60px;
     display: flex;
     justify-content: center;
@@ -2281,7 +2281,7 @@ input[type="date"] {
 }
 
 
-.form-row .toggle-right {
+.form-row .toggle-left {
     flex: 1;
 }
 
