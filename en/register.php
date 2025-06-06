@@ -132,10 +132,10 @@ echo '<!DOCTYPE html>
    <div id="form-submission-box">
         <div class="form-container">
 
-            <div style="text-align:center;width:100%;margin:auto;margin-top:65px;">
+            <div style="width:100%;margin:auto;margin-top:65px;">
 
                 <?php if ($is_registered): ?>
-        <div id="registered-notice" style="background-color:#4CAF50; color:white; padding:10px 15px; border-radius:8px; display:block; width:fit-content; margin:auto; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
+        <div id="registered-notice" style="text-align:center;background-color:#4CAF50; color:white; padding:10px 15px; border-radius:8px; display:block; width:fit-content; margin:auto; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
             <span style="margin-right:10px;">👍</span> You're registered for this <?php echo $training_type; ?>!.  Check your email or dashboard for full details and Zoom link.
         </div>
     <?php endif; ?>
@@ -143,16 +143,16 @@ echo '<!DOCTYPE html>
                 <p style="font-size:1.1em;margin-top:10px;"><?php echo $training_type; ?></p>
                  <p style="font-size:1.3emm"><strong><?php echo $training_date; ?></strong></p>
 
-                <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
+                <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;padding: 10px" id="event-lead-photo">
 
 
-                <div class="training-title-box" style="width:100%;display:flex;flex-flow:row">
+                <div class="training-title-box" style="width:100%;display:flex;flex-flow:row;">
                     <div class="the-titles" style="width:80%">
                         <h2><?php echo $training_title; ?></h2>
                         <h4>Lead by <?php echo $lead_trainer; ?></h4>
                         <p style="font-size:1.0emm"><?php echo $training_date; ?></p>
                     </div>
-                    <div class="profile-images" style="width:20%"
+                    <div class="profile-images" style="width:20%">
                         <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
                     </div>
                 </div>
