@@ -205,8 +205,10 @@ if ($new_training_id && !empty($trainers)) {
         die("Prepare failed: " . $gobrik_conn->error);
     }
 
+
     // avoid undefined variable notice that can corrupt JSON output
     $tr_id = null;
+
     $ins->bind_param("ii", $new_training_id, $tr_id);
 
     foreach ($trainers as $tr_id) {
