@@ -537,48 +537,6 @@ function renderMessages(messages, conversation_id, serverTime) {
         updateMessageStatuses(conversation_id);
     }, 500);
 
-// Helper function to format the timestamp with adjusted server time
-function formatTimestamp(timestamp, serverTime) {
-    // Ensure timestamps are treated as UTC by appending 'Z'
-    const messageDate = new Date(`${timestamp.replace(' ', 'T')}Z`);
-    let serverDate = new Date(`${serverTime.replace(' ', 'T')}Z`);
-
-    // Adjust serverDate to UTC+8 (add 8 hours)
-    serverDate.setHours(serverDate.getHours() + 8);
-
-    // Calculate the difference in seconds between adjusted server time and message time
-    const diffInSeconds = Math.floor((serverDate - messageDate) / 1000);
-
-    console.log(`Timestamp: ${timestamp}, Adjusted Server Time: ${serverDate.toISOString()}, Diff in seconds: ${diffInSeconds}`);
-
-    // Format the relative time based on the difference
-    if (diffInSeconds < 30) {
-        return "A moment ago";
-    } else if (diffInSeconds < 180) {
-        return "A minute ago";
-    } else if (diffInSeconds < 86400 && serverDate.toDateString() === messageDate.toDateString()) {
-        return `Today at ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-    } else if (diffInSeconds < 172800 && serverDate.toDateString() !== messageDate.toDateString()) {
-        return `Yesterday at ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-    } else if (serverDate.getFullYear() === messageDate.getFullYear()) {
-        return messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
-    } else {
-        return messageDate.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Add click event to open modal for each thumbnail link
     $('.thumbnail-link').on('click', function(event) {
         event.preventDefault();
