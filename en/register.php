@@ -78,7 +78,9 @@ if ($result->num_rows > 0) {
     $featured_description = strip_tags($row['featured_description'] ?? '', $allowed_tags);
     $training_agenda = strip_tags($row['training_agenda'] ?? '', $allowed_tags);
     $training_title = htmlspecialchars($row['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
+    $training_date = htmlspecialchars($row['training_subtitle'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_date = htmlspecialchars($row['training_date'] ?? '', ENT_QUOTES, 'UTF-8');
+    $training_date = htmlspecialchars($row['training_time_txt'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_logged = htmlspecialchars($row['training_logged'] ?? '', ENT_QUOTES, 'UTF-8');
     $lead_trainer = htmlspecialchars($row['lead_trainer'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_type = htmlspecialchars($row['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -125,10 +127,10 @@ echo '<!DOCTYPE html>
     <div class="splash-title-block"></div>
     <div id="splash-bar"></div>
 
-    <!-- PAGE CONTENT     <div id="top-page-image" class="gea-logo top-page-image"></div>
+    <!-- PAGE CONTENT
 -->
 
-
+<div id="top-page-image" class="gea-logo top-page-image"></div>
    <div id="form-submission-box">
         <div class="form-container">
 
@@ -145,11 +147,12 @@ echo '<!DOCTYPE html>
             <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
 
 
-            <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;" class="form-field">
+            <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;padding:15px;" class="form-field">
                 <div class="the-titles" style="width:80%">
                 <h3><?php echo $training_title; ?></h3>
+                <h3><?php echo $training_subtitle; ?></h3>
                     <p style="font-size:1em"><?php echo $training_date; ?></p>
-                    <p style="font-size:1em;"><?php echo $training_type; ?></p>
+                    <p style="font-size:1em;"><?php echo $training_type; ?> | <?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_location; ?></p>
                 </div>
                 <div class="profile-images" style="width:20%">
