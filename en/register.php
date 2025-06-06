@@ -133,7 +133,7 @@ echo '<!DOCTYPE html>
 
 <div id="top-page-image" class="gea-logo top-page-image"></div>
    <div id="form-submission-box">
-        <div class="form-container">
+        <div class="form-container" style="padding-top:60px;">
 
             <div style="width:100%;margin:auto;margin-top:65px;">
 
