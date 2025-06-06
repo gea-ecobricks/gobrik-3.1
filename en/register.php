@@ -14,6 +14,8 @@ $training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 // Initialize training variables
 $training_title = $training_date = $lead_trainer = "";
 $training_type = $training_country = $training_location = "";
+$language_id = $country_id = 0;
+$training_language = '';
 $training_url = "";
 $ecobricker_id = null;
 $is_registered = false; // Default: user is not registered
@@ -84,10 +86,11 @@ if ($result->num_rows > 0) {
     $training_logged = htmlspecialchars($row['training_logged'] ?? '', ENT_QUOTES, 'UTF-8');
     $lead_trainer = htmlspecialchars($row['lead_trainer'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_type = htmlspecialchars($row['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
-    $training_country = htmlspecialchars($row['training_country'] ?? '', ENT_QUOTES, 'UTF-8');
+    $country_id = intval($row['country_id'] ?? 0);
     $training_location = htmlspecialchars($row['training_location'] ?? '', ENT_QUOTES, 'UTF-8');
     $registration_scope = htmlspecialchars($row['registration_scope'] ?? '', ENT_QUOTES, 'UTF-8');
-     $training_language = htmlspecialchars($row['training_language'] ?? '', ENT_QUOTES, 'UTF-8');
+    $language_id = intval($row['training_language'] ?? 0);
+
 
 
     $training_url = htmlspecialchars($row['training_url'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -102,6 +105,31 @@ if ($result->num_rows > 0) {
     if ($ready_to_show == 0) {
         echo "<script>alert('Sorry this training isn\'t yet listed for public registration.'); window.location.href='trainings.php';</script>";
         exit;
+    }
+
+    // Look up the language and country names using the IDs
+    require_once '../buwanaconn_env.php';
+
+    $training_country = '';
+    if ($country_id > 0) {
+        $stmt_country = $buwana_conn->prepare("SELECT country_name FROM countries_tb WHERE country_id = ?");
+        $stmt_country->bind_param("i", $country_id);
+        $stmt_country->execute();
+        $stmt_country->bind_result($training_country_name);
+        $stmt_country->fetch();
+        $stmt_country->close();
+        $training_country = htmlspecialchars($training_country_name ?? '', ENT_QUOTES, 'UTF-8');
+    }
+
+    $training_language = '';
+    if ($language_id > 0) {
+        $stmt_language = $buwana_conn->prepare("SELECT language_name_en FROM languages_tb WHERE language_id = ?");
+        $stmt_language->bind_param("i", $language_id);
+        $stmt_language->execute();
+        $stmt_language->bind_result($training_language_name);
+        $stmt_language->fetch();
+        $stmt_language->close();
+        $training_language = htmlspecialchars($training_language_name ?? '', ENT_QUOTES, 'UTF-8');
     }
 }
 
@@ -195,6 +223,10 @@ echo '<!DOCTYPE html>
             <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
             <p><strong>Country:</strong> <?php echo $training_country; ?></p>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
+            <p><strong>Language:</strong> <?php echo $training_language; ?></p>
+            <p><strong>Subtitle:</strong> <?php echo $training_subtitle; ?></p>
+            <p><strong>Time:</strong> <?php echo $training_time_txt; ?></p>
+            <p><strong>Training Logged:</strong> <?php echo $training_logged; ?></p>
             <p><strong>Scope:</strong> <?php echo $registration_scope; ?></p> <!-- ✅ Add this -->
         </div>
 
