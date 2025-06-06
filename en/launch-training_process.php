@@ -201,10 +201,18 @@ if ($new_training_id && !empty($trainers)) {
     $del->close();
 
     $ins = $gobrik_conn->prepare("INSERT INTO tb_training_trainers (training_id, ecobricker_id) VALUES (?, ?)");
-    foreach ($trainers as $tr_id) {
-        $ins->bind_param("ii", $new_training_id, $tr_id);
-        $ins->execute();
+    if (!$ins) {
+        die("Prepare failed: " . $gobrik_conn->error);
     }
+
+    $ins->bind_param("ii", $new_training_id, $tr_id);
+
+    foreach ($trainers as $tr_id) {
+        if (!$ins->execute()) {
+            error_log("Insert error for ecobricker $tr_id: " . $ins->error);
+        }
+    }
+
     $ins->close();
 }
 
