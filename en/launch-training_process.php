@@ -105,6 +105,16 @@ if ($community_id !== null) {
 }
 
 if ($editing) {
+    // ✅ ensure the training exists before attempting the update
+    $check = $gobrik_conn->prepare("SELECT training_id FROM tb_trainings WHERE training_id=?");
+    $check->bind_param("i", $training_id);
+    $check->execute();
+    $check->store_result();
+    if ($check->num_rows === 0) {
+        echo json_encode(["success" => false, "error" => "Training not found."]);
+        exit();
+    }
+    $check->close();
     $sql = "UPDATE tb_trainings SET
             training_title=?, training_subtitle=?, lead_trainer=?, country_id=?, training_date=?, training_time_txt=?,
             no_participants=?, training_type=?, training_language=?, briks_made=?, avg_brik_weight=?,
@@ -127,13 +137,9 @@ if ($editing) {
         $training_id
     );
     if ($stmt->execute()) {
-        if ($stmt->affected_rows === 0) {
-            echo json_encode(['success' => false, 'error' => 'Training not found.']);
-            exit();
-        }
         $new_training_id = $training_id;
     } else {
-        echo json_encode(['success' => false, 'error' => 'Update failed.']);
+        echo json_encode(["success" => false, "error" => "Update failed."]);
         exit();
     }
     $stmt->close();
