@@ -125,8 +125,8 @@ echo '<!DOCTYPE html>
     <div class="splash-title-block"></div>
     <div id="splash-bar"></div>
 
-    <!-- PAGE CONTENT -->
-    <div id="top-page-image" class="gea-logo top-page-image"></div>
+    <!-- PAGE CONTENT     <div id="top-page-image" class="gea-logo top-page-image"></div>
+-->
 
 
    <div id="form-submission-box">
@@ -140,17 +140,18 @@ echo '<!DOCTYPE html>
         </div>
     <?php endif; ?>
 
-                <p style="font-size:1.1em;margin-top:10px;"><?php echo $training_type; ?></p>
-                 <p style="font-size:1.3emm"><strong><?php echo $training_date; ?></strong></p>
-
-                <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;padding: 10px" id="event-lead-photo">
 
 
-                <div class="training-title-box" style="width:100%;display:flex;flex-flow:row;">
+                <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
+
+
+                <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;" class="form-field">
                     <div class="the-titles" style="width:80%">
                         <h2><?php echo $training_title; ?></h2>
                         <h4>Lead by <?php echo $lead_trainer; ?></h4>
-                        <p style="font-size:1.0emm"><?php echo $training_date; ?></p>
+                        <p style="font-size:1emm"><?php echo $training_date; ?></p>
+                        <p style="font-size:1em;;"><?php echo $training_type; ?></p>
+                        <p style="font-size:1em;;"><?php echo $training_location; ?></p>
                     </div>
                     <div class="profile-images" style="width:20%">
                         <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
