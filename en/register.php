@@ -14,7 +14,8 @@ $training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 // Initialize training variables
 $training_title = $training_date = $lead_trainer = "";
 $training_type = $training_country = $training_location = "";
-$language_id = $country_id = 0;
+$country_id = 0;
+$language_id = '';
 $training_language = '';
 $training_url = "";
 $ecobricker_id = null;
@@ -89,7 +90,7 @@ if ($result->num_rows > 0) {
     $country_id = intval($row['country_id'] ?? 0);
     $training_location = htmlspecialchars($row['training_location'] ?? '', ENT_QUOTES, 'UTF-8');
     $registration_scope = htmlspecialchars($row['registration_scope'] ?? '', ENT_QUOTES, 'UTF-8');
-    $language_id = intval($row['training_language'] ?? 0);
+    $language_id = trim($row['training_language'] ?? '');
 
 
 
@@ -122,9 +123,9 @@ if ($result->num_rows > 0) {
     }
 
     $training_language = '';
-    if ($language_id > 0) {
+    if (!empty($language_id)) {
         $stmt_language = $buwana_conn->prepare("SELECT language_name_en FROM languages_tb WHERE language_id = ?");
-        $stmt_language->bind_param("i", $language_id);
+        $stmt_language->bind_param("s", $language_id);
         $stmt_language->execute();
         $stmt_language->bind_result($training_language_name);
         $stmt_language->fetch();
