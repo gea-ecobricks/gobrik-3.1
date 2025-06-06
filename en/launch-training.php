@@ -71,7 +71,7 @@ $trainer_contact_email = '';
 // ✅ If editi   ng, fetch existing training details
 if ($editing) {
     $sql_fetch = "SELECT training_title, training_subtitle, lead_trainer, country_id, training_date, training_time_txt, no_participants,
-                  training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long, training_location,
+                  training_type, training_language, briks_made, avg_brik_weight, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
                   zoom_link, zoom_link_full, feature_photo1_main, feature_photo2_main, feature_photo3_main, registration_scope, trainer_contact_email
@@ -81,7 +81,7 @@ if ($editing) {
     $stmt_fetch->bind_param("i", $training_id);
     $stmt_fetch->execute();
     $stmt_fetch->bind_result($training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
-                            $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
+                            $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
                             $zoom_link, $zoom_link_full, $feature_photo1_main, $feature_photo2_main, $feature_photo3_main, $registration_scope, $trainer_contact_email);
@@ -975,13 +975,14 @@ function initFeatureImagePreviews() {
         const input = document.getElementById(id);
         if (input) {
             input.addEventListener('input', () => updateImagePreview(id, imgId, containerId));
+            input.addEventListener('change', () => updateImagePreview(id, imgId, containerId));
             updateImagePreview(id, imgId, containerId); // initial
         }
     });
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFeatureImagePreviews);
+    window.addEventListener('load', initFeatureImagePreviews);
 } else {
     initFeatureImagePreviews();
 }
