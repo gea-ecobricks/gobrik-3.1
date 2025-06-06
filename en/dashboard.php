@@ -256,7 +256,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
                     <!-- Edit column showing publication status -->
                     <td style="text-align:center;">
-                        <a href="training.php?training_id=<?php echo $training['training_id']; ?>">
+                        <a href="launch-training.php?id=<?php echo $training['training_id']; ?>">
                             <?php echo ($training['ready_to_show'] == 1) ? '🟢' : '⚪'; ?>
                         </a>
                     </td>
@@ -570,7 +570,8 @@ $(document).ready(function() {
         "columnDefs": [
             { "orderable": false, "targets": [4, 5, 6] }, // Disable sorting on "Registered", "Edit" and "Report" columns
             { "targets": [1, 2, 3], "visible": true }, // Show Date, Location, Type
-            { "targets": [1, 2, 3], "visible": false, "responsivePriority": 1 } // Hide on small screens
+            { "targets": [1, 2, 3], "visible": false, "responsivePriority": 1 }, // Hide on small screens
+            { "className": "all", "targets": [5] } // Always show Edit column
         ]
     });
 

@@ -204,7 +204,7 @@ echo '<!DOCTYPE html>
 document.getElementById("rsvp-button").addEventListener("click", function() {
     <?php if ($is_logged_in && isset($ecobricker_id)): ?>
         // Redirect logged-in users to registration-confirmation.php
-        window.location.href = "registration_confirmation.php?training_id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>";
+        window.location.href = "registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>";
     <?php else: ?>
         // Show login modal for non-logged-in users
         openInfoModal('<?php echo $lang; ?>');

@@ -51,7 +51,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <?php
 require_once '../gobrikconn_env.php';
 
-$trainingId = $_GET['training_id'];
+$trainingId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 $sql = "SELECT * FROM tb_trainings WHERE training_id = ?";
 $stmt = $gobrik_conn->prepare($sql);

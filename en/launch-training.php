@@ -54,8 +54,8 @@ if ($result_languages && $result_languages->num_rows > 0) {
 
 require_once '../gobrikconn_env.php';
 
-// ✅ Get training_id from URL (for editing)
-$training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
+// ✅ Get training ID from URL (for editing)
+$training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $editing = ($training_id > 0);
 $training_language = 'en';
 $zoom_link = '';
@@ -758,8 +758,8 @@ function showTrainingSavedModal(trainingId) {
         <h1>Training saved!</h1>
         <p>You can view the course listing or keeping editing the page</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;">
-            <a href="launch-training.php?training_id=${trainingId}" class="confirm-button enabled" style="margin:10px;">Keep Editing</a>
-            <a href="register.php?training_id=${trainingId}" class="confirm-button enabled" style="margin:10px;">View Listing</a>
+            <a href="launch-training.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">Keep Editing</a>
+            <a href="register.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">View Listing</a>
         </div>
     `;
 }
