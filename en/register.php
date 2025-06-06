@@ -157,13 +157,15 @@ echo '<!DOCTYPE html>
     <div id="splash-bar"></div>
 
     <!-- PAGE CONTENT
+
+    <div id="top-page-image" class="gea-logo top-page-image"></div>
 -->
 
-<div id="top-page-image" class="gea-logo top-page-image"></div>
-   <div id="form-submission-box">
-        <div class="form-container" style="padding-top:60px;">
 
-            <div style="width:100%;margin:auto;margin-top:65px;">
+   <div id="form-submission-box">
+        <div class="form-container" style="padding-top:0px;">
+
+            <div style="width:100%;margin:auto;margin-top:5px;">
 
                 <?php if ($is_registered): ?>
         <div id="registered-notice" style="text-align:center;background-color:#4CAF50; color:white; padding:10px 15px; border-radius:8px; display:block; width:fit-content; margin:auto; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
@@ -176,7 +178,7 @@ echo '<!DOCTYPE html>
             <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
 
 
-            <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;padding:15px;" class="form-field">
+            <div class="training-title-box">
                 <div class="the-titles" style="width:80%">
                 <h3><?php echo $training_title; ?></h3>
                 <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
@@ -189,10 +191,9 @@ echo '<!DOCTYPE html>
 
                 </div>
                 <div class="profile-images">
-                    <img src="<?php echo $feature_photo3_main; ?>" style="width:250px;padding:15px;margin-top:-40px;">
+                    <img src="<?php echo $feature_photo3_main; ?>">
                     <p style="text-align:right; text-align:center;margin-top: 0px; margin-bottom: auto;">Led by <?php echo $lead_trainer; ?></p>
                     <p style="font-size:1em; text-align:center;"><?php echo $training_location; ?> from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
-
                 </div>
             </div>
         </div>

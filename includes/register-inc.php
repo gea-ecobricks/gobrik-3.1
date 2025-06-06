@@ -50,7 +50,38 @@
     }
 
 
+@media screen and (max-width: 7691px) {
+.profile-images {
+width:100px
+;padding:15px;
+margin-top:-30px;
+}
 
+training-title-box {
+width:100%;
+display:flex;
+flex-flow: column;
+margin-top: 20px;
+padding:15px
+}
+}
+
+@media screen and (min-width: 770px) {
+.profile-images {
+width:250px
+;padding:15px;
+margin-top:-40px;
+}
+
+training-title-box {
+width:100%;
+display:flex;
+flex-flow:row;
+margin-top: 20px;
+padding:15px
+}
+
+}
 
 
 
