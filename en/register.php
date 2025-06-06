@@ -157,7 +157,7 @@ echo '<!DOCTYPE html>
                     <p style="font-size:1em;"><?php echo $training_location; ?> from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
                 </div>
                 <div class="profile-images">
-                    <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
+                    <img src="<?php echo $feature_photo3_main; ?>" style="width:300px;padding:15px">
                     <p style="text-align:right; width:200px; text-align:center">Led by <?php echo $lead_trainer; ?></p>
                 </div>
             </div>
@@ -166,7 +166,7 @@ echo '<!DOCTYPE html>
 
 
 
-               <p style="margin-top:20px;font-size:1.3em"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
+               <p style="margin-top:20px;font-size:1.5em"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
 
 
 
