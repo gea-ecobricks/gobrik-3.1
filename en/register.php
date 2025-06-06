@@ -171,8 +171,7 @@ echo '<!DOCTYPE html>
 
 
 
-               <p><?php echo $training_agenda; ?></p>
-
+               <p><?php echo nl2br($training_agenda, ENT_QUOTES, 'UTF-8'); ?></p>
 
 
 
