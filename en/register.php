@@ -181,14 +181,17 @@ echo '<!DOCTYPE html>
                 <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
                     <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
-                    <p style="font-size:1em;"><?php echo $training_location; ?> from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
+
+                    <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
+                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
+                                        </button>
+
                 </div>
                 <div class="profile-images">
                     <img src="<?php echo $feature_photo3_main; ?>" style="width:250px;padding:15px;margin-top:-40px;">
                     <p style="text-align:right; text-align:center;margin-top: 0px; margin-bottom: auto;">Led by <?php echo $lead_trainer; ?></p>
-                    <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
-                        <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
-                    </button>
+                    <p style="font-size:1em;"><?php echo $training_location; ?> from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
+
                 </div>
             </div>
         </div>
