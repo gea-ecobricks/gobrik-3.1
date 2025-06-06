@@ -60,8 +60,8 @@ margin-top:-30px;
 .training-title-box {
 width:100%;
 display:flex;
-flex-flow: column-reverse;
-margin-top: 20px;
+/* flex-flow: column-reverse; */
+/* margin-top: 20px; */
 padding:15px
 }
 }
@@ -73,7 +73,7 @@ padding:15px;
 margin-top:-40px;
 }
 
-training-title-box {
+.training-title-box {
 width:100%;
 display:flex;
 flex-flow:row;
