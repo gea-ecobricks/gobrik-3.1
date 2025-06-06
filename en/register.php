@@ -148,13 +148,14 @@ echo '<!DOCTYPE html>
                 <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;" class="form-field">
                     <div class="the-titles" style="width:80%">
                         <h2><?php echo $training_title; ?></h2>
-                        <h4>Lead by <?php echo $lead_trainer; ?></h4>
-                        <p style="font-size:1emm"><?php echo $training_date; ?></p>
-                        <p style="font-size:1em;;"><?php echo $training_type; ?></p>
-                        <p style="font-size:1em;;"><?php echo $training_location; ?></p>
+
+                        <p style="font-size:1em"><?php echo $training_date; ?></p>
+                        <p style="font-size:1em;"><?php echo $training_type; ?></p>
+                        <p style="font-size:1em;"><?php echo $training_location; ?></p>
                     </div>
                     <div class="profile-images" style="width:20%">
                         <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
+                        <p style="font-size:1em; text-align:right;">Led by <?php echo $lead_trainer; ?></p>
                     </div>
                 </div>
 
