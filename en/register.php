@@ -75,7 +75,7 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $allowed_tags = '<b><i><u><strong><em><p><br><ul><li><ol>';
-    $training_summary = strip_tags($row['training_summary'] ?? '', $allowed_tags);
+    $featured_description = strip_tags($row['featured_description'] ?? '', $allowed_tags);
     $training_agenda = strip_tags($row['training_agenda'] ?? '', $allowed_tags);
     $training_title = htmlspecialchars($row['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_date = htmlspecialchars($row['training_date'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -87,9 +87,7 @@ if ($result->num_rows > 0) {
     $registration_scope = htmlspecialchars($row['registration_scope'] ?? '', ENT_QUOTES, 'UTF-8');
     $location_full = isset($row['location_full']) ? htmlspecialchars($row['location_full'], ENT_QUOTES, 'UTF-8') : '';
 
-    $training_success = nl2br(htmlspecialchars($row['training_success'] ?? '', ENT_QUOTES, 'UTF-8'));
-    $training_challenges = nl2br(htmlspecialchars($row['training_challenges'] ?? '', ENT_QUOTES, 'UTF-8'));
-    $training_lessons_learned = nl2br(htmlspecialchars($row['training_lessons_learned'] ?? '', ENT_QUOTES, 'UTF-8'));
+
     $training_url = htmlspecialchars($row['training_url'] ?? '', ENT_QUOTES, 'UTF-8');
     $ready_to_show = $row['ready_to_show'];
 
@@ -146,10 +144,11 @@ echo '<!DOCTYPE html>
                  <p style="font-size:1.3emm"><strong><?php echo $training_date; ?></strong></p>
 
                 <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
+                <img src="<?php echo $feature_photo3_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
 
                 <h2><?php echo $training_title; ?></h2>
                 <h4 >Lead by <?php echo $lead_trainer; ?></h4>
-               <p><?php echo nl2br(htmlspecialchars_decode($training_summary)); ?></p>
+               <p><?php echo nl2br(htmlspecialchars_decode($featured_description)); ?></p>
 
 
                 <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;" id="event-lead-photo">
