@@ -64,12 +64,13 @@ $feature_photo1_main = '';
 $feature_photo2_main = '';
 $feature_photo3_main = '';
 $training_subtitle = '';
+$training_time_txt = '';
 $registration_scope = '';
 $trainer_contact_email = '';
 
 // ✅ If editi   ng, fetch existing training details
 if ($editing) {
-    $sql_fetch = "SELECT training_title, training_subtitle, lead_trainer, country_id, training_date, no_participants,
+    $sql_fetch = "SELECT training_title, training_subtitle, lead_trainer, country_id, training_date, training_time_txt, no_participants,
                   training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
@@ -79,7 +80,7 @@ if ($editing) {
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
     $stmt_fetch->bind_param("i", $training_id);
     $stmt_fetch->execute();
-    $stmt_fetch->bind_result($training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $no_participants,
+    $stmt_fetch->bind_result($training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
                             $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
@@ -238,6 +239,14 @@ if (!empty($community_id)) {
                aria-label="Training Date" class="form-field-style">
         <p class="form-caption" data-lang-id="006-training-date">On what date and time did this training run?</p>
         <div id="date-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+    </div>
+
+    <!-- ======================= Training Time Text ======================= -->
+    <div class="form-item">
+        <label for="training_time_txt">Specify the time your training starts in key timezones...</label><br>
+        <input type="text" id="training_time_txt" name="training_time_txt" class="form-field-style"
+               placeholder="Jakarta: 7PM / UK: 1 PM / Morocco: 1PM"
+               value="<?php echo htmlspecialchars($training_time_txt ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     </div>
 
     <!-- ======================= Training Language ======================= -->
