@@ -57,10 +57,10 @@ width:100px
 margin-top:-30px;
 }
 
-training-title-box {
+.training-title-box {
 width:100%;
 display:flex;
-flex-flow: column;
+flex-flow: column-reverse;
 margin-top: 20px;
 padding:15px
 }
@@ -68,8 +68,8 @@ padding:15px
 
 @media screen and (min-width: 770px) {
 .profile-images img {
-width:250px
-;padding:15px;
+width:250px;
+padding:15px;
 margin-top:-40px;
 }
 
