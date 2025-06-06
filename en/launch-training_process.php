@@ -18,6 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 $training_id = isset($_POST['training_id']) ? intval($_POST['training_id']) : 0;
+if ($training_id <= 0 && isset($_GET['id'])) {
+    $training_id = intval($_GET['id']);
+}
 $editing = ($training_id > 0);
 
 $training_title = trim($_POST['training_title'] ?? '');
