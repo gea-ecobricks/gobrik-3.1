@@ -51,7 +51,7 @@
 
 
 @media screen and (max-width: 7691px) {
-.profile-images {
+.profile-images img {
 width:100px
 ;padding:15px;
 margin-top:-30px;
@@ -67,7 +67,7 @@ padding:15px
 }
 
 @media screen and (min-width: 770px) {
-.profile-images {
+.profile-images img {
 width:250px
 ;padding:15px;
 margin-top:-40px;
