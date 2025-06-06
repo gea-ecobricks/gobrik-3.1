@@ -149,15 +149,15 @@ echo '<!DOCTYPE html>
                 </div>
 
 
-                <h2><?php echo $training_title; ?></h2>
-                <h4 >Lead by <?php echo $lead_trainer; ?></h4>
-               <p><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES, 'UTF-8')); ?></p>
+               <h2><?php echo $training_title; ?></h2>
 
+               <h4>Lead by <?php echo $lead_trainer; ?></h4>
 
-                <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;" id="event-lead-photo">
+               <p><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
 
-                <p><?php echo nl2br(htmlspecialchars($training_agenda, ENT_QUOTES, 'UTF-8')); ?></p>
+               <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo">
 
+               <p><?php echo nl2br(htmlspecialchars($training_agenda, ENT_QUOTES, 'UTF-8')); ?></p>
 
 
 
@@ -171,9 +171,7 @@ echo '<!DOCTYPE html>
 
 
 
-        <?php if (!empty($feature_photo3_main)): ?>
-            <img src="<?php echo $feature_photo3_main; ?>" style="width:100%;" id="event-lead-photo">
-        <?php endif; ?>
+
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;font-size:small;">
             <h4>Community Event Details</h4>
             <hr>
