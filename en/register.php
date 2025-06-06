@@ -87,6 +87,7 @@ if ($result->num_rows > 0) {
     $training_country = htmlspecialchars($row['training_country'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'] ?? '', ENT_QUOTES, 'UTF-8');
     $registration_scope = htmlspecialchars($row['registration_scope'] ?? '', ENT_QUOTES, 'UTF-8');
+     $training_language = htmlspecialchars($row['training_language'] ?? '', ENT_QUOTES, 'UTF-8');
     $location_full = isset($row['location_full']) ? htmlspecialchars($row['location_full'], ENT_QUOTES, 'UTF-8') : '';
 
 
@@ -151,9 +152,9 @@ echo '<!DOCTYPE html>
                 <div class="the-titles" style="width:80%">
                 <h3><?php echo $training_title; ?></h3>
                 <h3><?php echo $training_subtitle; ?></h3>
-                    <p style="font-size:1em"><?php echo $training_date; ?></p>
-                    <p style="font-size:1em;"><?php echo $training_type; ?> | <?php echo $training_time_txt; ?></p>
-                    <p style="font-size:1em;"><?php echo $training_location; ?></p>
+                    <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
+                    <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
+                    <p style="font-size:1em;"><?php echo $training_location; ?> | from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
                 </div>
                 <div class="profile-images" style="width:20%">
                     <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
