@@ -158,8 +158,7 @@ echo '<!DOCTYPE html>
                 </div>
                 <div class="profile-images">
                     <img src="<?php echo $feature_photo3_main; ?>" style="width:275px;padding:15px">
-                    <p style="text-align:right; width:200px; text-align:center;margin-top: 0px;
-                                                                                 margin-bottom: auto;">Led by <?php echo $lead_trainer; ?></p>
+                    <p style="text-align:right; text-align:center;margin-top: 0px; margin-bottom: auto;">Led by <?php echo $lead_trainer; ?></p>
                 </div>
             </div>
         </div>
@@ -171,7 +170,8 @@ echo '<!DOCTYPE html>
 
 
 
-               <p><?php echo nl2br($training_agenda, ENT_QUOTES, 'UTF-8'); ?></p>
+               <p><?php echo nl2br($training_agenda); ?></p>
+
 
 
 
