@@ -8,8 +8,8 @@ $page = 'register';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in
 
-// Define training ID at the top
-$training_id = 818; // Ensure this is defined before any queries
+// Get training ID from the URL
+$training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // Initialize training variables
 $training_title = $training_date = $lead_trainer = "";
@@ -82,9 +82,6 @@ if ($result->num_rows > 0) {
     $training_logged = htmlspecialchars($row['training_logged'], ENT_QUOTES, 'UTF-8');
     $lead_trainer = htmlspecialchars($row['lead_trainer'], ENT_QUOTES, 'UTF-8');
     $training_type = htmlspecialchars($row['training_type'], ENT_QUOTES, 'UTF-8');
-    $briks_made = $row['briks_made'];
-    $avg_brik_weight = $row['avg_brik_weight'];
-    $est_plastic_packed = $row['est_plastic_packed'];
     $training_country = htmlspecialchars($row['training_country'], ENT_QUOTES, 'UTF-8');
     $training_location = htmlspecialchars($row['training_location'], ENT_QUOTES, 'UTF-8');
     $registration_scope = htmlspecialchars($row['registration_scope'], ENT_QUOTES, 'UTF-8');
@@ -94,13 +91,17 @@ if ($result->num_rows > 0) {
     $training_challenges = nl2br(htmlspecialchars($row['training_challenges'], ENT_QUOTES, 'UTF-8'));
     $training_lessons_learned = nl2br(htmlspecialchars($row['training_lessons_learned'], ENT_QUOTES, 'UTF-8'));
     $training_url = htmlspecialchars($row['training_url'], ENT_QUOTES, 'UTF-8');
-    $connected_ecobricks = nl2br(htmlspecialchars($row['connected_ecobricks'], ENT_QUOTES, 'UTF-8'));
     $ready_to_show = $row['ready_to_show'];
 
     // ✅ Fetch feature photos
     $feature_photo1_main = htmlspecialchars($row['feature_photo1_main'], ENT_QUOTES, 'UTF-8');
     $feature_photo2_main = htmlspecialchars($row['feature_photo2_main'], ENT_QUOTES, 'UTF-8');
     $feature_photo1_tmb = htmlspecialchars($row['feature_photo1_tmb'], ENT_QUOTES, 'UTF-8');
+
+    if ($ready_to_show == 0) {
+        echo "<script>alert('Sorry this training isn\'t yet listed for public registration.'); window.location.href='trainings.php';</script>";
+        exit;
+    }
 }
 
 
@@ -116,30 +117,6 @@ echo '<!DOCTYPE html>
 ';
 ?>
 
-<title><?php echo $training_title; ?></title>
-<meta name="keywords" content="GEA Registration, Community, Event, Webinar, Course">
-<meta name="description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo $training_date; ?>">
-
-<!-- Facebook Open Graph Tags for social sharing -->
-<meta property="og:url" content="https://www.gobrik.com/en/register.php">
-<meta property="og:type" content="website">
-<meta property="og:title" content="<?php echo $training_title; ?>">
-<meta property="og:description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo $training_date; ?>">
-<meta property="og:image" content="<?php echo !empty($feature_photo1_main) ? $feature_photo1_main : '../photos/events/terraces-forests-gladys.jpg'; ?>">
-<meta property="fb:app_id" content="1781710898523821">
-<meta property="og:image:width" content="1000">
-<meta property="og:image:height" content="500">
-<meta property="og:image:alt" content="<?php echo $training_title; ?>">
-<meta property="og:locale" content="en_GB">
-
-<meta property="article:modified_time" content="<?php echo date("c"); ?>">
-
-<meta name="author" content="GoBrik.com">
-<meta property="og:type" content="page">
-<meta property="og:site_name" content="GoBrik.com">
-<meta property="article:publisher" content="https://web.facebook.com/ecobricks.org">
-<meta property="og:image:type" content="image/png">
-<meta name="author" content="GoBrik.com">
 
 
 <!-- Page CSS & JS Initialization -->
