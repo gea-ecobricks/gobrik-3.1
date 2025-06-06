@@ -114,6 +114,10 @@ if ($editing) {
             zoom_link=?, zoom_link_full=?, registration_scope=?, trainer_contact_email=?
             WHERE training_id=?";
     $stmt = $gobrik_conn->prepare($sql);
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
+        exit();
+    }
     $stmt->bind_param("sssississiiddssssssssisissssi",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
         $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
@@ -159,6 +163,10 @@ if ($editing) {
             zoom_link, zoom_link_full, registration_scope, trainer_contact_email)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $gobrik_conn->prepare($sql);
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
+        exit();
+    }
     $stmt->bind_param("sssississiiddssssssssisissss",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
         $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
