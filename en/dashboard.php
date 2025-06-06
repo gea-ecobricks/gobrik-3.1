@@ -76,7 +76,7 @@ $locationFullTxt = $location_third_last . ', ' . $location_last;
 
 // Fetch trainings where the user is a trainer, including trainee count
 $trainings = [];
-$sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type,
+$sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type, t.ready_to_show,
                          (SELECT COUNT(*) FROM tb_training_trainees WHERE training_id = t.training_id) AS trainee_count
                   FROM tb_trainings t
                   INNER JOIN tb_training_trainers tt ON t.training_id = tt.training_id
@@ -207,6 +207,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
             <a href="bug-report.php" class="page-button">Report a Bug</a>
             <a href="accounting.php" class="page-button">GEA Accounting</a>
+            <a href="launch-training.php" class="page-button">Launch a training</a>
             <a href="add-training.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">Log Training Report</a>
             <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training" style="margin: 10px;">+ Set Buwana Totem</a>
 
@@ -231,6 +232,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <th>Location</th>
                 <th>Type</th>
                 <th>Registered</th> <!-- Updated Column Name -->
+                <th>Edit</th>
                 <th>Report</th> <!-- New Column -->
             </tr>
         </thead>
@@ -249,6 +251,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <td style="text-align:center;">
                         <a href="javascript:void(0);" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
                             <span style="text-decoration: underline;"><?php echo (int) $training['trainee_count']; ?></span> 🔎
+                        </a>
+                    </td>
+
+                    <!-- Edit column showing publication status -->
+                    <td style="text-align:center;">
+                        <a href="training.php?training_id=<?php echo $training['training_id']; ?>">
+                            <?php echo ($training['ready_to_show'] == 1) ? '🟢' : '⚪'; ?>
                         </a>
                     </td>
 
@@ -559,7 +568,7 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [4, 5] }, // Disable sorting on "Registered" and "Report" columns
+            { "orderable": false, "targets": [4, 5, 6] }, // Disable sorting on "Registered", "Edit" and "Report" columns
             { "targets": [1, 2, 3], "visible": true }, // Show Date, Location, Type
             { "targets": [1, 2, 3], "visible": false, "responsivePriority": 1 } // Hide on small screens
         ]
