@@ -17,7 +17,7 @@ if (!isLoggedIn()) {
 require_once '../gobrikconn_env.php';
 
 /* ✅ Get `training_id` and `ecobricker_id` from URL */
-$training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
+$training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $ecobricker_id = isset($_GET['ecobricker_id']) ? intval($_GET['ecobricker_id']) : 0;
 
 /* ✅ Validate Inputs */
@@ -60,7 +60,7 @@ $stmt_check->store_result();
 if ($stmt_check->num_rows > 0) {
     $stmt_check->close();
     $gobrik_conn->close();
-    header("Location: register.php?training_id=$training_id&registered=1");
+    header("Location: register.php?id=$training_id&registered=1");
     exit();
 }
 $stmt_check->close();
@@ -77,12 +77,12 @@ if ($stmt_insert->execute()) {
     sendTrainingConfirmationEmail($first_name, $email_addr, $training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $agenda_url, $lead_trainer, $trainer_contact_email, $zoom_link_full);
 
     // ✅ Redirect User Back to the Registration Page with Success Message
-    header("Location: register.php?training_id=$training_id&registered=1");
+    header("Location: register.php?id=$training_id&registered=1");
     exit();
 }
 
 // Registration failed, redirect with error message
-header("Location: register.php?training_id=$training_id&error=failed");
+header("Location: register.php?id=$training_id&error=failed");
 exit();
 
 $gobrik_conn->close();
