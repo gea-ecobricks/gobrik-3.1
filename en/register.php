@@ -151,14 +151,14 @@ echo '<!DOCTYPE html>
             <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;padding:15px;" class="form-field">
                 <div class="the-titles" style="width:80%">
                 <h3><?php echo $training_title; ?></h3>
-                <h3><?php echo $training_subtitle; ?></h3>
+                <h4><?php echo $training_subtitle; ?></h4>
                     <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
-                    <p style="font-size:1em;"><?php echo $training_location; ?> | from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
+                    <p style="font-size:1em;"><?php echo $training_location; ?> from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
                 </div>
                 <div class="profile-images" style="width:20%">
                     <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
-                    <p style="text-align:right;">Led by <?php echo $lead_trainer; ?></p>
+                    <p style="text-align:right; width:200px; text-align:center">Led by <?php echo $lead_trainer; ?></p>
                 </div>
             </div>
         </div>
@@ -166,7 +166,7 @@ echo '<!DOCTYPE html>
 
 
 
-               <p><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
+               <p style="margin-top:20px;font-size:1.3em"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
 
 
 
