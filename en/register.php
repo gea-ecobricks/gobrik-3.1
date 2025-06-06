@@ -78,9 +78,9 @@ if ($result->num_rows > 0) {
     $featured_description = strip_tags($row['featured_description'] ?? '', $allowed_tags);
     $training_agenda = strip_tags($row['training_agenda'] ?? '', $allowed_tags);
     $training_title = htmlspecialchars($row['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
-    $training_date = htmlspecialchars($row['training_subtitle'] ?? '', ENT_QUOTES, 'UTF-8');
+    $training_subtitle = htmlspecialchars($row['training_subtitle'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_date = htmlspecialchars($row['training_date'] ?? '', ENT_QUOTES, 'UTF-8');
-    $training_date = htmlspecialchars($row['training_time_txt'] ?? '', ENT_QUOTES, 'UTF-8');
+    $training_time_txt = htmlspecialchars($row['training_time_txt'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_logged = htmlspecialchars($row['training_logged'] ?? '', ENT_QUOTES, 'UTF-8');
     $lead_trainer = htmlspecialchars($row['lead_trainer'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_type = htmlspecialchars($row['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
