@@ -108,7 +108,7 @@ if ($editing) {
     $sql = "UPDATE tb_trainings SET
             training_title=?, training_subtitle=?, lead_trainer=?, country_id=?, training_date=?, training_time_txt=?,
             no_participants=?, training_type=?, training_language=?, briks_made=?, avg_brik_weight=?,
-            location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?,
+            training_location=?, training_summary=?, training_agenda=?,
             training_success=?, training_challenges=?, training_lessons_learned=?,
             youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?,
             zoom_link=?, zoom_link_full=?, registration_scope=?, trainer_contact_email=?
@@ -118,9 +118,9 @@ if ($editing) {
         echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
         exit();
     }
-    $stmt->bind_param("sssississiiddssssssssisissssi",
+    $stmt->bind_param("sssississiissssssssisissssi",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
-        $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
+        $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
         $featured_description, $community_id, $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email,
@@ -157,8 +157,7 @@ if ($editing) {
 } else {
     $sql = "INSERT INTO tb_trainings
             (training_title, training_subtitle, lead_trainer, country_id, training_date, training_time_txt, no_participants,
-            training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long,
-            training_location, training_summary, training_agenda, training_success, training_challenges,
+            training_type, training_language, briks_made, avg_brik_weight, training_location, training_summary, training_agenda, training_success, training_challenges,
             training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
             zoom_link, zoom_link_full, registration_scope, trainer_contact_email)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -167,9 +166,9 @@ if ($editing) {
         echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
         exit();
     }
-    $stmt->bind_param("sssississiiddssssssssisissss",
+    $stmt->bind_param("sssississiissssssssisissss",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
-        $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
+        $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
         $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email
