@@ -90,7 +90,7 @@ if ($result->num_rows > 0) {
     $training_location = htmlspecialchars($row['training_location'] ?? '', ENT_QUOTES, 'UTF-8');
     $registration_scope = htmlspecialchars($row['registration_scope'] ?? '', ENT_QUOTES, 'UTF-8');
     $language_id = intval($row['training_language'] ?? 0);
-    $location_full = isset($row['location_full']) ? htmlspecialchars($row['location_full'], ENT_QUOTES, 'UTF-8') : '';
+
 
 
     $training_url = htmlspecialchars($row['training_url'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -214,7 +214,7 @@ echo '<!DOCTYPE html>
 
 
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;font-size:small;">
-            <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo"><h4>Community Event Details</h4>
+            <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo"><h4><?php echo $training_type; ?></h4>
 
             <hr>
             <p><strong>Title:</strong> <?php echo $training_title; ?></p>
