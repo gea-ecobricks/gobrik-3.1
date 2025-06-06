@@ -63,12 +63,13 @@ $zoom_link_full = '';
 $feature_photo1_main = '';
 $feature_photo2_main = '';
 $feature_photo3_main = '';
+$training_subtitle = '';
 $registration_scope = '';
 $trainer_contact_email = '';
 
 // ✅ If editi   ng, fetch existing training details
 if ($editing) {
-    $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
+    $sql_fetch = "SELECT training_title, training_subtitle, lead_trainer, country_id, training_date, no_participants,
                   training_type, training_language, briks_made, avg_brik_weight, location_lat, location_long, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
@@ -78,7 +79,7 @@ if ($editing) {
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
     $stmt_fetch->bind_param("i", $training_id);
     $stmt_fetch->execute();
-    $stmt_fetch->bind_result($training_title, $lead_trainer, $country_id, $training_date, $no_participants,
+    $stmt_fetch->bind_result($training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $no_participants,
                             $training_type, $training_language, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
@@ -166,12 +167,15 @@ if (!empty($community_id)) {
 
             <div class="splash-form-content-block">
                 <div class="splash-box">
-                    <div class="splash-heading" data-lang-id="001-splash-title-post">Launch a GEA Training</div>
+                    <div class="splash-heading" data-lang-id="001-splash-title-post"><?php echo $editing ? 'Edit your training' : 'Launch a GEA Training'; ?></div>
                     <div class="lead-page-paragraph">
                                     <p data-lang-id="004-form-description-post">Use this form to launch a training, workshop or community event on GoBrik.</p>
                                 </div>
                             <div style="text-align:right; margin:10px 0;">
                                 <button type="button" id="starterPresetBtn" style="padding:7px">+ Starter Workshop Presets</button>
+<?php if ($editing): ?>
+                                <button type="button" style="padding:7px; margin-left:10px;" onclick="window.open('training.php?id=<?php echo $training_id; ?>','_blank');">&gt; View training listing</button>
+<?php endif; ?>
                             </div>
                 </div>
                 <div class="splash-image" data-lang-id="003-splash-image-alt">
@@ -198,6 +202,14 @@ if (!empty($community_id)) {
         <div id="title-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
         <div id="title-error-long" class="form-field-error" data-lang-id="000-title-field-too-long-error">Your training title is too long. Max 500 characters.</div>
         <div id="title-error-invalid" class="form-field-error" data-lang-id="005b-training-title-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs please.</div>
+    </div>
+
+    <!-- ======================= Training Subtitle ======================= -->
+    <div class="form-item">
+        <label for="training_subtitle">Add an optional subtitle to your training...</label><br>
+        <input type="text" id="training_subtitle" name="training_subtitle"
+               value="<?php echo htmlspecialchars($training_subtitle ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+               aria-label="Training Subtitle">
     </div>
 
     <!-- ======================= Trainers ======================= -->
@@ -875,6 +887,7 @@ function setFileInputFromUrl(inputId, url) {
 
 function presetForStarterWorkshop() {
     document.getElementById('training_title').value = 'Plastic, the Biosphere & Ecobricks: An Introduction';
+    document.getElementById('training_subtitle').value = 'An Introduction to Ecobricking';
     document.getElementById('no_participants').value = 30;
     document.getElementById('community_search').value = 'Global Ecobrick Movement';
 
