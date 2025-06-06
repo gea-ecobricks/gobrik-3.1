@@ -156,7 +156,7 @@ echo '<!DOCTYPE html>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
                     <p style="font-size:1em;"><?php echo $training_location; ?> from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
                 </div>
-                <div class="profile-images" style="width:20%">
+                <div class="profile-images">
                     <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
                     <p style="text-align:right; width:200px; text-align:center">Led by <?php echo $lead_trainer; ?></p>
                 </div>
