@@ -127,6 +127,10 @@ if ($editing) {
         $training_id
     );
     if ($stmt->execute()) {
+        if ($stmt->affected_rows === 0) {
+            echo json_encode(['success' => false, 'error' => 'Training not found.']);
+            exit();
+        }
         $new_training_id = $training_id;
     } else {
         echo json_encode(['success' => false, 'error' => 'Update failed.']);
