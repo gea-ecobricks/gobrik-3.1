@@ -144,16 +144,20 @@ echo '<!DOCTYPE html>
                  <p style="font-size:1.3emm"><strong><?php echo $training_date; ?></strong></p>
 
                 <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
-                <img src="<?php echo $feature_photo3_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
+                <div class="trainer-profile-images" style="width:100%;display:flex;flex-flow:row">
+                    <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;margin: -40px 20px 20px auto;">
+                </div>
+
 
                 <h2><?php echo $training_title; ?></h2>
                 <h4 >Lead by <?php echo $lead_trainer; ?></h4>
-               <p><?php echo nl2br(htmlspecialchars_decode($featured_description)); ?></p>
+               <p><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES, 'UTF-8')); ?></p>
 
 
                 <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;" id="event-lead-photo">
 
-                <p><?php echo $training_agenda; ?></p>
+                <p><?php echo nl2br(htmlspecialchars($training_agenda, ENT_QUOTES, 'UTF-8')); ?></p>
+
 
 
 
