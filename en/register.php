@@ -140,31 +140,31 @@ echo '<!DOCTYPE html>
         </div>
     <?php endif; ?>
 
+        <div class="intro-to-training-wrapper" style="width: 100$; background: #00000015; border-radius:15px; padding:10px;"
+
+            <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
 
 
-                <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
-
-
-                <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;" class="form-field">
-                    <div class="the-titles" style="width:80%">
-                        <h2><?php echo $training_title; ?></h2>
-
-                        <p style="font-size:1em"><?php echo $training_date; ?></p>
-                        <p style="font-size:1em;"><?php echo $training_type; ?></p>
-                        <p style="font-size:1em;"><?php echo $training_location; ?></p>
-                    </div>
-                    <div class="profile-images" style="width:20%">
-                        <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
-                        <p style="font-size:1em; text-align:right;">Led by <?php echo $lead_trainer; ?></p>
-                    </div>
+            <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;" class="form-field">
+                <div class="the-titles" style="width:80%">
+                <h2><?php echo $training_title; ?></h2>
+                    <p style="font-size:1em"><?php echo $training_date; ?></p>
+                    <p style="font-size:1em;"><?php echo $training_type; ?></p>
+                    <p style="font-size:1em;"><?php echo $training_location; ?></p>
                 </div>
+                <div class="profile-images" style="width:20%">
+                    <img src="<?php echo $feature_photo3_main; ?>" style="width:200px;">
+                    <p style="font-size:1.3em; text-align:right;">Led by <?php echo $lead_trainer; ?></p>
+                </div>
+            </div>
+        </div>
 
 
 
 
                <p><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
 
-               <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo">
+
 
                <p><?php echo nl2br(htmlspecialchars($training_agenda, ENT_QUOTES, 'UTF-8')); ?></p>
 
@@ -182,7 +182,8 @@ echo '<!DOCTYPE html>
 
 
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;font-size:small;">
-            <h4>Community Event Details</h4>
+            <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo"><h4>Community Event Details</h4>
+
             <hr>
             <p><strong>Title:</strong> <?php echo $training_title; ?></p>
             <p><strong>Date:</strong> <?php echo $training_date; ?></p>
