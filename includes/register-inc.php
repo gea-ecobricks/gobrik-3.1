@@ -17,6 +17,22 @@
 <STYLE>
 
 
+#rsvp-register-button
+
+{color: white;
+   padding: 10px 20px;
+   border: none;
+   border-radius: 5px;
+   cursor: pointer;
+   background: var(--emblem-green);
+   font-size: 1.3em;
+   justify-content: center;
+   text-align: center;
+   text-decoration: none;
+   margin-top: 10px;
+   display: flex;
+
+   }
 
 
       #main {
