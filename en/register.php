@@ -151,7 +151,7 @@ echo '<!DOCTYPE html>
             <div class="training-title-box" style="width:100%;display:flex;flex-flow:row; margin-top: 20px;padding:15px;" class="form-field">
                 <div class="the-titles" style="width:80%">
                 <h3><?php echo $training_title; ?></h3>
-                <h4><?php echo $training_subtitle; ?></h4>
+                <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
                     <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
                     <p style="font-size:1em;"><?php echo $training_location; ?> from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
