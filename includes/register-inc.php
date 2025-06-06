@@ -17,9 +17,7 @@
 <STYLE>
 
 
-#rsvp-register-button
-
-{}
+#rsvp-register-button  {
 
     color: white;
    padding: 10px 20px;
