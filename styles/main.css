@@ -2243,13 +2243,13 @@ label {
 
 @media screen and (min-width: 770px) {
     .top-container-notice {
-        width: 77%;
+        width: 60%;
     }
 }
 
 @media screen and (max-width: 770px) {
     .top-container-notice {
-        width: 88%;
+        width: 77%;
     }
 }
 
