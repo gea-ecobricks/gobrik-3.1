@@ -64,7 +64,7 @@ margin-top:-10px;
 }
 
 .profile-names {
-width:175px;
+width:150px;
 text-align:right;
 }
 
