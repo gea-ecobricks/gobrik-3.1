@@ -81,7 +81,7 @@ padding: 12px;
 }
 
 .profile-images img {
-width:200px;
+width:177px;
 margin-top:-10px;
 margin-left:auto;
 margin-right: 10px;
@@ -92,7 +92,7 @@ width:250px;
 text-align:right;
 margin-left:auto;
 margin-right: 10px;
-margin-top: 0px;
+margin-top: 10px;
 }
 
 .training-title-box {
