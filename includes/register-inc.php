@@ -132,6 +132,7 @@ margin-right: 10px;
 margin-left:auto;
 margin-right: 10px;
 margin-top: 10px;
+
 }
 
 .training-title-box {
