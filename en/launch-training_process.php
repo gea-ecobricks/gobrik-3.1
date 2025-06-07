@@ -127,10 +127,6 @@ if ($editing) {
         $training_id
     );
     if ($stmt->execute()) {
-        if ($stmt->affected_rows === 0) {
-            echo json_encode(['success' => false, 'error' => 'Training not found.']);
-            exit();
-        }
         $new_training_id = $training_id;
     } else {
         echo json_encode(['success' => false, 'error' => 'Update failed.']);
@@ -218,13 +214,11 @@ if ($new_training_id) {
     if (!empty($trainers)) {
         // Insert the currently selected trainers
         $ins = $gobrik_conn->prepare("INSERT INTO tb_training_trainers (training_id, ecobricker_id) VALUES (?, ?)");
-        if ($ins) {
-            $ins->bind_param("ii", $new_training_id, $trainer_id);
-            foreach ($trainers as $trainer_id) {
-                $ins->execute();
-            }
-            $ins->close();
+        $ins->bind_param("ii", $new_training_id, $trainer_id);
+        foreach ($trainers as $trainer_id) {
+            $ins->execute();
         }
+        $ins->close();
     }
 }
 
