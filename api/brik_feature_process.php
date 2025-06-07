@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php';
 require_once '../gobrikconn_env.php';
 
 header('Content-Type: application/json');
-session_start();
+// Session management is handled in earthenAuth_helper.php
 
 if (!isLoggedIn()) {
     echo json_encode(['success' => false, 'error' => 'not_logged_in']);
