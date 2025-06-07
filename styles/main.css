@@ -2241,6 +2241,16 @@ font-family: 'Mulish', sans-serif;
   z-index: 30;
 }
 
+.notice-close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding-left: 8px;
+}
+
 @media screen and (min-width: 770px) {
     .top-container-notice {
         width: 60%;
