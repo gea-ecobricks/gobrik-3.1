@@ -12,7 +12,7 @@
 }
 
 .course-module-box {
-  background: var(--darker);
+  background: var(--course-module);
   border-radius: 12px;
   overflow: hidden;
   display:flex;
@@ -25,7 +25,8 @@
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   cursor:pointer;
-  border: 1px solidvar(--emblem-green);
+  border: 1px solid var(--emblem-green);
+  background: var(--course-module-over);
 }
 
 .course-module-box img {

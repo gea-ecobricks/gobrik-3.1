@@ -23,7 +23,7 @@ if ($is_logged_in) {
 require_once '../gobrikconn_env.php';
 
 $courses = [];
-$sql = "SELECT training_id, training_title, training_subtitle, lead_trainer, featured_description, training_type, training_location, training_language, training_date, training_time_txt, registration_scope, display_cost, feature_photo1_main FROM tb_trainings WHERE ready_to_show = 1 AND training_date >= CURDATE() ORDER BY training_date ASC";
+$sql = "SELECT training_id, training_title, training_subtitle, lead_trainer, featured_description, training_type, training_location, training_language, training_date, training_time_txt, registration_scope, display_cost, feature_photo1_main, display_cost FROM tb_trainings WHERE ready_to_show = 1 AND training_date >= CURDATE() ORDER BY training_date ASC";
 $result = $gobrik_conn->query($sql);
 if ($result) {
     while ($row = $result->fetch_assoc()) {
