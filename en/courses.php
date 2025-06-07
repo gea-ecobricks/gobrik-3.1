@@ -75,6 +75,11 @@ $gobrik_conn->close();
         </div>
     </div>
 </div>
+
+<!--FOOTER STARTS HERE-->
+<?php require_once ("../footer-2025.php");?>
+
+</div> <!--Closes main-->
 </body>
 </html>
 
