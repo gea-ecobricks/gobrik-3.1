@@ -467,7 +467,16 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php endif; ?>
 </script>
 
-<?php if (isset($_GET['status']) && $_GET['status'] == 'relanding'): ?>
+<?php
+$relanding = false;
+if (isset($_GET['status']) && $_GET['status'] == 'relanding') {
+    $relanding = true;
+} elseif (isset($_GET['id']) && strpos($_GET['id'], 'status=relanding') !== false) {
+    $relanding = true;
+} elseif (strpos($_SERVER['REQUEST_URI'], 'status=relanding') !== false) {
+    $relanding = true;
+}
+if ($relanding): ?>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     openConfirmRegistrationModal(
