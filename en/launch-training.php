@@ -173,9 +173,9 @@ if (!empty($community_id)) {
                                     <p data-lang-id="004-form-description-post">Use this form to launch a training, workshop or community event on GoBrik.</p>
                                 </div>
                             <div style="text-align:right; margin:10px 0;">
-                                <button type="button" id="starterPresetBtn" style="padding:7px">+ Starter Workshop Presets</button>
+                                <button type="button" id="starterPresetBtn" class="page-button">+ Starter Workshop Presets</button>
 <?php if ($editing): ?>
-                                <button type="button" style="padding:7px; margin-left:10px;" onclick="window.open('register.php?id=<?php echo $training_id; ?>','_blank');">&gt; View training listing</button>
+                                <button type="button" class="page-button" style="margin-left:10px;" onclick="window.open('register.php?id=<?php echo $training_id; ?>','_blank');">&gt; View training listing</button>
 <?php endif; ?>
                             </div>
                 </div>
@@ -435,7 +435,9 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 1 ======================= -->
     <div class="form-item">
 <?php if ($editing && !empty($feature_photo1_main)): ?>
-    <img src="<?php echo htmlspecialchars($feature_photo1_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 1">
+    <div>
+        <img src="<?php echo htmlspecialchars($feature_photo1_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 1">
+    </div>
 <?php endif; ?>
         <label for="feature_photo1_main">Set Feature Photo</label><br>
 
@@ -448,7 +450,8 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 2 ======================= -->
     <div class="form-item">
 <?php if ($editing && !empty($feature_photo2_main)): ?>
-    <img src="<?php echo htmlspecialchars($feature_photo2_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 2">
+    <div><img src="<?php echo htmlspecialchars($feature_photo2_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 2">
+    </div>
 <?php endif; ?>
         <label for="feature_photo2_main">Set a Second Training Feature Photo</label><br>
 
@@ -461,7 +464,8 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 3 ======================= -->
     <div class="form-item">
 <?php if ($editing && !empty($feature_photo3_main)): ?>
-    <img src="<?php echo htmlspecialchars($feature_photo3_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 3">
+    <div><img src="<?php echo htmlspecialchars($feature_photo3_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 3">
+    </div>
 <?php endif; ?>
         <label for="feature_photo3_main">Set a Third Training Feature Photo</label><br>
         <input type="url" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo3_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
@@ -472,7 +476,8 @@ if (!empty($community_id)) {
 
 <br><hr>
 <h4>Training Costing</h4>
-<p><span style="color:red">UNDER DEVELOPMENT</span> Set the way that participants will register for your course through fiat payment, brikcoin purchase or by 'free/ by donation'.</p>
+<p><span style="color:red">UNDER DEVELOPMENT</span></p>
+ <p>Set the way that participants will register for your course through fiat payment, brikcoin purchase or by 'free/ by donation'.</p>
 <div class="form-item">
     <label for="currency_display">What currency will payment for this training be in?</label><br>
     <input type="text" id="currency_display" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>" disabled class="form-field-style">

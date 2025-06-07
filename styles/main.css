@@ -2316,7 +2316,7 @@ input[type="text"], input[type="name"], input[type="credential"],  input[type="p
   border: 3px solid var(--button-2-1);
   border-radius: 5px;
   background-color: var(--top-header);
-  color: var(--text-color);
+  color: var(--same);
    border: 1.5px solid var(--button-2-1);
 }
 
@@ -2552,7 +2552,7 @@ position:relative;
 }
 
 
-//ADVANCED BOX
+/*ADVANCED BOX
 /* Initially hide content using max-height */
 .advanced-box[aria-expanded="false"] .advanced-box-content {
     max-height: 0;  /* Set max height to 0 to hide the content */
@@ -2576,7 +2576,7 @@ position:relative;
 
 
 
-//DataTables
+/*DataTables*/
 
     #ecobrick-search-return_info, #latest-ecobricks_info {
    color: grey !important;
