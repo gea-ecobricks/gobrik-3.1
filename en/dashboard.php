@@ -167,8 +167,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php require_once("../includes/dashboard-inc.php"); ?>
 
-<div class="splash-title-block"></div>
-<div id="splash-bar"></div>
 <div id="slider-box">
     <div id="ecobrick-slider">
         <?php foreach ($featured_ecobricks as $index => $brick): ?>
