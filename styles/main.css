@@ -2260,15 +2260,16 @@ label {
 }
 /* Featured ecobrick slider */
 #slider-box {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 70px);
+    overflow: hidden;
+    margin-top: 70px;
 }
 
 #ecobrick-slider {
   width: 100%;
-  height: 100%;
+    height: calc(100vh - 150px);
   position: relative;
 }
 

@@ -168,6 +168,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php require_once("../includes/dashboard-inc.php"); ?>
 
 <div id="slider-box">
+    <div id="registered-notice" class="top-container-notice">
+                <span style="margin-right:10px;">👍</span><span> GoBrik now has a slider to show the latest awesome ecobricks logged by ecobrickers like you around the world.</span>
+            </div>
     <div id="ecobrick-slider">
         <?php foreach ($featured_ecobricks as $index => $brick): ?>
             <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
@@ -189,9 +192,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <!-- DASHBOARD CONTENT -->
 <div id="form-submission-box" style="height:fit-content;margin-top: 110px;">
     <div class="form-container">
-        <div id="registered-notice" class="top-container-notice">
-            <span style="margin-right:10px;">👍</span><span> GoBrik now has a slider to show the latest awesome ecobricks logged by ecobrickers like you around the world.</span>
-        </div>
+
         <div style="display:flex;flex-flow:row;width:100%;justify-content:center;">
             <a href="log.php" class="confirm-button enabled" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick" style="margin: 10px;">➕ Log an Ecobrick</a>
             <button id="take-gobrik-tour" style="margin: 10px;" class="confirm-button enabled" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()"> 🛳️ GoBrik Tour</button>
