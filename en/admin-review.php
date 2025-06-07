@@ -120,6 +120,7 @@ echo '<!DOCTYPE html>
                             <th data-lang-id="1109-density">Density</th>
                             <th data-lang-id="1105-location">Location</th>
                             <th data-lang-id="1107-serial">Serial</th>
+                            <th>⭐</th>
 
                         </tr>
                     </thead>
@@ -194,11 +195,23 @@ echo '<!DOCTYPE html>
                         return data;
                     },
                     "orderable": false
+                },
+                {
+                    "data": "feature",
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            const icon = data == 1 ? '🌟' : '➕';
+                            return `<span class="feature-toggle" data-serial="${row.serial_no}" data-feature="${data}">${icon}</span>`;
+                        }
+                        return data;
+                    },
+                    "orderable": false,
+                    "className": "all"
                 }
             ],
             "columnDefs": [
-                { "orderable": false, "targets": [0, 3, 4, 5] }, // Make the image and status columns unsortable
-                { "className": "all", "targets": [0, 1, 2, 7] }, // Ensure Brik (thumbnail), Maker, Weight, and Serial always display
+                { "orderable": false, "targets": [0, 3, 4, 5, 8] }, // Make the image and certain columns unsortable
+                { "className": "all", "targets": [0, 1, 2, 7, 8] }, // Ensure Brik (thumbnail), Maker, Status, Serial and Feature always display
                 { "className": "min-tablet", "targets": [1, 4, 5, 6] }, // These fields can be hidden first on smaller screens
             ],
             "initComplete": function() {
@@ -210,6 +223,14 @@ echo '<!DOCTYPE html>
                     var serialNo = $(this).data('serial-no');
                     var status = $(this).data('status');
                     viewEcobrickActions(serialNo, status, userLang);
+                });
+
+                // Toggle feature field when the star column is clicked
+                $('#latest-ecobricks tbody').on('click', '.feature-toggle', function() {
+                    var serialNo = $(this).data('serial');
+                    var featureVal = parseInt($(this).data('feature'));
+                    var newVal = featureVal === 1 ? 0 : 1;
+                    setBrikFeatured(serialNo, newVal, $(this));
                 });
             }
         });
@@ -360,6 +381,27 @@ function deleteEcobrick(serial_no) {
             alert('There was an error processing your request.');
         });
     }
+}
+
+function setBrikFeatured(serial_no, featureVal, element) {
+    $.ajax({
+        url: '../api/brik_feature_process.php',
+        method: 'POST',
+        dataType: 'json',
+        data: { serial_no: serial_no, feature: featureVal },
+        success: function(response) {
+            if (response.success) {
+                var icon = featureVal === 1 ? '🌟' : '➕';
+                element.text(icon);
+                element.data('feature', featureVal);
+            } else {
+                alert('Error updating feature');
+            }
+        },
+        error: function() {
+            alert('Error updating feature');
+        }
+    });
 }
 </script>
 
