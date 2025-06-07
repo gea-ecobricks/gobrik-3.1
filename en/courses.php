@@ -51,17 +51,19 @@ $gobrik_conn->close();
             <?php foreach ($courses as $course): ?>
                 <div class="course-module-box">
                     <img src="<?php echo htmlspecialchars($course['feature_photo1_main']); ?>" alt="">
+                    <div class="course-date-lang-bar">
+                        <?php echo date('m.d.Y', strtotime($course['training_date'])); ?> |
+                        🌐 <?php echo strtoupper($course['training_language']); ?>
+                    </div>
                     <div class="course-module-info">
                         <h3><?php echo htmlspecialchars($course['training_title']); ?></h3>
                         <h4><?php echo htmlspecialchars($course['training_subtitle']); ?></h4>
-                        <div class="training-leaders"><?php echo htmlspecialchars($course['lead_trainer']); ?></div>
+                        <div class="training-leaders">Led by <?php echo htmlspecialchars($course['lead_trainer']); ?></div>
                         <?php $desc = strip_tags($course['featured_description']); if(strlen($desc)>255) $desc = substr($desc,0,255).'...'; ?>
                         <div class="course-description"><?php echo htmlspecialchars($desc); ?></div>
                         <div class="module-caption-item">
                             <?php echo htmlspecialchars($course['training_type']); ?> |
                             <?php echo htmlspecialchars($course['training_location']); ?> |
-                            <?php echo htmlspecialchars($course['training_language']); ?> |
-                            <?php echo htmlspecialchars($course['training_date']); ?> |
                             <?php echo htmlspecialchars($course['training_time_txt']); ?> |
                             <?php echo htmlspecialchars($course['registration_scope']); ?>
                             <?php if (!empty($course['display_cost'])) { echo ' | ' . htmlspecialchars($course['display_cost']); } ?>
