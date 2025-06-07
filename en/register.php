@@ -177,7 +177,7 @@ echo '<!DOCTYPE html>
 -->
 
 
-   <div id="form-submission-box">
+   <div id="form-submission-box" style="margin-top: 77px;">
         <div class="form-container" style="padding-top:0px;">
 
             <div style="width:100%;margin:auto;margin-top:5px;">
