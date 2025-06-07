@@ -360,7 +360,7 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
                 <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled" style="flex:1;width:80%;">Confirm Registration</a>
                 <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button" style="background:grey;flex:1;width:80%;">Back to Course</a>
             </div>
-            <p style="font-size:0.9em; color: grey;" >Upon confirmation we will send you the access links and information to your Buwana account e-mail: ${userEmail}</p>
+            <p style="font-size:1em; color: grey;" >Upon confirmation we will send you the access links and information to your Buwana account e-mail: ${userEmail}</p>
         </div>
     `;
 

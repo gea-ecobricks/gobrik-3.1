@@ -98,15 +98,15 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
 
     // ✅ Email Body (HTML)
     $html_body = "
-        <div style='text-align: center; font-family: Arial, sans-serif;'>
+        <div style='text-align: left; font-family: Arial, sans-serif;'>
             <img src='$feature_photo1_tmb' style='max-width: 100%; border-radius: 8px; margin-bottom: 15px;'>
             <h2>Hi there, $first_name!</h2>
             <p>Alright! 🎉 You're confirmed for our <strong>$training_type</strong> on <strong>$training_date</strong>.</p>
-            <p>You can join <strong>$training_title</strong> on Zoom using the following link:</p>
+            <p>You can join <strong>$training_title</strong> on strong>$training_date</strong> (that's $training_time_txt) using the following link:</p>
             <p style='font-size: 1.2em;'><a href='$zoom_link' target='_blank' style='color: #0073e6; font-weight: bold;'>🔗 Join Zoom Meeting</a></p>
             <p>The event will open 15 minutes beforehand for a meet & greet.</p>
-            <p>You can view the full <strong>$training_type</strong> agenda here:</p>
-            <p><a href='$agenda_url' target='_blank' style='color: #0073e6; font-weight: bold;'>📄 View Training Agenda</a></p>
+            <p>Here's the full zoom event invitation:</p>
+            <p>$zoom_link_full</p>
             <br>
             <p>Thank you, and see you then!</p>
             <br><br>
