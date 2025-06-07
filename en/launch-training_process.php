@@ -208,30 +208,24 @@ if ($editing) {
 }
 
 // ✅ Update trainers association
-if ($new_training_id && !empty($trainers)) {
+if ($new_training_id) {
+    // Remove any existing trainer links for this training
     $del = $gobrik_conn->prepare("DELETE FROM tb_training_trainers WHERE training_id = ?");
     $del->bind_param("i", $new_training_id);
     $del->execute();
     $del->close();
 
-    $ins = $gobrik_conn->prepare("INSERT INTO tb_training_trainers (training_id, ecobricker_id) VALUES (?, ?)");
-    if (!$ins) {
-        die("Prepare failed: " . $gobrik_conn->error);
-    }
-
-
-    // avoid undefined variable notice that can corrupt JSON output
-    $tr_id = null;
-
-    $ins->bind_param("ii", $new_training_id, $tr_id);
-
-    foreach ($trainers as $tr_id) {
-        if (!$ins->execute()) {
-            error_log("Insert error for ecobricker $tr_id: " . $ins->error);
+    if (!empty($trainers)) {
+        // Insert the currently selected trainers
+        $ins = $gobrik_conn->prepare("INSERT INTO tb_training_trainers (training_id, ecobricker_id) VALUES (?, ?)");
+        if ($ins) {
+            $ins->bind_param("ii", $new_training_id, $trainer_id);
+            foreach ($trainers as $trainer_id) {
+                $ins->execute();
+            }
+            $ins->close();
         }
     }
-
-    $ins->close();
 }
 
 echo json_encode(['success' => true, 'training_id' => $new_training_id]);
