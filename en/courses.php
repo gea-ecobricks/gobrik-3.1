@@ -52,8 +52,8 @@ $gobrik_conn->close();
                 <div class="course-module-box">
                     <img src="<?php echo htmlspecialchars($course['feature_photo1_main']); ?>" alt="">
                     <div class="course-date-lang-bar">
-                        <?php echo date('m.d.Y', strtotime($course['training_date'])); ?> |
-                        🌐 <?php echo strtoupper($course['training_language']); ?>
+                        <?php echo date('M j', strtotime($course['training_date'])); ?> |
+                        🌐<?php echo strtoupper($course['training_language']); ?>
                     </div>
                     <div class="course-module-info">
                         <h3><?php echo htmlspecialchars($course['training_title']); ?></h3>
@@ -63,10 +63,10 @@ $gobrik_conn->close();
                         <div class="course-description"><?php echo htmlspecialchars($desc); ?></div>
                         <div class="module-caption-item">
                             <?php echo htmlspecialchars($course['training_type']); ?> |
-                            <?php echo htmlspecialchars($course['training_location']); ?> |
-                            <?php echo htmlspecialchars($course['training_time_txt']); ?> |
-                            <?php echo htmlspecialchars($course['registration_scope']); ?>
-                            <?php if (!empty($course['display_cost'])) { echo ' | ' . htmlspecialchars($course['display_cost']); } ?>
+                            <?php echo htmlspecialchars($course['training_location']); ?>
+                        </div>
+                        <div class="module-caption-item">
+                            Open to: <?php echo htmlspecialchars($course['registration_scope']); ?>
                         </div>
                     </div>
                     <a class="learn-more-btn" href="register.php?id=<?php echo $course['training_id']; ?>">Learn More</a>
