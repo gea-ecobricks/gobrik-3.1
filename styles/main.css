@@ -2258,6 +2258,64 @@ label {
 
 
 }
+/* Featured ecobrick slider */
+#slider-box {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#ecobrick-slider {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#ecobrick-slider .slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#ecobrick-slider .slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#ecobrick-slider .slide.active {
+  opacity: 1;
+}
+
+#slider-dots {
+  position: absolute;
+  bottom: 15px;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+}
+
+#slider-dots .dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 0 4px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+#slider-dots .dot.active {
+  opacity: 1;
+  background: var(--emblem-green);
+}
+
 
 
 /*upload*/

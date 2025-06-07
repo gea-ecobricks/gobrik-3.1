@@ -118,6 +118,22 @@ if ($stmt_registered_trainings) {
     die("Error preparing statement for registered trainings: " . $gobrik_conn->error);
 }
 
+// Fetch featured ecobricks for the slider
+$featured_ecobricks = [];
+$sql_featured = "SELECT ecobrick_full_photo_url, serial_no, photo_version FROM tb_ecobricks WHERE feature = 1 AND status != 'not ready' ORDER BY date_logged_ts DESC LIMIT 10";
+$stmt_featured = $gobrik_conn->prepare($sql_featured);
+
+if ($stmt_featured) {
+    $stmt_featured->execute();
+    $result_featured = $stmt_featured->get_result();
+    while ($row = $result_featured->fetch_assoc()) {
+        $featured_ecobricks[] = $row;
+    }
+    $stmt_featured->close();
+} else {
+    die("Error preparing statement for featured ecobricks: " . $gobrik_conn->error);
+}
+
 
 
     // Close the database connections
@@ -153,13 +169,30 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
-<div id="top-page-image" class="dolphin-pic top-page-image"></div>
+<div id="slider-box">
+    <div id="ecobrick-slider">
+        <?php foreach ($featured_ecobricks as $index => $brick): ?>
+            <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
+                <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                     alt="Ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+            </div>
+        <?php endforeach; ?>
+        <div id="slider-dots">
+            <?php foreach ($featured_ecobricks as $index => $_): ?>
+                <span class="dot<?php echo $index === 0 ? ' active' : ''; ?>" data-slide="<?php echo $index; ?>"></span>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <div style="text-align:center;width:100%;margin:auto;">
+        <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
+        <p id="subgreeting">Welcome to your new dashboard.</p>
+    </div>
+</div>
 <!-- DASHBOARD CONTENT -->
 <div id="form-submission-box" style="height:fit-content;margin-top: 110px;">
     <div class="form-container">
-        <div style="text-align:center;width:100%;margin:auto;">
-            <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
-            <p id="subgreeting">Welcome to the new GoBrik 3.0!</p>
+        <div id="registered-notice" class="top-container-notice">
+            <span style="margin-right:10px;">👍</span><span> GoBrik now has a slider to show the latest awesome ecobricks logged by ecobrickers like you around the world.</span>
         </div>
         <div style="display:flex;flex-flow:row;width:100%;justify-content:center;">
             <a href="log.php" class="confirm-button enabled" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick" style="margin: 10px;">➕ Log an Ecobrick</a>
@@ -1085,6 +1118,56 @@ function deleteEcobrick(serial_no) {
         // Your guided tour logic here
         alert("Starting the GoBrik guided tour!");
     }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const slides = document.querySelectorAll('#ecobrick-slider .slide');
+    const dots = document.querySelectorAll('#slider-dots .dot');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        slides[currentSlide].classList.remove('active');
+        dots[currentSlide].classList.remove('active');
+        currentSlide = (index + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() {
+        showSlide(currentSlide + 1);
+    }
+
+    let interval = setInterval(nextSlide, 10000);
+
+    function resetInterval() {
+        clearInterval(interval);
+        interval = setInterval(nextSlide, 10000);
+    }
+
+    dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+            showSlide(idx);
+            resetInterval();
+        });
+    });
+
+    let startX = 0;
+    const sliderBox = document.getElementById('slider-box');
+    sliderBox.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+    });
+    sliderBox.addEventListener('touchend', e => {
+        const diff = e.changedTouches[0].clientX - startX;
+        if (diff < -50) {
+            showSlide(currentSlide + 1);
+            resetInterval();
+        } else if (diff > 50) {
+            showSlide(currentSlide - 1);
+            resetInterval();
+        }
+    });
+});
 </script>
 
 </body>
