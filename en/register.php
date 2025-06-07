@@ -24,6 +24,8 @@ $country_id = 0;
 $language_id = '';
 $training_language = '';
 $training_url = "";
+$cost = '';
+$currency = '';
 $ecobricker_id = null;
 $users_email_address = '';
 $is_registered = false; // Default: user is not registered
@@ -101,6 +103,8 @@ if ($result->num_rows > 0) {
     $language_id = trim($row['training_language'] ?? '');
 
     $display_cost = htmlspecialchars($row['display_cost'] ?? '', ENT_QUOTES, 'UTF-8');
+    $cost = htmlspecialchars($row['cost'] ?? '', ENT_QUOTES, 'UTF-8');
+    $currency = htmlspecialchars($row['currency'] ?? '', ENT_QUOTES, 'UTF-8');
 
 
 
@@ -183,7 +187,7 @@ echo '<!DOCTYPE html>
         </div>
     <?php endif; ?>
 
-        <div class="intro-to-training-wrapper" style="width: 100$; background: #00000015; border-radius:15px; padding:10px;">
+        <div class="intro-to-training-wrapper" style="width: 100$; background: var(--course-module); border-radius:15px; padding:10px;">
 
             <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
 
@@ -196,7 +200,7 @@ echo '<!DOCTYPE html>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
 
                     <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
-                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "✅ RSVP"); ?>
+                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
                     </button>
 
                 </div>
@@ -221,9 +225,6 @@ echo '<!DOCTYPE html>
 
 
 
-    <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
-        <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "✅ RSVP"); ?>
-    </button>
 </div>
 
 
@@ -245,8 +246,15 @@ echo '<!DOCTYPE html>
             <p><strong>Subtitle:</strong> <?php echo $training_subtitle; ?></p>
             <p><strong>Time:</strong> <?php echo $training_time_txt; ?></p>
             <p><strong>Training Logged:</strong> <?php echo $training_logged; ?></p>
-            <p><strong>Scope:</strong> <?php echo $registration_scope; ?></p> <!-- ✅ Add this -->
+            <p><strong>Scope:</strong> <?php echo $registration_scope; ?></p>
+            <p><strong>Cost:</strong> <?php echo $cost; ?></p>
+            <p><strong>Currency:</strong> <?php echo $currency; ?></p>
+            <p><strong>Display Cost:</strong> <?php echo $display_cost; ?></p>
         </div>
+
+        <button id="rsvp-bottom-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: pointer; width:100%;">
+            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
+        </button>
 
 </div>
 
@@ -270,7 +278,7 @@ echo '<!DOCTYPE html>
 
 <!-- JavaScript to handle RSVP click -->
 <script>
-document.getElementById("rsvp-button").addEventListener("click", handleRegistrationClick);
+document.getElementById("rsvp-bottom-button").addEventListener("click", handleRegistrationClick);
 document.getElementById("rsvp-register-button").addEventListener("click", handleRegistrationClick);
 
 function handleRegistrationClick() {
@@ -304,12 +312,14 @@ function openInfoModal() {
     photobox.style.display = 'none';
 
     const content = `
-        <div class="preview-title">Login or Sign Up</div>
-        <p>Please log in or sign up to confirm your registration for the course.</p>
+        <h1>🔑</h1>
+        <h2>Login to Register</h2>
+        <p>To register for this course you must use your GoBrik account.</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-right:10px;">Login to Register</a>
+            <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-right:10px;">Login</a>
             <a href="signup.php" class="action-btn-blue">Sign Up</a>
         </div>
+        <p style="font-size: 1em; color: grey;">GoBrik authentication is powered by Buwana SSO for regenerative apps</p>
     `;
 
     messageContainer.innerHTML = content;
@@ -382,7 +392,7 @@ function openCancelRegistrationModal() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const btns = [document.getElementById('rsvp-button'), document.getElementById('rsvp-register-button')];
+    const btns = [document.getElementById('rsvp-bottom-button'), document.getElementById('rsvp-register-button')];
     btns.forEach(btn => {
         if (!btn) return;
         btn.addEventListener('mouseover', function() {
