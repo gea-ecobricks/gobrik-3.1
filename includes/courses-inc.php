@@ -34,7 +34,7 @@
 }
 
 .course-date-lang-bar {
-  background: var(--subdued-text);
+  background: var(--strong-back);
   color: white;
   text-align: right;
   font-family: 'Mulish', sans-serif;
