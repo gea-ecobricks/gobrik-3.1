@@ -207,7 +207,7 @@ echo '<!DOCTYPE html>
                 </div>
                 <div class="profile-images">
                     <img src="<?php echo $feature_photo3_main; ?>">
-                    <p style="text-align:right; text-align:center;margin-top: 0px; margin-bottom: auto;">Led by <?php echo $lead_trainer; ?></p>
+                    <p class="profile-names">Led by <?php echo $lead_trainer; ?></p>
                     <p style="font-size:1em; text-align:center;">Language: <?php echo $training_language; ?></p>
                 </div>
             </div>
