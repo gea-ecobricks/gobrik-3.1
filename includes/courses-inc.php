@@ -5,10 +5,10 @@
 <STYLE>
 
 .course-grid {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap:20px;
+  justify-items:stretch;
 }
 
 .course-module-box {
@@ -19,7 +19,6 @@
   flex-direction: column;
   transition: transform 0.2s, box-shadow 0.2s;
   width:100%;
-  max-width:300px;
 }
 
 .course-module-box:hover {
@@ -35,12 +34,17 @@
 }
 
 .course-date-lang-bar {
-  background: var(--settings-background);
+  background: var(--subdued-text);
   color: white;
   text-align: right;
   font-family: 'Mulish', sans-serif;
   font-size: 1em;
   padding: 5px 10px;
+  transition: background-color 0.2s;
+}
+
+.course-module-box:hover .course-date-lang-bar {
+  background: green;
 }
 
 .course-module-info {
@@ -98,16 +102,6 @@
 
 .course-module-box:hover .learn-more-btn {
   background: green;
-}
-
-@media (min-width:2001px) {
-  .course-module-box { flex-basis: calc(33.33% - 20px); }
-}
-@media (min-width:770px) and (max-width:2000px) {
-  .course-module-box { flex-basis: calc(50% - 20px); }
-}
-@media (max-width:769px) {
-  .course-module-box { flex-basis: 100%; }
 }
 
 #main {
