@@ -22,7 +22,7 @@ function safe_html($string) {
 
 // Prepare the base SQL query, including the community_name field
 $sql = "SELECT ecobrick_thumb_photo_url, ecobrick_full_photo_url, weight_g, volume_ml, density, date_logged_ts,
-        location_full, location_watershed, ecobricker_maker, community_name, serial_no, status, photo_version
+        location_full, location_watershed, ecobricker_maker, community_name, serial_no, status, feature, photo_version
         FROM tb_ecobricks
         WHERE status != 'not ready'";
 
@@ -113,7 +113,8 @@ while ($row = $result->fetch_assoc()) {
         'ecobricker_maker' => safe_html($row['ecobricker_maker']),
         'community_name' => safe_html($row['community_name']),
         'status' => safe_html($row['status']),
-        'serial_no' => safe_html($row['serial_no']) // Pass only the raw serial number
+        'serial_no' => safe_html($row['serial_no']), // Pass only the raw serial number
+        'feature' => isset($row['feature']) ? (int)$row['feature'] : 0
     ];
 }
 
