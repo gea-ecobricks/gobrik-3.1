@@ -196,12 +196,12 @@ echo '<!DOCTYPE html>
                 <div class="the-titles" style="width:80%">
                     <h3><?php echo $training_title; ?></h3>
                     <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
-                        <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
-                        <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
-                        <p style="font-size:1em;"><?php echo $display_cost; ?></p>
-                        <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
-                                                                    <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
-                                    </button>
+                    <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
+                    <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
+                    <p style="font-size:1em;"><?php echo $display_cost; ?></p>
+                    <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
+                                                                <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
+                                </button>
 
                 </div>
                 <div class="profile-images">
@@ -237,7 +237,9 @@ echo '<!DOCTYPE html>
 
 
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;font-size:small;">
-            <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo"><h4><?php echo $training_type; ?></h4>
+            <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo">
+
+            <h2><?php echo $training_type; ?></h2>
 
             <hr>
             <p><strong>Title:</strong> <?php echo $training_title; ?></p>
@@ -381,7 +383,7 @@ function openCancelRegistrationModal() {
         <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
             <div>
                 <h1>💔</h1>
-                <h4>Cancel Registration?</h4>
+                <h2>Cancel Registration?</h2>
                 <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
             </div>
             <div style="display:flex;gap:10px;width:100%;margin-top:20px;">
