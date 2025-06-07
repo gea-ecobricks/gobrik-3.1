@@ -182,8 +182,8 @@ echo '<!DOCTYPE html>
             <div style="width:100%;margin:auto;margin-top:5px;">
 
                 <?php if ($is_registered): ?>
-        <div id="registered-notice" style="text-align:center;background-color:#4CAF50; color:white; padding:10px 15px; border-radius:8px; display:block; width:fit-content; margin:auto; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
-            <span style="margin-right:10px;">👍</span> You're registered for this <?php echo $training_type; ?>!.  Check your email or dashboard for full details and Zoom link.
+        <div id="registered-notice" style="text-align:center;background-color:#4CAF50; color:white; padding:10px 15px; border-radius:0px 0px 8px 8px; display:block; width:fit-content; margin:auto; margin-top:-3px; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
+            <span style="margin-right:10px;">👍</span> You're registered for this <?php echo $training_type; ?>!<br>  See your email or <a href="dashboard.php">dashboard for full registration details.
         </div>
     <?php endif; ?>
 
@@ -215,11 +215,11 @@ echo '<!DOCTYPE html>
 
 
 
-               <p style="margin-top:20px;font-size:1.5em"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
+               <p style="margin-top:20px;font-size:1.5em; padding: 15px;"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
 
 
 
-               <p><?php echo nl2br($training_agenda); ?></p>
+               <p style="font-size:1.15em; padding: 15px;"><?php echo nl2br($training_agenda); ?></p>
 
 
 
@@ -237,14 +237,16 @@ echo '<!DOCTYPE html>
 
             <hr>
             <p><strong>Title:</strong> <?php echo $training_title; ?></p>
+            <p><strong>Subtitle:</strong> <?php echo $training_subtitle; ?></p>
             <p><strong>Date:</strong> <?php echo $training_date; ?></p>
+            <p><strong>Time:</strong> <?php echo $training_time_txt; ?></p>
             <p><strong>Lead Trainer(s):</strong> <?php echo $lead_trainer; ?></p>
             <p><strong>Training Type:</strong> <?php echo $training_type; ?></p>
             <p><strong>Country:</strong> <?php echo $training_country; ?></p>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
             <p><strong>Language:</strong> <?php echo $training_language; ?></p>
-            <p><strong>Subtitle:</strong> <?php echo $training_subtitle; ?></p>
-            <p><strong>Time:</strong> <?php echo $training_time_txt; ?></p>
+
+
             <p><strong>Training Logged:</strong> <?php echo $training_logged; ?></p>
             <p><strong>Scope:</strong> <?php echo $registration_scope; ?></p>
             <p><strong>Cost:</strong> <?php echo $cost; ?></p>
