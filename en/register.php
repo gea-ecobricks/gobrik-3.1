@@ -183,7 +183,7 @@ echo '<!DOCTYPE html>
 
                 <?php if ($is_registered): ?>
         <div id="registered-notice" style="text-align:center;background-color:#4CAF50; color:white; padding:10px 15px; border-radius:0px 0px 8px 8px; display:block; width:fit-content; margin:auto; margin-top:-3px; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
-            <span style="margin-right:10px;">👍</span> You're registered for this <?php echo $training_type; ?>!<br>  See your email or <a href="dashboard.php">dashboard for full registration details.
+            <span style="margin-right:10px;">👍</span><span> You're registered for this <?php echo $training_type; ?>!<br>See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
         </div>
     <?php endif; ?>
 
@@ -198,6 +198,7 @@ echo '<!DOCTYPE html>
                 <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
                     <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
+                    <p style="font-size:1em;"><?php echo $display_cost; ?></p>
 
                     <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
                                             <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
@@ -207,7 +208,7 @@ echo '<!DOCTYPE html>
                 <div class="profile-images">
                     <img src="<?php echo $feature_photo3_main; ?>">
                     <p style="text-align:right; text-align:center;margin-top: 0px; margin-bottom: auto;">Led by <?php echo $lead_trainer; ?></p>
-                    <p style="font-size:1em; text-align:center;"><?php echo $training_location; ?> from: <?php echo $training_country; ?> | Language: <?php echo $training_language; ?></p>
+                    <p style="font-size:1em; text-align:center;">Language: <?php echo $training_language; ?></p>
                 </div>
             </div>
         </div>
