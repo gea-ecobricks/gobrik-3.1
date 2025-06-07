@@ -36,12 +36,15 @@
 
 @media screen and (max-width: 768px) {
     #rsvp-register-button-desktop { display:none; }
-    #rsvp-register-button-mobile { display:flex;width:100%; }
+    #rsvp-register-button-mobile { display:flex;width:100% !important; }
+    .training-title-box { flex-flow: column;}
+
 }
 
 @media screen and (min-width: 769px) {
     #rsvp-register-button-mobile { display:none; }
     #rsvp-register-button-desktop { display:flex; align-self:flex-start; }
+    .training-title-box { flex-flow: row;}
 }
 
 
@@ -66,7 +69,7 @@ margin-bottom: auto;"
 }
 
 
-@media screen and (max-width: 7691px) {
+@media screen and (max-width: 769px) {
 .profile-images img {
 width:175px
 ;padding:15px;
