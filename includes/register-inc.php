@@ -77,7 +77,7 @@ flex-flow:column;
 @media screen and (max-width: 769px) {
 
 .the-titles {
-padding: 12px;
+padding: 7px;
 }
 
 .profile-images img {
