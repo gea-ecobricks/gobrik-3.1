@@ -15,10 +15,10 @@
 <STYLE>
 
 .form-container {
-padding-top: 0px;
-background: none;
-border: none;
-margin-top:-100px;
+padding-top: 0px !important;
+background: none !important;
+border: none !important;
+margin-top:-100px !important;
 }
 
 
