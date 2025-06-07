@@ -94,6 +94,7 @@ width:150px;
 text-align:right;
 margin-left:auto;
 margin-right: 10px;
+margin-top: 10px;
 }
 
 .training-title-box {
@@ -109,6 +110,8 @@ padding:15px
 
 .the-titles {
 width:80%;
+padding: 20px;
+margin-top: -5px;
 }
 .profile-images {
 width:100%;
@@ -118,13 +121,17 @@ width:100%;
 width:250px;
 padding:15px;
 margin-top:-20px;
+margin-left:auto;
+margin-right: 10px;
 
 }
 
 .profile-names {
 width:250px;
+margin-right: 10px;
 margin-left:auto;
 margin-right: 10px;
+margin-top: 10px;
 }
 
 .training-title-box {
