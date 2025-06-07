@@ -14,6 +14,13 @@
 
 <STYLE>
 
+.form-container {
+padding-top: 0px;
+background: none;
+border: none;
+margin-top:-100px;
+}
+
 
 .log-report-btn {
     display: inline-block;
