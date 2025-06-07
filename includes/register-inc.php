@@ -17,34 +17,31 @@
 <STYLE>
 
 
-#rsvp-register-button  {
-
+#rsvp-register-button-desktop,
+#rsvp-register-button-mobile  {
     color: white;
-   padding: 10px 20px;
-   border: none;
-   border-radius: 5px;
-   cursor: pointer;
-   background: var(--emblem-green);
-   font-size: 1.3em;
-   justify-content: center;
-   text-align: center;
-   text-decoration: none;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: var(--emblem-green);
+    font-size: 1.3em;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
     margin-top: 10px;
     display: flex;
-
-    }
+    width: 80%;
+}
 
 @media screen and (max-width: 768px) {
-    #rsvp-register-button {
-        width: 100%;
-    }
+    #rsvp-register-button-desktop { display:none; }
+    #rsvp-register-button-mobile { display:flex; }
 }
 
 @media screen and (min-width: 769px) {
-    #rsvp-register-button {
-        width: auto;
-        align-self: flex-start;
-    }
+    #rsvp-register-button-mobile { display:none; }
+    #rsvp-register-button-desktop { display:flex; align-self:flex-start; }
 }
 
 

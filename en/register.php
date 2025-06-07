@@ -89,13 +89,14 @@ if ($result->num_rows > 0) {
     $allowed_tags = '<b><i><u><strong><em><p><br><ul><li><ol>';
     $featured_description = strip_tags($row['featured_description'] ?? '', $allowed_tags);
     $training_agenda = strip_tags($row['training_agenda'] ?? '', $allowed_tags);
-    $training_title = htmlspecialchars($row['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
+    // Pre-escape to display characters like '&' correctly without double encoding
+    $training_title = htmlspecialchars($row['training_title'] ?? '', ENT_QUOTES, 'UTF-8', false);
     $training_name = $training_title; // alias for modal text
-    $training_subtitle = htmlspecialchars($row['training_subtitle'] ?? '', ENT_QUOTES, 'UTF-8');
+    $training_subtitle = htmlspecialchars($row['training_subtitle'] ?? '', ENT_QUOTES, 'UTF-8', false);
     $training_date = htmlspecialchars($row['training_date'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_time_txt = htmlspecialchars($row['training_time_txt'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_logged = htmlspecialchars($row['training_logged'] ?? '', ENT_QUOTES, 'UTF-8');
-    $lead_trainer = htmlspecialchars($row['lead_trainer'] ?? '', ENT_QUOTES, 'UTF-8');
+    $lead_trainer = htmlspecialchars($row['lead_trainer'] ?? '', ENT_QUOTES, 'UTF-8', false);
     $training_type = htmlspecialchars($row['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
     $country_id = intval($row['country_id'] ?? 0);
     $training_location = htmlspecialchars($row['training_location'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -199,7 +200,7 @@ echo '<!DOCTYPE html>
                     <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
                     <p style="font-size:1em;"><?php echo $display_cost; ?></p>
-                    <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
+                    <button id="rsvp-register-button-desktop" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
                                                                 <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
                                 </button>
 
@@ -211,7 +212,7 @@ echo '<!DOCTYPE html>
                 </div>
             </div>
 
-            <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
+            <button id="rsvp-register-button-mobile" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
                                             <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
             </button>
         </div>
@@ -287,7 +288,10 @@ echo '<!DOCTYPE html>
 <!-- JavaScript to handle RSVP click -->
 <script>
 document.getElementById("rsvp-bottom-button").addEventListener("click", handleRegistrationClick);
-document.getElementById("rsvp-register-button").addEventListener("click", handleRegistrationClick);
+var rsvpDesk = document.getElementById("rsvp-register-button-desktop");
+if (rsvpDesk) rsvpDesk.addEventListener("click", handleRegistrationClick);
+var rsvpMob = document.getElementById("rsvp-register-button-mobile");
+if (rsvpMob) rsvpMob.addEventListener("click", handleRegistrationClick);
 
 function handleRegistrationClick() {
     <?php if ($is_logged_in && isset($ecobricker_id)): ?>
@@ -403,7 +407,7 @@ function openCancelRegistrationModal() {
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = 'courses.php';
+                    openUnregisterSuccessModal();
                 } else {
                     alert('Unable to cancel registration.');
                 }
@@ -412,8 +416,35 @@ function openCancelRegistrationModal() {
     });
 }
 
+function openUnregisterSuccessModal() {
+    const modal = document.getElementById('form-modal-message');
+    const messageContainer = modal.querySelector('.modal-message');
+    const photobox = document.getElementById('modal-photo-box');
+
+    photobox.style.display = 'none';
+
+    const content = `
+        <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
+            <h1>😿</h1>
+            <h2>You're un-enrolled.</h2>
+            <p>We're sorry to see you go!  We hope you can find another course that suits your interests and availability from our course listings</p>
+            <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+                <a href="courses.php" class="confirm-button enabled" style="font-size: 1.2em; padding: 10px 20px; cursor: pointer;">OK</a>
+            </div>
+        </div>
+    `;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    const btns = [document.getElementById('rsvp-bottom-button'), document.getElementById('rsvp-register-button')];
+    const btns = [
+        document.getElementById('rsvp-bottom-button'),
+        document.getElementById('rsvp-register-button-desktop'),
+        document.getElementById('rsvp-register-button-mobile')
+    ];
     btns.forEach(btn => {
         if (!btn) return;
         btn.addEventListener('mouseover', function() {
