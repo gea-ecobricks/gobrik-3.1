@@ -182,7 +182,7 @@ echo '<!DOCTYPE html>
             <div style="width:100%;margin:auto;margin-top:5px;">
 
                 <?php if ($is_registered): ?>
-        <div id="registered-notice" style="text-align:center;background-color:#4CAF50; color:white; padding:10px 15px; border-radius:0px 0px 8px 8px; display:block; width:fit-content; margin:auto; margin-top:-3px; font-size:1.1em; font-weight:bold; display:flex; align-items:center;">
+        <div id="registered-notice" style="background-color:#4CAF50; color:white; padding:10px 15px; border-radius:0px 0px 8px 8px; display:block; width:fit-content; margin:auto; margin-top:-3px; font-size:1.1em; display:flex; align-items:center;">
             <span style="margin-right:10px;">👍</span><span> You're registered for this <?php echo $training_type; ?>!<br>See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
         </div>
     <?php endif; ?>
@@ -220,7 +220,7 @@ echo '<!DOCTYPE html>
 
 
 
-               <p style="font-size:1.15em; padding: 15px;"><?php echo nl2br($training_agenda); ?></p>
+               <p style="font-size:1.23em; padding: 15px;margin-top: 0px;"><?php echo nl2br($training_agenda); ?></p>
 
 
 
