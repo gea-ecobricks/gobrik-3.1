@@ -194,7 +194,7 @@ echo '<!DOCTYPE html>
 
 
             <div class="training-title-box">
-                <div class="the-titles" style="width:80%">
+                <div class="the-titles">
                     <h3><?php echo $training_title; ?></h3>
                     <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
                     <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>

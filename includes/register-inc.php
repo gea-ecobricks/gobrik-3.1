@@ -70,6 +70,11 @@ margin-bottom: auto;"
 
 
 @media screen and (max-width: 769px) {
+
+.the-titles {
+width:100%;
+}
+
 .profile-images img {
 width:175px
 ;padding:15px;
@@ -92,18 +97,25 @@ padding:15px
 
 @media screen and (min-width: 770px) {
 
+.the-titles {
+width:80%;
+}
 .profile-images {
-width:400px;
+width:100%;
 }
 
 .profile-images img {
 width:250px;
 padding:15px;
 margin-top:-20px;
+margin-left:auto;
+margin-right: 10px;
 }
 
 .profile-names {
-width:250px
+width:250px;
+margin-left:auto;
+margin-right: 10px;
 }
 
 .training-title-box {
