@@ -2237,8 +2237,20 @@ label {
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.1em;
-  width: fit-content;
+
   z-index: 30;
+}
+
+@media screen and (min-width: 770px) {
+    .top-container-notice {
+        width: 60%;
+    }
+}
+
+@media screen and (max-width: 770px) {
+    .top-container-notice {
+        width: 88%;
+    }
 }
 
 .confirm-button:hover {

@@ -82,15 +82,16 @@ padding: 15px;
 }
 
 .profile-images img {
-width:175px
-;padding:15px;
+width:200px;
+padding:15px;
 margin-top:-10px;
 margin-left:auto;
 margin-right: 10px;
 }
 
 .profile-names {
-width:150px;
+width:250px;
+padding:15px;
 text-align:right;
 margin-left:auto;
 margin-right: 10px;
@@ -100,9 +101,8 @@ margin-top: 10px;
 .training-title-box {
 width:100%;
 display:flex;
-/* flex-flow: column-reverse; */
-/* margin-top: 20px; */
-padding:15px
+
+
 }
 }
 
