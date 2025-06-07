@@ -197,8 +197,7 @@ echo '<!DOCTYPE html>
                 <div class="the-titles">
                     <h3><?php echo $training_title; ?></h3>
                     <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
-                    <p style="font-size:1em"><?php echo date("F j, Y", strtotime($training_date)); ?></p>
-                    <p style="font-size:1em"><?php echo $training_time_txt; ?></p>
+                    <p style="font-size:1em"><?php echo date("F j, Y", strtotime($training_date)); ?> | <?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_type; ?></p>
                     <p style="font-size:1em;"><span data-lang-id="000-open-to">Open to:</span> <?php echo $registration_scope; ?></p>
                     <p style="font-size:1em;"><?php echo $display_cost; ?></p>
