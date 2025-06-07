@@ -197,7 +197,8 @@ echo '<!DOCTYPE html>
                 <div class="the-titles">
                     <h3><?php echo $training_title; ?></h3>
                     <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
-                    <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
+                    <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_country; ?></p>
+                    <p style="font-size:1em"><?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
                     <p style="font-size:1em;"><?php echo $display_cost; ?></p>
                     <button id="rsvp-register-button-desktop" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">

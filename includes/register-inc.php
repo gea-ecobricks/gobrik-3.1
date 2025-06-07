@@ -69,21 +69,31 @@ margin-bottom: auto;"
 }
 
 
+.profile-images {
+display: flex;
+flex-flow:column;
+}
+
 @media screen and (max-width: 769px) {
 
 .the-titles {
 width:100%;
+padding: 15px;
 }
 
 .profile-images img {
 width:175px
 ;padding:15px;
 margin-top:-10px;
+margin-left:auto;
+margin-right: 10px;
 }
 
 .profile-names {
 width:150px;
 text-align:right;
+margin-left:auto;
+margin-right: 10px;
 }
 
 .training-title-box {
@@ -108,8 +118,7 @@ width:100%;
 width:250px;
 padding:15px;
 margin-top:-20px;
-margin-left:auto;
-margin-right: 10px;
+
 }
 
 .profile-names {
@@ -123,7 +132,7 @@ width:100%;
 display:flex;
 flex-flow:row;
 margin-top: 20px;
-padding:15px
+
 }
 
 }
