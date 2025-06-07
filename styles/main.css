@@ -2858,3 +2858,8 @@ padding: 10px;
 .toggle-switch input:checked + .slider:before {
     transform: translateX(20px);
 }
+
+/* Feature toggle icon in admin review */
+.feature-toggle:hover {
+    cursor: pointer;
+}
