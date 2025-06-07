@@ -175,7 +175,7 @@ if (!empty($community_id)) {
                             <div style="text-align:right; margin:10px 0;">
                                 <button type="button" id="starterPresetBtn" style="padding:7px">+ Starter Workshop Presets</button>
 <?php if ($editing): ?>
-                                <button type="button" style="padding:7px; margin-left:10px;" onclick="window.open('training.php?id=<?php echo $training_id; ?>','_blank');">&gt; View training listing</button>
+                                <button type="button" style="padding:7px; margin-left:10px;" onclick="window.open('register.php?id=<?php echo $training_id; ?>','_blank');">&gt; View training listing</button>
 <?php endif; ?>
                             </div>
                 </div>
@@ -435,11 +435,10 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 1 ======================= -->
     <div class="form-item">
         <label for="feature_photo1_main">Set Feature Photo</label><br>
+<?php if ($editing && !empty($feature_photo1_main)): ?>
+    <img src="<?php echo htmlspecialchars($feature_photo1_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 1">
+<?php endif; ?>
 
-        <div id="feature_photo1_preview" style="background:#ccc;max-width:350px;max-height:200px;margin-bottom:5px;display:none;">
-            <img id="feature_photo1_preview_img" src="" style="max-width:350px;max-height:200px;" alt="Feature Photo 1 Preview">
-
-        </div>
         <input type="url" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo1_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
             This is the image that will be used to list your training on GoBrik.
@@ -449,11 +448,10 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 2 ======================= -->
     <div class="form-item">
         <label for="feature_photo2_main">Set a Second Training Feature Photo</label><br>
+<?php if ($editing && !empty($feature_photo2_main)): ?>
+    <img src="<?php echo htmlspecialchars($feature_photo2_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 2">
+<?php endif; ?>
 
-        <div id="feature_photo2_preview" style="background:#ccc;max-width:350px;max-height:200px;margin-bottom:5px;display:none;">
-            <img id="feature_photo2_preview_img" src="" style="max-width:350px;max-height:200px;" alt="Feature Photo 2 Preview">
-
-        </div>
         <input type="url" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo2_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
             This image will be visible on the training registration page.
@@ -464,16 +462,35 @@ if (!empty($community_id)) {
     <div class="form-item">
         <label for="feature_photo3_main">Set a Third Training Feature Photo</label><br>
 
-        <div id="feature_photo3_preview" style="background:#ccc;max-width:350px;max-height:200px;margin-bottom:5px;display:none;">
-            <img id="feature_photo3_preview_img" src="" style="max-width:350px;max-height:200px;" alt="Feature Photo 3 Preview">
-
-        </div>
+<?php if ($editing && !empty($feature_photo3_main)): ?>
+    <img src="<?php echo htmlspecialchars($feature_photo3_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 3">
+<?php endif; ?>
         <input type="url" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo3_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
             This image will also be visible on the training registration page.
         </p>
     </div>
 
+<br><hr>
+<h4>Training Costing</h4>
+<p><span style="color:red">UNDER DEVELOPMENT</span> Set the way that participants will register for your course through fiat payment, brikcoin purchase or by 'free/ by donation'.</p>
+<div class="form-item">
+    <label for="currency_display">What currency will payment for this training be in?</label><br>
+    <input type="text" id="currency_display" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>" disabled class="form-field-style">
+    <input type="hidden" id="currency" name="currency" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <p class="form-caption">Set the currency for receiving payments.  Leave blank for free / donations.</p>
+</div>
+<div class="form-item">
+    <label for="cost_display">What will be the cost of this course in the above currency?</label><br>
+    <input type="number" id="cost_display" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>" disabled class="form-field-style">
+    <input type="hidden" id="cost" name="cost" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <p class="form-caption">Leave blank for free / donations.</p>
+</div>
+<div class="form-item">
+    <label for="display_cost">What will the course listing display for the cost?</label><br>
+    <input type="text" id="display_cost" name="display_cost" class="form-field-style" value="<?php echo htmlspecialchars($display_cost ?? 'Free / by Donation', ENT_QUOTES, 'UTF-8'); ?>">
+    <p class="form-caption" style="color:red;">Please leave as "Free / Donation" until the course payment system is set up.</p>
+</div>
 
 
     <!-- ======================= Ready to Show Toggle ======================= -->
@@ -779,7 +796,7 @@ function showTrainingSavedModal(trainingId) {
         <h1>Training saved!</h1>
         <p>You can view the course listing or keeping editing the page</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;">
-            <a href="launch-training.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">Keep Editing</a>
+            <a href="launch-register.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">Keep Editing</a>
             <a href="register.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">View Listing</a>
         </div>
     `;
@@ -888,9 +905,6 @@ function setFileInputFromUrl(inputId, url) {
     const input = document.getElementById(inputId);
     if (input) {
         input.value = url;
-        const imgId = inputId + '_preview_img';
-        const containerId = inputId + '_preview';
-        updateImagePreview(inputId, imgId, containerId);
     }
 }
 
@@ -952,40 +966,6 @@ Schedule
 
 document.getElementById('starterPresetBtn')?.addEventListener('click', presetForStarterWorkshop);
 
-function updateImagePreview(inputId, imgId, containerId) {
-    const input = document.getElementById(inputId);
-    const img = document.getElementById(imgId);
-    const container = document.getElementById(containerId);
-    if (input && img && container) {
-        const url = input.value.trim();
-        if (url) {
-            img.src = url;
-            container.style.display = 'block';
-        } else {
-            img.src = '';
-            container.style.display = 'none';
-        }
-    }
-}
-
-function initFeatureImagePreviews() {
-    ['feature_photo1_main','feature_photo2_main','feature_photo3_main'].forEach(function(id) {
-        const imgId = id + '_preview_img';
-        const containerId = id + '_preview';
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('input', () => updateImagePreview(id, imgId, containerId));
-            input.addEventListener('change', () => updateImagePreview(id, imgId, containerId));
-            updateImagePreview(id, imgId, containerId); // initial
-        }
-    });
-}
-
-if (document.readyState === 'loading') {
-    window.addEventListener('load', initFeatureImagePreviews);
-} else {
-    initFeatureImagePreviews();
-}
 
 
 
