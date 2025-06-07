@@ -2106,30 +2106,7 @@ label {
   background: var(--input-background);
   font-size: 1.3em;
 }
-/*
-.form-item select {
-  background: var(--input-background);
-  font-size: 1.2em;
-  padding: 5px;
-  border-radius: 5px;
-  margin-top: 9px;
-  margin-bottom: 10px;
-}
 
-input[type="text"],
-input[type="number"],
-textarea,
-input[type="date"] {
-  font-family: "Mulish", sans-serif;
-  font-weight: 300;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid var(--divider-line);
-  border-radius: 5px;
-  box-sizing: border-box;
-  margin-top: 8px;
-}*/
 
 
 .spinner-photo-loading {
@@ -2316,7 +2293,7 @@ input[type="text"], input[type="name"], input[type="credential"],  input[type="p
   border: 3px solid var(--button-2-1);
   border-radius: 5px;
   background-color: var(--top-header);
-  color: var(--same);
+  color: var(--h1);
    border: 1.5px solid var(--button-2-1);
 }
 
@@ -2682,6 +2659,7 @@ position:relative;
     text-align: center;
     flex: 1 1 90%; /* Make each button take 90% of the width of the container */
     max-width: 200px; /* Prevent buttons from becoming too wide */
+    cursor: pointer;
 }
 
 .page-button:hover {

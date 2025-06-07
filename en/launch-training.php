@@ -173,7 +173,7 @@ if (!empty($community_id)) {
                                     <p data-lang-id="004-form-description-post">Use this form to launch a training, workshop or community event on GoBrik.</p>
                                 </div>
                             <div style="text-align:right; margin:10px 0;">
-                                <button type="button" id="starterPresetBtn" class="page-button">+ Starter Workshop Presets</button>
+                                <button type="button" id="starterPresetBtn" class="page-button">+ Starter Presets</button>
 <?php if ($editing): ?>
                                 <button type="button" class="page-button" style="margin-left:10px;" onclick="window.open('register.php?id=<?php echo $training_id; ?>','_blank');">&gt; View training listing</button>
 <?php endif; ?>
