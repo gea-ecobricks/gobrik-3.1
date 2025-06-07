@@ -2262,7 +2262,7 @@ label {
 #slider-box {
     position: relative;
     width: 100%;
-    height: calc(100vh - 70px);
+    height: calc(100vh - 216px);
     overflow: hidden;
     margin-top: 70px;
 }
