@@ -169,7 +169,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
-                <span style="margin-right:10px;">👍</span><span> GoBrik now has a slider to show the latest awesome ecobricks logged by ecobrickers like you around the world.</span>
+                <span style="margin-right:10px;">👍</span>
+                <span> GoBrik now has a slider to show the latest awesome ecobricks logged by ecobrickers like you around the world.</span>
+                <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">
         <?php foreach ($featured_ecobricks as $index => $brick): ?>

@@ -593,3 +593,15 @@ function handleLogout(event) {
         element.classList.add('shake');
         setTimeout(() => element.classList.remove('shake'), 400);
     }
+
+// Close notices when X is clicked
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.notice-close').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const notice = this.closest('.top-container-notice');
+            if (notice) {
+                notice.style.display = 'none';
+            }
+        });
+    });
+});
