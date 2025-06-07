@@ -183,7 +183,7 @@ echo '<!DOCTYPE html>
 
                 <?php if ($is_registered): ?>
         <div id="registered-notice" class="top-container-notice">
-            <span style="margin-right:10px;">👍</span><span> You're registered for this <?php echo $training_type; ?>!<br>See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
+            <span style="margin-right:10px;">👍</span><span> You're registered for this <?php echo $training_type; ?>!  See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
         </div>
     <?php endif; ?>
 
