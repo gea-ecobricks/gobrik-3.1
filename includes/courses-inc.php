@@ -19,6 +19,8 @@
   flex-direction: column;
   transition: transform 0.2s, box-shadow 0.2s;
   width:100%;
+  text-decoration:none;
+  color:inherit;
 }
 
 .course-module-box:hover {

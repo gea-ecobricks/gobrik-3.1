@@ -49,7 +49,7 @@ $gobrik_conn->close();
             </div>
             <div class="course-grid">
                 <?php foreach ($courses as $course): ?>
-                    <div class="course-module-box">
+                    <a class="course-module-box" href="training.php?id=<?php echo $course['training_id']; ?>">
                         <img src="<?php echo htmlspecialchars($course['feature_photo1_main']); ?>" alt="">
                         <div class="course-date-lang-bar">
                             <?php echo date('M j', strtotime($course['training_date'])); ?> |
@@ -71,9 +71,9 @@ $gobrik_conn->close();
                         </div>
                         <div id="learn-more-button-wrapper" style="background:var(--darker);text-align: center; color: var(--text-color);   font-weight: 500; border-radius:10px;padding:8px;">
                             <div class="display-cost"><?php echo htmlspecialchars($course['display_cost']); ?></div>
-                            <a class="learn-more-btn" href="register.php?id=<?php echo $course['training_id']; ?>">ℹ️ Learn More</a>
+                            <div class="learn-more-btn">ℹ️ Learn More</div>
                         </div>
-                    </div>
+                    </a>
                 <?php endforeach; ?>
             </div>
         </div>
