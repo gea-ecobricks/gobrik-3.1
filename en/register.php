@@ -177,7 +177,7 @@ echo '<!DOCTYPE html>
 -->
 
 
-   <div id="form-submission-box" style="margin-top: 77px;">
+   <div id="form-submission-box" style="margin-top: 108px;">
         <div class="form-container" style="padding-top:0px;">
 
             <div style="width:100%;margin:auto;margin-top:5px;">
@@ -202,7 +202,7 @@ echo '<!DOCTYPE html>
                     <p style="font-size:1em;"><span data-lang-id="000-open-to">Open to:</span> <?php echo $registration_scope; ?></p>
                     <p style="font-size:1em;"><?php echo $display_cost; ?></p>
                     <button id="rsvp-register-button-desktop" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
-                                                                <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
+                                                                <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                                 </button>
 
                 </div>
@@ -330,8 +330,8 @@ function openInfoModal() {
             <h2>Login to Register</h2>
             <p>To register for this course you must use your GoBrik account.</p>
             <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-right:10px;">Login</a>
-                <a href="signup.php" class="confirm-button enabled">Sign Up</a>
+                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-right:10px;width:90%;">Login</a>
+                <a href="signup.php" class="confirm-button enabled" style="width:90%;">Sign Up</a>
             </div>
             <p style="font-size: 1em; color: grey;">GoBrik authentication is powered by Buwana SSO for regenerative apps</p>
         </div>
