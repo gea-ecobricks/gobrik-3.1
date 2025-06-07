@@ -344,8 +344,8 @@ display: none;
     .modal-content-box {
         padding: 10px;
         border-radius: 8px;
-        width: 88%;
-        height: 80%;
+        width: 100%;
+        height: 100%;
         /*background: none !important;*/
     }
 
