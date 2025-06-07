@@ -25,11 +25,21 @@
 .course-module-box:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  cursor:pointer;
 }
 
 .course-module-box img {
   width:100%;
   display:block;
+}
+
+.course-date-lang-bar {
+  background: grey;
+  color: white;
+  text-align: right;
+  font-family: 'Mulish', sans-serif;
+  font-size: 1.2em;
+  padding: 5px 10px;
 }
 
 .course-module-info {
@@ -55,6 +65,7 @@
   font-family:'Mulish', sans-serif;
   font-size:1.2em;
   font-weight:400;
+  font-style:italic;
   color: var(--text-color);
   margin-bottom:8px;
 }
