@@ -11,6 +11,12 @@ $is_logged_in = isLoggedIn(); // Check if the user is logged in
 // Get training ID from the URL
 $training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
+// If no valid training ID is provided, redirect to the courses list
+if ($training_id <= 0) {
+    header('Location: courses.php');
+    exit();
+}
+
 // Initialize training variables
 $training_title = $training_date = $lead_trainer = "";
 $training_type = $training_country = $training_location = "";
@@ -189,9 +195,9 @@ echo '<!DOCTYPE html>
                     <p style="font-size:1em"><?php echo $training_date; ?> | <?php echo $training_time_txt; ?></p>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
 
-                    <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
+                    <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
                                             <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "✅ RSVP"); ?>
-                                        </button>
+                    </button>
 
                 </div>
                 <div class="profile-images">
@@ -215,7 +221,7 @@ echo '<!DOCTYPE html>
 
 
 
-    <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
+    <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
         <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "✅ RSVP"); ?>
     </button>
 </div>
@@ -269,15 +275,19 @@ document.getElementById("rsvp-register-button").addEventListener("click", handle
 
 function handleRegistrationClick() {
     <?php if ($is_logged_in && isset($ecobricker_id)): ?>
-        openConfirmRegistrationModal(
-            <?php echo json_encode($training_name); ?>,
-            <?php echo json_encode($training_type); ?>,
-            <?php echo json_encode($training_date); ?>,
-            <?php echo json_encode($training_time_txt); ?>,
-            <?php echo json_encode($training_location); ?>,
-            <?php echo json_encode($display_cost); ?>,
-            <?php echo json_encode($users_email_address); ?>
-        );
+        <?php if ($is_registered): ?>
+            openCancelRegistrationModal();
+        <?php else: ?>
+            openConfirmRegistrationModal(
+                <?php echo json_encode($training_name); ?>,
+                <?php echo json_encode($training_type); ?>,
+                <?php echo json_encode($training_date); ?>,
+                <?php echo json_encode($training_time_txt); ?>,
+                <?php echo json_encode($training_location); ?>,
+                <?php echo json_encode($display_cost); ?>,
+                <?php echo json_encode($users_email_address); ?>
+            );
+        <?php endif; ?>
     <?php else: ?>
         openInfoModal();
     <?php endif; ?>
@@ -334,6 +344,60 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 }
+
+<?php if ($is_registered): ?>
+function openCancelRegistrationModal() {
+    const modal = document.getElementById('form-modal-message');
+    const messageContainer = modal.querySelector('.modal-message');
+    const photobox = document.getElementById('modal-photo-box');
+
+    photobox.style.display = 'none';
+
+    const content = `
+        <h1>Cancel Registration?</h1>
+        <p>Are you sure you want to un-enroll from this course?  If you've made a payment it cannot be refunded.</p>
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+            <a href="#" id="confirm-unregister" class="confirm-button" style="background:red;color:white;margin-right:10px;">Cancel Registration</a>
+            <a href="courses.php" class="confirm-button" style="background:grey;">↩️ Back to Courses</a>
+        </div>
+    `;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+
+    document.getElementById('confirm-unregister').addEventListener('click', function(e) {
+        e.preventDefault();
+        fetch('../api/unregister_training.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>')
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = 'courses.php';
+                } else {
+                    alert('Unable to cancel registration.');
+                }
+            })
+            .catch(() => alert('Unable to cancel registration.'));
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btns = [document.getElementById('rsvp-button'), document.getElementById('rsvp-register-button')];
+    btns.forEach(btn => {
+        if (!btn) return;
+        btn.addEventListener('mouseover', function() {
+            this.dataset.originalText = this.innerHTML;
+            this.dataset.originalBg = this.style.background;
+            this.style.background = 'grey';
+            this.innerHTML = '💔 Cancel Registration';
+        });
+        btn.addEventListener('mouseout', function() {
+            this.style.background = this.dataset.originalBg;
+            this.innerHTML = this.dataset.originalText;
+        });
+    });
+});
+<?php endif; ?>
 </script>
 
 <?php if (isset($_GET['registered']) && $_GET['registered'] == 1): ?>
