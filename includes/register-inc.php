@@ -77,6 +77,11 @@ padding:15px
 }
 
 @media screen and (min-width: 770px) {
+
+.profile-images {
+width:400px;
+}
+
 .profile-images img {
 width:250px;
 padding:15px;

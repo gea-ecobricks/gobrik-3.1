@@ -208,7 +208,7 @@ echo '<!DOCTYPE html>
                 <div class="profile-images">
                     <img src="<?php echo $feature_photo3_main; ?>">
                     <p class="profile-names">Led by <?php echo $lead_trainer; ?></p>
-                    <p style="font-size:1em; text-align:center;">Language: <?php echo $training_language; ?></p>
+                    <p class="profile-names" style="font-size:1em; text-align:center;">Language: <?php echo $training_language; ?></p>
                 </div>
             </div>
         </div>
@@ -367,11 +367,14 @@ function openCancelRegistrationModal() {
     photobox.style.display = 'none';
 
     const content = `
-        <h1>Cancel Registration?</h1>
-        <p>Are you sure you want to un-enroll from this course?  If you've made a payment it cannot be refunded.</p>
-        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <a href="#" id="confirm-unregister" class="confirm-button" style="background:red;color:white;margin-right:10px;">Cancel Registration</a>
-            <a href="courses.php" class="confirm-button" style="background:grey;">↩️ Back to Courses</a>
+        <div style="text-align="center">
+            <h1>💔</h1>
+            <h4>Cancel Registration?</h4>
+            <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
+            <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+                <a href="#" id="confirm-unregister" class="confirm-button" style="background:red;color:white;margin-right:10px;">Cancel Registration</a>
+                <a href="courses.php" class="confirm-button" style="background:grey;">↩️ Back to Courses</a>
+            </div>
         </div>
     `;
 
