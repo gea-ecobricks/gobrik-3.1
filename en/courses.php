@@ -49,7 +49,7 @@ $gobrik_conn->close();
             </div>
             <div class="course-grid">
                 <?php foreach ($courses as $course): ?>
-                    <a class="course-module-box" href="training.php?id=<?php echo $course['training_id']; ?>">
+                    <a class="course-module-box" href="register.php?id=<?php echo $course['training_id']; ?>">
                         <img src="<?php echo htmlspecialchars($course['feature_photo1_main']); ?>" alt="">
                         <div class="course-date-lang-bar">
                             <?php echo date('M j', strtotime($course['training_date'])); ?> |
