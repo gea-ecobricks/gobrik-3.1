@@ -77,13 +77,11 @@ flex-flow:column;
 @media screen and (max-width: 769px) {
 
 .the-titles {
-width:100%;
-padding: 15px;
+padding: 12px;
 }
 
 .profile-images img {
 width:200px;
-padding:15px;
 margin-top:-10px;
 margin-left:auto;
 margin-right: 10px;
@@ -91,11 +89,10 @@ margin-right: 10px;
 
 .profile-names {
 width:250px;
-padding:15px;
 text-align:right;
 margin-left:auto;
 margin-right: 10px;
-margin-top: 10px;
+margin-top: 0px;
 }
 
 .training-title-box {
