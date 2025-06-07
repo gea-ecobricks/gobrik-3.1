@@ -2264,6 +2264,8 @@ font-family: 'Mulish', sans-serif;
     width: 100%;
     height: calc(100vh - 70px);
     overflow: hidden;
+    margin: auto;
+    max-width:777px;
     margin-top: 70px;
 }
 
