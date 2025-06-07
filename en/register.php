@@ -330,8 +330,8 @@ function openInfoModal() {
             <h2>Login to Register</h2>
             <p>To register for this course you must use your GoBrik account.</p>
             <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-right:10px;width:90%;">Login</a>
-                <a href="signup.php" class="confirm-button enabled" style="width:90%;">Sign Up</a>
+                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-right:10px;width:77%;">Login</a>
+                <a href="signup.php" class="confirm-button enabled" style="width:77%;">Sign Up</a>
             </div>
             <p style="font-size: 1em; color: grey;">GoBrik authentication is powered by Buwana SSO for regenerative apps</p>
         </div>
