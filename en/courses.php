@@ -69,8 +69,8 @@ $gobrik_conn->close();
                                 Open to: <?php echo htmlspecialchars($course['registration_scope']); ?>
                             </div>
                         </div>
-                        <div id="learn-more-button-wrapper" style="background:var(--strong-back);text-align: center; color: var(--sub-menu);   font-weight: 500; border-radius:10px;padding:8px;">
-                            <div class="display-cost"><?php echo htmlspecialchars($course['training_location']); ?></div>
+                        <div id="learn-more-button-wrapper" style="background:var(--darker);text-align: center; color: var(--text-color);   font-weight: 500; border-radius:10px;padding:8px;">
+                            <div class="display-cost"><?php echo htmlspecialchars($course['display_cost']); ?></div>
                             <a class="learn-more-btn" href="register.php?id=<?php echo $course['training_id']; ?>">ℹ️ Learn More</a>
                         </div>
                     </div>

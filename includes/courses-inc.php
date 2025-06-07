@@ -25,7 +25,7 @@
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   cursor:pointer;
-  border: 1px solid green;
+  border: 1px solidvar(--emblem-green);
 }
 
 .course-module-box img {
@@ -44,7 +44,7 @@
 }
 
 .course-module-box:hover .course-date-lang-bar {
-  background: green;
+  background:var(--emblem-green);
 }
 
 .course-module-info {
@@ -89,7 +89,7 @@
 }
 
 .learn-more-btn {
-  background: limegreen;
+  background: var(--emblem-green-over);
   color:white;
   text-align:center;
   padding:8px 12px;
@@ -101,7 +101,7 @@
 }
 
 .course-module-box:hover .learn-more-btn {
-  background: green;
+  background:var(--emblem-green);
 }
 
 #main {
