@@ -36,7 +36,7 @@
 
 @media screen and (max-width: 768px) {
     #rsvp-register-button-desktop { display:none; }
-    #rsvp-register-button-mobile { display:flex; }
+    #rsvp-register-button-mobile { display:flex;width:100%; }
 }
 
 @media screen and (min-width: 769px) {
