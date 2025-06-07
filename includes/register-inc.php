@@ -58,13 +58,14 @@ margin-bottom: auto;"
 
 @media screen and (max-width: 7691px) {
 .profile-images img {
-width:100px
+width:175px
 ;padding:15px;
-margin-top:-30px;
+margin-top:-10px;
 }
 
 .profile-names {
-width:100px
+width:175px;
+text-align:right;
 }
 
 .training-title-box {
@@ -85,7 +86,7 @@ width:400px;
 .profile-images img {
 width:250px;
 padding:15px;
-margin-top:-40px;
+margin-top:-20px;
 }
 
 .profile-names {
