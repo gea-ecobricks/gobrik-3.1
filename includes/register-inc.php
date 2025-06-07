@@ -29,10 +29,23 @@
    justify-content: center;
    text-align: center;
    text-decoration: none;
-   margin-top: 10px;
-   display: flex;
+    margin-top: 10px;
+    display: flex;
 
-   }
+    }
+
+@media screen and (max-width: 768px) {
+    #rsvp-register-button {
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 769px) {
+    #rsvp-register-button {
+        width: auto;
+        align-self: flex-start;
+    }
+}
 
 
       #main {

@@ -182,7 +182,7 @@ echo '<!DOCTYPE html>
             <div style="width:100%;margin:auto;margin-top:5px;">
 
                 <?php if ($is_registered): ?>
-        <div id="registered-notice" style="background-color:#4CAF50; color:white; padding:10px 15px; border-radius:0px 0px 8px 8px; display:block; width:fit-content; margin:auto; margin-top:-3px; font-size:1.1em; display:flex; align-items:center;">
+        <div id="registered-notice" class="top-container-notice">
             <span style="margin-right:10px;">👍</span><span> You're registered for this <?php echo $training_type; ?>!<br>See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
         </div>
     <?php endif; ?>
@@ -200,10 +200,6 @@ echo '<!DOCTYPE html>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
                     <p style="font-size:1em;"><?php echo $display_cost; ?></p>
 
-                    <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
-                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
-                    </button>
-
                 </div>
                 <div class="profile-images">
                     <img src="<?php echo $feature_photo3_main; ?>">
@@ -211,6 +207,10 @@ echo '<!DOCTYPE html>
                     <p class="profile-names" style="font-size:1em;">Language: <?php echo $training_language; ?></p>
                 </div>
             </div>
+
+            <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
+                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
+            </button>
         </div>
 
 
@@ -345,11 +345,15 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
     photobox.style.display = 'none';
 
     const content = `
-        <div class="preview-title">Confirm Registration</div>
-        <p>Please confirm your registration to the course ${trainingName}.  This ${trainingType} will take place at ${trainingDate} (${trainingTime}) on ${trainingLocation}.  The training is ${displayCost} so there is no need to make any initial payments.  Upon confirmation we will send you the access links and information to your Buwana account e-mail: ${userEmail}</p>
-        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled" style="margin-right:10px;">Confirm Registration</a>
-            <a href="courses.php" class="confirm-button" style="background:grey;">Back to Courses</a>
+        <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
+            <div>
+                <h2>${trainingName}</h2>
+                <p>Please confirm your registration to this ${trainingType} taking place at ${trainingDate} (${trainingTime}) on ${trainingLocation}. The training is ${displayCost} so there is no need to make any initial payments. Upon confirmation we will send you the access links and information to your Buwana account e-mail: ${userEmail}</p>
+            </div>
+            <div style="display:flex;gap:10px;width:100%;margin-top:20px;">
+                <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled" style="flex:1;">Confirm Registration</a>
+                <a href="courses.php" class="confirm-button" style="background:grey;flex:1;">Back to Courses</a>
+            </div>
         </div>
     `;
 
@@ -367,13 +371,15 @@ function openCancelRegistrationModal() {
     photobox.style.display = 'none';
 
     const content = `
-        <div style="text-align="center">
-            <h1>💔</h1>
-            <h4>Cancel Registration?</h4>
-            <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
-            <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="#" id="confirm-unregister" class="confirm-button" style="background:red;color:white;margin-right:10px;">Cancel Registration</a>
-                <a href="courses.php" class="confirm-button" style="background:grey;">↩️ Back to Courses</a>
+        <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
+            <div>
+                <h1>💔</h1>
+                <h4>Cancel Registration?</h4>
+                <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
+            </div>
+            <div style="display:flex;gap:10px;width:100%;margin-top:20px;">
+                <a href="#" id="confirm-unregister" class="confirm-button" style="background:red;color:white;flex:1;">Cancel Registration</a>
+                <a href="courses.php" class="confirm-button" style="background:grey;flex:1;">↩️ Back to Courses</a>
             </div>
         </div>
     `;
