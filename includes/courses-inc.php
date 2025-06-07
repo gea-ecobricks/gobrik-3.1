@@ -26,6 +26,7 @@
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   cursor:pointer;
+  border: 1px solid green;
 }
 
 .course-module-box img {
@@ -34,11 +35,11 @@
 }
 
 .course-date-lang-bar {
-  background: grey;
+  background: var(--settings-background);
   color: white;
   text-align: right;
   font-family: 'Mulish', sans-serif;
-  font-size: 1.2em;
+  font-size: 1em;
   padding: 5px 10px;
 }
 
@@ -99,13 +100,13 @@
   background: green;
 }
 
-@media (min-width:1000px) {
+@media (min-width:2001px) {
   .course-module-box { flex-basis: calc(33.33% - 20px); }
 }
-@media (min-width:769px) and (max-width:999px) {
+@media (min-width:770px) and (max-width:2000px) {
   .course-module-box { flex-basis: calc(50% - 20px); }
 }
-@media (max-width:768px) {
+@media (max-width:769px) {
   .course-module-box { flex-basis: 100%; }
 }
 
