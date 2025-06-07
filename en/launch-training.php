@@ -792,12 +792,19 @@ function showTrainingSavedModal(trainingId) {
     document.getElementById('footer-full')?.classList.add('blurred');
     document.body.classList.add('modal-open');
 
+    const readyToShow = document.getElementById('ready_to_show')?.checked;
+    const listingMsg = readyToShow
+        ? 'Your training is currently publicly listed and live'
+        : 'Your training is not yet listed.';
+
     modalBox.innerHTML = `
-        <h1>Training saved!</h1>
-        <p>You can view the course listing or keeping editing the page</p>
+        <h1 style="text-align:center;">🐿️</h1>
+        <h2 style="text-align:center;">Training Saved</h2>
+        <p style="text-align:center;">Your training was saved. ${listingMsg}</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;">
-            <a href="launch-register.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">Keep Editing</a>
-            <a href="register.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">View Listing</a>
+            <a href="launch-training.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">Continue Editing</a>
+            <a href="register.php?id=${trainingId}" class="confirm-button enabled" style="margin:10px;">View Registration</a>
+            <a href="courses.php" class="confirm-button enabled" style="margin:10px;">View Listings</a>
         </div>
     `;
 }
