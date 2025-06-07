@@ -82,7 +82,6 @@ padding: 7px;
 
 .profile-images img {
 width:177px;
-margin-top:-10px;
 margin-left:auto;
 margin-right: 10px;
 }
