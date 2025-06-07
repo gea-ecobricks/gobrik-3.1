@@ -2262,14 +2262,14 @@ label {
 #slider-box {
     position: relative;
     width: 100%;
-    height: calc(100vh - 216px);
+    height: calc(100vh - 70px);
     overflow: hidden;
     margin-top: 70px;
 }
 
 #ecobrick-slider {
   width: 100%;
-    height: calc(100vh - 150px);
+    height: calc(100vh - 214px);
   position: relative;
 }
 
