@@ -19,6 +19,7 @@ $language_id = '';
 $training_language = '';
 $training_url = "";
 $ecobricker_id = null;
+$users_email_address = '';
 $is_registered = false; // Default: user is not registered
 
 
@@ -40,12 +41,12 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
-    // Fetch ecobricker_id using buwana_id
-    $sql = "SELECT ecobricker_id FROM tb_ecobrickers WHERE buwana_id = ?";
+    // Fetch ecobricker_id and user's email using buwana_id
+    $sql = "SELECT ecobricker_id, email_addr FROM tb_ecobrickers WHERE buwana_id = ?";
     $stmt = $gobrik_conn->prepare($sql);
     $stmt->bind_param("i", $buwana_id);
     $stmt->execute();
-    $stmt->bind_result($ecobricker_id);
+    $stmt->bind_result($ecobricker_id, $users_email_address);
     $stmt->fetch();
     $stmt->close();
 
@@ -81,6 +82,7 @@ if ($result->num_rows > 0) {
     $featured_description = strip_tags($row['featured_description'] ?? '', $allowed_tags);
     $training_agenda = strip_tags($row['training_agenda'] ?? '', $allowed_tags);
     $training_title = htmlspecialchars($row['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
+    $training_name = $training_title; // alias for modal text
     $training_subtitle = htmlspecialchars($row['training_subtitle'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_date = htmlspecialchars($row['training_date'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_time_txt = htmlspecialchars($row['training_time_txt'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -91,6 +93,8 @@ if ($result->num_rows > 0) {
     $training_location = htmlspecialchars($row['training_location'] ?? '', ENT_QUOTES, 'UTF-8');
     $registration_scope = htmlspecialchars($row['registration_scope'] ?? '', ENT_QUOTES, 'UTF-8');
     $language_id = trim($row['training_language'] ?? '');
+
+    $display_cost = htmlspecialchars($row['display_cost'] ?? '', ENT_QUOTES, 'UTF-8');
 
 
 
@@ -186,7 +190,7 @@ echo '<!DOCTYPE html>
                     <p style="font-size:1em;"><?php echo $training_type; ?> | Scope: <?php echo $registration_scope; ?></p>
 
                     <button id="rsvp-register-button" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
-                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
+                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "✅ RSVP"); ?>
                                         </button>
 
                 </div>
@@ -212,7 +216,7 @@ echo '<!DOCTYPE html>
 
 
     <button id="rsvp-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: <?php echo $is_registered ? 'default' : 'pointer'; ?>;" <?php echo $is_registered ? 'disabled' : ''; ?>>
-        <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? "✅ RSVP as " . htmlspecialchars($first_name, ENT_QUOTES, 'UTF-8') : "✅ RSVP"); ?>
+        <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "✅ RSVP"); ?>
     </button>
 </div>
 
@@ -260,71 +264,45 @@ echo '<!DOCTYPE html>
 
 <!-- JavaScript to handle RSVP click -->
 <script>
-document.getElementById("rsvp-button").addEventListener("click", function() {
+document.getElementById("rsvp-button").addEventListener("click", handleRegistrationClick);
+document.getElementById("rsvp-register-button").addEventListener("click", handleRegistrationClick);
+
+function handleRegistrationClick() {
     <?php if ($is_logged_in && isset($ecobricker_id)): ?>
-        // Redirect logged-in users to registration-confirmation.php
-        window.location.href = "registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>";
+        openConfirmRegistrationModal(
+            <?php echo json_encode($training_name); ?>,
+            <?php echo json_encode($training_type); ?>,
+            <?php echo json_encode($training_date); ?>,
+            <?php echo json_encode($training_time_txt); ?>,
+            <?php echo json_encode($training_location); ?>,
+            <?php echo json_encode($display_cost); ?>,
+            <?php echo json_encode($users_email_address); ?>
+        );
     <?php else: ?>
-        // Show login modal for non-logged-in users
-        openInfoModal('<?php echo $lang; ?>');
+        openInfoModal();
     <?php endif; ?>
-});
+}
 </script>
 
 
 <script>
-function openInfoModal(lang) {
+function openInfoModal() {
     const modal = document.getElementById('form-modal-message');
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
 
-    photobox.style.display = 'none'; // Hide photo box if not needed
+    photobox.style.display = 'none';
 
-    let title, message, loginButton, signupButton;
-
-    switch (lang) {
-        case 'fr':
-            title = "Connexion requise";
-            message = "Pour vous inscrire à l'événement communautaire, veuillez vous connecter avec votre compte GoBrik.";
-            loginButton = "🔑 Se connecter";
-            signupButton = "📝 S'inscrire";
-            break;
-        case 'es':
-            title = "Inicio de sesión requerido";
-            message = "Para inscribirse en el evento comunitario, inicie sesión con su cuenta de GoBrik.";
-            loginButton = "🔑 Iniciar sesión";
-            signupButton = "📝 Registrarse";
-            break;
-        case 'id':
-            title = "Diperlukan Login";
-            message = "Untuk mendaftar acara komunitas, silakan masuk dengan akun GoBrik Anda.";
-            loginButton = "🔑 Masuk";
-            signupButton = "📝 Daftar";
-            break;
-        default: // English (en)
-            title = "Login Required";
-            message = "To RSVP for the Community Event, please log in with your GoBrik account.";
-            loginButton = "🔑 Log In";
-            signupButton = "📝 Sign Up";
-            break;
-    }
-
-    let content = `
+    const content = `
+        <div class="preview-title">Login or Sign Up</div>
+        <p>Please log in or sign up to confirm your registration for the course.</p>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <h1>🌍</h1>
-        </div>
-        <div class="preview-title">${title}</div>
-
-        <p style="font-size:1.4;">${message}</p>
-        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <a href="login.php?redirect=register.php" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">${loginButton}</a>
-            <p style="font-size:0.9";color:grey;margin-top: 10px;">No account yet?
-            <a href="signup.php"">${signupButton}</a>
+            <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-right:10px;">Login to Register</a>
+            <a href="signup.php" class="action-btn-blue">Sign Up</a>
         </div>
     `;
 
     messageContainer.innerHTML = content;
-
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 }
@@ -334,6 +312,27 @@ function closeInfoModal() {
     const modal = document.getElementById('form-modal-message');
     modal.style.display = 'none';
     document.body.classList.remove('modal-open');
+}
+
+function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, displayCost, userEmail) {
+    const modal = document.getElementById('form-modal-message');
+    const messageContainer = modal.querySelector('.modal-message');
+    const photobox = document.getElementById('modal-photo-box');
+
+    photobox.style.display = 'none';
+
+    const content = `
+        <div class="preview-title">Confirm Registration</div>
+        <p>Please confirm your registration to the course ${trainingName}.  This ${trainingType} will take place at ${trainingDate} (${trainingTime}) on ${trainingLocation}.  The training is ${displayCost} so there is no need to make any initial payments.  Upon confirmation we will send you the access links and information to your Buwana account e-mail: ${userEmail}</p>
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+            <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled" style="margin-right:10px;">Confirm Registration</a>
+            <a href="courses.php" class="confirm-button" style="background:grey;">Back to Courses</a>
+        </div>
+    `;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
 }
 </script>
 
