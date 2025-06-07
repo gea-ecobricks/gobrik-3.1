@@ -356,11 +356,11 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
                 <h2>${trainingName}</h2>
                 <p>Please confirm your registration to this ${trainingType} taking place at ${trainingDate} (${trainingTime}) on ${trainingLocation}. The training is ${displayCost} so there is no need to make any initial payments.</p>
             </div>
-            <div style="display:flex;gap:10px;width:100%;margin-top:20px;flex-flow:column">
+            <div style="display:flex;width:100%;margin-top:20px;flex-flow:column">
                 <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled" style="flex:1;width:80%;">Confirm Registration</a>
                 <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button" style="background:grey;flex:1;width:80%;">Back to Course</a>
             </div>
-            <p style="text-size:0.8em; color: grey;" >Upon confirmation we will send you the access links and information to your Buwana account e-mail: ${userEmail}</p>
+            <p style="font-size:0.9em; color: grey;" >Upon confirmation we will send you the access links and information to your Buwana account e-mail: ${userEmail}</p>
         </div>
     `;
 
