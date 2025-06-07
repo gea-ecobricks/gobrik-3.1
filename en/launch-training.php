@@ -434,10 +434,10 @@ if (!empty($community_id)) {
 
     <!-- ======================= Feature Photo 1 ======================= -->
     <div class="form-item">
-        <label for="feature_photo1_main">Set Feature Photo</label><br>
 <?php if ($editing && !empty($feature_photo1_main)): ?>
     <img src="<?php echo htmlspecialchars($feature_photo1_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 1">
 <?php endif; ?>
+        <label for="feature_photo1_main">Set Feature Photo</label><br>
 
         <input type="url" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo1_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
@@ -447,10 +447,10 @@ if (!empty($community_id)) {
 
     <!-- ======================= Feature Photo 2 ======================= -->
     <div class="form-item">
-        <label for="feature_photo2_main">Set a Second Training Feature Photo</label><br>
 <?php if ($editing && !empty($feature_photo2_main)): ?>
     <img src="<?php echo htmlspecialchars($feature_photo2_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 2">
 <?php endif; ?>
+        <label for="feature_photo2_main">Set a Second Training Feature Photo</label><br>
 
         <input type="url" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo2_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
@@ -460,11 +460,10 @@ if (!empty($community_id)) {
 
     <!-- ======================= Feature Photo 3 ======================= -->
     <div class="form-item">
-        <label for="feature_photo3_main">Set a Third Training Feature Photo</label><br>
-
 <?php if ($editing && !empty($feature_photo3_main)): ?>
     <img src="<?php echo htmlspecialchars($feature_photo3_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 3">
 <?php endif; ?>
+        <label for="feature_photo3_main">Set a Third Training Feature Photo</label><br>
         <input type="url" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo3_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
             This image will also be visible on the training registration page.
@@ -649,6 +648,16 @@ document.addEventListener("DOMContentLoaded", function() {
         box.appendChild(hidden);
         trainerContainer.appendChild(box);
     }
+
+    // Attach remove functionality to any pre-rendered trainer tags
+    document.querySelectorAll('#selected_trainers .trainer-tag-box').forEach(function(box) {
+        var removeBtn = box.querySelector('.remove-trainer');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                box.remove();
+            });
+        }
+    });
 
     trainerInput.addEventListener('input', function() {
         fetchTrainers(trainerInput.value.trim());
