@@ -37,44 +37,48 @@ $gobrik_conn->close();
 <head>
 <meta charset="UTF-8">
 <?php require_once("../includes/courses-inc.php"); ?>
-<div class="splash-title-block"></div>
-<div id="splash-bar"></div>
-<!-- PAGE CONTENT -->
-<div id="top-page-image" class="credentials-banner top-page-image"></div>
-<div id="form-submission-box" class="landing-page-form">
-    <div class="form-container">
-        <div style="text-align:center;width:100%;margin:auto;">
-            <h2 data-lang-id="001-current-courses">Current Courses</h2>
-            <p><span data-lang-id="002-course-selection">Select from our list of ongoing trainings, workshops and community events.</span></p>
-        </div>
-        <div class="course-grid">
-            <?php foreach ($courses as $course): ?>
-                <div class="course-module-box">
-                    <img src="<?php echo htmlspecialchars($course['feature_photo1_main']); ?>" alt="">
-                    <div class="course-date-lang-bar">
-                        <?php echo date('M j', strtotime($course['training_date'])); ?> |
-                        🌐<?php echo strtoupper($course['training_language']); ?>
-                    </div>
-                    <div class="course-module-info">
-                        <h3><?php echo htmlspecialchars($course['training_title']); ?></h3>
-                        <h4><?php echo htmlspecialchars($course['training_subtitle']); ?></h4>
-                        <div class="training-leaders">Led by <?php echo htmlspecialchars($course['lead_trainer']); ?></div>
-                        <?php $desc = strip_tags($course['featured_description']); if(strlen($desc)>255) $desc = substr($desc,0,255).'...'; ?>
-                        <div class="course-description"><?php echo htmlspecialchars($desc); ?></div>
-                        <div class="module-caption-item">
-                            <?php echo htmlspecialchars($course['training_type']); ?> |
-                            <?php echo htmlspecialchars($course['training_location']); ?>
+    <div class="splash-title-block"></div>
+    <div id="splash-bar"></div>
+    <!-- PAGE CONTENT -->
+    <div id="top-page-image" class="credentials-banner top-page-image"></div>
+    <div id="form-submission-box" class="landing-page-form">
+        <div class="form-container">
+            <div style="text-align:center;width:100%;margin:auto;">
+                <h2 data-lang-id="001-current-courses">Current Courses</h2>
+                <p style="margin-bottom: 20px;"><span data-lang-id="002-course-selection">Select from our list of ongoing trainings, workshops and community events.</span></p>
+            </div>
+            <div class="course-grid">
+                <?php foreach ($courses as $course): ?>
+                    <div class="course-module-box">
+                        <img src="<?php echo htmlspecialchars($course['feature_photo1_main']); ?>" alt="">
+                        <div class="course-date-lang-bar">
+                            <?php echo date('M j', strtotime($course['training_date'])); ?> |
+                            🌐<?php echo strtoupper($course['training_language']); ?>
                         </div>
-                        <div class="module-caption-item">
-                            Open to: <?php echo htmlspecialchars($course['registration_scope']); ?>
+                        <div class="course-module-info">
+                            <h3><?php echo htmlspecialchars($course['training_title']); ?></h3>
+                            <h4><?php echo htmlspecialchars($course['training_subtitle']); ?></h4>
+                            <div class="training-leaders">Led by <?php echo htmlspecialchars($course['lead_trainer']); ?></div>
+                            <?php $desc = strip_tags($course['featured_description']); if(strlen($desc)>255) $desc = substr($desc,0,255).'...'; ?>
+                            <div class="course-description"><?php echo htmlspecialchars($desc); ?></div>
+                            <div class="module-caption-item">
+                                <?php echo htmlspecialchars($course['training_type']); ?> |
+                                <?php echo htmlspecialchars($course['training_location']); ?>
+                            </div>
+                            <div class="module-caption-item">
+                                Open to: <?php echo htmlspecialchars($course['registration_scope']); ?>
+                            </div>
+                        </div>
+                        <div id="learn-more-button-wrapper" style="background:grey;width:100%; border-radius:10px;padding:10px;">
+                            <div class="display-cost"><?php echo htmlspecialchars($course['training_location']); ?></div>
+                            <a class="learn-more-btn" href="register.php?id=<?php echo $course['training_id']; ?>">ℹ️ Learn More</a>
                         </div>
                     </div>
-                    <a class="learn-more-btn" href="register.php?id=<?php echo $course['training_id']; ?>">Learn More</a>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
-</div>
+</div> <!--closing #main as opened in header-->
 
 <!--FOOTER STARTS HERE-->
 <?php require_once ("../footer-2025.php");?>
