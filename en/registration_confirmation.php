@@ -131,9 +131,6 @@ function sendTrainingConfirmationEmail(
             <p style='font-size: 1.2em;'><a href='$zoom_link' target='_blank' style='color: #0073e6; font-weight: bold;'>🔗 Join Zoom Meeting</a></p>
             <p>The event will open 15 minutes beforehand for a meet & greet.</p>
 
-            <p>View the agenda: <a href='$agenda_url' target='_blank'>$agenda_url</a></p>
-
-            <br>
             <p>Thank you, and see you then!</p>
             <br><br>
             <p><strong>$lead_trainer</strong></p>
