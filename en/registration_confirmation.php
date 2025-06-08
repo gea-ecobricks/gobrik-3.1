@@ -35,17 +35,28 @@ $stmt_user->bind_result($first_name, $email_addr);
 $stmt_user->fetch();
 $stmt_user->close();
 
-/* ✅ Fetch Training Details from `tb_trainings` */
-$sql_training = "SELECT training_title, training_date, zoom_link, training_type, feature_photo1_tmb, training_agenda, agenda_url, lead_trainer, trainer_contact_email, zoom_link_full
+$sql_training = "SELECT training_title, training_date, zoom_link, training_time_txt, training_type, feature_photo1_tmb, training_agenda, agenda_url, lead_trainer, trainer_contact_email, zoom_link_full
                  FROM tb_trainings WHERE training_id = ?";
 $stmt_training = $gobrik_conn->prepare($sql_training);
 $stmt_training->bind_param("i", $training_id);
 $stmt_training->execute();
-$stmt_training->bind_result($training_title, $training_date, $zoom_link, $training_time_txt, $training_type, $feature_photo1_tmb, $training_agenda, $agenda_url, $lead_trainer, $trainer_contact_email, $zoom_link_full);
+$stmt_training->bind_result(
+    $training_title,
+    $training_date,
+    $zoom_link,
+    $training_time_txt,
+    $training_type,
+    $feature_photo1_tmb,
+    $training_agenda,
+    $agenda_url,
+    $lead_trainer,
+    $trainer_contact_email,
+    $zoom_link_full
+);
 $stmt_training->fetch();
 $training_date_formatted = date("F j, Y", strtotime($training_date));
-
 $stmt_training->close();
+
 
 // ✅ Ensure `$zoom_link_full` is defined (Fix Undefined Variable Warning)
 if (!isset($zoom_link_full)) {
