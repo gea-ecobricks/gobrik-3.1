@@ -38,7 +38,16 @@ $stmt_training->bind_result($training_title, $training_date, $zoom_link, $traini
 $stmt_training->fetch();
 $stmt_training->close();
 
-if (!isset($zoom_link_full)) {
+// Ensure optional fields are strings to satisfy strict typing
+// Use empty strings for potentially null database values
+$feature_photo1_tmb     = $feature_photo1_tmb     ?? '';
+$agenda_url             = $agenda_url             ?? '';
+$lead_trainer           = $lead_trainer           ?? '';
+$trainer_contact_email  = $trainer_contact_email  ?? '';
+$zoom_link_full         = $zoom_link_full         ?? '';
+$zoom_link              = $zoom_link              ?? '';
+
+if (empty($zoom_link_full)) {
     $zoom_link_full = "No additional Zoom details available.";
 }
 
