@@ -99,14 +99,12 @@ header("Location: register.php?id=$training_id&error=failed");
 exit();
 
 $gobrik_conn->close();
-
-/* ✅ Function to Send Training Registration Confirmation Email */
-function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $agenda_url, $lead_trainer, $trainer_contact_email, $zoom_link_full) {
+function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title, $training_date_formatted, $zoom_link, $zoom_link_full, $training_time_txt, $training_type, $feature_photo1_tmb, $agenda_url, $lead_trainer, $trainer_contact_email) {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU Mailgun API
     $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Get API key from environment
     $mailgunDomain = 'mail.gobrik.com'; // Verified Mailgun domain
-    $zoom_full = nl2br($zoom_link_full);
 
+    $zoom_full_html = nl2br($zoom_link_full);
 
     // ✅ Email Subject
     $subject = "Your registration to $training_title is confirmed!";
@@ -114,13 +112,15 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
     // ✅ Email Body (HTML)
     $html_body = "
         <div style='text-align: left; font-family: Arial, sans-serif;'>
-            <img src='$feature_photo1_tmb' style='max-width: 100%; border-radius: 8px; margin-bottom: 15px;'>
+            <img src='$feature_photo1_tmb' alt='Training Banner' style='max-width: 700px; max-height: 600px; border-radius: 8px; margin-bottom: 20px;'>
             <h2>Hi there, $first_name!</h2>
             <p>Alright! 🎉 You're confirmed for our <strong>$training_type</strong> on <strong>$training_date_formatted</strong>.</p>
 
-            <p>You can join <strong>$training_title</strong> on strong>$training_date</strong> (that's $training_time_txt) using the following link:</p>
+            <p>You can join <strong>$training_title</strong> on <strong>$training_date_formatted</strong> (that's $training_time_txt) using the following link:</p>
             <p style='font-size: 1.2em;'><a href='$zoom_link' target='_blank' style='color: #0073e6; font-weight: bold;'>🔗 Join Zoom Meeting</a></p>
             <p>The event will open 15 minutes beforehand for a meet & greet.</p>
+
+            <p>View the agenda: <a href='$agenda_url' target='_blank'>$agenda_url</a></p>
 
             <br>
             <p>Thank you, and see you then!</p>
@@ -129,14 +129,35 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
             <p>Contact: <a href='mailto:$trainer_contact_email'>$trainer_contact_email</a></p>
             <br><br><br>
             <hr>
-            <p>Here's the full zoom event invitation:</p>
-            <p>$zoom_full</p>
+            <p><strong>Full Zoom Invitation:</strong></p>
+            <p>$zoom_full_html</p>
         </div>
     ";
 
     // ✅ Plain Text Fallback
-    $text_body = "Hi $first_name,\n\nYou're confirmed for our $training_type on $training_date.\n\nJoin $training_title on Zoom: $zoom_link\n\nThe event opens 15 minutes beforehand for a meet & greet.\n\nView the full agenda: $agenda_url\n\nThank you, and see you then!\n\n$lead_trainer\nContact: $trainer_contact_email";
+    $text_body = <<<EOT
+Hi there, $first_name!
 
+You're confirmed for our $training_type on $training_date_formatted.
+
+You can join "$training_title" on $training_date_formatted (that's $training_time_txt) using this link:
+$zoom_link
+
+The event will open 15 minutes beforehand for a meet & greet.
+
+Agenda: $agenda_url
+
+Thank you, and see you then!
+
+$lead_trainer
+Contact: $trainer_contact_email
+
+-----
+Full Zoom Invitation:
+$zoom_link_full
+EOT;
+
+    // ✅ Send Email via Mailgun
     try {
         $response = $client->post("$mailgunDomain/messages", [
             'auth' => ['api', $mailgunApiKey],
@@ -154,7 +175,7 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
             error_log("Mailgun: Training confirmation email sent successfully to $email_addr");
             return true;
         } else {
-            error_log("Mailgun: Failed to send confirmation email.");
+            error_log("Mailgun: Failed to send confirmation email to $email_addr.");
             return false;
         }
 
@@ -163,4 +184,5 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
         return false;
     }
 }
+
 ?>
