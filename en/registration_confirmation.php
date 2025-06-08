@@ -41,8 +41,10 @@ $sql_training = "SELECT training_title, training_date, zoom_link, training_type,
 $stmt_training = $gobrik_conn->prepare($sql_training);
 $stmt_training->bind_param("i", $training_id);
 $stmt_training->execute();
-$stmt_training->bind_result($training_title, $training_date, $zoom_link, $training_type, $feature_photo1_tmb, $training_agenda, $agenda_url, $lead_trainer, $trainer_contact_email, $zoom_link_full);
+$stmt_training->bind_result($training_title, $training_date, $zoom_link, $training_time_txt, $training_type, $feature_photo1_tmb, $training_agenda, $agenda_url, $lead_trainer, $trainer_contact_email, $zoom_link_full);
 $stmt_training->fetch();
+$training_date_formatted = date("F j, Y", strtotime($training_date));
+
 $stmt_training->close();
 
 // ✅ Ensure `$zoom_link_full` is defined (Fix Undefined Variable Warning)
@@ -92,6 +94,8 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU Mailgun API
     $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Get API key from environment
     $mailgunDomain = 'mail.gobrik.com'; // Verified Mailgun domain
+    $zoom_full = nl2br($zoom_link_full);
+
 
     // ✅ Email Subject
     $subject = "Your registration to $training_title is confirmed!";
@@ -101,12 +105,12 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
         <div style='text-align: left; font-family: Arial, sans-serif;'>
             <img src='$feature_photo1_tmb' style='max-width: 100%; border-radius: 8px; margin-bottom: 15px;'>
             <h2>Hi there, $first_name!</h2>
-            <p>Alright! 🎉 You're confirmed for our <strong>$training_type</strong> on <strong>$training_date</strong>.</p>
+            <p>Alright! 🎉 You're confirmed for our <strong>$training_type</strong> on <strong>$training_date_formatted</strong>.</p>
+
             <p>You can join <strong>$training_title</strong> on strong>$training_date</strong> (that's $training_time_txt) using the following link:</p>
             <p style='font-size: 1.2em;'><a href='$zoom_link' target='_blank' style='color: #0073e6; font-weight: bold;'>🔗 Join Zoom Meeting</a></p>
             <p>The event will open 15 minutes beforehand for a meet & greet.</p>
-            <p>Here's the full zoom event invitation:</p>
-            <p>$zoom_link_full</p>
+
             <br>
             <p>Thank you, and see you then!</p>
             <br><br>
@@ -114,7 +118,8 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
             <p>Contact: <a href='mailto:$trainer_contact_email'>$trainer_contact_email</a></p>
             <br><br><br>
             <hr>
-            <p style='font-size:0.9em;'>$zoom_link_full</p>
+            <p>Here's the full zoom event invitation:</p>
+            <p>$zoom_full</p>
         </div>
     ";
 
