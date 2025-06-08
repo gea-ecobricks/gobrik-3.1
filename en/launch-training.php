@@ -17,9 +17,31 @@ if (isset($_GET['training_id'])) {
 } elseif (isset($_GET['id'])) {
     $training_id = intval($_GET['id']);
 }
+function isCrawler() {
+    $bots = [
+        // Search engine bots
+        'Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider', 'YandexBot',
+        'Sogou', 'Exabot',
+
+        // Social preview bots
+        'facebookexternalhit', 'facebot', 'Twitterbot', 'Slackbot', 'LinkedInBot', 'Pinterest',
+
+        // Messaging apps
+        'WhatsApp', 'TelegramBot', 'Discordbot', 'Signal-Android', 'Signal-iOS', 'iMessagePreview'
+    ];
+
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    foreach ($bots as $bot) {
+        if (stripos($userAgent, $bot) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 // PART 2: ✅ LOGIN & ROLE CHECK
-if (!isLoggedIn()) {
+if (!isLoggedIn() && !isCrawler()) {
     $login_params = [];
     if (isset($_SESSION['buwana_id'])) {
         $login_params['id'] = $_SESSION['buwana_id'];
@@ -34,6 +56,7 @@ if (!isLoggedIn()) {
     header('Location: login.php?' . http_build_query($login_params));
     exit();
 }
+
 
 $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
