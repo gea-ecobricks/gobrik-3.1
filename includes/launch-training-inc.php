@@ -1,6 +1,6 @@
 
 
-<?php require_once ("../meta/$page-$lang.php");?>
+<?php require_once ("../meta/launch-training-$lang.php");?>
 
 
 <STYLE>
