@@ -40,22 +40,34 @@ function isCrawler() {
 }
 
 
-// PART 2: ✅ LOGIN & ROLE CHECK
-if (!isLoggedIn() && !isCrawler()) {
-    $login_params = [];
-    if (isset($_SESSION['buwana_id'])) {
-        $login_params['id'] = $_SESSION['buwana_id'];
-    }
+if (!isLoggedIn()) {
+    if (isCrawler()) {
+        // ✅ Serve minimal head/meta and stop execution
+        header('Content-Type: text/html; charset=UTF-8');
+        echo "<!DOCTYPE html><html lang='en'><head>";
+        require_once ("../meta/launch-training-$lang.php"); // ✅ your actual meta tags
+        echo "</head><body>";
+        echo "<p>This is a preview page for bots only.</p>";
+        echo "</body></html>";
+        exit();
+    } else {
+        // ✅ redirect real users
+        $login_params = [];
+        if (isset($_SESSION['buwana_id'])) {
+            $login_params['id'] = $_SESSION['buwana_id'];
+        }
 
-    $redirect = 'launch-training.php';
-    if ($training_id) {
-        $redirect .= '?training_id=' . $training_id;
-    }
-    $login_params['redirect'] = $redirect;
+        $redirect = 'launch-training.php';
+        if ($training_id) {
+            $redirect .= '?training_id=' . $training_id;
+        }
+        $login_params['redirect'] = $redirect;
 
-    header('Location: login.php?' . http_build_query($login_params));
-    exit();
+        header('Location: login.php?' . http_build_query($login_params));
+        exit();
+    }
 }
+
 
 
 $buwana_id = $_SESSION['buwana_id'];
