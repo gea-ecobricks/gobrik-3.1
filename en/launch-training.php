@@ -10,9 +10,28 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 ob_start(); // Prevent output before headers
 
+// ✅ Determine training ID from URL
+$training_id = 0;
+if (isset($_GET['training_id'])) {
+    $training_id = intval($_GET['training_id']);
+} elseif (isset($_GET['id'])) {
+    $training_id = intval($_GET['id']);
+}
+
 // PART 2: ✅ LOGIN & ROLE CHECK
 if (!isLoggedIn()) {
-    header("Location: login.php");
+    $login_params = [];
+    if (isset($_SESSION['buwana_id'])) {
+        $login_params['id'] = $_SESSION['buwana_id'];
+    }
+
+    $redirect = 'launch-training.php';
+    if ($training_id) {
+        $redirect .= '?training_id=' . $training_id;
+    }
+    $login_params['redirect'] = $redirect;
+
+    header('Location: login.php?' . http_build_query($login_params));
     exit();
 }
 
@@ -54,8 +73,7 @@ if ($result_languages && $result_languages->num_rows > 0) {
 
 require_once '../gobrikconn_env.php';
 
-// ✅ Get training ID from URL (for editing)
-$training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+// ✅ Determine if editing existing training
 $editing = ($training_id > 0);
 $training_language = 'en';
 $zoom_link = '';
