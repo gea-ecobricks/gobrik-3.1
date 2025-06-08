@@ -99,17 +99,30 @@ header("Location: register.php?id=$training_id&error=failed");
 exit();
 
 $gobrik_conn->close();
-function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title, $training_date_formatted, $zoom_link, $zoom_link_full, $training_time_txt, $training_type, $feature_photo1_tmb, $agenda_url, $lead_trainer, $trainer_contact_email) {
-    $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU Mailgun API
-    $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Get API key from environment
-    $mailgunDomain = 'mail.gobrik.com'; // Verified Mailgun domain
 
+
+
+function sendTrainingConfirmationEmail(
+    string $first_name,
+    string $email_addr,
+    string $training_title,
+    string $training_date_formatted,
+    string $zoom_link,
+    string $zoom_link_full,
+    string $training_time_txt,
+    string $training_type,
+    string $feature_photo1_tmb,
+    string $agenda_url,
+    string $lead_trainer,
+    string $trainer_contact_email
+) {
+    $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
+    $mailgunApiKey = getenv('MAILGUN_API_KEY');
+    $mailgunDomain = 'mail.gobrik.com';
     $zoom_full_html = nl2br($zoom_link_full);
 
-    // ✅ Email Subject
     $subject = "Your registration to $training_title is confirmed!";
 
-    // ✅ Email Body (HTML)
     $html_body = "
         <div style='text-align: left; font-family: Arial, sans-serif;'>
             <img src='$feature_photo1_tmb' alt='Training Banner' style='max-width: 700px; max-height: 600px; border-radius: 8px; margin-bottom: 20px;'>
@@ -134,7 +147,6 @@ function sendTrainingConfirmationEmail($first_name, $email_addr, $training_title
         </div>
     ";
 
-    // ✅ Plain Text Fallback
     $text_body = <<<EOT
 Hi there, $first_name!
 
@@ -157,7 +169,6 @@ Full Zoom Invitation:
 $zoom_link_full
 EOT;
 
-    // ✅ Send Email via Mailgun
     try {
         $response = $client->post("$mailgunDomain/messages", [
             'auth' => ['api', $mailgunApiKey],
@@ -184,5 +195,6 @@ EOT;
         return false;
     }
 }
+
 
 ?>

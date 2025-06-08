@@ -433,7 +433,7 @@ function openUnregisterSuccessModal() {
             <h2>You're un-enrolled.</h2>
             <p>We're sorry to see you go!  We hope you can find another course that suits your interests and availability from our course listings</p>
             <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="courses.php" class="confirm-button enabled" style="font-size: 1.2em; padding: 10px 20px; cursor: pointer;">OK</a>
+                <a href="courses.php" class="confirm-button enabled" style="font-size: 1.2em; padding: 10px 20px; cursor: pointer;flex:1;max-width:77%">OK</a>
             </div>
         </div>
     `;
