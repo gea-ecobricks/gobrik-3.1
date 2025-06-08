@@ -1,12 +1,12 @@
 <title><?php echo $training_title; ?></title>
 <meta name="keywords" content="GEA Registration, Community, Event, Webinar, Course">
-<meta name="description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo $training_date; ?>">
+<meta name="description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo date('F j, Y', strtotime($training_date)); ?>">
 
 <!-- Facebook Open Graph Tags for social sharing -->
 <meta property="og:url" content="https://www.gobrik.com/<?php echo $lang; ?>/register.php?id=<?php echo $training_id; ?>">
 <meta property="og:type" content="website">
 <meta property="og:title" content="<?php echo $training_title; ?>">
-<meta property="og:description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo $training_date; ?>">
+<meta property="og:description" content="Register for our <?php echo $training_type; ?> led by <?php echo $lead_trainer; ?> on <?php echo date('F j, Y', strtotime($training_date)); ?>">
 <?php $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : 'https://www.gobrik.com/photos/events/terraces-forests-gladys.jpg'; ?>
 <meta property="og:image" content="<?php echo $og_image; ?>">
 <meta property="fb:app_id" content="1781710898523821">
