@@ -38,6 +38,8 @@ if (!empty($training_date)) {
 $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
 $moodle_url = trim($_POST['moodle_url'] ?? '');
 $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
+$show_report = isset($_POST['show_report']) ? 1 : 0;
+$show_signup_count = isset($_POST['show_signup_count']) ? 1 : 0;
 $featured_description = trim($_POST['featured_description'] ?? '');
 $training_summary = trim($_POST['training_summary'] ?? '');
 $training_agenda = trim($_POST['training_agenda'] ?? '');
@@ -113,7 +115,7 @@ if ($editing) {
             no_participants=?, training_type=?, training_language=?, briks_made=?, avg_brik_weight=?,
             training_location=?, training_summary=?, training_agenda=?,
             training_success=?, training_challenges=?, training_lessons_learned=?,
-            youtube_result_video=?, moodle_url=?, ready_to_show=?, featured_description=?, community_id=?,
+            youtube_result_video=?, moodle_url=?, ready_to_show=?, show_report=?, show_signup_count=?, featured_description=?, community_id=?,
             zoom_link=?, zoom_link_full=?, registration_scope=?, trainer_contact_email=?, cost=?, currency=?, display_cost=?
             WHERE training_id=?";
     $stmt = $gobrik_conn->prepare($sql);
@@ -121,11 +123,11 @@ if ($editing) {
         echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
         exit();
     }
-    $stmt->bind_param("sssississiissssssssisissssissi",
+    $stmt->bind_param("sssississiissssssssiiisissssissi",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
         $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show,
+        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $show_signup_count,
         $featured_description, $community_id, $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email, $cost, $currency, $display_cost,
         $training_id
     );
@@ -161,19 +163,19 @@ if ($editing) {
     $sql = "INSERT INTO tb_trainings
             (training_title, training_subtitle, lead_trainer, country_id, training_date, training_time_txt, no_participants,
             training_type, training_language, briks_made, avg_brik_weight, training_location, training_summary, training_agenda, training_success, training_challenges,
-            training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
+            training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, show_report, show_signup_count, featured_description, community_id,
             zoom_link, zoom_link_full, registration_scope, trainer_contact_email, cost, currency, display_cost)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $gobrik_conn->prepare($sql);
     if (!$stmt) {
         echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
         exit();
     }
-    $stmt->bind_param("sssississiissssssssisissssiss",
+    $stmt->bind_param("sssississiissssssssiiisissssiss",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
         $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
-        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
+        $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $show_signup_count, $featured_description, $community_id,
         $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email, $cost, $currency, $display_cost
     );
     if ($stmt->execute()) {
