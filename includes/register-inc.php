@@ -260,6 +260,27 @@ margin-top: 20px;
     color: white;          /* White text for contrast */
 }
 
+/* Signup count styles */
+.signup-count-box {
+    background: grey;
+    border-radius: 10px;
+    padding: 5px 10px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.signup-count-number {
+    font-family: 'Arvo', serif;
+    font-size: 1.5em;
+    color: white;
+}
+
+.signup-count-text {
+    font-family: 'Mulish', sans-serif;
+    font-size: 0.9em;
+    color: white;
+}
+
 </style>
 
 

@@ -107,6 +107,21 @@ if ($result->num_rows > 0) {
     $cost = htmlspecialchars($row['cost'] ?? '', ENT_QUOTES, 'UTF-8');
     $currency = htmlspecialchars($row['currency'] ?? '', ENT_QUOTES, 'UTF-8');
 
+    // Signup count settings
+    $show_signup_count = intval($row['show_signup_count'] ?? 0);
+    $no_participants = intval($row['no_participants'] ?? 0);
+    $registration_count = 0;
+    if ($show_signup_count === 1) {
+        $count_stmt = $gobrik_conn->prepare("SELECT COUNT(*) FROM tb_training_trainees WHERE training_id = ?");
+        if ($count_stmt) {
+            $count_stmt->bind_param("i", $training_id);
+            $count_stmt->execute();
+            $count_stmt->bind_result($registration_count);
+            $count_stmt->fetch();
+            $count_stmt->close();
+        }
+    }
+
 
 
     $training_url = htmlspecialchars($row['training_url'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -212,6 +227,13 @@ echo '<!DOCTYPE html>
                     <img src="<?php echo $feature_photo3_main; ?>">
                     <p class="profile-names" style="margin-bottom: 10px;">Led by <?php echo $lead_trainer; ?></p>
                     <p class="profile-names" style="font-size:1em;">Language: <?php echo $training_language; ?></p>
+                    <?php if ($show_signup_count === 1): ?>
+                    <div class="signup-count-box">
+                        <span class="signup-count-text">Registrations:</span>
+                        <span class="signup-count-number"><?php echo $registration_count; ?></span>
+                        <span class="signup-count-text">of <?php echo $no_participants; ?></span>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
