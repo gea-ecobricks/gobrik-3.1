@@ -226,9 +226,9 @@ echo '<!DOCTYPE html>
                 <div class="profile-images">
                     <img src="<?php echo $feature_photo3_main; ?>">
                     <p class="profile-names" style="margin-bottom: 10px;">Led by <?php echo $lead_trainer; ?></p>
-                    <p class="profile-names" style="font-size:1em;">Language: <?php echo $training_language; ?></p>
+                    <p class="profile-names" style="margin-bottom: 10px;font-size:1em;">Language: <?php echo $training_language; ?></p>
                     <?php if ($show_signup_count === 1): ?>
-                    <div class="signup-count-box">
+                    <div class="profile-names">
                         <span class="signup-count-text">Registrations:</span>
                         <span class="signup-count-number"><?php echo $registration_count; ?></span>
                         <span class="signup-count-text">of <?php echo $no_participants; ?></span>
@@ -238,7 +238,7 @@ echo '<!DOCTYPE html>
             </div>
 
             <button id="rsvp-register-button-mobile" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
-                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
+                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
             </button>
         </div>
 

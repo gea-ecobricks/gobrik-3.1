@@ -554,7 +554,7 @@ if (!empty($community_id)) {
 
     <!-- ======================= Ready to Show Toggle ======================= -->
     <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
-        <div id="left-colum">
+        <div id="left-colum" style="width: 100%;">
             <label>🚀 Launch Training</label>
             <p class="form-caption" data-lang-id="022-training-show" style="margin-top:10px;">
                         Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don’t worry — you can always come back to edit the listing!
@@ -573,7 +573,7 @@ if (!empty($community_id)) {
 
     <!-- ======================= Show Report Toggle ======================= -->
     <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
-        <div id="left-colum">
+        <div id="left-colum" style="width: 100%;">
             <label>📋 Show Training Report</label>
             <p class="form-caption" style="margin-top:10px;">Display the final training report of this training on ecobricks.org</p>
         </div>
@@ -590,7 +590,7 @@ if (!empty($community_id)) {
 
     <!-- ======================= Show Signup Count Toggle ======================= -->
     <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
-        <div id="left-colum">
+        <div id="left-colum" style="width: 100%;">
             <label>🔢 Show Signup Count</label>
             <p class="form-caption" style="margin-top:10px;">Display the count of registrations on the training's registration page.</p>
         </div>
