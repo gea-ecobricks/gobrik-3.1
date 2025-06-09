@@ -120,13 +120,15 @@ $training_subtitle = '';
 $training_time_txt = '';
 $registration_scope = '';
 $trainer_contact_email = '';
+$show_report = 0;
+$show_signup_count = 0;
 
 // ✅ If editi   ng, fetch existing training details
 if ($editing) {
     $sql_fetch = "SELECT training_title, training_subtitle, lead_trainer, country_id, training_date, training_time_txt, no_participants,
                   training_type, training_language, briks_made, avg_brik_weight, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
-                  youtube_result_video, moodle_url, ready_to_show, featured_description, community_id,
+                  youtube_result_video, moodle_url, ready_to_show, show_report, show_signup_count, featured_description, community_id,
                   zoom_link, zoom_link_full, feature_photo1_main, feature_photo2_main, feature_photo3_main, registration_scope, trainer_contact_email
                   FROM tb_trainings WHERE training_id = ?";
 
@@ -136,7 +138,7 @@ if ($editing) {
     $stmt_fetch->bind_result($training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
                             $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
-                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id,
+                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $show_signup_count, $featured_description, $community_id,
                             $zoom_link, $zoom_link_full, $feature_photo1_main, $feature_photo2_main, $feature_photo3_main, $registration_scope, $trainer_contact_email);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
@@ -563,6 +565,40 @@ if (!empty($community_id)) {
             <label class="toggle-switch">
             <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
                    <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+            <span class="slider"></span>
+        </div>
+        </label>
+
+    </div>
+
+    <!-- ======================= Show Report Toggle ======================= -->
+    <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
+        <div id="left-colum">
+            <label>📋 Show Training Report</label>
+            <p class="form-caption" style="margin-top:10px;">Display the final training report of this training on ecobricks.org</p>
+        </div>
+
+        <div id="right-column" style="width:100px; justify-content:center;">
+            <label class="toggle-switch">
+            <input type="checkbox" id="show_report" name="show_report" value="1"
+                   <?php echo (isset($show_report) && $show_report) ? 'checked' : ''; ?>>
+            <span class="slider"></span>
+        </div>
+        </label>
+
+    </div>
+
+    <!-- ======================= Show Signup Count Toggle ======================= -->
+    <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
+        <div id="left-colum">
+            <label>🔢 Show Signup Count</label>
+            <p class="form-caption" style="margin-top:10px;">Display the count of registrations on the training's registration page.</p>
+        </div>
+
+        <div id="right-column" style="width:100px; justify-content:center;">
+            <label class="toggle-switch">
+            <input type="checkbox" id="show_signup_count" name="show_signup_count" value="1"
+                   <?php echo (isset($show_signup_count) && $show_signup_count) ? 'checked' : ''; ?>>
             <span class="slider"></span>
         </div>
         </label>
