@@ -198,6 +198,7 @@ echo '<!DOCTYPE html>
                 <?php endforeach; ?>
             </ul>
             <p>Please resolve these alerts before proceeding.</p>
+            <button id="reset-alerts-button" class="confirm-button delete" style="margin-top:10px;">✅ Alerts Resolved</button>
         </div>
     <?php endif; ?>
 
@@ -444,6 +445,30 @@ $(document).ready(function () {
         if (autoSendEnabled() && recipientEmail) {
             sendEmail();
         }
+    });
+
+    // 🔹 Reset admin alerts
+    $('#reset-alerts-button').on('click', function (e) {
+        e.preventDefault();
+        if (!confirm('Mark all admin alerts as addressed?')) {
+            return;
+        }
+        $.ajax({
+            url: '../scripts/reset_admin_alerts.php',
+            type: 'POST',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    alert('✅ Alerts have been reset.');
+                    location.reload();
+                } else {
+                    alert('❌ Failed to reset alerts.');
+                }
+            },
+            error: function () {
+                alert('❌ Failed to reset alerts.');
+            }
+        });
     });
 
     // 🔹 Initial state from localStorage
