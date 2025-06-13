@@ -37,7 +37,7 @@ if ($is_logged_in) {
     // Redirect to login page with the redirect parameter set to the current page
     echo '<script>
         alert("Please login before viewing this page.");
-        window.location.href = "login.php?redirect=' . urlencode($page) . '.php";
+        window.location.href = "login.php?redirect=' . urlencode('earthen-sender') . '.php";
     </script>';
     exit();
 }
@@ -214,11 +214,18 @@ echo '<!DOCTYPE html>
 
 
 <!-- Auto-send toggle -->
-<div style="margin: 10px 0;">
-  <label for="auto-send-toggle" style="font-weight: bold; font-size: 16px;display:flex;">
-    <input type="checkbox" id="auto-send-toggle" style="transform: scale(1.2); margin-right: 8px;">
-  <p>Uncheck this to prevent the email from sending automatically after countdown.
-  </p>
+<div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
+    <div id="left-colum" style="width: 100%;">
+        <label>✉️ Auto Send Emails</label>
+        <p class="form-caption" style="margin-top:10px;">Uncheck to prevent the email from sending automatically after countdown.</p>
+    </div>
+
+    <div id="right-column" style="width:100px; justify-content:center;">
+        <label class="toggle-switch">
+            <input type="checkbox" id="auto-send-toggle" value="1">
+            <span class="slider"></span>
+        </label>
+    </div>
 </div>
 
 
@@ -302,9 +309,13 @@ $(document).ready(function () {
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
 
     function updateVisibleButton() {
-        if (testSendEnabled() && !autoSendEnabled()) {
+        if (!autoSendEnabled()) {
             $('#test-email-container').show();
-            $('#test-send-button').show().html("📨 Send to russmaier@gmail.com");
+            if (testSendEnabled()) {
+                $('#test-send-button').show().html("📨 Send to russmaier@gmail.com");
+            } else {
+                $('#test-send-button').hide();
+            }
             $('#auto-send-button').hide();
         } else {
             $('#test-email-container').hide();
