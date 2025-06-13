@@ -184,8 +184,8 @@ $email_template = <<<HTML
 
         <div class="footer">
             <p><em>Together we can be the transition to ever increasing harmony with the cycles of life.</em></p>
-            <p>Earthen © 2025 – <a href="https://earthen.io/unsubscribe/?uuid=611f7d90-e87c-4c43-ab51-0772a7883703&key=c8c3faf87323b6ad7a8b96bcc9f9d742316e82dc604c69de46e524bcb11e3104&newsletter=7bbd5ff6-f69e-4ff0-a9d3-67963d85410b">Unsubscribe</a></p>
-            <p style="margin-top: 20px;"><a href="https://ghost.org/?via=pbg-newsletter"><img src="https://static.ghost.org/v4.0.0/images/powered.png" width="142" height="30" alt="Powered by Ghost"></a></p>
+            <p>Earthen © 2025 – <a href="<?php echo $unsubscribe_link ?: 'https://earthen.io/unsubscribe/?uuid=611f7d90-e87c-4c43-ab51-0772a7883703&key=c8c3faf87323b6ad7a8b96bcc9f9d742316e82dc604c69de46e524bcb11e3104&newsletter=7bbd5ff6-f69e-4ff0-a9d3-67963d85410b'; ?>">Unsubscribe</a></p>
+            <p style="margin-top:20px"><a href="https://ghost.org/?via=pbg-newsletter"><img src="https://static.ghost.org/v4.0.0/images/powered.png" width="142" height="30" alt="Powered by Ghost"></a></p>
         </div>
     </div>
 </body>
