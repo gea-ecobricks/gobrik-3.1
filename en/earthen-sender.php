@@ -94,18 +94,10 @@ $total_members = intval($row['total_members'] ?? 0);
 $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Fetch the 3 most recently sent emails
-$query_sent = "SELECT id, email, name, test_sent, test_sent_date_time FROM earthen_members_tb WHERE test_sent = 1 ORDER BY test_sent_date_time DESC LIMIT 3";
-$sent_result = $buwana_conn->query($query_sent);
-$sent_members = $sent_result->fetch_all(MYSQLI_ASSOC);
-
-// Fetch the next 7 pending emails
-$query_pending = "SELECT id, email, name, test_sent, test_sent_date_time FROM earthen_members_tb WHERE test_sent = 0 ORDER BY id ASC LIMIT 7";
-$pending_result = $buwana_conn->query($query_pending);
-$pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
-
-// Merge sent and pending for display
-$all_members = array_merge($sent_members, $pending_members);
+// Fetch the status of all members ordered by earliest sent date
+$query_status = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time FROM earthen_members_tb ORDER BY test_sent_date_time ASC";
+$status_result = $buwana_conn->query($query_status);
+$all_members = $status_result->fetch_all(MYSQLI_ASSOC);
 
 
 require_once 'live-newsletter.php';  //the newsletter html
@@ -227,7 +219,7 @@ echo '<!DOCTYPE html>
         <p class="form-caption" style="margin-top:10px;">Uncheck to prevent the email from sending automatically after countdown.</p>
 
         <label for="send-delay-slider" style="display:block;margin-top:20px;margin-bottom: 5px;">⏱️ Send Delay</label>
-        <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;">
+        <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;accent-color:var(--emblem-green);">
                 <p class="form-caption" style="margin-top:5px;">Adjust sending delay from 1 to 10 seconds.</p>
 
     </div>
@@ -300,24 +292,24 @@ echo '<!DOCTYPE html>
 
 
     <h3>Email Sending Status:</h3>
-    <table border="1" width="100%">
+    <table id="email-status-table" class="display responsive nowrap" style="width:100%">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Email</th>
                 <th>Name</th>
-                <th>Sent</th>
+                <th>Email</th>
+                <th>Open Rate</th>
                 <th>Sent Date</th>
+                <th>Sent</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($all_members as $member): ?>
                 <tr>
-                    <td><?php echo $member['id']; ?></td>
-                    <td><?php echo $member['email']; ?></td>
-                    <td><?php echo $member['name']; ?></td>
-                    <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
+                    <td><?php echo htmlspecialchars($member['name']); ?></td>
+                    <td><?php echo htmlspecialchars($member['email']); ?></td>
+                    <td><?php echo $member['email_open_rate'] ?? '0%'; ?></td>
                     <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
+                    <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -331,9 +323,16 @@ $(document).ready(function () {
     let countdownInterval = null;
     let isSending = false; // prevent duplicate sends
     let sendDelay = 5;
+    let sendFailCount = 0;
 
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
+
+    // Initialize DataTable for status overview
+    $('#email-status-table').DataTable({
+        order: [[3, 'asc']]
+    });
+    $("div.dataTables_filter input").attr('placeholder', 'Search emails...');
 
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
@@ -396,7 +395,7 @@ $(document).ready(function () {
     });
 
     // 🟢 Fetch next recipient via AJAX
-  function fetchNextRecipient() {
+function fetchNextRecipient() {
     $.ajax({
         url: '../scripts/get_next_recipient.php',
         type: 'GET',
@@ -436,10 +435,30 @@ $(document).ready(function () {
             }
         },
         error: function () {
-            alert("❌ Failed to fetch next recipient.");
+            logError('Failed to fetch next recipient.');
         }
     });
 }
+
+    function logError(message) {
+        console.error(message);
+        $.post('../scripts/log_sender_error.php', {message});
+    }
+
+    function handleSendError(msg) {
+        sendFailCount++;
+        logError(`${msg} Attempt ${sendFailCount} for ${recipientEmail}`);
+        if (sendFailCount >= 3 && recipientId) {
+            $.post('../scripts/mark_member_sent.php', {id: recipientId}).always(() => {
+                sendFailCount = 0;
+                fetchNextRecipient(true);
+            });
+        } else {
+            updateVisibleButton();
+            // attempt again after small delay
+            setTimeout(sendEmail, 2000);
+        }
+    }
 
 
 
@@ -495,15 +514,15 @@ function sendEmail() {
                         fetchNextRecipient(true); // fetch + auto-send next
                     }
                 } else {
-                    alert(data.message || "❌ Failed to send the email.");
-                    updateVisibleButton();
+                    isSending = false;
+                    handleSendError(data.message || 'Failed to send the email.');
+                    return;
                 }
                 isSending = false;
             },
             error: function () {
-                alert("❌ Failed to send the email.");
-                updateVisibleButton();
                 isSending = false;
+                handleSendError('Failed to send the email.');
             }
         });
     }
