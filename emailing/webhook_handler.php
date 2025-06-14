@@ -109,40 +109,41 @@ if (stripos($response_message, "rate limited") !== false || stripos($response_me
     // ✅ Log what we found in the database
     if ($current_status !== null) {
         error_log("🔎 Found $email_addr in tb_ecobrickers. Current emailing_status: '$current_status'");
-    } else {
-        error_log("❌ No record found for $email_addr in tb_ecobrickers!");
-    }
 
-    // 🚨 Prioritize status updates to avoid downgrades 🚨
-    $priority = [
-        'failed' => 3,
-        'bounced' => 3,
-        'complained' => 3,
-        'delivered' => 2,
-        'accepted' => 1
-    ];
+        // 🚨 Prioritize status updates to avoid downgrades 🚨
+        $priority = [
+            'failed' => 3,
+            'bounced' => 3,
+            'complained' => 3,
+            'delivered' => 2,
+            'accepted' => 1
+        ];
 
-    $current_level = $priority[strtolower($current_status)] ?? 0;
-    $new_level = $priority[strtolower($basic_mailgun_status)] ?? 0;
+        $current_level = $priority[strtolower($current_status)] ?? 0;
+        $new_level = $priority[strtolower($basic_mailgun_status)] ?? 0;
 
-    if ($new_level >= $current_level) {
-        $sql_update_status = "UPDATE tb_ecobrickers SET emailing_status = ? WHERE email_addr = ?";
-        $stmt_update_status = $gobrik_conn->prepare($sql_update_status);
-        if (!$stmt_update_status) {
-            throw new Exception('❌ Error preparing update statement: ' . $gobrik_conn->error);
-        }
-        $stmt_update_status->bind_param('ss', $basic_mailgun_status, $email_addr);
-        $stmt_update_status->execute();
+        if ($new_level >= $current_level) {
+            $sql_update_status = "UPDATE tb_ecobrickers SET emailing_status = ? WHERE email_addr = ?";
+            $stmt_update_status = $gobrik_conn->prepare($sql_update_status);
+            if (!$stmt_update_status) {
+                throw new Exception('❌ Error preparing update statement: ' . $gobrik_conn->error);
+            }
+            $stmt_update_status->bind_param('ss', $basic_mailgun_status, $email_addr);
+            $stmt_update_status->execute();
 
-        if ($stmt_update_status->affected_rows > 0) {
-            error_log("✅ Delivered! Emailing_status set to '$basic_mailgun_status' for $email_addr.");
+            if ($stmt_update_status->affected_rows > 0) {
+                error_log("✅ Delivered! Emailing_status set to '$basic_mailgun_status' for $email_addr.");
+            } else {
+                error_log("👌️ No update needed for $email_addr. Emailing_status was already '$basic_mailgun_status'.");
+            }
+
+            $stmt_update_status->close();
         } else {
-            error_log("👌️ No update needed for $email_addr. Emailing_status was already '$basic_mailgun_status'.");
+            error_log("👌️ Ignored lower priority status '$basic_mailgun_status' for $email_addr.");
         }
-
-        $stmt_update_status->close();
     } else {
-        error_log("👌️ Ignored lower priority status '$basic_mailgun_status' for $email_addr.");
+        // 🚫 No record to update
+        error_log("❌ No record found for $email_addr in tb_ecobrickers! Skipping status update.");
     }
 
     // If Mailgun confirms delivery, mark the newsletter member as sent
