@@ -253,7 +253,7 @@ echo '<!DOCTYPE html>
 
 
 
-   <form id="email-form" method="POST">
+   <form id="email-form" method="POST" style="margin-top: 50px;">
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
 
