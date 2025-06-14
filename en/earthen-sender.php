@@ -239,7 +239,7 @@ echo '<!DOCTYPE html>
             <span class="slider"></span>
         </label>
         <div style="margin-top:auto;margin-bottom:10px">
-            <p style="text-align:center;margin-top:10px;font-weight:bold;">⏱<span id="delay-display">5</span>s</p>
+            <p style="text-align:center;margin:40px 10px 10px 0px;font-weight:bold;">⏱ <span id="delay-display">5</span>s</p>
         </div>
 
     </div>
