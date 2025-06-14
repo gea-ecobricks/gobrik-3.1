@@ -112,13 +112,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
     $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null;
 
     if (!empty($email_html) && !empty($recipient_email) && $subscriber_id) {
+        // The webhook updates members once Mailgun confirms delivery
         try {
             if (sendEmail($recipient_email, $email_html)) {
-                // ✅ Mark as sent
-                $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?");
-                $stmt->bind_param("i", $subscriber_id);
-                $stmt->execute();
-                $stmt->close();
 
                 error_log("[EARTHEN] ✅ COMMITTED: {$recipient_email} by " . session_id());
 
