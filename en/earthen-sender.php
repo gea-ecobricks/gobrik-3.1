@@ -321,6 +321,8 @@ $(document).ready(function () {
     let recipientEmail = '';
     let recipientName = '';
     let recipientId = null;
+    let countdownInterval = null;
+    let isSending = false; // prevent duplicate sends
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
@@ -354,6 +356,31 @@ $(document).ready(function () {
         }
     }
 
+    function startCountdownAndSend() {
+        clearInterval(countdownInterval);
+        if (isSending) return; // don't queue another send while sending
+        let remaining = 5;
+        $('#auto-send-button, #test-send-button').prop('disabled', true);
+        $('#countdown').text(remaining);
+        $('#countdown-timer').show();
+        countdownInterval = setInterval(() => {
+            remaining--;
+            $('#countdown').text(remaining);
+            if (remaining <= 0) {
+                clearInterval(countdownInterval);
+                $('#countdown-timer').hide();
+                sendEmail();
+            }
+        }, 1000);
+    }
+
+    $('#stop-timer-btn').on('click', function () {
+        clearInterval(countdownInterval);
+        $('#countdown-timer').hide();
+        $('#auto-send-button, #test-send-button').prop('disabled', false);
+        updateVisibleButton();
+    });
+
     // 🟢 Fetch next recipient via AJAX
   function fetchNextRecipient() {
     $.ajax({
@@ -381,10 +408,7 @@ $(document).ready(function () {
 
                 // 🟢 Auto-send the next email if enabled
                 if ($('#auto-send-toggle').is(':checked')) {
-                    // Slow down automation to once every 5 seconds
-                    setTimeout(() => {
-                        sendEmail();
-                    }, 5000);
+                    startCountdownAndSend();
                 }
 
             } else {
@@ -404,7 +428,10 @@ $(document).ready(function () {
 
 
     // 🟢 Shared send function
-    function sendEmail() {
+function sendEmail() {
+        clearInterval(countdownInterval);
+        $('#countdown-timer').hide();
+
         const emailBody = $('#email_html').val().trim();
         const isTestMode = testSendEnabled() && !autoSendEnabled();
 
@@ -419,6 +446,9 @@ $(document).ready(function () {
             alert("❌ No recipient available.");
             return;
         }
+
+        if (isSending) return; // prevent duplicate calls
+        isSending = true;
 
         // Show sending state
         $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
@@ -449,10 +479,12 @@ $(document).ready(function () {
                     alert(data.message || "❌ Failed to send the email.");
                     updateVisibleButton();
                 }
+                isSending = false;
             },
             error: function () {
                 alert("❌ Failed to send the email.");
                 updateVisibleButton();
+                isSending = false;
             }
         });
     }
@@ -481,9 +513,7 @@ $(document).ready(function () {
 
         // If switched ON and a recipient is already loaded, auto-trigger
         if (autoSendEnabled() && recipientEmail) {
-            setTimeout(() => {
-                sendEmail();
-            }, 5000);
+            startCountdownAndSend();
         }
     });
 
