@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
         try {
             if (sendEmail($recipient_email, $email_html)) {
                 if (!$is_test_mode) {
-                    // ✅ Mark as sent
+                    // ✅ Mark as sent only after successful email delivery
                     $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ? AND test_sent = 0");
                     $stmt->bind_param("i", $subscriber_id);
                     $stmt->execute();
@@ -277,7 +277,7 @@ echo '<!DOCTYPE html>
 </form>
 
 <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
-    <p>Email will send in <span id="countdown">1</span> seconds...</p>
+    <p>Email will send in <span id="countdown">5</span> seconds...</p>
     <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
 
@@ -374,9 +374,10 @@ $(document).ready(function () {
 
                 // 🟢 Auto-send the next email if enabled
                 if ($('#auto-send-toggle').is(':checked')) {
+                    // Slow down automation to once every 5 seconds
                     setTimeout(() => {
                         sendEmail();
-                    }, 200); // small buffer for DOM update
+                    }, 5000);
                 }
 
             } else {
@@ -473,7 +474,9 @@ $(document).ready(function () {
 
         // If switched ON and a recipient is already loaded, auto-trigger
         if (autoSendEnabled() && recipientEmail) {
-            sendEmail();
+            setTimeout(() => {
+                sendEmail();
+            }, 5000);
         }
     });
 
