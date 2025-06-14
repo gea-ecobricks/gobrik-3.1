@@ -146,8 +146,8 @@ if (stripos($response_message, "rate limited") !== false || stripos($response_me
         error_log("❌ No record found for $email_addr in tb_ecobrickers! Skipping status update.");
     }
 
-    // If Mailgun confirms delivery, mark the newsletter member as sent
-    if ($basic_mailgun_status === 'delivered') {
+    // If Mailgun confirms delivery or a failure event, mark the member as processed
+    if ($basic_mailgun_status === 'delivered' || in_array($basic_mailgun_status, $failure_events)) {
         $stmt_update_member = $buwana_conn->prepare(
             "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ? AND test_sent = 0"
         );
