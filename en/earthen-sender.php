@@ -69,7 +69,7 @@ require_once '../buwanaconn_env.php';
 
 // Default newsletter headers
 $email_from = 'Earthen <earthen@ecobricks.org>';
-$email_subject = 'An Earthen Ethics update & a June Ecobrick Intro Course';
+$email_subject = 'Earthen Ethics Update & June Intro to Ecobricks Course';
 
 // 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
 $has_alerts = false;
