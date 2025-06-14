@@ -236,6 +236,9 @@ echo '<!DOCTYPE html>
     <div id="left-colum" style="width: 100%;">
         <label>✉️ Auto Send Emails</label>
         <p class="form-caption" style="margin-top:10px;">Uncheck to prevent the email from sending automatically after countdown.</p>
+
+        <label for="send-delay-slider" style="display:block;margin-top:20px;">⏱️ Send Delay</label>
+        <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;">
     </div>
 
 
@@ -244,6 +247,7 @@ echo '<!DOCTYPE html>
             <input type="checkbox" id="auto-send-toggle" value="1">
             <span class="slider"></span>
         </label>
+        <p style="text-align:center;margin-top:10px;font-weight:bold;">⏱️<span id="delay-display">5</span>s</p>
     </div>
 </div>
 <div class="form-row" style="margin-top:10px;">
@@ -377,6 +381,7 @@ $(document).ready(function () {
         let remaining = sendDelay;
         $('#delay-display').text(sendDelay);
         console.log(`⏰ Countdown ${sendDelay}s for ${recipientEmail}`);
+
         $('#auto-send-button, #test-send-button').prop('disabled', true);
 
         $('#countdown').text(remaining);
@@ -544,7 +549,7 @@ function sendEmail() {
         sendDelay = parseInt($(this).val());
         $('#delay-display').text(sendDelay);
         console.log(`⏲️ Delay set to ${sendDelay}s`);
-        localStorage.setItem('sendDelay', sendDelay);
+
     });
 
     // 🔹 Reset admin alerts
