@@ -8,6 +8,7 @@ $unsubscribe_link = isset($recipient_email)
  // Default email HTML with dynamic unsubscribe link
 $email_template = <<<HTML
 <!DOCTYPE html>
+<!--June 14th version-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
