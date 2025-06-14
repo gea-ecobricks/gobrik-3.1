@@ -119,11 +119,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
     if (!empty($email_html) && !empty($recipient_email) && ($subscriber_id || $is_test_mode)) {
         // The webhook will mark members as sent once Mailgun confirms delivery
         try {
+            error_log("[EARTHEN] → Sending " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
             if (sendEmail($recipient_email, $email_html)) {
 
-                error_log("[EARTHEN] ✅ SENT " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
+                error_log("[EARTHEN] ✅ Mailgun accepted " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
 
                 if (!$is_test_mode) {
+                    // Immediately mark this member as sent to avoid duplicates
+                    if ($subscriber_id) {
+                        $stmt_mark_sent = $buwana_conn->prepare(
+                            "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ? AND test_sent = 0"
+                        );
+                        if ($stmt_mark_sent) {
+                            $stmt_mark_sent->bind_param('i', $subscriber_id);
+                            $stmt_mark_sent->execute();
+                            $stmt_mark_sent->close();
+                        }
+                    }
+
                     unset($_SESSION['locked_subscriber_id']); // Clean up
                 }
 
@@ -225,12 +238,17 @@ echo '<!DOCTYPE html>
         <p class="form-caption" style="margin-top:10px;">Uncheck to prevent the email from sending automatically after countdown.</p>
     </div>
 
+
     <div id="right-column" style="width:100px; justify-content:center;">
         <label class="toggle-switch">
             <input type="checkbox" id="auto-send-toggle" value="1">
             <span class="slider"></span>
         </label>
     </div>
+</div>
+<div class="form-row" style="margin-top:10px;">
+    <label for="send-delay-slider">⏱️ Send Delay: <span id="delay-display">5</span>s</label>
+    <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;">
 </div>
 
 
@@ -317,6 +335,7 @@ $(document).ready(function () {
     let recipientId = null;
     let countdownInterval = null;
     let isSending = false; // prevent duplicate sends
+    let sendDelay = 5;
 
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
@@ -354,7 +373,10 @@ $(document).ready(function () {
     function startCountdownAndSend() {
         clearInterval(countdownInterval);
         if (isSending) return; // don't queue another send while sending
-        let remaining = 5;
+        sendDelay = parseInt($('#send-delay-slider').val()) || 5;
+        let remaining = sendDelay;
+        $('#delay-display').text(sendDelay);
+        console.log(`⏰ Countdown ${sendDelay}s for ${recipientEmail}`);
         $('#auto-send-button, #test-send-button').prop('disabled', true);
 
         $('#countdown').text(remaining);
@@ -390,6 +412,8 @@ $(document).ready(function () {
                 recipientEmail = sub?.email || '';
                 recipientName = sub?.name || '';
                 recipientId = sub?.id || null;
+
+                console.log("📋 Next recipient:", recipientEmail);
 
                 $('#email_to').val(recipientEmail);
 
@@ -446,6 +470,8 @@ function sendEmail() {
         if (isSending) return; // prevent duplicate calls
         isSending = true;
 
+        console.log("🚀 Sending to:", targetEmail);
+
         // Show sending state
         $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
 
@@ -464,10 +490,11 @@ function sendEmail() {
                 if (data.success) {
                     if (isTestMode) {
                         $('#test-send-button').text("✅ Sent!").prop('disabled', true);
+                        console.log("✅ Server confirmed test send to:", targetEmail);
                         localStorage.removeItem('testSend');
                     } else {
                         $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
-                        console.log("📫 Sent to:", recipientEmail);
+                        console.log("✅ Server confirmed send to:", targetEmail);
                         // Chain to next
                         fetchNextRecipient(true); // fetch + auto-send next
                     }
@@ -513,6 +540,13 @@ function sendEmail() {
         }
     });
 
+    $('#send-delay-slider').on('input change', function () {
+        sendDelay = parseInt($(this).val());
+        $('#delay-display').text(sendDelay);
+        console.log(`⏲️ Delay set to ${sendDelay}s`);
+        localStorage.setItem('sendDelay', sendDelay);
+    });
+
     // 🔹 Reset admin alerts
     $('#reset-alerts-button').on('click', function (e) {
         e.preventDefault();
@@ -540,6 +574,9 @@ function sendEmail() {
     // 🔹 Initial state from localStorage
     const savedAutoSend = localStorage.getItem('autoSend') === 'true';
     const savedTestSend = localStorage.getItem('testSend') === 'true';
+    sendDelay = parseInt(localStorage.getItem('sendDelay')) || 5;
+    $('#send-delay-slider').val(sendDelay);
+    $('#delay-display').text(sendDelay);
 
     $('#auto-send-toggle').prop('checked', savedAutoSend);
     $('#test-email-toggle').prop('checked', savedTestSend);
@@ -550,6 +587,7 @@ function sendEmail() {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#auto-send-button, #test-send-button').prop('disabled', true);
     } else {
+        console.log("🚚 Fetching first recipient...");
         fetchNextRecipient(true); // Fetch on page load, and auto-send if toggled
     }
 });
