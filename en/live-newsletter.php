@@ -1,11 +1,12 @@
 <?php
 
+// Build the unsubscribe link using the recipient's email if available.
+// Fallback to the generic Earthen unsubscribe URL when the email is not set.
 $unsubscribe_link = isset($recipient_email)
     ? "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email)
-    : '';
-
+    : "https://earthen.io/unsubscribe/?uuid=611f7d90-e87c-4c43-ab51-0772a7883703&key=c8c3faf87323b6ad7a8b96bcc9f9d742316e82dc604c69de46e524bcb11e3104&newsletter=7bbd5ff6-f69e-4ff0-a9d3-67963d85410b";
 // Default email HTML with dynamic unsubscribe link
-$email_template = <<<'HTML'
+$email_template = <<<HTML
 <!doctype html>
 <html>
     <head>
@@ -822,7 +823,7 @@ First, GEA co-founder Russell Maier and GEA Center Circle Trainer Paula Apolloni
                                             <span>You are receiving this because you are a <strong style="font-weight: 700;">free subscriber</strong> to Earthen.</span> 
                                         </p>        <div class="footer">
                                                         <p><em>Together we can be the transition to ever increasing harmony with the cycles of life.</em></p>
-                                                        <p>Earthen © 2025 – <a href="<?php echo $unsubscribe_link ?: "https://earthen.io/unsubscribe/?uuid=611f7d90-e87c-4c43-ab51-0772a7883703&key=c8c3faf87323b6ad7a8b96bcc9f9d742316e82dc604c69de46e524bcb11e3104&newsletter=7bbd5ff6-f69e-4ff0-a9d3-67963d85410b"; ?>">Unsubscribe</a></p>
+                                                        <p>Earthen © 2025 – <a href="$unsubscribe_link">Unsubscribe</a></p>
                                                         <p style="margin-top: 20px;"><a href="https://ghost.org/?via=pbg-newsletter"><img src="https://static.ghost.org/v4.0.0/images/powered.png" width="142" height="30" alt="Powered by Ghost"></a></p>
                                                     </div>
                                         </tr>
