@@ -67,6 +67,10 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 require_once '../buwanaconn_env.php';
 
+// Default newsletter headers
+$email_from = 'Earthen <earthen@ecobricks.org>';
+$email_subject = 'An Earthen Ethics update & a June Ecobrick Intro Course';
+
 // 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
 $has_alerts = false;
 $alerts = [];
@@ -116,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
         try {
             if (sendEmail($recipient_email, $email_html)) {
                 if (!$is_test_mode) {
-                    // ✅ Mark as sent
+                    // ✅ Mark as sent only after successful email delivery
                     $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ? AND test_sent = 0");
                     $stmt->bind_param("i", $subscriber_id);
                     $stmt->execute();
@@ -151,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 
 // Email sending function
 function sendEmail($to, $htmlBody) {
+    global $email_from, $email_subject;
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
     $mailgunApiKey = getenv('EARTHEN_MAILGUN_SENDING_KEY');
     $mailgunDomain = 'earthen.ecobricks.org';
@@ -159,9 +164,9 @@ function sendEmail($to, $htmlBody) {
          $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
         'auth' => ['api', $mailgunApiKey],
         'form_params' => [
-            'from' => 'Earthen <earthen@ecobricks.org>',
+            'from' => $email_from,
             'to' => $to,
-            'subject' => 'Earthen Ethics update & June Intro to Ecobricks Course',
+            'subject' => $email_subject,
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
             'o:stop-retrying' => 'yes',  // Stops Mailgun from retrying if delivery fails
@@ -253,7 +258,9 @@ echo '<!DOCTYPE html>
 
 
 
-   <form id="email-form" method="POST" style="margin-top: 50px;">
+<form id="email-form" method="POST" style="margin-top: 50px;">
+    <p><strong>From:</strong> <?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></p>
+    <p><strong>Subject:</strong> <?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></p>
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
 
@@ -277,7 +284,7 @@ echo '<!DOCTYPE html>
 </form>
 
 <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
-    <p>Email will send in <span id="countdown">1</span> seconds...</p>
+    <p>Email will send in <span id="countdown">5</span> seconds...</p>
     <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
 
@@ -374,9 +381,10 @@ $(document).ready(function () {
 
                 // 🟢 Auto-send the next email if enabled
                 if ($('#auto-send-toggle').is(':checked')) {
+                    // Slow down automation to once every 5 seconds
                     setTimeout(() => {
                         sendEmail();
-                    }, 200); // small buffer for DOM update
+                    }, 5000);
                 }
 
             } else {
@@ -473,7 +481,9 @@ $(document).ready(function () {
 
         // If switched ON and a recipient is already loaded, auto-trigger
         if (autoSendEnabled() && recipientEmail) {
-            sendEmail();
+            setTimeout(() => {
+                sendEmail();
+            }, 5000);
         }
     });
 
