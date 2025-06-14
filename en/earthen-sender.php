@@ -161,7 +161,7 @@ function sendEmail($to, $htmlBody) {
         'form_params' => [
             'from' => 'Earthen <earthen@ecobricks.org>',
             'to' => $to,
-            'subject' => 'Spring Earthen Update',
+            'subject' => 'An Earthen Ethics update & a June Ecobrick Intro Course',
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
             'o:stop-retrying' => 'yes',  // Stops Mailgun from retrying if delivery fails
