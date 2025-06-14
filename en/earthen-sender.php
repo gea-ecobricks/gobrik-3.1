@@ -67,6 +67,10 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 require_once '../buwanaconn_env.php';
 
+// Default newsletter headers
+$email_from = 'Earthen <earthen@ecobricks.org>';
+$email_subject = 'An Earthen Ethics update & a June Ecobrick Intro Course';
+
 // 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
 $has_alerts = false;
 $alerts = [];
@@ -151,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 
 // Email sending function
 function sendEmail($to, $htmlBody) {
+    global $email_from, $email_subject;
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
     $mailgunApiKey = getenv('EARTHEN_MAILGUN_SENDING_KEY');
     $mailgunDomain = 'earthen.ecobricks.org';
@@ -159,9 +164,9 @@ function sendEmail($to, $htmlBody) {
          $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
         'auth' => ['api', $mailgunApiKey],
         'form_params' => [
-            'from' => 'Earthen <earthen@ecobricks.org>',
+            'from' => $email_from,
             'to' => $to,
-            'subject' => 'An Earthen Ethics update & a June Ecobrick Intro Course',
+            'subject' => $email_subject,
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
             'o:stop-retrying' => 'yes',  // Stops Mailgun from retrying if delivery fails
@@ -253,7 +258,9 @@ echo '<!DOCTYPE html>
 
 
 
-   <form id="email-form" method="POST" style="margin-top: 50px;">
+<form id="email-form" method="POST" style="margin-top: 50px;">
+    <p><strong>From:</strong> <?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></p>
+    <p><strong>Subject:</strong> <?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></p>
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
 
