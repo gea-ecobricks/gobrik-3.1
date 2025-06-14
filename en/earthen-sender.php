@@ -94,8 +94,8 @@ $total_members = intval($row['total_members'] ?? 0);
 $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Fetch the status of all members ordered by earliest sent date
-$query_status = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time FROM earthen_members_tb ORDER BY test_sent_date_time ASC";
+// Fetch the status of the first ten members ordered by earliest sent date
+$query_status = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time FROM earthen_members_tb ORDER BY test_sent_date_time ASC LIMIT 10";
 $status_result = $buwana_conn->query($query_status);
 $all_members = $status_result->fetch_all(MYSQLI_ASSOC);
 
@@ -257,6 +257,7 @@ echo '<!DOCTYPE html>
 
 
 
+<div id="send-controls" style="height:240px;">
 <form id="email-form" method="POST" style="margin-top: 50px;">
     <p><strong>From:</strong> <?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></p>
     <p><strong>Subject:</strong> <?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></p>
@@ -287,12 +288,14 @@ echo '<!DOCTYPE html>
     <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
 
+</div>
+
 
 
 
 
     <h3>Email Sending Status:</h3>
-    <table id="email-status-table" class="display responsive nowrap" style="width:100%">
+    <table id="email-status-table" class="display responsive nowrap mdl-data-table" style="width:100%">
         <thead>
             <tr>
                 <th>Name</th>
@@ -330,7 +333,8 @@ $(document).ready(function () {
 
     // Initialize DataTable for status overview
     $('#email-status-table').DataTable({
-        order: [[3, 'asc']]
+        order: [[3, 'asc']],
+        pageLength: 10
     });
     $("div.dataTables_filter input").attr('placeholder', 'Search emails...');
 
