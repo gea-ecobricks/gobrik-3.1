@@ -228,6 +228,8 @@ echo '<!DOCTYPE html>
 
         <label for="send-delay-slider" style="display:block;margin-top:20px;">⏱️ Send Delay</label>
         <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;">
+                <p class="form-caption" style="margin-top:10px;">Adjust sending delay from 1 to 10 seconds.</p>
+
     </div>
 
 
@@ -236,13 +238,13 @@ echo '<!DOCTYPE html>
             <input type="checkbox" id="auto-send-toggle" value="1">
             <span class="slider"></span>
         </label>
-        <p style="text-align:center;margin-top:10px;font-weight:bold;">⏱️<span id="delay-display">5</span>s</p>
+        <div style="margin-top:auto;margin-bottom:10px">
+            <p style="text-align:center;margin-top:10px;font-weight:bold;">⏱<span id="delay-display">5</span>s</p>
+        </div>
+
     </div>
 </div>
-<div class="form-row" style="margin-top:10px;">
-    <label for="send-delay-slider">⏱️ Send Delay: <span id="delay-display">5</span>s</label>
-    <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;">
-</div>
+
 
 
         <!-- Send one test email (hidden unless auto-send is off) -->
