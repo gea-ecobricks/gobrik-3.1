@@ -110,24 +110,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
     $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
     $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null;
+    $is_test_mode = isset($_POST['test_mode']) && $_POST['test_mode'] == '1';
 
-    if (!empty($email_html) && !empty($recipient_email) && $subscriber_id) {
+    if (!empty($email_html) && !empty($recipient_email) && ($subscriber_id || $is_test_mode)) {
         try {
             if (sendEmail($recipient_email, $email_html)) {
-                // ✅ Mark as sent
-                $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ? AND test_sent = 0");
+                if (!$is_test_mode) {
+                    // ✅ Mark as sent
+                    $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ? AND test_sent = 0");
+                    $stmt->bind_param("i", $subscriber_id);
+                    $stmt->execute();
+                    $stmt->close();
+                }
 
-                $stmt->bind_param("i", $subscriber_id);
-                $stmt->execute();
-                $stmt->close();
+                error_log("[EARTHEN] ✅ SENT " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
 
-                error_log("[EARTHEN] ✅ COMMITTED: {$recipient_email} by " . session_id());
+                if (!$is_test_mode) {
+                    unset($_SESSION['locked_subscriber_id']); // Clean up
+                }
 
-                unset($_SESSION['locked_subscriber_id']); // Clean up
                 echo json_encode(['success' => true]);
                 exit();
             } else {
-                error_log("[EARTHEN] ❌ Failed to send: {$recipient_email} by " . session_id());
+                error_log("[EARTHEN] ❌ Failed to send " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
                 echo json_encode(['success' => false, 'message' => 'Sending failed']);
                 exit();
             }
@@ -137,6 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             exit();
         }
     } else {
+        error_log("[EARTHEN] ❌ Missing recipient or content");
         echo json_encode(['success' => false, 'message' => 'Missing recipient or content']);
         exit();
     }
@@ -230,13 +236,19 @@ echo '<!DOCTYPE html>
 
 
         <!-- Send one test email (hidden unless auto-send is off) -->
-        <div id="test-email-container" style="margin: 10px 0; display: none;">
-            <label for="test-email-toggle" style="font-weight: bold; font-size: 16px;">
-                <input type="checkbox" id="test-email-toggle" style="transform: scale(1.2); margin-right: 8px;">
-                Send one test email
-            </label>
-            <p style="font-size: 13px; color: #666;">Will send this email once to russmaier@gmail.com</p>
+        <div id="test-email-container" class="form-row" style="display:none;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
+            <div id="left-colum" style="width: 100%;">
+                <label for="test-email-toggle">📨 Send One Test Email</label>
+                <p class="form-caption" style="margin-top:10px;">Will send this email once to russmaier@gmail.com</p>
+            </div>
+            <div id="right-column" style="width:100px;justify-content:center;">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="test-email-toggle" value="1">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
+
 
 
 
@@ -409,18 +421,25 @@ $(document).ready(function () {
             data: {
                 send_email: "1",
                 email_to: targetEmail,
-                email_html: emailBody
+                email_html: emailBody,
+                test_mode: isTestMode ? 1 : 0
             },
-            success: function () {
-                if (isTestMode) {
-                    $('#test-send-button').text("✅ Sent!").prop('disabled', true);
-                    localStorage.removeItem('testSend');
+            success: function (resp) {
+                let data = {};
+                try { data = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch (e) {}
+                if (data.success) {
+                    if (isTestMode) {
+                        $('#test-send-button').text("✅ Sent!").prop('disabled', true);
+                        localStorage.removeItem('testSend');
+                    } else {
+                        $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
+                        console.log("📫 Sent to:", recipientEmail);
+                        // Chain to next
+                        fetchNextRecipient(true); // fetch + auto-send next
+                    }
                 } else {
-                    $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
-                    console.log("📫 Sent to:", recipientEmail);
-
-                    // Chain to next
-                    fetchNextRecipient(true); // fetch + auto-send next
+                    alert(data.message || "❌ Failed to send the email.");
+                    updateVisibleButton();
                 }
             },
             error: function () {
