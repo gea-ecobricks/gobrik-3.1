@@ -2876,3 +2876,6 @@ padding: 10px;
 .feature-toggle:hover {
     cursor: pointer;
 }
+
+/* Material Design theme for DataTables */
+@import url('https://cdn.datatables.net/plug-ins/1.13.5/integration/material/dataTables.material.min.css');
