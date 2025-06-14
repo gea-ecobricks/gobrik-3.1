@@ -318,6 +318,7 @@ $(document).ready(function () {
     let countdownInterval = null;
     let isSending = false; // prevent duplicate sends
 
+
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
@@ -355,6 +356,7 @@ $(document).ready(function () {
         if (isSending) return; // don't queue another send while sending
         let remaining = 5;
         $('#auto-send-button, #test-send-button').prop('disabled', true);
+
         $('#countdown').text(remaining);
         $('#countdown-timer').show();
         countdownInterval = setInterval(() => {
