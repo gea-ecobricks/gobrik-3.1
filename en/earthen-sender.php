@@ -117,15 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
     $is_test_mode = isset($_POST['test_mode']) && $_POST['test_mode'] == '1';
 
     if (!empty($email_html) && !empty($recipient_email) && ($subscriber_id || $is_test_mode)) {
+        // The webhook will mark members as sent once Mailgun confirms delivery
         try {
             if (sendEmail($recipient_email, $email_html)) {
-                if (!$is_test_mode) {
-                    // ✅ Mark as sent only after successful email delivery
-                    $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ? AND test_sent = 0");
-                    $stmt->bind_param("i", $subscriber_id);
-                    $stmt->execute();
-                    $stmt->close();
-                }
 
                 error_log("[EARTHEN] ✅ SENT " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
 
