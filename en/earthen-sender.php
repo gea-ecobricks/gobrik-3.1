@@ -321,6 +321,7 @@ $(document).ready(function () {
     let recipientEmail = '';
     let recipientName = '';
     let recipientId = null;
+    let countdownInterval = null;
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
@@ -354,6 +355,28 @@ $(document).ready(function () {
         }
     }
 
+    function startCountdownAndSend() {
+        clearInterval(countdownInterval);
+        let remaining = 5;
+        $('#countdown').text(remaining);
+        $('#countdown-timer').show();
+        countdownInterval = setInterval(() => {
+            remaining--;
+            $('#countdown').text(remaining);
+            if (remaining <= 0) {
+                clearInterval(countdownInterval);
+                $('#countdown-timer').hide();
+                sendEmail();
+            }
+        }, 1000);
+    }
+
+    $('#stop-timer-btn').on('click', function () {
+        clearInterval(countdownInterval);
+        $('#countdown-timer').hide();
+        updateVisibleButton();
+    });
+
     // 🟢 Fetch next recipient via AJAX
   function fetchNextRecipient() {
     $.ajax({
@@ -381,10 +404,7 @@ $(document).ready(function () {
 
                 // 🟢 Auto-send the next email if enabled
                 if ($('#auto-send-toggle').is(':checked')) {
-                    // Slow down automation to once every 5 seconds
-                    setTimeout(() => {
-                        sendEmail();
-                    }, 5000);
+                    startCountdownAndSend();
                 }
 
             } else {
@@ -404,7 +424,10 @@ $(document).ready(function () {
 
 
     // 🟢 Shared send function
-    function sendEmail() {
+function sendEmail() {
+        clearInterval(countdownInterval);
+        $('#countdown-timer').hide();
+
         const emailBody = $('#email_html').val().trim();
         const isTestMode = testSendEnabled() && !autoSendEnabled();
 
@@ -481,9 +504,7 @@ $(document).ready(function () {
 
         // If switched ON and a recipient is already loaded, auto-trigger
         if (autoSendEnabled() && recipientEmail) {
-            setTimeout(() => {
-                sendEmail();
-            }, 5000);
+            startCountdownAndSend();
         }
     });
 
