@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\RequestException;
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.53';
+$version = '0.54';
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -219,7 +219,7 @@ echo '<!DOCTYPE html>
         <p class="form-caption" style="margin-top:10px;">Uncheck to prevent the email from sending automatically after countdown.</p>
 
         <label for="send-delay-slider" style="display:block;margin-top:20px;margin-bottom: 5px;">⏱️ Send Delay</label>
-        <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;accent-color:var(--emblem-green);">
+        <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:90%;accent-color:var(--emblem-green);">
                 <p class="form-caption" style="margin-top:5px;">Adjust sending delay from 1 to 10 seconds.</p>
 
     </div>
@@ -231,7 +231,7 @@ echo '<!DOCTYPE html>
             <span class="slider"></span>
         </label>
         <div style="margin-top:auto;margin-bottom:10px">
-            <p style="text-align:center;margin:40px 10px 10px 0px;font-weight:bold;">⏱ <span id="delay-display">5</span>s</p>
+            <p style="text-align:center;margin:45px 30px 10px 0px;font-weight:bold;">⏱ <span id="delay-display">5</span>s</p>
         </div>
 
     </div>
@@ -257,7 +257,7 @@ echo '<!DOCTYPE html>
 
 
 
-<div id="send-controls" style="height:240px;">
+<div id="send-controls" style="height:500px;">
 <form id="email-form" method="POST" style="margin-top: 50px;">
     <p><strong>From:</strong> <?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></p>
     <p><strong>Subject:</strong> <?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></p>
