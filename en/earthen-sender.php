@@ -322,6 +322,8 @@ $(document).ready(function () {
     let recipientName = '';
     let recipientId = null;
     let countdownInterval = null;
+    let isSending = false; // prevent duplicate sends
+
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
@@ -357,7 +359,10 @@ $(document).ready(function () {
 
     function startCountdownAndSend() {
         clearInterval(countdownInterval);
+        if (isSending) return; // don't queue another send while sending
         let remaining = 5;
+        $('#auto-send-button, #test-send-button').prop('disabled', true);
+
         $('#countdown').text(remaining);
         $('#countdown-timer').show();
         countdownInterval = setInterval(() => {
@@ -374,6 +379,7 @@ $(document).ready(function () {
     $('#stop-timer-btn').on('click', function () {
         clearInterval(countdownInterval);
         $('#countdown-timer').hide();
+        $('#auto-send-button, #test-send-button').prop('disabled', false);
         updateVisibleButton();
     });
 
@@ -443,6 +449,9 @@ function sendEmail() {
             return;
         }
 
+        if (isSending) return; // prevent duplicate calls
+        isSending = true;
+
         // Show sending state
         $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
 
@@ -472,10 +481,12 @@ function sendEmail() {
                     alert(data.message || "❌ Failed to send the email.");
                     updateVisibleButton();
                 }
+                isSending = false;
             },
             error: function () {
                 alert("❌ Failed to send the email.");
                 updateVisibleButton();
+                isSending = false;
             }
         });
     }
