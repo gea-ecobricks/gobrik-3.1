@@ -95,6 +95,10 @@ if ($stmt_credential) {
 
                             // 🚪 Not connected → Redirect to Buwana connection page
                             $connect_url = "https://buwana.ecobricks.org/app-connect.php?id=" . urlencode($buwana_id) . "&client_id=" . urlencode($client_id);
+                            if (!empty($_POST['redirect'])) {
+                                $redirect_param = filter_var($_POST['redirect'], FILTER_SANITIZE_SPECIAL_CHARS);
+                                $connect_url .= "&redirect=" . urlencode($redirect_param);
+                            }
                             header("Location: $connect_url");
                             exit();
                         }

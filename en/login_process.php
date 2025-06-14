@@ -102,7 +102,10 @@ if ($stmt_credential) {
                         if ($check_stmt->num_rows === 0) {
                             $check_stmt->close();
 
-                            $connect_url = "https://buwana.ecobricks.org/en/app-connect.php?id=" . urlencode($buwana_id) . "&client_id=" . urlencode($client_id);
+                            $connect_url = "https://buwana.ecobricks.org/{$lang}/app-connect.php?id=" . urlencode($buwana_id) . "&client_id=" . urlencode($client_id);
+                            if (!empty($redirect)) {
+                                $connect_url .= "&redirect=" . urlencode($redirect);
+                            }
                             header("Location: $connect_url");
                             exit();
                         }
