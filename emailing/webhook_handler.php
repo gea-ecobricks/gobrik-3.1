@@ -17,7 +17,8 @@ if (!$mailgun_signing_key) {
 
 try {
     // Log when the file is accessed
-    error_log("🟢 webhook_handler.php accessed at " . date('Y-m-d H:i:s'));
+    error_log("");
+    error_log("➡️ webhook_handler.php accessed at " . date('Y-m-d H:i:s'));
 
     // Read the POST data sent by Mailgun
     $input = file_get_contents('php://input');
