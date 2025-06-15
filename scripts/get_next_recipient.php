@@ -36,8 +36,7 @@ try {
     $query = "
         SELECT id, email, name
         FROM earthen_members_tb
-        WHERE test_sent = 0
-
+        WHERE test_sent = 0 AND processing = 0
         ORDER BY id ASC
         LIMIT 1
         FOR UPDATE
@@ -48,6 +47,15 @@ try {
     if ($result && $result->num_rows > 0) {
         $subscriber = $result->fetch_assoc();
         $_SESSION['locked_subscriber_id'] = $subscriber['id'];
+
+        // Mark this subscriber as processing to avoid duplicates
+        $update_sql = "UPDATE earthen_members_tb SET processing = 1 WHERE id = ?";
+        $stmt_update = $buwana_conn->prepare($update_sql);
+        if ($stmt_update) {
+            $stmt_update->bind_param('i', $subscriber['id']);
+            $stmt_update->execute();
+            $stmt_update->close();
+        }
 
         // ✅ Commit lock early
         $buwana_conn->commit();
