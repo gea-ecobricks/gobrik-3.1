@@ -17,7 +17,8 @@ if (!$mailgun_signing_key) {
 
 try {
     // Log when the file is accessed
-    error_log("🟢 webhook_handler.php accessed at " . date('Y-m-d H:i:s'));
+    error_log("");
+    error_log("➡️ webhook_handler.php accessed at " . date('Y-m-d H:i:s'));
 
     // Read the POST data sent by Mailgun
     $input = file_get_contents('php://input');
@@ -146,10 +147,11 @@ if (stripos($response_message, "rate limited") !== false || stripos($response_me
         error_log("❌ No record found for $email_addr in tb_ecobrickers! Skipping status update.");
     }
 
-    // If Mailgun confirms delivery, mark the newsletter member as sent
-    if ($basic_mailgun_status === 'delivered') {
+    // If Mailgun confirms delivery or a failure event, mark the member as processed
+    if ($basic_mailgun_status === 'delivered' || in_array($basic_mailgun_status, $failure_events)) {
+        // Mark subscriber as sent and release the processing flag
         $stmt_update_member = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE email = ? AND test_sent = 0"
+            "UPDATE earthen_members_tb SET test_sent = 1, processing = 0, test_sent_date_time = NOW() WHERE email = ? AND test_sent = 0"
         );
         if ($stmt_update_member) {
             $stmt_update_member->bind_param('s', $email_addr);

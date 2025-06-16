@@ -6,7 +6,8 @@ $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
 $response = ['success' => false];
 
 if ($id > 0) {
-    $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, processing = 1, test_sent_date_time = NOW() WHERE id = ?");
+    // Mark the subscriber as sent and clear the processing flag
+    $stmt = $buwana_conn->prepare("UPDATE earthen_members_tb SET test_sent = 1, processing = 0, test_sent_date_time = NOW() WHERE id = ?");
     if ($stmt) {
         $stmt->bind_param('i', $id);
         if ($stmt->execute()) {

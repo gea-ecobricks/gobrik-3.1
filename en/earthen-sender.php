@@ -94,10 +94,30 @@ $total_members = intval($row['total_members'] ?? 0);
 $sent_count = intval($row['sent_count'] ?? 0);
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
-// Fetch the status of the first ten members ordered by earliest sent date
-$query_status = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time FROM earthen_members_tb ORDER BY test_sent_date_time ASC LIMIT 10";
-$status_result = $buwana_conn->query($query_status);
-$all_members = $status_result->fetch_all(MYSQLI_ASSOC);
+// Fetch the last four sent members and the remaining pending ones
+$status_limit = 20; // total rows to display in the status table
+$sent_limit = 4;    // number of most recent sent entries
+
+$query_sent = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
+               FROM earthen_members_tb
+               WHERE test_sent = 1
+               ORDER BY test_sent_date_time DESC
+               LIMIT {$sent_limit}";
+$sent_result = $buwana_conn->query($query_sent);
+$sent_members = $sent_result ? $sent_result->fetch_all(MYSQLI_ASSOC) : [];
+$sent_count = count($sent_members);
+
+$pending_limit = $status_limit - $sent_count;
+
+$query_pending = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
+                  FROM earthen_members_tb
+                  WHERE test_sent = 0
+                  ORDER BY id ASC
+                  LIMIT {$pending_limit}";
+$pending_result = $buwana_conn->query($query_pending);
+$pending_members = $pending_result ? $pending_result->fetch_all(MYSQLI_ASSOC) : [];
+
+$all_members = array_merge($sent_members, $pending_members);
 
 
 require_once 'live-newsletter.php';  //the newsletter html
@@ -332,11 +352,28 @@ $(document).ready(function () {
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
     // Initialize DataTable for status overview
-    $('#email-status-table').DataTable({
-        order: [[3, 'asc']],
+    const statusTable = $('#email-status-table').DataTable({
+        order: [],
         pageLength: 10
     });
     $("div.dataTables_filter input").attr('placeholder', 'Search emails...');
+
+    function refreshStatusTable() {
+        $.getJSON('../scripts/get_email_status.php', function(resp) {
+            if (resp.success) {
+                const rows = resp.members.map(m => [
+                    m.name,
+                    m.email,
+                    m.email_open_rate || '0%',
+                    m.test_sent_date_time || 'N/A',
+                    m.test_sent == 1 ? '✅' : '❌'
+                ]);
+                statusTable.clear().rows.add(rows).draw(false);
+            }
+        });
+    }
+
+    refreshStatusTable();
 
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
@@ -424,6 +461,7 @@ function fetchNextRecipient() {
                 }
 
                 updateVisibleButton();
+                refreshStatusTable();
 
                 // 🟢 Auto-send the next email if enabled
                 if ($('#auto-send-toggle').is(':checked')) {
