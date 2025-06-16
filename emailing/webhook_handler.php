@@ -149,8 +149,9 @@ if (stripos($response_message, "rate limited") !== false || stripos($response_me
 
     // If Mailgun confirms delivery or a failure event, mark the member as processed
     if ($basic_mailgun_status === 'delivered' || in_array($basic_mailgun_status, $failure_events)) {
+        // Mark subscriber as sent and release the processing flag
         $stmt_update_member = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET test_sent = 1, processing = 1, test_sent_date_time = NOW() WHERE email = ? AND test_sent = 0"
+            "UPDATE earthen_members_tb SET test_sent = 1, processing = 0, test_sent_date_time = NOW() WHERE email = ? AND test_sent = 0"
         );
         if ($stmt_update_member) {
             $stmt_update_member->bind_param('s', $email_addr);
