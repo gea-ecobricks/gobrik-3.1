@@ -30,34 +30,26 @@ try {
         exit();
     }
 
-    // Begin transaction to lock recipient
+    // Begin transaction to safely select recipient
     $buwana_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 
-    $query = "
+    // First check if there is already a recipient marked as processing
+    $processing_sql = "
         SELECT id, email, name
         FROM earthen_members_tb
-        WHERE test_sent = 0 AND processing = 0
+        WHERE test_sent = 0 AND processing = 1
         ORDER BY id ASC
         LIMIT 1
         FOR UPDATE
     ";
 
-    $result = $buwana_conn->query($query);
+    $result = $buwana_conn->query($processing_sql);
 
     if ($result && $result->num_rows > 0) {
         $subscriber = $result->fetch_assoc();
         $_SESSION['locked_subscriber_id'] = $subscriber['id'];
 
-        // Mark this subscriber as processing to avoid duplicates
-        $update_sql = "UPDATE earthen_members_tb SET processing = 1 WHERE id = ?";
-        $stmt_update = $buwana_conn->prepare($update_sql);
-        if ($stmt_update) {
-            $stmt_update->bind_param('i', $subscriber['id']);
-            $stmt_update->execute();
-            $stmt_update->close();
-        }
-
-        // ✅ Commit lock early
+        // Commit lock
         $buwana_conn->commit();
 
         // ✅ Optional: fetch email stats for real-time updates
@@ -77,12 +69,47 @@ try {
             'has_alerts' => false,
         ]);
     } else {
-        $buwana_conn->commit();
-        echo json_encode([
-            'success' => false,
-            'message' => 'No more recipients',
-            'has_alerts' => false
-        ]);
+        // No current processing recipient, fetch a new one
+        $new_sql = "
+            SELECT id, email, name
+            FROM earthen_members_tb
+            WHERE test_sent = 0 AND processing = 0
+            ORDER BY id ASC
+            LIMIT 1
+            FOR UPDATE
+        ";
+
+        $new_res = $buwana_conn->query($new_sql);
+
+        if ($new_res && $new_res->num_rows > 0) {
+            $subscriber = $new_res->fetch_assoc();
+            $_SESSION['locked_subscriber_id'] = $subscriber['id'];
+
+            $buwana_conn->commit();
+
+            $stats = $buwana_conn->query("SELECT COUNT(*) AS total, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent FROM earthen_members_tb")->fetch_assoc();
+            $percentage = ($stats['total'] > 0) ? round(($stats['sent'] / $stats['total']) * 100, 2) : 0;
+
+            error_log("[EARTHEN] LOCKED: {$subscriber['email']} via get-next-recipient");
+
+            echo json_encode([
+                'success' => true,
+                'subscriber' => $subscriber,
+                'stats' => [
+                    'total' => (int)$stats['total'],
+                    'sent' => (int)$stats['sent'],
+                    'percentage' => $percentage
+                ],
+                'has_alerts' => false,
+            ]);
+        } else {
+            $buwana_conn->commit();
+            echo json_encode([
+                'success' => false,
+                'message' => 'No more recipients',
+                'has_alerts' => false
+            ]);
+        }
     }
 
 } catch (Exception $e) {
