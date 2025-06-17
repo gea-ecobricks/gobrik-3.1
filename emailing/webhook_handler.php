@@ -147,9 +147,8 @@ if (stripos($response_message, "rate limited") !== false || stripos($response_me
         error_log("❌ No record found for $email_addr in tb_ecobrickers! Skipping status update.");
     }
 
-    // If Mailgun confirms delivery or a failure event, mark the member as processed
-    if ($basic_mailgun_status === 'delivered' || in_array($basic_mailgun_status, $failure_events)) {
-        // Mark subscriber as sent and release the processing flag
+    // Update earthen_members_tb based on the event result
+    if ($basic_mailgun_status === 'delivered') {
         $stmt_update_member = $buwana_conn->prepare(
             "UPDATE earthen_members_tb SET test_sent = 1, processing = 0, test_sent_date_time = NOW() WHERE email = ? AND test_sent = 0"
         );
@@ -158,6 +157,18 @@ if (stripos($response_message, "rate limited") !== false || stripos($response_me
             $stmt_update_member->execute();
             $stmt_update_member->close();
             error_log("✅ Marked $email_addr as sent in earthen_members_tb.");
+        } else {
+            error_log("❌ Failed to update earthen_members_tb for $email_addr: " . $buwana_conn->error);
+        }
+    } elseif (in_array($basic_mailgun_status, $failure_events)) {
+        $stmt_update_member = $buwana_conn->prepare(
+            "UPDATE earthen_members_tb SET processing = 2 WHERE email = ? AND test_sent = 0"
+        );
+        if ($stmt_update_member) {
+            $stmt_update_member->bind_param('s', $email_addr);
+            $stmt_update_member->execute();
+            $stmt_update_member->close();
+            error_log("✅ Marked $email_addr as failed in earthen_members_tb.");
         } else {
             error_log("❌ Failed to update earthen_members_tb for $email_addr: " . $buwana_conn->error);
         }
