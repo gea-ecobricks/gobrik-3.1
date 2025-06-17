@@ -416,8 +416,8 @@ echo '<!DOCTYPE html>
         </select>
     </div>
 
-    <!-- Continent (Uneditable) -->
-    <div class="form-item uneditable-select">
+    <!-- Continent (Uneditable  uneditable-select) -->
+    <div class="form-item ">
         <label for="continent_code" data-lang-id="021-continent">Continent:</label>
         <select name="continent_code" id="continent_code">
             <option value="" data-lang-id="022-select-continent">Select Continent</option>
