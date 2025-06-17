@@ -402,6 +402,20 @@ echo '<!DOCTYPE html>
     <input type="hidden" id="lat" name="latitude" value="<?= htmlspecialchars($user_location_lat, ENT_QUOTES); ?>">
     <input type="hidden" id="lon" name="longitude" value="<?= htmlspecialchars($user_location_long, ENT_QUOTES); ?>">
 
+
+    <!-- Country (Uneditable uneditable-select) -->
+    <div class="form-item ">
+        <label for="country_id" data-lang-id="015-country">Country:</label>
+        <select name="country_id" id="country_id">
+            <option value="" data-lang-id="016-select-country">Select Country</option>
+            <?php foreach ($countries as $country): ?>
+                <option value="<?php echo $country['country_id']; ?>" <?php if ($country['country_id'] == $country_id) echo 'selected'; ?>>
+                    <?php echo htmlspecialchars($country['country_name']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
     <!-- Continent (Uneditable) -->
     <div class="form-item uneditable-select">
         <label for="continent_code" data-lang-id="021-continent">Continent:</label>
@@ -415,18 +429,7 @@ echo '<!DOCTYPE html>
         </select>
     </div>
 
-    <!-- Country (Uneditable) -->
-    <div class="form-item uneditable-select">
-        <label for="country_id" data-lang-id="015-country">Country:</label>
-        <select name="country_id" id="country_id">
-            <option value="" data-lang-id="016-select-country">Select Country</option>
-            <?php foreach ($countries as $country): ?>
-                <option value="<?php echo $country['country_id']; ?>" <?php if ($country['country_id'] == $country_id) echo 'selected'; ?>>
-                    <?php echo htmlspecialchars($country['country_name']); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
+
 <br><br>
     <!-- Save and Update Button -->
     <div style="margin:auto;text-align: center;margin-top:30px;">
