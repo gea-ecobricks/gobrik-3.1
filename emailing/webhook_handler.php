@@ -147,31 +147,32 @@ if (stripos($response_message, "rate limited") !== false || stripos($response_me
         error_log("❌ No record found for $email_addr in tb_ecobrickers! Skipping status update.");
     }
 
-    // Update earthen_members_tb based on the event result
+    // Update earthen_members_tb processing column based on the event result
     if ($basic_mailgun_status === 'delivered') {
         $stmt_update_member = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET test_sent = 1, processing = 0, test_sent_date_time = NOW() WHERE email = ? AND test_sent = 0"
+            "UPDATE earthen_members_tb SET processing = 0 WHERE email = ?"
         );
-        if ($stmt_update_member) {
-            $stmt_update_member->bind_param('s', $email_addr);
-            $stmt_update_member->execute();
-            $stmt_update_member->close();
-            error_log("✅ Marked $email_addr as sent in earthen_members_tb.");
-        } else {
-            error_log("❌ Failed to update earthen_members_tb for $email_addr: " . $buwana_conn->error);
-        }
+    } elseif ($basic_mailgun_status === 'accepted' || $basic_mailgun_status === 'sending') {
+        $stmt_update_member = $buwana_conn->prepare(
+            "UPDATE earthen_members_tb SET processing = 1 WHERE email = ?"
+        );
     } elseif (in_array($basic_mailgun_status, $failure_events)) {
         $stmt_update_member = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET processing = 2 WHERE email = ? AND test_sent = 0"
+            "UPDATE earthen_members_tb SET processing = 2 WHERE email = ?"
         );
-        if ($stmt_update_member) {
-            $stmt_update_member->bind_param('s', $email_addr);
-            $stmt_update_member->execute();
-            $stmt_update_member->close();
-            error_log("✅ Marked $email_addr as failed in earthen_members_tb.");
-        } else {
-            error_log("❌ Failed to update earthen_members_tb for $email_addr: " . $buwana_conn->error);
-        }
+    } elseif ($basic_mailgun_status === 'rejected') {
+        $stmt_update_member = $buwana_conn->prepare(
+            "UPDATE earthen_members_tb SET processing = 3 WHERE email = ?"
+        );
+    } else {
+        $stmt_update_member = null;
+    }
+
+    if ($stmt_update_member) {
+        $stmt_update_member->bind_param('s', $email_addr);
+        $stmt_update_member->execute();
+        $stmt_update_member->close();
+        error_log("✅ Updated processing for $email_addr to $basic_mailgun_status.");
     }
 
     // Respond with HTTP 200 to acknowledge the webhook

@@ -129,52 +129,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
     $is_test_mode = isset($_POST['test_mode']) && $_POST['test_mode'] == '1';
 
     if (!empty($email_html) && !empty($recipient_email) && ($subscriber_id || $is_test_mode)) {
-        // The webhook will mark members as sent once Mailgun confirms delivery
+        // The webhook previously confirmed sends, now we update immediately
         try {
-            if (!$is_test_mode && $subscriber_id) {
-                $stmt_queue = $buwana_conn->prepare("UPDATE earthen_members_tb SET processing = 1 WHERE id = ?");
-                if ($stmt_queue) {
-                    $stmt_queue->bind_param('i', $subscriber_id);
-                    $stmt_queue->execute();
-                    $stmt_queue->close();
-                }
-            }
 
             error_log("[EARTHEN] → Sending " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
-            if (sendEmail($recipient_email, $email_html)) {
+            $send_ok = sendEmail($recipient_email, $email_html);
 
-                error_log("[EARTHEN] ✅ Mailgun accepted " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
-
-                if (!$is_test_mode) {
-                    unset($_SESSION['locked_subscriber_id']); // Clean up
+            if ($subscriber_id && !$is_test_mode) {
+                if ($send_ok) {
+                    // Mark as sent and processing (sending)
+                    $stmt = $buwana_conn->prepare(
+                        "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 1 WHERE id = ?"
+                    );
+                } else {
+                    // Mark attempt but leave processing NULL
+                    $stmt = $buwana_conn->prepare(
+                        "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?"
+                    );
                 }
 
-                echo json_encode(['success' => true]);
-                exit();
+                if ($stmt) {
+                    $stmt->bind_param('i', $subscriber_id);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+            }
+
+            if ($send_ok) {
+                error_log("[EARTHEN] ✅ Mailgun accepted " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
             } else {
                 error_log("[EARTHEN] ❌ Failed to send " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
-
-                if (!$is_test_mode && $subscriber_id) {
-                    $stmt_fail = $buwana_conn->prepare("UPDATE earthen_members_tb SET processing = 2 WHERE id = ?");
-                    if ($stmt_fail) {
-                        $stmt_fail->bind_param('i', $subscriber_id);
-                        $stmt_fail->execute();
-                        $stmt_fail->close();
-                    }
-                }
-
-                echo json_encode(['success' => false, 'message' => 'Sending failed']);
-                exit();
             }
+
+            unset($_SESSION['locked_subscriber_id']);
+
+            echo json_encode(['success' => $send_ok, 'message' => $send_ok ? '' : 'Sending failed']);
+            exit();
         } catch (Exception $e) {
             if (!$is_test_mode && $subscriber_id) {
-                $stmt_fail = $buwana_conn->prepare("UPDATE earthen_members_tb SET processing = 2 WHERE id = ?");
-                if ($stmt_fail) {
-                    $stmt_fail->bind_param('i', $subscriber_id);
-                    $stmt_fail->execute();
-                    $stmt_fail->close();
+                $stmt = $buwana_conn->prepare(
+                    "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?"
+                );
+                if ($stmt) {
+                    $stmt->bind_param('i', $subscriber_id);
+                    $stmt->execute();
+                    $stmt->close();
                 }
             }
+            unset($_SESSION['locked_subscriber_id']);
             error_log("[EARTHEN] ❌ Exception: " . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Server error']);
             exit();
@@ -516,15 +518,8 @@ function fetchNextRecipient() {
     function handleSendError(msg) {
         sendFailCount++;
         logError(`${msg} Attempt ${sendFailCount} for ${recipientEmail}`);
-        if (recipientId) {
-            $.post('../scripts/mark_member_sent.php', {id: recipientId}).always(() => {
-                sendFailCount = 0;
-                fetchNextRecipient(true);
-            });
-        } else {
-            updateVisibleButton();
-            setTimeout(sendEmail, 2000);
-        }
+        sendFailCount = 0;
+        fetchNextRecipient(true);
     }
 
 
