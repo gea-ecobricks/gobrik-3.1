@@ -19,8 +19,8 @@ try {
 
     $pending_sql = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
                      FROM earthen_members_tb
-                     WHERE test_sent = 0
-                     ORDER BY id ASC
+                     WHERE test_sent = 0 AND processing IS NULL
+                     ORDER BY created_at ASC
                      LIMIT {$pending_limit}";
     $pending_res = $buwana_conn->query($pending_sql);
     $pending_members = $pending_res ? $pending_res->fetch_all(MYSQLI_ASSOC) : [];

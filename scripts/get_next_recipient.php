@@ -38,7 +38,7 @@ try {
         SELECT id, email, name
         FROM earthen_members_tb
         WHERE test_sent = 0 AND processing = 1
-        ORDER BY id ASC
+        ORDER BY created_at ASC
         LIMIT 1
         FOR UPDATE
     ";
@@ -73,8 +73,8 @@ try {
         $new_sql = "
             SELECT id, email, name
             FROM earthen_members_tb
-            WHERE test_sent = 0 AND processing = 0
-            ORDER BY id ASC
+            WHERE test_sent = 0 AND processing IS NULL
+            ORDER BY created_at ASC
             LIMIT 1
             FOR UPDATE
         ";
