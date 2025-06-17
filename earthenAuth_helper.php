@@ -224,6 +224,11 @@ function getUserContinent($buwana_conn, $buwana_id) {
         }
     }
 
+    // Use the default globe if no continent code was found
+    if (empty($continent_code)) {
+        return '🌐';
+    }
+
     // Determine the globe emoticon based on the continent_code
     switch (strtoupper($continent_code)) {
         case 'AF':
@@ -280,6 +285,23 @@ function retryEcobrick($gobrik_conn, $ecobrick_unique_id) {
 
         if ($stmt->fetch()) {
             $stmt->close();
+
+            // Ensure variables are not null to prevent warnings
+            $ecobricker_maker = $ecobricker_maker ?? '';
+            $volume_ml = $volume_ml ?? '';
+            $weight_g = $weight_g ?? '';
+            $sequestration_type = $sequestration_type ?? '';
+            $plastic_from = $plastic_from ?? '';
+            $brand_name = $brand_name ?? '';
+            $community_id = $community_id ?? '';
+            $community_name = $community_name ?? '';
+            $location_full = $location_full ?? '';
+            $bottom_colour = $bottom_colour ?? '';
+            $location_lat = $location_lat ?? '';
+            $location_long = $location_long ?? '';
+            $location_watershed = $location_watershed ?? '';
+            $country_id = $country_id ?? '';
+            $status = $status ?? '';
 
             // Prevent retrying authenticated ecobricks
             if ($status === "authenticated") {
