@@ -251,9 +251,6 @@ echo '<!DOCTYPE html>
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
 
-
-<div class="splash-title-block"></div>
-<div id="splash-bar"></div>
 <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
     <div style="position:relative;">
         <canvas id="processingChart" width="300" height="300"></canvas>
@@ -396,6 +393,15 @@ echo '<!DOCTYPE html>
         </tbody>
     </table>
 </div>
+
+
+
+<!--FOOTER STARTS HERE-->
+<?php require_once ("../footer-2025.php"); ?>
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 var processingData = <?php echo json_encode($processing_percentages); ?>;
@@ -740,15 +746,6 @@ function sendEmail() {
 
 
 
-
-
-
-
-
-
-
-<!--FOOTER STARTS HERE-->
-<?php require_once ("../footer-2025.php"); ?>
 
 
 
