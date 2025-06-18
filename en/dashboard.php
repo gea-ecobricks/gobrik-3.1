@@ -581,6 +581,82 @@ function openRegisteredTrainingsModal(trainingId, trainingLocation) {
     modal.classList.remove('modal-hidden');
 }
 
+function openTraineeSender(trainingId) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    function escapeHTML(str) {
+        return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    modalBox.innerHTML = `<p>Loading message...</p>`;
+
+    fetch(`../api/fetch_registered_training.php?training_id=${trainingId}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                modalBox.innerHTML = `<p style="color:red;">${escapeHTML(data.error)}</p>`;
+                return;
+            }
+
+            const msg = `Hi there $first_name,\n\nThank you again for registering for our ${escapeHTML(data.training_title)}!  \n\nThis is a reminder that today, at ${escapeHTML(data.training_time_txt)} the workshop begins!\n\nThe training is on Zoom.  Here's the full zoom link and invite you will need to access:\n\n${escapeHTML(data.zoom_link_full)}\n\nWe'll be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.\n\nMeanwhile, we're also setting up a support chat for the week.  I don't know about you, but I've got a lot of plastic saved up and it needs packing.  So after the workshop we're going to use the group to let you (and us!) share our ecobricking progress and ask questions.\n\nWe do our best to avoid meta products in the same way we avoid single-use plastic products, so sorry no whatsapp.  We use Signal (a free, open-source, foundation-run equivalent).  Click the link to join the group now or after the workshop:\n\nhttps://signal.group/#CjQKICIVvzmbBXqB7_9-5XyXd53zbdw7RLqVWKbQ8UzX2EkREhC0_jo3SCAr40xIO_jePrmT\n\nUnlike some of our GEA workshops, no need to bring anything to this workshop except your curiousity.  It will be interactive, so be prepared to share and anwser questions via mic and via chat.\n\nAlright, see you soon!\n\n${escapeHTML(data.lead_trainer)}`;
+
+            modalBox.innerHTML = `
+                <h4 style="text-align:center;">Send a message to Participants</h4>
+                <p style="text-align:center;">Use this quick tool and default message to send a message to everyone who has signed up for the training</p>
+                <pre style="white-space:pre-wrap;text-align:left;">${msg}</pre>
+                <button id="trainee-test-send" class="confirm-button enabled">Test to: ${escapeHTML(data.trainer_contact_email)}</button>
+                <button id="trainee-all-send" class="confirm-button enabled">Send Email to All</button>
+                <div id="trainee-send-status" style="margin-top:10px;text-align:center;"></div>
+            `;
+
+            document.getElementById('trainee-test-send').addEventListener('click', () => sendTraineeEmails(trainingId, true));
+            document.getElementById('trainee-all-send').addEventListener('click', () => sendTraineeEmails(trainingId, false));
+        })
+        .catch(err => {
+            modalBox.innerHTML = `<p style="color:red;">Error loading training: ${escapeHTML(err.message)}</p>`;
+        });
+
+    modal.classList.remove('modal-hidden');
+}
+
+function sendTraineeEmails(trainingId, isTest) {
+    const statusDiv = document.getElementById('trainee-send-status');
+    const btn = isTest ? document.getElementById('trainee-test-send') : document.getElementById('trainee-all-send');
+    btn.innerHTML = '<div class="spinner-photo-loading"></div>';
+
+    fetch('../processes/trainee_sender.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ training_id: trainingId, test: isTest ? 1 : 0 })
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                btn.textContent = '✅ Message sent!';
+                btn.style.background = 'green';
+            } else {
+                btn.textContent = '🙄Message failed to send';
+                btn.style.background = 'red';
+            }
+            if (data.message) {
+                statusDiv.innerHTML += `<p>${escapeHTML(data.message)}</p>`;
+            }
+        })
+        .catch(err => {
+            btn.textContent = '🙄Message failed to send';
+            btn.style.background = 'red';
+            statusDiv.innerHTML += `<p>${escapeHTML(err.message)}</p>`;
+        });
+}
+
 
 $(document).ready(function() {
     let table = $("#trainer-trainings").DataTable({
@@ -655,9 +731,15 @@ function openTraineesModal(trainingId, trainingTitle) {
 
     // Set up modal structure
     modalBox.innerHTML = `
+        <button id="message-participants-btn" class="confirm-button enabled" style="margin-bottom:10px;">📨 Message Participants</button>
         <h4 style="text-align:center;">Registered Trainees for <br> ${escapeHTML(trainingTitle)}</h4>
         <div id="trainee-table-container" style="max-height: 100%; overflow-y: auto; margin-bottom: 20px;"></div>
     `;
+
+    document.getElementById('message-participants-btn').addEventListener('click', () => {
+        closeInfoModal();
+        openTraineeSender(trainingId);
+    });
 
     // Fetch trainees via AJAX
     fetch(`../api/fetch_training_trainees.php?training_id=${trainingId}`)
