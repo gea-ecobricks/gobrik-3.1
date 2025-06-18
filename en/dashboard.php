@@ -283,8 +283,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
                     <!-- Updated Registered Column -->
                     <td style="text-align:center;">
-                        <a href="javascript:void(0);" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')">
-                            <span style="text-decoration: underline;"><?php echo (int) $training['trainee_count']; ?></span> 🔎
+                        <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
+                            <?php echo (int) $training['trainee_count']; ?>
                         </a>
                     </td>
 
@@ -592,10 +592,6 @@ function openTraineeSender(trainingId) {
     document.getElementById('footer-full')?.classList.add('blurred');
     document.body.classList.add('modal-open');
 
-    function escapeHTML(str) {
-        return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
     modalBox.innerHTML = `<p>Loading message...</p>`;
 
     fetch(`../api/fetch_registered_training.php?training_id=${trainingId}`)
@@ -611,9 +607,9 @@ function openTraineeSender(trainingId) {
             modalBox.innerHTML = `
                 <h4 style="text-align:center;">Send a message to Participants</h4>
                 <p style="text-align:center;">Use this quick tool and default message to send a message to everyone who has signed up for the training</p>
-                <pre style="white-space:pre-wrap;text-align:left;">${msg}</pre>
-                <button id="trainee-test-send" class="confirm-button enabled">Test to: ${escapeHTML(data.trainer_contact_email)}</button>
-                <button id="trainee-all-send" class="confirm-button enabled">Send Email to All</button>
+                <textarea id="trainee-message" style="white-space:pre-wrap;text-align:left;width:100%;height:260px;">${msg}</textarea>
+                <button id="trainee-test-send" class="confirm-button enabled" style="min-width:360px;margin-top:10px;">Test to: ${escapeHTML(data.trainer_contact_email)}</button>
+                <button id="trainee-all-send" class="confirm-button enabled" style="min-width:360px;margin-top:10px;">Send Email to All</button>
                 <div id="trainee-send-status" style="margin-top:10px;text-align:center;"></div>
             `;
 
@@ -635,7 +631,11 @@ function sendTraineeEmails(trainingId, isTest) {
     fetch('../processes/trainee_sender.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ training_id: trainingId, test: isTest ? 1 : 0 })
+        body: new URLSearchParams({
+            training_id: trainingId,
+            test: isTest ? 1 : 0,
+            message: document.getElementById('trainee-message').value
+        })
     })
         .then(r => r.json())
         .then(data => {
@@ -724,16 +724,11 @@ function openTraineesModal(trainingId, trainingTitle) {
     document.getElementById('footer-full')?.classList.add('blurred');
     document.body.classList.add('modal-open');
 
-    // Escape function to prevent XSS
-    function escapeHTML(str) {
-        return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
     // Set up modal structure
     modalBox.innerHTML = `
-        <button id="message-participants-btn" class="confirm-button enabled" style="margin-bottom:10px;">📨 Message Participants</button>
         <h4 style="text-align:center;">Registered Trainees for <br> ${escapeHTML(trainingTitle)}</h4>
         <div id="trainee-table-container" style="max-height: 100%; overflow-y: auto; margin-bottom: 20px;"></div>
+        <button id="message-participants-btn" class="confirm-button enabled" style="margin-top:10px;">Message Participants...</button>
     `;
 
     document.getElementById('message-participants-btn').addEventListener('click', () => {

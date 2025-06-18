@@ -12,6 +12,7 @@ if (!isset($_SESSION['buwana_id'])) {
 
 $training_id = intval($_POST['training_id'] ?? 0);
 $test = isset($_POST['test']) ? intval($_POST['test']) : 0;
+$custom_message = trim($_POST['message'] ?? '');
 
 if ($training_id <= 0) {
     echo json_encode(['success' => false, 'message' => 'Invalid training']);
@@ -38,7 +39,7 @@ $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
 $mailgunApiKey = getenv('MAILGUN_API_KEY');
 $mailgunDomain = 'mail.gobrik.com';
 
-function sendMsg($to, $first_name, $vars) {
+function sendMsg($to, $first_name, $vars, $override = '') {
     global $client, $mailgunApiKey, $mailgunDomain, $trainer_contact_email, $lead_trainer, $training_title;
     $body = <<<EOT
 Hi there {$first_name},
@@ -65,6 +66,10 @@ Alright, see you soon!
 
 {$lead_trainer}
 EOT;
+
+    if ($override !== '') {
+        $body = $override;
+    }
 
     $html = nl2br($body);
 
@@ -97,7 +102,7 @@ $messages = [];
 $success = true;
 
 if ($test) {
-    $ok = sendMsg($trainer_contact_email, $lead_trainer, $vars);
+    $ok = sendMsg($trainer_contact_email, $lead_trainer, $vars, $custom_message);
     $success = $ok;
     $messages[] = $ok ? "Test sent to $trainer_contact_email" : "Failed to send test";
 } else {
@@ -107,7 +112,7 @@ if ($test) {
     $stmt->execute();
     $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) {
-        $ok = sendMsg($row['email_addr'], $row['first_name'], $vars);
+        $ok = sendMsg($row['email_addr'], $row['first_name'], $vars, $custom_message);
         $messages[] = $ok ? "Sent to {$row['email_addr']}" : "Failed to {$row['email_addr']}";
         if (!$ok) $success = false;
     }

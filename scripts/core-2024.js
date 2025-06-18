@@ -9,6 +9,17 @@ function logoutUser() {
     window.location.href = `logout.php?redirect=${redirectUrl}`;
 }
 
+// Safely escape HTML for dynamic content
+function escapeHTML(str) {
+    if (str === undefined || str === null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 
 
 
