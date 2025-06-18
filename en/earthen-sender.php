@@ -119,6 +119,29 @@ $pending_members = $pending_result ? $pending_result->fetch_all(MYSQLI_ASSOC) : 
 
 $all_members = array_merge($sent_members, $pending_members);
 
+// Processing stats for Chart.js
+$processing_query = "SELECT
+    SUM(CASE WHEN processing IS NULL THEN 1 ELSE 0 END) AS null_count,
+    SUM(CASE WHEN processing = 0 THEN 1 ELSE 0 END) AS delivered_count,
+    SUM(CASE WHEN processing = 1 THEN 1 ELSE 0 END) AS sending_count,
+    SUM(CASE WHEN processing = 2 THEN 1 ELSE 0 END) AS failed_immediate_count,
+    SUM(CASE WHEN processing = 3 THEN 1 ELSE 0 END) AS failed_later_count
+    FROM earthen_members_tb";
+$proc_result = $buwana_conn->query($processing_query);
+$proc_row = $proc_result->fetch_assoc();
+$processing_counts = [
+    'unsent' => intval($proc_row['null_count'] ?? 0),
+    'delivered' => intval($proc_row['delivered_count'] ?? 0),
+    'sending' => intval($proc_row['sending_count'] ?? 0),
+    'failed_immediate' => intval($proc_row['failed_immediate_count'] ?? 0),
+    'failed_later' => intval($proc_row['failed_later_count'] ?? 0)
+];
+
+$processing_percentages = [];
+foreach ($processing_counts as $key => $count) {
+    $processing_percentages[$key] = ($total_members > 0) ? round(($count / $total_members) * 100, 2) : 0;
+}
+$unsent_percentage = $processing_percentages['unsent'];
 
 require_once 'live-newsletter.php';  //the newsletter html
 
@@ -254,6 +277,13 @@ echo '<!DOCTYPE html>
             <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
         </div>
 
+        <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
+            <div style="position:relative;">
+                <canvas id="processingChart" width="300" height="300"></canvas>
+                <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;"></div>
+            </div>
+        </div>
+
 <p>Total Members: <strong id="total-members"><?php echo $total_members; ?></strong></p>
 <p>Emails Sent: <strong id="sent-count"><?php echo $sent_count; ?></strong> (
     <span id="sent-percentage"><?php echo number_format($sent_percentage, 2); ?></span>%)</p>
@@ -366,6 +396,11 @@ echo '<!DOCTYPE html>
         </tbody>
     </table>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+var processingData = <?php echo json_encode($processing_percentages); ?>;
+var unsentPercentage = <?php echo json_encode($unsent_percentage); ?>;
+</script>
 <script>
 $(document).ready(function () {
     let recipientEmail = '';
@@ -378,6 +413,29 @@ $(document).ready(function () {
 
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
+
+    // Initialize doughnut chart
+    const chartCtx = document.getElementById('processingChart').getContext('2d');
+    new Chart(chartCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Unsent', 'Delivered', 'Sending', 'Failed Immediately', 'Failed Later'],
+            datasets: [{
+                data: [
+                    processingData.unsent,
+                    processingData.delivered,
+                    processingData.sending,
+                    processingData.failed_immediate,
+                    processingData.failed_later
+                ],
+                backgroundColor: ['yellow', '#006400', '#90ee90', 'red', '#8b0000']
+            }]
+        },
+        options: {
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+    $('#unsent-percentage-label').text(unsentPercentage + '% Unsent');
 
     // Initialize DataTable for status overview
     const statusTable = $('#email-status-table').DataTable({
