@@ -254,7 +254,7 @@ echo '<!DOCTYPE html>
 
 
 <!-- SENDER FORM CONTENT -->
-    <div class="form-container">
+    <div class="form-container" style="padding-top:10px; margin-top: 100px;">
 
         <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
             <div style="position:relative;">
