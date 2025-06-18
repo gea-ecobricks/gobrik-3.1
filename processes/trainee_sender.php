@@ -49,7 +49,8 @@ function sendMsg($to, $first_name, $vars, $override = '') {
     $body = <<<EOT
 Hi there {$first_name},
 
-Thank you again for registering for our {$vars['title']} workshop!
+Thank you again for registering for our {$vars['title']} event!
+
 
 This is a reminder that today, at {$vars['time_txt']} the {$training_type} begins!
 
@@ -61,7 +62,7 @@ The training is on Zoom.  Here's the full zoom link and invite you will need to 
 
 ------------------------
 
-We will be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.
+We'll be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.
 
 Meanwhile, we're also setting up a support chat for the week.  I don't know about you, but I've got a lot of plastic saved up and it needs packing.  So after the workshop we're going to use the group to let you (and us!) share our ecobricking progress and ask questions.
 
