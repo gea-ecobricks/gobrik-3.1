@@ -51,6 +51,7 @@ Hi there {$first_name},
 
 Thank you again for registering for our {$vars['title']} event!
 
+
 This is a reminder that today, at {$vars['time_txt']} the {$training_type} begins!
 
 The training is on Zoom.  Here's the full zoom link and invite you will need to access:
