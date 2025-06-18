@@ -254,7 +254,12 @@ echo '<!DOCTYPE html>
 
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
-<div id="top-page-image" class="message-birded top-page-image"></div>
+<div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
+    <div style="position:relative;">
+        <canvas id="processingChart" width="300" height="300"></canvas>
+        <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;color:grey;"></div>
+    </div>
+</div>
 
 <!-- SENDER FORM CONTENT -->
     <div class="form-container">
@@ -277,12 +282,7 @@ echo '<!DOCTYPE html>
             <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
         </div>
 
-        <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
-            <div style="position:relative;">
-                <canvas id="processingChart" width="300" height="300"></canvas>
-                <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;"></div>
-            </div>
-        </div>
+
 
 <p>Total Members: <strong id="total-members"><?php echo $total_members; ?></strong></p>
 <p>Emails Sent: <strong id="sent-count"><?php echo $sent_count; ?></strong> (
@@ -428,11 +428,16 @@ $(document).ready(function () {
                     processingData.failed_immediate,
                     processingData.failed_later
                 ],
-                backgroundColor: ['yellow', '#006400', '#90ee90', 'red', '#8b0000']
+                backgroundColor: ['yellow', 'limegreen', '#90ee90', 'red', '#8b0000'],
+                borderColor: 'transparent',
+                borderWidth: 0
             }]
         },
         options: {
-            plugins: { legend: { position: 'bottom' } }
+            plugins: {
+                legend: { position: 'bottom', labels: { color: 'grey' } },
+                tooltip: { bodyColor: 'grey', titleColor: 'grey' }
+            }
         }
     });
     $('#unsent-percentage-label').text(unsentPercentage + '% Unsent');
@@ -440,7 +445,9 @@ $(document).ready(function () {
     // Initialize DataTable for status overview
     const statusTable = $('#email-status-table').DataTable({
         order: [],
-        pageLength: 10
+        pageLength: 10,
+        responsive: true,
+        autoWidth: false
     });
     $("div.dataTables_filter input").attr('placeholder', 'Search emails...');
 
