@@ -251,15 +251,17 @@ echo '<!DOCTYPE html>
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
 
-<div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
-    <div style="position:relative;">
-        <canvas id="processingChart" width="300" height="300"></canvas>
-        <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;color:grey;"></div>
-    </div>
-</div>
+
 
 <!-- SENDER FORM CONTENT -->
     <div class="form-container">
+
+        <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
+            <div style="position:relative;">
+                <canvas id="processingChart" width="300" height="300"></canvas>
+                <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;color:grey;"></div>
+            </div>
+        </div>
 
         <?php if ($has_alerts): ?>
         <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
@@ -393,7 +395,7 @@ echo '<!DOCTYPE html>
         </tbody>
     </table>
 </div>
-
+</div>
 
 
 <!--FOOTER STARTS HERE-->
