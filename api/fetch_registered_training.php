@@ -12,7 +12,7 @@ if ($training_id <= 0) {
 
 // Fetch training details
 $sql = "SELECT training_title, lead_trainer, training_date, training_time_txt, training_type, training_summary, training_location,
-               zoom_link, zoom_link_full, moodle_url, feature_photo1_tmb
+               zoom_link, zoom_link_full, moodle_url, feature_photo1_tmb, trainer_contact_email
         FROM tb_trainings
         WHERE training_id = ?";
 
