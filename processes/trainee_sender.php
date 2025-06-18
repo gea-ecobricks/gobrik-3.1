@@ -21,11 +21,11 @@ if ($training_id <= 0) {
 
 require_once '../gobrikconn_env.php';
 
-$sql = "SELECT training_title, training_time_txt, lead_trainer, trainer_contact_email, zoom_link_full FROM tb_trainings WHERE training_id = ?";
+$sql = "SELECT training_title, training_time_txt, training_type, lead_trainer, trainer_contact_email, zoom_link_full FROM tb_trainings WHERE training_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
 $stmt->bind_param('i', $training_id);
 $stmt->execute();
-$stmt->bind_result($training_title, $training_time_txt, $lead_trainer, $trainer_contact_email, $zoom_link_full);
+$stmt->bind_result($training_title, $training_time_txt, $training_type, $lead_trainer, $trainer_contact_email, $zoom_link_full);
 $stmt->fetch();
 $stmt->close();
 
@@ -33,6 +33,7 @@ $lead_trainer = $lead_trainer ?? '';
 $trainer_contact_email = $trainer_contact_email ?? '';
 $training_title = $training_title ?? '';
 $training_time_txt = $training_time_txt ?? '';
+$training_type = $training_type ?? '';
 $zoom_link_full = $zoom_link_full ?? '';
 
 $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU-based endpoint
@@ -40,17 +41,25 @@ $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Use environment variable for Mail
 $mailgunDomain = 'mail.gobrik.com'; // Your Mailgun domain
 
 function sendMsg($to, $first_name, $vars, $override = '') {
-    global $client, $mailgunApiKey, $mailgunDomain, $trainer_contact_email, $lead_trainer, $training_title;
+    global $client, $mailgunApiKey, $mailgunDomain, $trainer_contact_email, $lead_trainer, $training_title, $training_type;
+    $first_name = trim($first_name);
+    if ($first_name === '') {
+        $first_name = 'ecobricker';
+    }
     $body = <<<EOT
 Hi there {$first_name},
 
-Thank you again for registering for our {$vars['title']}!  
+Thank you again for registering for our {$vars['title']} event!
 
-This is a reminder that today, at {$vars['time_txt']} the workshop begins!
+This is a reminder that today, at {$vars['time_txt']} the {$training_type} begins!
 
 The training is on Zoom.  Here's the full zoom link and invite you will need to access:
 
+------------------------
+
 {$vars['zoom']}
+
+------------------------
 
 We'll be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.
 
@@ -65,6 +74,7 @@ Unlike some of our GEA workshops, no need to bring anything to this workshop exc
 Alright, see you soon!
 
 {$lead_trainer}
+{$trainer_contact_email}
 EOT;
 
     if ($override !== '') {
@@ -77,7 +87,7 @@ EOT;
         $response = $client->post("{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
-                'from' => 'GoBrik Course System <no-reply@mail.gobrik.com>',
+                'from' => "GoBrik Course System | {$lead_trainer} <no-reply@mail.gobrik.com>",
                 'to' => $to,
                 'cc' => $trainer_contact_email,
                 'bcc' => 'russmaier@gmail.com',
