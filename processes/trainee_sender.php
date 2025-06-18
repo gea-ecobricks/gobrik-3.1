@@ -35,9 +35,9 @@ $training_title = $training_title ?? '';
 $training_time_txt = $training_time_txt ?? '';
 $zoom_link_full = $zoom_link_full ?? '';
 
-$client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
-$mailgunApiKey = getenv('MAILGUN_API_KEY');
-$mailgunDomain = 'mail.gobrik.com';
+$client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU-based endpoint
+$mailgunApiKey = getenv('MAILGUN_API_KEY'); // Use environment variable for Mailgun API key
+$mailgunDomain = 'mail.gobrik.com'; // Your Mailgun domain
 
 function sendMsg($to, $first_name, $vars, $override = '') {
     global $client, $mailgunApiKey, $mailgunDomain, $trainer_contact_email, $lead_trainer, $training_title;
@@ -74,10 +74,10 @@ EOT;
     $html = nl2br($body);
 
     try {
-        $response = $client->post("https://api.eu.mailgun.net/v3/{$mailgunDomain}/messages", [
+        $response = $client->post("{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
             'form_params' => [
-                'from' => "$lead_trainer <{$trainer_contact_email}>",
+                'from' => 'GoBrik Course System <no-reply@mail.gobrik.com>',
                 'to' => $to,
                 'cc' => $trainer_contact_email,
                 'bcc' => 'russmaier@gmail.com',
