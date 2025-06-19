@@ -507,6 +507,12 @@ display: none;
         <a href="dashboard.php" aria-label="Log" data-lang-id="1000-dashboard">Dashboard</a>
         <span class="status-circle" style="background-color: LIMEGREEN;" title="Working. Under development"></span>
       </div>
+  <div class="menu-page-item">
+    <a href="log.php" data-lang-id="1000-log-ecobricks">
+      Log Ecobricks
+    </a>
+    <span class="status-circle" style="background-color: YELLOW;" title="Working.  Being tested."></span>
+  </div>
     <?php else: ?>
       <!-- If the user is not logged in, show the login/signup options -->
       <div class="menu-page-item">
@@ -520,11 +526,12 @@ display: none;
 
 <!-- Other menu items -->
 <div class="menu-page-item">
-  <a href="log.php" data-lang-id="1000-log-ecobricks">
-    Log Ecobricks
+  <a href="courses.php" data-lang-id="1000-courses">
+    Course Listings
   </a>
   <span class="status-circle" style="background-color: YELLOW;" title="Working.  Being tested."></span>
 </div>
+
 
 <div class="menu-page-item">
   <a href="newest-briks.php" data-lang-id="1000-latest-ecobricks">
