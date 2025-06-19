@@ -1019,16 +1019,28 @@ function setFileInputFromUrl(inputId, url) {
 }
 
 function presetForStarterWorkshop() {
-    document.getElementById('training_title').value = 'Plastic, the Biosphere & Ecobricks: An Introduction';
+    document.getElementById('training_title').value = 'Plastic, the Biosphere and Ecobricks';
     document.getElementById('training_subtitle').value = 'An Introduction to Ecobricking';
     document.getElementById('no_participants').value = 30;
     document.getElementById('community_search').value = 'Global Ecobrick Movement';
+    document.getElementById('training_date').value = '2025-07-18T19:30';
+    document.getElementById('training_time_txt').value = 'Jakarta 7:30 PM / UK 1:30 PM / Namibia 2:30 PM';
 
     const typeSelect = document.getElementById('training_type');
     if (typeSelect) {
         for (let opt of typeSelect.options) {
             if (opt.text.trim() === 'Online Starter Workshop' || opt.value === 'Online Starter Workshop') {
                 typeSelect.value = opt.value;
+                break;
+            }
+        }
+    }
+
+    const langSelect = document.getElementById('training_language');
+    if (langSelect) {
+        for (let opt of langSelect.options) {
+            if (opt.text.trim() === 'English' || opt.value === 'English' || opt.value === 'en') {
+                langSelect.value = opt.value;
                 break;
             }
         }
@@ -1044,27 +1056,33 @@ function presetForStarterWorkshop() {
         }
     }
 
-    document.getElementById('featured_description').value = `Just getting started ecobricking? Curious what it ecobricking is all about?  Want to be sure you are on the right track?  This basic, 1.5 our course will get you started right.  You’ll learn a lot more than just how to pack a bottle!
+    document.getElementById('featured_description').value = `Just getting started ecobricking? Curious what it ecobricking is all about?  Want to be sure you are on the right track?  This basic, 1.5 our course will get you started right.  You’ll learn a lot more than just how to pack a bottle!`;
 
-In this introduction to ecobricks we will cover not just how to make an ecobrick, but why.  We’ll cover the context of ayyew and Earthen ethics and we’ll go through the illusions and daners surrounding plastic.  We'll take a look at modern plastic solutions and why ecobricking is as relevant as ever.  Finally, we'll go over correct ecobrick technique, best practices and building possibilities.`;
+    document.getElementById('training_agenda').value = `In this introduction to ecobricking we will cover not just how to make an ecobrick, but <i>why</i>.
+We’ll go over the both the primordial and modern story of our everyday plastic, as well as the illusions and dangers of it. We'll take a look at industrial plastic solutions and why ecobricking remains as relevant as ever. Finally, we'll go over correct ecobrick technique, best practices, and building possibilities.
 
-    document.getElementById('training_agenda').value = `What you will learn:
+<b>What you will learn...</b>
 
-1. The primordial Earthen origins of plastic
-2. How we can follow Earth’s example with our plastic
-3. The modern context of plastic
-4.  The shortcomings of recycling and industrial waste management
-5.  The dangers of plastic when it gets into the environment
-6.  The spiral green principle behind ecobricking
-7.  How to Ecobrick
-8.  Using the GoBrik app
-9.  Using ecobricks for Modules and Earth Building
+\t1. The primordial Earthen origins of plastic
+\t2. How we can follow Earth’s example with our plastic
+\t3. The modern petro-capital context of plastic
+\t4. The shortcomings of industrial recycling
+\t5. The dangers of plastic when it gets into the environment
+\t6. The spiral green principle behind ecobricking
+\t7. How to Ecobrick
+\t8. Using the GoBrik app
+\t9. Using ecobricks for Modules and Earth Building
 
-Schedule
-• 40 minutes of science and theory
-• 20 minutes of ecobrick technique and best practices
-• 10 minutes on ecobrick applications
-• 20 minutes of questions and discussion.`;
+<b>Schedule...</b>
+
+\t• 40 minutes of science and theory
+\t• 20 minutes of ecobrick technique and best practices
+\t• 10 minutes on ecobrick applications
+\t• 20 minutes of questions and discussion.
+
+<b>Payment...</b>
+
+Course registration is free / by donation so no payment is required to register.  Ater the course, donations are welcome (suggested donation is 20$ / 20 GBP / 200k IDR).  20% of course proceeds go to the Global Ecobrick Alliance`;
 
     const regScope = document.getElementById('registration_scope');
     if (regScope) regScope.value = 'anyone';
