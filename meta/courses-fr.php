@@ -10,7 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Cours Actuels">
 <meta property="og:description" content="Sélectionnez parmi notre liste de formations, d'ateliers et d'événements communautaires sur des sujets régénératifs">
-<meta property="og:image" content="https://gobrik.com/photos/course-banner.png">
+<meta property="og:image" content="https://gobrik.com/pngs/course-banner.png">
 <meta property="og:image:width" content="1000">
 <meta property="og:image:height" content="1000">
 <meta property="og:image:alt" content="Bannière des cours">
