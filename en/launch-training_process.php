@@ -60,8 +60,10 @@ $display_cost = trim($_POST["display_cost"] ?? "Free / by Donation");
 $no_participants = filter_var($_POST['no_participants'], FILTER_VALIDATE_INT) ?? 0;
 $briks_made = filter_var($_POST['briks_made'], FILTER_VALIDATE_INT) ?? 0;
 $avg_brik_weight = filter_var($_POST['avg_brik_weight'], FILTER_VALIDATE_INT) ?? 0;
-$country_id = filter_var($_POST['country_id'], FILTER_VALIDATE_INT) ?? null;
-$community_id = filter_var($_POST['community_id'], FILTER_VALIDATE_INT) ?? null;
+$country_id = isset($_POST['country_id']) ? filter_var($_POST['country_id'], FILTER_VALIDATE_INT) : null;
+if ($country_id === false) { $country_id = null; }
+$community_id = isset($_POST['community_id']) ? filter_var($_POST['community_id'], FILTER_VALIDATE_INT) : null;
+if ($community_id === false) { $community_id = null; }
 $trainers = isset($_POST['trainers']) && is_array($_POST['trainers']) ? array_map('intval', $_POST['trainers']) : [];
 
 function buildLeadTrainerString($conn, $trainerIds, $language) {
