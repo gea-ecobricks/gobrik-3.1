@@ -10,8 +10,8 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Cursos Actuales">
 <meta property="og:description" content="Seleccione de nuestra lista de formaciones, talleres y eventos comunitarios en temas regenerativos">
-<meta property="og:image" content="https://gobrik.com/images/social-banner-1200px.png">
-<meta property="og:image:width" content="1200">
+<meta property="og:image" content="https://gobrik.com/photos/course-banner.png">
+<meta property="og:image:width" content="1000">
 <meta property="og:image:height" content="1000">
 <meta property="og:image:alt" content="Banner de cursos">
 <meta property="og:locale" content="es_ES">

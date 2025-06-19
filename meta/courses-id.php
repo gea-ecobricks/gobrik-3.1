@@ -10,8 +10,8 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Kursus Saat Ini">
 <meta property="og:description" content="Pilih dari daftar pelatihan, lokakarya, dan acara komunitas kami yang sedang berlangsung tentang topik regeneratif">
-<meta property="og:image" content="https://gobrik.com/images/social-banner-1200px.png">
-<meta property="og:image:width" content="1200">
+<meta property="og:image" content="https://gobrik.com/photos/course-banner.png">
+<meta property="og:image:width" content="1000">
 <meta property="og:image:height" content="1000">
 <meta property="og:image:alt" content="Banner kursus">
 <meta property="og:locale" content="id_ID">
