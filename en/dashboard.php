@@ -169,8 +169,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
-                <span style="margin-right:10px;">👍</span>
-                <span> Free Intro to Ecobrick course today!  <a href="register.php?id=917">Register</a></span>
+                <span style="margin-right:10px;">🌟</span>
+                <span> A new community event on the meaning of Ayyew has been listed.  <a href="https://gobrik.com/en/register.php?id=913">Register</a></span>
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">
