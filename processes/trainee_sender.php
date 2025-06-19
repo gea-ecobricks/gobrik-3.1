@@ -13,6 +13,7 @@ if (!isset($_SESSION['buwana_id'])) {
 $training_id = intval($_POST['training_id'] ?? 0);
 $test = isset($_POST['test']) ? intval($_POST['test']) : 0;
 $custom_message = trim($_POST['message'] ?? '');
+$custom_title = trim($_POST['title'] ?? '');
 
 if ($training_id <= 0) {
     echo json_encode(['success' => false, 'message' => 'Invalid training']);
@@ -40,7 +41,7 @@ $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU-ba
 $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Use environment variable for Mailgun API key
 $mailgunDomain = 'mail.gobrik.com'; // Your Mailgun domain
 
-function sendMsg($to, $first_name, $vars, $override = '') {
+function sendMsg($to, $first_name, $vars, $override = '', $subject_override = '') {
     global $client, $mailgunApiKey, $mailgunDomain, $trainer_contact_email, $lead_trainer, $training_title, $training_type;
     $first_name = trim($first_name);
     if ($first_name === '') {
@@ -49,7 +50,8 @@ function sendMsg($to, $first_name, $vars, $override = '') {
     $body = <<<EOT
 Hi there {$first_name},
 
-Thank you again for registering for our {$vars['title']} workshop!
+Thank you again for registering for our {$vars['title']} event!
+
 
 This is a reminder that today, at {$vars['time_txt']} the {$training_type} begins!
 
@@ -61,7 +63,7 @@ The training is on Zoom.  Here's the full zoom link and invite you will need to 
 
 ------------------------
 
-We will be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.
+We'll be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.
 
 Meanwhile, we're also setting up a support chat for the week.  I don't know about you, but I've got a lot of plastic saved up and it needs packing.  So after the workshop we're going to use the group to let you (and us!) share our ecobricking progress and ask questions.
 
@@ -83,6 +85,8 @@ EOT;
 
     $html = nl2br($body);
 
+    $subject = $subject_override !== '' ? $subject_override : "Reminder: {$training_title} starts today";
+
     try {
         $response = $client->post("{$mailgunDomain}/messages", [
             'auth' => ['api', $mailgunApiKey],
@@ -91,7 +95,7 @@ EOT;
                 'to' => $to,
                 'cc' => $trainer_contact_email,
                 'bcc' => 'russmaier@gmail.com',
-                'subject' => "Reminder: {$training_title} starts today",
+                'subject' => $subject,
                 'html' => $html,
                 'text' => $body,
                 'h:Reply-To' => $trainer_contact_email,
@@ -112,7 +116,7 @@ $messages = [];
 $success = true;
 
 if ($test) {
-    $ok = sendMsg($trainer_contact_email, $lead_trainer, $vars, $custom_message);
+    $ok = sendMsg($trainer_contact_email, $lead_trainer, $vars, $custom_message, $custom_title);
     $success = $ok;
     $messages[] = $ok ? "Test sent to $trainer_contact_email" : "Failed to send test";
 } else {
@@ -122,7 +126,7 @@ if ($test) {
     $stmt->execute();
     $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) {
-        $ok = sendMsg($row['email_addr'], $row['first_name'], $vars, $custom_message);
+        $ok = sendMsg($row['email_addr'], $row['first_name'], $vars, $custom_message, $custom_title);
         $messages[] = $ok ? "Sent to {$row['email_addr']}" : "Failed to {$row['email_addr']}";
         if (!$ok) $success = false;
     }

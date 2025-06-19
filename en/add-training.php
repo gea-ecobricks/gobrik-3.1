@@ -313,26 +313,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 
 
-<div class="form-item">
-    <label for="featured_description" data-lang-id="014-feature-description">Featured Description:</label><br>
-    <textarea id="featured_description" name="featured_description"
-              placeholder="Write a compelling description for this training..."
-              rows="5"><?php echo htmlspecialchars($featured_description ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-    <p class="form-caption" data-lang-id="014-training-description">This text is shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
-<!--ERRORS-->
-                    <div id="featured-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                    <div id="featured-error-long" class="form-field-error" data-lang-id="000-field-summary-too-long-error">Your training summary is too long. Max 255 characters.</div>
-                    <div id="featured-error-invalid" class="form-field-error" data-lang-id="005b-training-summary-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
-                </div>
-
-
-    <div class="form-item">
-        <label for="training_agenda" data-lang-id="015-title-training-agenda">Training Agenda:</label><br>
-        <textarea id="training_agenda" name="training_agenda"><?php echo htmlspecialchars($training_agenda ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-            <p class="form-caption" data-lang-id="015-training-agenda">Optional: Please layout the agenda that your training followed. Max 1000 words. You may not need to update this field as it was shown on the registration page to describe the training. Basic HTML formatting allowed.</p>
-<!--ERRORS-->
-                    <div id="agenda-error-long" class="form-field-error" data-lang-id="000-long-field-too-long-error">Your training agenda is too long. Maximum 2000 characters.</div>
-                </div>
 
 <br><br>
 <hr>
@@ -419,13 +399,21 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </p>
     </div>
 
-    <!-- Ready to Show -->
-    <div class="form-item">
+    <!-- ======================= Ready to Show Toggle ======================= -->
+    <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
+        <div id="left-colum" style="width: 100%;">
+            <label>🚀 Publish this training publicly?</label>
+            <p class="form-caption" style="margin-top:10px;">Display the final training report of this training on ecobricks.org</p>
+        </div>
 
-        <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
-               <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
-               <label for="ready_to_show" data-lang-id="024-title-show">🚀 Publish this training publicly?</label><br>
-        <p class="form-caption" data-lang-id="022-training-show">Is this training ready to be displayed on ecobricks.org?  If so, we'll post the completed workshop for to the live feed of GEA trainings.  Don't worry you can always come back here to edit the live listing!</p>
+        <div id="right-column" style="width:100px; justify-content:center;">
+            <label class="toggle-switch">
+            <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
+                   <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+            <span class="slider"></span>
+        </div>
+        </label>
+
     </div>
 <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
@@ -615,10 +603,6 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     // 🔹 14. Training Location (Required)
     var trainingLocation = document.getElementById('training_location').value.trim();
 //     displayError('location-error-required', trainingLocation === '');
-
-    // 🔹 15. Featured Description (Optional, Max 255 chars)
-    var featuredDescription = document.getElementById('featured_description').value.trim();
-    displayError('featured-error-long', featuredDescription.length > 2000);
 
     // ✅ Scroll to First Error if any
     if (!isValid) {

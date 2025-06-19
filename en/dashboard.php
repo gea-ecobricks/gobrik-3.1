@@ -169,8 +169,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
-                <span style="margin-right:10px;">👍</span>
-                <span> Free Intro to Ecobrick course today!  <a href="register.php?id=917">Register</a></span>
+                <span style="margin-right:10px;">🌟</span>
+                <span> A new community event on the meaning of Ayyew has been listed.  <a href="https://gobrik.com/en/register.php?id=913">Register</a></span>
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">
@@ -602,11 +602,14 @@ function openTraineeSender(trainingId) {
                 return;
             }
 
-            const msg = `Hi there $first_name,\n\nThank you again for registering for our ${escapeHTML(data.training_title)}!  \n\nThis is a reminder that today, at ${escapeHTML(data.training_time_txt)} the workshop begins!\n\nThe training is on Zoom.  Here's the full zoom link and invite you will need to access:\n\n${escapeHTML(data.zoom_link_full)}\n\nWe'll be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.\n\nMeanwhile, we're also setting up a support chat for the week.  I don't know about you, but I've got a lot of plastic saved up and it needs packing.  So after the workshop we're going to use the group to let you (and us!) share our ecobricking progress and ask questions.\n\nWe do our best to avoid meta products in the same way we avoid single-use plastic products, so sorry no whatsapp.  We use Signal (a free, open-source, foundation-run equivalent).  Click the link to join the group now or after the workshop:\n\nhttps://signal.group/#CjQKICIVvzmbBXqB7_9-5XyXd53zbdw7RLqVWKbQ8UzX2EkREhC0_jo3SCAr40xIO_jePrmT\n\nUnlike some of our GEA workshops, no need to bring anything to this workshop except your curiousity.  It will be interactive, so be prepared to share and anwser questions via mic and via chat.\n\nAlright, see you soon!\n\n${escapeHTML(data.lead_trainer)}`;
+            const msg = `Hi there $first_name,\n\nThank you again for registering for our ${escapeHTML(data.training_title)} event!  \n\nThis is a reminder that today, at ${escapeHTML(data.training_time_txt)} the ${escapeHTML(data.training_type)} begins!\n\nThe training is on Zoom.  Here's the full zoom link and invite you will need to access:\n\n------------------------\n\n${escapeHTML(data.zoom_link_full)}\n\n------------------------\n\nWe'll be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.\n\nMeanwhile, we're also setting up a support chat for the week.  I don't know about you, but I've got a lot of plastic saved up and it needs packing.  So after the workshop we're going to use the group to let you (and us!) share our ecobricking progress and ask questions.\n\nWe do our best to avoid meta products in the same way we avoid single-use plastic products, so sorry no whatsapp.  We use Signal (a free, open-source, foundation-run equivalent).  Click the link to join the group now or after the workshop:\n\nhttps://signal.group/#CjQKICIVvzmbBXqB7_9-5XyXd53zbdw7RLqVWKbQ8UzX2EkREhC0_jo3SCAr40xIO_jePrmT\n\nUnlike some of our GEA workshops, no need to bring anything to this workshop except your curiousity.  It will be interactive, so be prepared to share and anwser questions via mic and via chat.\n\nAlright, see you soon!\n\n${escapeHTML(data.lead_trainer)}\n${escapeHTML(data.trainer_contact_email)}`;
+
+            const defaultTitle = `Reminder: ${escapeHTML(data.training_title)} starts today`;
 
             modalBox.innerHTML = `
                 <h4 style="text-align:center;">Send a message to Participants</h4>
                 <p style="text-align:center;">Use this quick tool and default message to send a message to everyone who has signed up for the training</p>
+                <input id="trainee-title" type="text" style="width:100%;margin-bottom:10px;" value="${defaultTitle}" />
                 <textarea id="trainee-message" style="white-space:pre-wrap;text-align:left;width:100%;height:260px;">${msg}</textarea>
                 <button id="trainee-test-send" class="confirm-button enabled" style="min-width:360px;margin-top:10px;">Test to: ${escapeHTML(data.trainer_contact_email)}</button>
                 <button id="trainee-all-send" class="confirm-button enabled" style="min-width:360px;margin-top:10px;">Send Email to All</button>
@@ -634,6 +637,7 @@ function sendTraineeEmails(trainingId, isTest) {
         body: new URLSearchParams({
             training_id: trainingId,
             test: isTest ? 1 : 0,
+            title: document.getElementById('trainee-title').value,
             message: document.getElementById('trainee-message').value
         })
     })

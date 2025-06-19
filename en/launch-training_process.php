@@ -165,7 +165,7 @@ if ($editing) {
             training_type, training_language, briks_made, avg_brik_weight, training_location, training_summary, training_agenda, training_success, training_challenges,
             training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, show_report, show_signup_count, featured_description, community_id,
             zoom_link, zoom_link_full, registration_scope, trainer_contact_email, cost, currency, display_cost)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $gobrik_conn->prepare($sql);
     if (!$stmt) {
         echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
