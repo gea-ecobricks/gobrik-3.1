@@ -37,8 +37,7 @@ $gobrik_conn->close();
 <head>
 <meta charset="UTF-8">
 <?php require_once("../includes/courses-inc.php"); ?>
-    <div class="splash-title-block"></div>
-    <div id="splash-bar"></div>
+
     <!-- PAGE CONTENT -->
     <div id="top-page-image" class="credentials-banner top-page-image"></div>
     <div id="form-submission-box" class="landing-page-form">
