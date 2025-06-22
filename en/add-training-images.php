@@ -382,7 +382,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </div>
     <div id="upload-success-message"></div>
     <a class="confirm-button" target="_blank" href="https://ecobricks.org/en/training.php?training_id=<?php echo $_GET['training_id']; ?>" data-lang-id="013-view-training-post">🎉 View Training Post</a>
-    <a class="confirm-button" data-lang-id="014-edit-training" href="add-training.php?training_id=<?php echo $_GET['training_id']; ?>">Edit Training Post</a>
+    <a class="confirm-button" data-lang-id="014-edit-training" href="training-report.php?training_id=<?php echo $_GET['training_id']; ?>">Edit Training Post</a>
 
     <form id="deleteForm" action="" method="POST">
         <input type="hidden" name="training_id" value="<?php echo htmlspecialchars($_GET['training_id']); ?>">
@@ -639,7 +639,7 @@ function uploadSuccess(data) {
     successMessage += galleryHTML;
 
     // ✅ Add "Next Training" button
-    successMessage += `<a class="confirm-button" href="add-training.php">${selectedMessage.button}</a>`;
+    successMessage += `<a class="confirm-button" href="training-report.php">${selectedMessage.button}</a>`;
 
     // ✅ Update the success div content
     var uploadSuccessDiv = document.getElementById('upload-success');

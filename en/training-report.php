@@ -5,7 +5,7 @@ require_once '../earthenAuth_helper.php'; // Authentication helper
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.63';
-$page = 'add-training';
+$page = 'training-report';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 ob_start(); // Prevent output before headers
@@ -120,7 +120,7 @@ if (!empty($community_id)) {
     : "Log your GEA workshop. Reports will be featured on the front page of Ecobricks.org and shareable on social media."; ?>">
 
 <!-- Facebook Open Graph Tags for social sharing -->
-<meta property="og:url" content="https://www.gobrik.com/<?php echo $lang; ?>/add-report.php">
+<meta property="og:url" content="https://www.gobrik.com/<?php echo $lang; ?>/training-report.php">
 <meta property="og:type" content="website">
 <meta property="og:title" content="<meta property="og:title" content="<?php echo !empty($training_title) ? 'Log: ' . $training_title : 'Log your Training Report'; ?>">
 ">
@@ -420,6 +420,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 <!--     <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
 <!--     <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
+<?php if ($editing): ?>
+<div>
+    <button type='submit' id='save-progress' class='confirm-button' style='background:grey'>Save Progress</button>
+</div>
+<?php endif; ?>
 
 <div>
     <input type="submit" value="Next: Upload Photos ➡️" data-lang-id="100-submit-report-1">
@@ -509,12 +514,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+
 document.getElementById('submit-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent default form submission
-        var isValid = true;
+    event.preventDefault();
+    var redirectToPhotos = !(event.submitter && event.submitter.id === 'save-progress');
+    var submitButton = event.submitter || document.querySelector('input[type="submit"]');
+    var isValid = true;
     var trainingIdField = document.getElementById('training_id');
     var trainingId = trainingIdField ? trainingIdField.value.trim() : "";
-
 
     function displayError(elementId, showError) {
         var errorDiv = document.getElementById(elementId);
@@ -525,86 +532,52 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     }
 
     function hasInvalidChars(value) {
-        const invalidChars = /[<>]/; // Prevents only dangerous characters
+        const invalidChars = /[<>]/;
         return invalidChars.test(value);
     }
 
-    // 🔹 1. Training Title (Max 500 chars)
     var trainingTitle = document.getElementById('training_title').value.trim();
-//     displayError('title-error-required', trainingTitle === '');
     displayError('title-error-long', trainingTitle.length > 500);
     displayError('title-error-invalid', hasInvalidChars(trainingTitle));
 
-    // 🔹 2. Training Date (Required)
     var trainingDate = document.getElementById('training_date').value.trim();
-//     displayError('date-error-required', trainingDate === '');
 
-    // 🔹 3. Number of Participants (Required, 1 - 5000)
     var noParticipants = parseInt(document.getElementById('no_participants').value, 10);
     if (isNaN(noParticipants) || noParticipants === '') {
-//         displayError('participants-error-required', true);
         displayError('participants-error-range', false);
     } else if (noParticipants < 1 || noParticipants > 5000) {
-//         displayError('participants-error-required', false);
         displayError('participants-error-range', true);
     } else {
-//         displayError('participants-error-required', false);
         displayError('participants-error-range', false);
     }
 
-    // 🔹 4. Lead Trainer (Required)
     var leadTrainer = document.getElementById('lead_trainer').value.trim();
-//     displayError('trainer-error-required', leadTrainer === '');
-
-    // 🔹 5. Training Community (Required)
     var communityId = document.getElementById('community_id').value.trim();
-//     displayError('community-error-required', communityId === '');
-
-    // 🔹 6. Training Type (Required)
     var trainingType = document.getElementById('training_type').value;
-//     displayError('type-error-required', trainingType === "");
 
-    // 🔹 7. Briks Made (Min 0)
     var briksMade = parseInt(document.getElementById('briks_made').value, 10);
-//     displayError('briks-error-required', isNaN(briksMade) || briksMade < 0 || briksMade > 5000);
-
-    // 🔹 8. Average Brik Weight (Min 0)
     var avgBrikWeight = parseInt(document.getElementById('avg_brik_weight').value, 10);
-//     displayError('weight-error-required', isNaN(avgBrikWeight) || avgBrikWeight < 0 || avgBrikWeight > 2000);
 
-    // 🔹 9. Training Country (Required)
     var trainingCountry = document.getElementById('country_id').value.trim();
-//     displayError('country-error-required', trainingCountry === '');
 
-    // 🔹 10. Training Summary (Required, Max 2000 chars)
     var trainingSummary = document.getElementById('training_summary').value.trim();
-//     displayError('summary-error-required', trainingSummary === '');
     displayError('summary-error-long', trainingSummary.length > 2000);
     displayError('summary-error-invalid', hasInvalidChars(trainingSummary));
 
-    // 🔹 11. Training Success (Required, Max 2000 chars)
     var trainingSuccess = document.getElementById('training_success').value.trim();
-//     displayError('success-error-required', trainingSuccess === '');
     displayError('success-error-long', trainingSuccess.length > 2000);
     displayError('success-error-invalid', hasInvalidChars(trainingSuccess));
 
-    // 🔹 12. Training Challenges (Required, Max 2000 chars)
     var trainingChallenges = document.getElementById('training_challenges').value.trim();
-//     displayError('challenges-error-required', trainingChallenges === '');
     displayError('challenges-error-long', trainingChallenges.length > 2000);
     displayError('challenges-error-invalid', hasInvalidChars(trainingChallenges));
 
-    // 🔹 13. Lessons Learned (Required, Max 2000 chars)
     var trainingLessons = document.getElementById('training_lessons_learned').value.trim();
-//     displayError('lessons-error-required', trainingLessons === '');
     displayError('lessons-error-long', trainingLessons.length > 2000);
     displayError('lessons-error-invalid', hasInvalidChars(trainingLessons));
 
-    // 🔹 14. Training Location (Required)
     var trainingLocation = document.getElementById('training_location').value.trim();
-//     displayError('location-error-required', trainingLocation === '');
 
-    // ✅ Scroll to First Error if any
     if (!isValid) {
         var firstError = document.querySelector('.form-field-error:not([style*="display: none"])');
         if (firstError) {
@@ -612,40 +585,43 @@ document.getElementById('submit-form').addEventListener('submit', function(event
             var relatedInput = firstError.closest('.form-item').querySelector('input, select, textarea');
             if (relatedInput) relatedInput.focus();
         }
-        return; // Stop execution if validation fails
+        return;
     }
 
-    // ✅ Proceed with AJAX Submission
-// ✅ Prepare Form Data for Submission
     var formData = new FormData(this);
-    var submitButton = document.querySelector('input[type="submit"]');
     var originalButtonText = submitButton.value;
-    submitButton.value = "Processing...";
+    submitButton.value = 'Processing...';
     submitButton.disabled = true;
 
     fetch(this.action, {
-        method: "POST",
+        method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            var newTrainingId = data.training_id || trainingId; // Use returned ID or existing one
-            window.location.href = "add-training-images.php?training_id=" + newTrainingId;
+            var newTrainingId = data.training_id || trainingId;
+            trainingIdField.value = newTrainingId;
+            if (redirectToPhotos) {
+                window.location.href = 'add-training-images.php?training_id=' + newTrainingId;
+            } else {
+                submitButton.value = originalButtonText;
+                submitButton.disabled = false;
+                alert('Progress saved!');
+            }
         } else {
-            alert("Error: " + (data.error || "An unknown error occurred."));
+            alert('Error: ' + (data.error || 'An unknown error occurred.'));
             submitButton.value = originalButtonText;
             submitButton.disabled = false;
         }
     })
     .catch(error => {
-        console.error("Submission error:", error);
-        alert("There was a problem submitting the form.");
+        console.error('Submission error:', error);
+        alert('There was a problem submitting the form.');
         submitButton.value = originalButtonText;
         submitButton.disabled = false;
     });
 });
-
 
 
 
