@@ -609,6 +609,11 @@ if (!empty($community_id)) {
     <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
     <!-- ======================= Submit Button ======================= -->
+    <?php if ($editing): ?>
+    <div>
+        <button type='submit' id='save-progress' class='confirm-button' style='background:grey;width: 100%;margin: 30px 0px -15px 0px;'>💾 Save Progress</button>
+    </div>
+    <?php endif; ?>
     <div>
         <input type="submit" value="<?php echo $editing ? '💾 Save Changes to Training' : '➕ Create Training!'; ?>" data-lang-id="100-submit-report-1">
     </div>

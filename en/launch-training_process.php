@@ -23,6 +23,17 @@ if ($training_id <= 0 && isset($_GET['id'])) {
 }
 $editing = ($training_id > 0);
 
+// Default to existing values for certain fields when not posted
+$existing_summary = $existing_success = $existing_challenges = $existing_lessons = '';
+if ($editing) {
+    $stmt_existing = $gobrik_conn->prepare("SELECT training_summary, training_success, training_challenges, training_lessons_learned FROM tb_trainings WHERE training_id=?");
+    $stmt_existing->bind_param("i", $training_id);
+    $stmt_existing->execute();
+    $stmt_existing->bind_result($existing_summary, $existing_success, $existing_challenges, $existing_lessons);
+    $stmt_existing->fetch();
+    $stmt_existing->close();
+}
+
 $training_title = trim($_POST['training_title'] ?? '');
 $training_subtitle = trim($_POST['training_subtitle'] ?? '');
 $training_date = trim($_POST['training_date'] ?? '');
@@ -41,11 +52,11 @@ $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
 $show_report = isset($_POST['show_report']) ? 1 : 0;
 $show_signup_count = isset($_POST['show_signup_count']) ? 1 : 0;
 $featured_description = trim($_POST['featured_description'] ?? '');
-$training_summary = trim($_POST['training_summary'] ?? '');
+$training_summary = isset($_POST['training_summary']) ? trim($_POST['training_summary']) : $existing_summary;
 $training_agenda = trim($_POST['training_agenda'] ?? '');
-$training_success = trim($_POST['training_success'] ?? '');
-$training_challenges = trim($_POST['training_challenges'] ?? '');
-$training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
+$training_success = isset($_POST['training_success']) ? trim($_POST['training_success']) : $existing_success;
+$training_challenges = isset($_POST['training_challenges']) ? trim($_POST['training_challenges']) : $existing_challenges;
+$training_lessons_learned = isset($_POST['training_lessons_learned']) ? trim($_POST['training_lessons_learned']) : $existing_lessons;
 $training_location = trim($_POST['training_location'] ?? '');
 $training_type = trim($_POST['training_type'] ?? '');
 $training_language = trim($_POST['training_language'] ?? 'en');
