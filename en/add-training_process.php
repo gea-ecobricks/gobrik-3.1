@@ -35,8 +35,8 @@ $youtube_result_video = trim($_POST['youtube_result_video'] ?? '');
 $moodle_url = trim($_POST['moodle_url'] ?? '');
 $ready_to_show = isset($_POST['ready_to_show']) ? 1 : 0;
 $featured_description = trim($_POST['featured_description'] ?? '');
-$training_summary = trim($_POST['training_summary'] ?? '');
-$training_agenda = trim($_POST['training_agenda'] ?? '');
+$training_summary = isset($_POST['training_summary']) ? trim($_POST['training_summary']) : null;
+$training_agenda = isset($_POST['training_agenda']) ? trim($_POST['training_agenda']) : null;
 $training_success = trim($_POST['training_success'] ?? '');
 $training_challenges = trim($_POST['training_challenges'] ?? '');
 $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
@@ -57,6 +57,23 @@ if ($community_id !== null) {
         $community_id = null;
     }
     $stmt->close();
+}
+
+// Preserve existing fields when not provided in the form
+if ($editing) {
+    $stmt = $gobrik_conn->prepare("SELECT training_summary, training_agenda FROM tb_trainings WHERE training_id = ?");
+    $stmt->bind_param("i", $training_id);
+    $stmt->execute();
+    $stmt->bind_result($existing_summary, $existing_agenda);
+    $stmt->fetch();
+    $stmt->close();
+
+    if ($training_summary === null) {
+        $training_summary = $existing_summary;
+    }
+    if ($training_agenda === null) {
+        $training_agenda = $existing_agenda;
+    }
 }
 
 if ($editing) {
