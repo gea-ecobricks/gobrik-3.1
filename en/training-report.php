@@ -151,19 +151,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <!--PART 5 TOP DECORATION-->
     <?php require_once ("../includes/add-training-inc.php");?>
 
-    <div class="splash-content-block"></div>
-    <div id="splash-bar"></div>
 
     <!-- PAGE CONTENT-->
 
     <div id="form-submission-box">
         <div class="form-container">
-            <div class="form-top-header" style="display:flex;flex-flow:row;">
-                <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
-                    <img src="../svgs/step1-log-project.svg" style="height:25px;">
-                </div>
-                <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages">🌐<span data-lang-id="000-language-code"> EN</span></div>
-            </div>
 
             <div class="splash-form-content-block">
                 <div class="splash-box">
@@ -422,12 +414,12 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <!--     <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
 <?php if ($editing): ?>
 <div>
-    <button type='submit' id='save-progress' class='confirm-button' style='background:grey'>Save Progress</button>
+    <button type='submit' id='save-progress' class='confirm-button' style='background:grey;width: 100%;margin: 30px 0px -15px 0px;'>💾 Save Progress</button>
 </div>
 <?php endif; ?>
 
 <div>
-    <input type="submit" value="Next: Upload Photos ➡️" data-lang-id="100-submit-report-1">
+    <input type="submit" value="➡ Next: Upload Photos ️" data-lang-id="100-submit-report-1">
 </div>
 
 
