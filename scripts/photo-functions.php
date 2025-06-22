@@ -278,7 +278,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $training_id = $_POST['training_id'];
     $deleteResult = deleteTraining($training_id, $conn);
     if ($deleteResult === true) {
-        echo "<script>alert('Training has been successfully deleted.'); window.location.href='add-training.php';</script>";
+        echo "<script>alert('Training has been successfully deleted.'); window.location.href='training-report.php';</script>";
         exit;
     } else {
         echo "<script>alert('" . $deleteResult . "');</script>";

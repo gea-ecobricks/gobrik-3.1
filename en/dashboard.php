@@ -242,7 +242,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <a href="bug-report.php" class="page-button">Report a Bug</a>
             <a href="accounting.php" class="page-button">GEA Accounting</a>
             <a href="launch-training.php" class="page-button">Launch a training</a>
-            <a href="add-training.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">Log Training Report</a>
+            <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">Log Training Report</a>
             <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training" style="margin: 10px;">+ Set Buwana Totem</a>
 
 
@@ -297,7 +297,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
                     <!-- New Report Column -->
                     <td style="text-align:center;">
-                        <a href="add-training.php?training_id=<?php echo $training['training_id']; ?>" class="log-report-btn">
+                        <a href="training-report.php?training_id=<?php echo $training['training_id']; ?>" class="log-report-btn">
                             Log Report
                         </a>
                     </td>
