@@ -148,7 +148,7 @@ require_once 'live-newsletter.php';  //the newsletter html
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
-    $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null;
+$subscriber_id = isset($_POST['subscriber_id']) ? intval($_POST['subscriber_id']) : null;
     $is_test_mode = isset($_POST['test_mode']) && $_POST['test_mode'] == '1';
 
     if (!empty($email_html) && !empty($recipient_email) && ($subscriber_id || $is_test_mode)) {
@@ -340,7 +340,7 @@ echo '<!DOCTYPE html>
     <p><strong>Subject:</strong> <?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></p>
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
-
+<input type="hidden" id="subscriber_id" name="subscriber_id" value="">
     <!-- Hidden field for recipient email
         <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
 -->
