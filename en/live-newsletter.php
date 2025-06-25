@@ -160,11 +160,6 @@ $email_template = <<<HTML
 </td>
 </tr>
 
-
-
-
-
-
             <!-- Subscription footer -->
             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: separate; width: 100%;">
                 <tr>
