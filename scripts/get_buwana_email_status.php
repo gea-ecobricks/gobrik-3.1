@@ -19,7 +19,7 @@ try {
 
     $pending_sql = "SELECT buwana_id, email, full_name, bot_score, test_sent, test_sent_date_time
                     FROM users_tb
-                    WHERE test_sent = 0 AND processing IS NULL
+                    WHERE test_sent = 0 AND (processing IS NULL OR processing = 0)
                     ORDER BY created_at DESC
                     LIMIT {$pending_limit}";
     $pending_res = $buwana_conn->query($pending_sql);

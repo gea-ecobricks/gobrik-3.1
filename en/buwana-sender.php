@@ -111,8 +111,8 @@ $pending_limit = $status_limit - $sent_count;
 
 $query_pending = "SELECT buwana_id, email, full_name, bot_score, test_sent, test_sent_date_time
                  FROM users_tb
-                 WHERE test_sent = 0 AND processing IS NULL
-                ORDER BY created_at DESC
+                 WHERE test_sent = 0 AND (processing IS NULL OR processing = 0)
+                 ORDER BY created_at DESC
                  LIMIT {$pending_limit}";
 $pending_result = $buwana_conn->query($query_pending);
 $pending_members = $pending_result ? $pending_result->fetch_all(MYSQLI_ASSOC) : [];
@@ -121,8 +121,8 @@ $all_members = array_merge($sent_members, $pending_members);
 
 // Processing stats for Chart.js
 $processing_query = "SELECT
-    SUM(CASE WHEN processing IS NULL THEN 1 ELSE 0 END) AS null_count,
-    SUM(CASE WHEN processing = 0 THEN 1 ELSE 0 END) AS delivered_count,
+    SUM(CASE WHEN (processing IS NULL OR processing = 0) AND test_sent = 0 THEN 1 ELSE 0 END) AS null_count,
+    SUM(CASE WHEN processing = 0 AND test_sent = 1 THEN 1 ELSE 0 END) AS delivered_count,
     SUM(CASE WHEN processing = 1 THEN 1 ELSE 0 END) AS sending_count,
     SUM(CASE WHEN processing = 2 THEN 1 ELSE 0 END) AS failed_immediate_count,
     SUM(CASE WHEN processing = 3 THEN 1 ELSE 0 END) AS failed_later_count
