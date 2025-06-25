@@ -98,7 +98,7 @@ $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) *
 $status_limit = 20; // total rows to display in the status table
 $sent_limit = 4;    // number of most recent sent entries
 
-$query_sent = "SELECT buwana_id AS id, email, full_name AS name, email_open_rate, test_sent, test_sent_date_time
+$query_sent = "SELECT buwana_id AS id, email, full_name AS name, bot_score, test_sent, test_sent_date_time
                FROM users_tb
                WHERE test_sent = 1
                ORDER BY test_sent_date_time DESC
@@ -109,11 +109,11 @@ $sent_count = count($sent_members);
 
 $pending_limit = $status_limit - $sent_count;
 
-$query_pending = "SELECT buwana_id AS id, email, full_name AS name, email_open_rate, test_sent, test_sent_date_time
-                  FROM users_tb
-                  WHERE test_sent = 0 AND processing IS NULL
-                  ORDER BY created_at ASC
-                  LIMIT {$pending_limit}";
+$query_pending = "SELECT buwana_id AS id, email, full_name AS name, bot_score, test_sent, test_sent_date_time
+                 FROM users_tb
+                 WHERE test_sent = 0 AND processing IS NULL
+                 ORDER BY created_at ASC
+                 LIMIT {$pending_limit}";
 $pending_result = $buwana_conn->query($query_pending);
 $pending_members = $pending_result ? $pending_result->fetch_all(MYSQLI_ASSOC) : [];
 
@@ -377,7 +377,7 @@ echo '<!DOCTYPE html>
             <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Open Rate</th>
+                <th>🤖</th>
                 <th>Sent Date</th>
                 <th>Sent</th>
             </tr>
@@ -387,7 +387,7 @@ echo '<!DOCTYPE html>
                 <tr>
                     <td><?php echo htmlspecialchars($member['name']); ?></td>
                     <td><?php echo htmlspecialchars($member['email']); ?></td>
-                    <td><?php echo $member['email_open_rate'] ?? '0%'; ?></td>
+                    <td><?php echo $member['bot_score'] ?? '0'; ?></td>
                     <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
                     <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
                 </tr>
@@ -465,7 +465,7 @@ $(document).ready(function () {
                 const rows = resp.members.map(m => [
                     m.name,
                     m.email,
-                    m.email_open_rate || '0%',
+                    m.bot_score || '0',
                     m.test_sent_date_time || 'N/A',
                     m.test_sent == 1 ? '✅' : '❌'
                 ]);
