@@ -35,7 +35,7 @@ try {
 
     // First check if there is already a recipient marked as processing
     $processing_sql = "
-        SELECT buwana_id AS id, email, full_name AS name
+        SELECT buwana_id, email, full_name
         FROM users_tb
         WHERE test_sent = 0 AND processing = 1
         ORDER BY created_at DESC
@@ -47,7 +47,7 @@ try {
 
     if ($result && $result->num_rows > 0) {
         $subscriber = $result->fetch_assoc();
-        $_SESSION['locked_subscriber_id'] = $subscriber['id'];
+        $_SESSION['locked_subscriber_id'] = $subscriber['buwana_id'];
 
         // Commit lock
         $buwana_conn->commit();
@@ -71,7 +71,7 @@ try {
     } else {
         // No current processing recipient, fetch a new one
         $new_sql = "
-            SELECT buwana_id AS id, email, full_name AS name
+            SELECT buwana_id, email, full_name
             FROM users_tb
             WHERE test_sent = 0 AND processing IS NULL
             ORDER BY created_at DESC
@@ -83,7 +83,7 @@ try {
 
         if ($new_res && $new_res->num_rows > 0) {
             $subscriber = $new_res->fetch_assoc();
-            $_SESSION['locked_subscriber_id'] = $subscriber['id'];
+            $_SESSION['locked_subscriber_id'] = $subscriber['buwana_id'];
 
             $buwana_conn->commit();
 

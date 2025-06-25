@@ -6,7 +6,7 @@ try {
     $status_limit = 20;
     $sent_limit = 4;
 
-    $sent_sql = "SELECT buwana_id AS id, email, full_name AS name, bot_score, test_sent, test_sent_date_time
+    $sent_sql = "SELECT buwana_id, email, full_name, bot_score, test_sent, test_sent_date_time
                    FROM users_tb
                    WHERE test_sent = 1
                    ORDER BY test_sent_date_time DESC
@@ -17,7 +17,7 @@ try {
 
     $pending_limit = $status_limit - $sent_count;
 
-    $pending_sql = "SELECT buwana_id AS id, email, full_name AS name, bot_score, test_sent, test_sent_date_time
+    $pending_sql = "SELECT buwana_id, email, full_name, bot_score, test_sent, test_sent_date_time
                     FROM users_tb
                     WHERE test_sent = 0 AND processing IS NULL
                     ORDER BY created_at DESC
