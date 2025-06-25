@@ -20,7 +20,7 @@ try {
     $pending_sql = "SELECT buwana_id AS id, email, full_name AS name, bot_score, test_sent, test_sent_date_time
                     FROM users_tb
                     WHERE test_sent = 0 AND processing IS NULL
-                    ORDER BY created_at ASC
+                    ORDER BY created_at DESC
                     LIMIT {$pending_limit}";
     $pending_res = $buwana_conn->query($pending_sql);
     $pending_members = $pending_res ? $pending_res->fetch_all(MYSQLI_ASSOC) : [];

@@ -38,7 +38,7 @@ try {
         SELECT buwana_id AS id, email, full_name AS name
         FROM users_tb
         WHERE test_sent = 0 AND processing = 1
-        ORDER BY created_at ASC
+        ORDER BY created_at DESC
         LIMIT 1
         FOR UPDATE
     ";
@@ -74,7 +74,7 @@ try {
             SELECT buwana_id AS id, email, full_name AS name
             FROM users_tb
             WHERE test_sent = 0 AND processing IS NULL
-            ORDER BY created_at ASC
+            ORDER BY created_at DESC
             LIMIT 1
             FOR UPDATE
         ";
