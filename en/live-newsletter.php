@@ -144,19 +144,28 @@ $email_template = <<<HTML
 
 <p>We’re also pleased to announce another introduction to Ecobrick course which will run on July 19:</p>
 <!-- Start Ecobricks Card -->
-<div class="kg-card kg-bookmark-card" style="background: #ffffff; border: 1px solid #e0e7eb; border-radius: 3px; margin: 0 0 1.5em;">
-<a class="kg-bookmark-container" href="https://earthen.io/r/33183cd9?m=611f7d90-e87c-4c43-ab51-0772a7883703" target="_blank" style="display: flex; padding: 20px; text-decoration: none;">
-<div class="kg-bookmark-content" style="width: 100%;">
-<div class="kg-bookmark-title" style="font-weight: 600; font-size: 15px; color: #15212A;">Plastic, the Biosphere and Ecobricks</div>
-<div class="kg-bookmark-description" style="margin-top: 12px; font-size: 13px; color: #73818c;">Register for our Online Starter Workshop led by Paula Apollonia and Russell Maier on July 19, 2025</div>
-<div class="kg-bookmark-metadata" style="margin-top: 14px; font-size: 13px; color: #15212A;">
-<img class="kg-bookmark-icon" src="https://earthen.io/content/images/icon/apple-icon-180x180-14.png" alt="" width="22" height="22" style="margin-right: 8px;">
-<span class="kg-bookmark-author">GoBrik.com</span>
-</div>
-</div>
-</a>
+<div class="kg-card kg-bookmark-card" style="background: #ffffff; border: 1px solid #e0e7eb; border-radius: 3px; margin: 0 0 1.5em; overflow: hidden;">
+  <a class="kg-bookmark-container" href="https://earthen.io/r/33183cd9?m=611f7d90-e87c-4c43-ab51-0772a7883703" target="_blank" style="display: flex; text-decoration: none; color: #15212A; font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
+
+    <!-- Left Content -->
+    <div class="kg-bookmark-content" style="width: 100%; padding: 20px; box-sizing: border-box;">
+      <div class="kg-bookmark-title" style="font-weight: 600; font-size: 15px; color: #15212A;">Plastic, the Biosphere and Ecobricks</div>
+      <div class="kg-bookmark-description" style="margin-top: 12px; font-size: 13px; color: #73818c;">Register for our Online Starter Workshop led by Paula Apollonia and Russell Maier on July 19, 2025</div>
+      <div class="kg-bookmark-metadata" style="margin-top: 14px; font-size: 13px; color: #15212A; display: flex; align-items: center;">
+        <img class="kg-bookmark-icon" src="https://earthen.io/content/images/icon/apple-icon-180x180-14.png" alt="" width="22" height="22" style="margin-right: 8px;">
+        <span class="kg-bookmark-author">GoBrik.com</span>
+      </div>
+    </div>
+
+    <!-- Right Thumbnail -->
+    <div class="kg-bookmark-thumbnail" style="min-width: 140px; max-width: 180px;">
+      <img src="https://earthen.io/content/images/thumbnail/starter-workshop-feature-1-en-2.webp" alt="Plastic, the Biosphere and Ecobricks" width="180" height="148" style="width: 100%; height: auto; display: block; border-left: 1px solid #e0e7eb;">
+    </div>
+
+  </a>
 </div>
 <!-- End Ecobricks Card -->
+
 
 <p>Hope to see you there.<br><br>The Earthen Team</p>
 </td>
