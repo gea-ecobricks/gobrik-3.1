@@ -37,7 +37,7 @@ try {
     $processing_sql = "
         SELECT buwana_id, email, full_name
         FROM users_tb
-        WHERE test_sent = 0 AND processing = 1
+        WHERE test_sent = 0 AND (processing IS NULL OR processing = 0)
         ORDER BY created_at DESC
         LIMIT 1
         FOR UPDATE
