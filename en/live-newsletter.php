@@ -125,3 +125,7 @@ $unsubscribe_link = isset($recipient_email)
 
 </body>
 </html>
+
+HTML;
+
+?>
