@@ -118,123 +118,28 @@ $email_template = <<<HTML
 <p>The term is coined by Russell and Irene who we will be interviewing about their theory of <em>Earthen Ethics</em> on June 29th. We'll talk about Irene's cyclocentric Igorot culture and her people's concept of Ayyew. Russell and Irene argue that concept of Ayyew (and the cyclocentric paradigm) are crucial for transitioning humanity to deep ecological integration.</p>
 <p>Course registration on GoBrik is now open and free:</p>
 
-<!--[if !mso !vml]-->
-    <div class=3D"kg-card kg-bookmark-card " style=3D"margin: 0 0 1=
-    .5em; padding: 0; width: 100%; background: #ffffff;">
-    <a class=3D"kg-bookmark-container" href=3D"https://earthen.=
-       io/r/db2774f1?m=3D611f7d90-e87c-4c43-ab51-0772a7883703" style=3D"display: f=
-    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob=
-    oto, Helvetica, Arial, sans-serif; border-radius: 3px; border: 1px solid #e=
-    0e7eb; overflow-wrap: anywhere; color: #4B8501; text-decoration: none;" tar=
-    get=3D"_blank">
-    <div class=3D"kg-bookmark-content" style=3D"display: in=
-            line-block; width: 100%; padding: 20px;">
-    <div class=3D"kg-bookmark-title" style=3D"color: #1=
-            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">An Intro to =
-    Ayyew &amp; Earthen Ethics</div>
-    <div class=3D"kg-bookmark-description" style=3D"dis=
-         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px; =
-                 color: #73818c; font-size: 13px; line-height: 1.5em; font-weight: 400; -web=
-                 kit-line-clamp: 2; -webkit-box-orient: vertical;">Register for our GEA Comm=
-    unity Event led by Ani Himawati and Lucie Mann on June 29, 2025</div>
-    <div class=3D"kg-bookmark-metadata" style=3D"displa=
-         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15=
-                 212A; font-size: 13px; font-weight: 400;">
-    <img class=3D"kg-bookmark-icon" src=3D"https://=
-         earthen.io/content/images/icon/apple-icon-180x180-13.png" alt style=3D"bord=
-    er: none; -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8=
-    px; width: 22px; height: 22px;" width=3D"22" height=3D"22">
-    <span class=3D"kg-bookmark-author" src=3D"GoBri=
-          k.com" style=3D"line-height: 1.5em;">GoBrik.com</span>
-    =20
+<!-- Start GoBrik Card -->
+<div class="kg-card kg-bookmark-card" style="margin: 0 0 1.5em; padding: 0; width: 100%; background: #ffffff; border: 1px solid #e0e7eb; border-radius: 3px;">
+  <a class="kg-bookmark-container" href="https://earthen.io/r/db2774f1?m=611f7d90-e87c-4c43-ab51-0772a7883703" target="_blank" style="display: flex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; border-radius: 3px; overflow-wrap: anywhere; color: #4B8501; text-decoration: none;">
+
+    <!-- Left Content -->
+    <div class="kg-bookmark-content" style="width: 100%; padding: 20px;">
+      <div class="kg-bookmark-title" style="color: #15212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">An Intro to Ayyew &amp; Earthen Ethics</div>
+      <div class="kg-bookmark-description" style="margin-top: 12px; color: #73818c; font-size: 13px; line-height: 1.5em;">Register for our GEA Community Event led by Ani Himawati and Lucie Mann on June 29, 2025</div>
+      <div class="kg-bookmark-metadata" style="display: flex; align-items: center; margin-top: 14px; color: #15212A; font-size: 13px;">
+        <img class="kg-bookmark-icon" src="https://earthen.io/content/images/icon/apple-icon-180x180-13.png" alt="" width="22" height="22" style="margin-right: 8px;">
+        <span class="kg-bookmark-author">GoBrik.com</span>
+      </div>
     </div>
+
+    <!-- Right Thumbnail -->
+    <div class="kg-bookmark-thumbnail" style="min-width: 140px; max-width: 180px; border-radius: 0 3px 3px 0;">
+      <img src="https://earthen.io/content/images/thumbnail/earthen-ethics-launch-1.web" alt="Earthen Ethics Launch" width="180" height="148" style="width: 100%; height: auto; border-radius: 0 3px 3px 0; display: block;">
     </div>
-    <div class=3D"kg-bookmark-thumbnail" style=3D"min-width=
-         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c=
-                 over; background-position: center; border-radius: 0 2px 2px 0; background-i=
-                 mage: url(&#39;https://earthen.io/content/images/thumbnail/earthen-ethics-l=
-    aunch-1.web&#39;);">
-    <img src=3D"https://earthen.io/content/images/thumb=
-         nail/earthen-ethics-launch-1.web" alt onerror=3D"this.style.display=3D&#39;=
-    none&#39;" style=3D"border: none; -ms-interpolation-mode: bicubic; max-widt=
-    h: 100%; display: none;"></div>
-    </a>
-    =20
-    </div>
-    <!--[endif]-->
-    <!--[if vml]>
-        <table class=3D"kg-card kg-bookmark-card--outlook" style=3D"mar=
-gin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ff=
-ffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, O=
-xygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border=
--collapse: collapse; border-spacing: 0;" width=3D"100%">
-            <tr>
-                <td width=3D"100%" style=3D"padding: 20px;">
-                    <table style=3D"margin: 0; padding: 0; border-colla=
-pse: collapse; border-spacing: 0;">
-                        <tr>
-                            <td class=3D"kg-bookmark-title--outlook">
-                                <a href=3D"https://gobrik.com/en/regist=
-er.php?id=3D913" style=3D"text-decoration: none; color: #15212A; font-size:=
-15px; line-height: 1.5em; font-weight: 600;">
-                                    An Intro to Ayyew &amp; Earthen Eth=
-ics
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class=3D"kg-bookmark-description--=
-outlook">
-                                    <a href=3D"https://gobrik.com/en/re=
-gister.php?id=3D913" style=3D"text-decoration: none; margin-top: 12px; colo=
-r: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
-                                        Register for our GEA Community =
-Event led by Ani Himawati and Lucie Mann on June 29, 2025
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class=3D"kg-bookmark-metadata--outlook"=
-style=3D"padding-top: 14px; color: #15212A; font-size: 13px; font-weight: =
-400; line-height: 1.5em;">
-                                <table style=3D"margin: 0; padding: 0; =
-border-collapse: collapse; border-spacing: 0;">
-                                    <tr>
-                                       =20
-                                            <td valign=3D"middle" class=
-=3D"kg-bookmark-icon--outlook" style=3D"padding-right: 8px; font-size: 0; l=
-ine-height: 1.5em;">
-                                                <a href=3D"https://gobr=
-ik.com/en/register.php?id=3D913" style=3D"text-decoration: none; color: #15=
-212A;">
-                                                    <img src=3D"https:/=
-/earthen.io/content/images/icon/apple-icon-180x180-13.png" width=3D"22" hei=
-ght=3D"22" alt=3D" ">
-                                                </a>
-                                            </td>
-                                       =20
-                                        <td valign=3D"middle" class=3D"=
-kg-bookmark-byline--outlook">
-                                            <a href=3D"https://gobrik.c=
-om/en/register.php?id=3D913" style=3D"text-decoration: none; color: #15212A=
-;">
-                                                GoBrik.com
-                                               =20
-                                               =20
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-        <div class=3D"kg-bookmark-spacer--outlook" style=3D"height: 1.5=
-em;">&nbsp;</div>
+
+  </a>
+</div>
+
 <!-- End GoBrik Card -->
 
 <p>We’re also pleased to announce another introduction to Ecobrick course which will run on July 19:</p>
