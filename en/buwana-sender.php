@@ -605,73 +605,156 @@ function fetchNextRecipient() {
 
 
 // 🟢 Shared send function
+
+
+
+
+
+    // 🟢 Shared send function
 function sendEmail() {
-    clearInterval(countdownInterval);
-    $('#countdown-timer').hide();
+        clearInterval(countdownInterval);
+        $('#countdown-timer').hide();
 
-    const emailBody = $('#email_html').val().trim();
-    const isTestMode = testSendEnabled() && !autoSendEnabled();
-    const targetEmail = isTestMode ? "russmaier@gmail.com" : recipientEmail;
-    const subscriberId = $('#subscriber_id').val();
+        const emailBody = $('#email_html').val().trim();
+        const isTestMode = testSendEnabled() && !autoSendEnabled();
 
-    if (!emailBody) {
-        alert("⚠️ Please fill out the email content before sending.");
-        return;
-    }
+        if (!emailBody) {
+            alert("⚠️ Please fill out the email content before sending.");
+            return;
+        }
 
-    if (!targetEmail && !isTestMode) {
-        alert("❌ No recipient available.");
-        return;
-    }
+        const targetEmail = isTestMode ? "russmaier@gmail.com" : recipientEmail;
 
-    if (!isTestMode && (!subscriberId || isNaN(subscriberId))) {
-        alert("❌ Missing subscriber ID.");
-        return;
-    }
+        if (!targetEmail) {
+            alert("❌ No recipient available.");
+            return;
+        }
 
-    if (isSending) return; // prevent duplicate sends
-    isSending = true;
+        if (isSending) return; // prevent duplicate calls
+        isSending = true;
 
-    console.log("🚀 Sending to:", targetEmail);
+        console.log("🚀 Sending to:", targetEmail);
 
-    // Show sending state
-    $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
+        // Show sending state
+        $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
 
-    $.ajax({
-        url: "", // Same page
-        type: "POST",
-        data: {
-            send_email: "1",
-            email_to: targetEmail,
-            email_html: emailBody,
-            test_mode: isTestMode ? 1 : 0,
-            subscriber_id: isTestMode ? null : subscriberId
-        },
-        dataType: "json",
-        success: function (data) {
-            isSending = false;
-
-            if (data.success) {
-                if (isTestMode) {
-                    $('#test-send-button').text("✅ Sent!").prop('disabled', true);
-                    console.log("✅ Test email sent to:", targetEmail);
-                    localStorage.removeItem('testSend');
+        $.ajax({
+            url: "", // Same page
+            type: "POST",
+            data: {
+                send_email: "1",
+                email_to: targetEmail,
+                email_html: emailBody,
+                test_mode: isTestMode ? 1 : 0
+                subscriber_id: recipientId
+            },
+            success: function (resp) {
+                let data = {};
+                try { data = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch (e) {}
+                if (data.success) {
+                    if (isTestMode) {
+                        $('#test-send-button').text("✅ Sent!").prop('disabled', true);
+                        console.log("✅ Server confirmed test send to:", targetEmail);
+                        localStorage.removeItem('testSend');
+                    } else {
+                        $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
+                        console.log("✅ Server confirmed send to:", targetEmail);
+                        // Chain to next
+                        fetchNextRecipient(true); // fetch + auto-send next
+                    }
                 } else {
-                    $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
-                    console.log("✅ Email sent to:", targetEmail);
-                    fetchNextRecipient(); // Load next recipient
+                    isSending = false;
+                    handleSendError(data.message || 'Failed to send the email.');
+                    return;
                 }
-            } else {
-                handleSendError(data.message || '❌ Sending failed.');
+                isSending = false;
+            },
+            error: function () {
+                isSending = false;
+                handleSendError('Failed to send the email.');
             }
-        },
-        error: function () {
-            isSending = false;
-            handleSendError('❌ AJAX error: failed to send.');
+        });
+    }
+
+    // 🔹 Form submission (manual trigger)
+    $('#email-form').on('submit', function (e) {
+        e.preventDefault();
+        sendEmail();
+    });
+
+    // 🔹 Manual click trigger
+    $('#test-send-button, #auto-send-button').on('click', function (e) {
+        e.preventDefault();
+        $('#email-form').trigger('submit');
+    });
+
+    // 🔹 Toggle listeners
+    $('#test-email-toggle').on('change', function () {
+        localStorage.setItem('testSend', $(this).is(':checked'));
+        updateVisibleButton();
+    });
+
+    $('#auto-send-toggle').on('change', function () {
+        localStorage.setItem('autoSend', $(this).is(':checked'));
+        updateVisibleButton();
+
+        // If switched ON and a recipient is already loaded, auto-trigger
+        if (autoSendEnabled() && recipientEmail) {
+            startCountdownAndSend();
         }
     });
-}
 
+    $('#send-delay-slider').on('input change', function () {
+        sendDelay = parseInt($(this).val());
+        $('#delay-display').text(sendDelay);
+        console.log(`⏲️ Delay set to ${sendDelay}s`);
+
+    });
+
+    // 🔹 Reset admin alerts
+    $('#reset-alerts-button').on('click', function (e) {
+        e.preventDefault();
+        if (!confirm('Mark all admin alerts as addressed?')) {
+            return;
+        }
+        $.ajax({
+            url: '../scripts/reset_admin_alerts.php',
+            type: 'POST',
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    alert('✅ Alerts have been reset.');
+                    location.reload();
+                } else {
+                    alert('❌ Failed to reset alerts.');
+                }
+            },
+            error: function () {
+                alert('❌ Failed to reset alerts.');
+            }
+        });
+    });
+
+    // 🔹 Initial state from localStorage
+    const savedAutoSend = localStorage.getItem('autoSend') === 'true';
+    const savedTestSend = localStorage.getItem('testSend') === 'true';
+    sendDelay = parseInt(localStorage.getItem('sendDelay')) || 5;
+    $('#send-delay-slider').val(sendDelay);
+    $('#delay-display').text(sendDelay);
+
+    $('#auto-send-toggle').prop('checked', savedAutoSend);
+    $('#test-email-toggle').prop('checked', savedTestSend);
+
+    updateVisibleButton();
+
+    if (hasAlerts) {
+        alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
+        $('#auto-send-button, #test-send-button').prop('disabled', true);
+    } else {
+        console.log("🚚 Fetching first recipient...");
+        fetchNextRecipient(true); // Fetch on page load, and auto-send if toggled
+    }
+});
 
 
 </script>
