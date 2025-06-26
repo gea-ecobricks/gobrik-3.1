@@ -50,6 +50,16 @@ try {
     if ($result && $result->num_rows > 0) {
         $subscriber = $result->fetch_assoc();
 
+        // Mark the record as being processed to avoid duplicate fetches
+        $update = $buwana_conn->prepare(
+            "UPDATE earthen_members_tb SET processing = 1 WHERE id = ?"
+        );
+        if ($update) {
+            $update->bind_param('i', $subscriber['id']);
+            $update->execute();
+            $update->close();
+        }
+
         $buwana_conn->commit();
 
         // Fetch updated stats
