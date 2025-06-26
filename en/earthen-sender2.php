@@ -109,7 +109,7 @@ require_once 'live-newsletter.php';  //the newsletter html
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
-    $subscriber_id = $_SESSION['locked_subscriber_id'] ?? null;
+    $subscriber_id = isset($_POST['subscriber_id']) ? intval($_POST['subscriber_id']) : null;
 
     if (!empty($email_html) && !empty($recipient_email) && $subscriber_id) {
         // The webhook updates members once Mailgun confirms delivery
@@ -118,7 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 
                 error_log("[EARTHEN] ✅ COMMITTED: {$recipient_email} by " . session_id());
 
-                unset($_SESSION['locked_subscriber_id']); // Clean up
                 echo json_encode(['success' => true]);
                 exit();
             } else {
@@ -231,10 +230,11 @@ echo '<!DOCTYPE html>
    <form id="email-form" method="POST">
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
+    <input type="hidden" id="subscriber_id" name="subscriber_id" value="">
 
     <!-- Hidden field for recipient email
         <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
--->
+    -->
 <input type="hidden" id="email_to" name="email_to" value="">
     <br><br>
 <!-- Auto-send Button (hidden by default unless auto-send is enabled) -->
@@ -331,6 +331,8 @@ $(document).ready(function () {
                     recipientName = sub.name;
                     recipientId = sub.id;
 
+                    $('#subscriber_id').val(recipientId);
+
                     $('#email_to').val(recipientEmail);
                     updateVisibleButton();
 
@@ -341,6 +343,7 @@ $(document).ready(function () {
                     recipientEmail = '';
                     recipientId = null;
                     $('#email_to').val('');
+                    $('#subscriber_id').val('');
                     $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
                     console.log("✅ All recipients processed.");
                 }
@@ -377,7 +380,8 @@ $(document).ready(function () {
             data: {
                 send_email: "1",
                 email_to: targetEmail,
-                email_html: emailBody
+                email_html: emailBody,
+                subscriber_id: recipientId
             },
             success: function () {
                 if (isTestMode) {
