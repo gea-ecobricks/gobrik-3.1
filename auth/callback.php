@@ -47,8 +47,11 @@ curl_close($ch);
 
 // 5. Decode and validate ID token
 $tokens = json_decode($response, true);
-if (!isset($tokens['id_token'])) {
-    exit('Failed to receive ID token.');
+
+if (!$tokens || !isset($tokens['id_token'])) {
+    echo "<h2>❌ Token Response Error</h2>";
+    echo "<pre>Raw response:\n" . htmlspecialchars($response) . "</pre>";
+    exit("Failed to receive ID token.");
 }
 
 require_once 'verify_jwt.php';
