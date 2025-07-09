@@ -29,12 +29,6 @@ $params = [
     'client_secret' => $client_secret
 ];
 
-echo "<pre>";
-echo "Client Secret: " . htmlspecialchars($client_secret) . "\n";
-echo "Client ID: " . $client_id . "\n";
-echo "</pre>";
-
-
 // 4. Exchange code for tokens using cURL
 $ch = curl_init($token_url);
 curl_setopt($ch, CURLOPT_POST, true);
@@ -55,9 +49,7 @@ curl_close($ch);
 $tokens = json_decode($response, true);
 
 if (!$tokens || !isset($tokens['id_token'])) {
-    echo "<h2>❌ Token Response Error</h2>";
-    echo "<pre>Raw response:\n" . htmlspecialchars($response) . "</pre>";
-    exit("Failed to receive ID token.");
+    exit("❌ Token Response Error\n\nRaw response:\n$response");
 }
 
 require_once 'verify_jwt.php';
