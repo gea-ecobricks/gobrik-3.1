@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // 1. Ensure user is logged in via Buwana
 if (!isset($_SESSION['buwana_user']) || !isset($_SESSION['buwana_user']['jwt'])) {
