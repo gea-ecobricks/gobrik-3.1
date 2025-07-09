@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '1.02';
+$version = '1.03';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -146,7 +146,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
                 <span style="margin-right:10px;">🌟</span>
-                <span> A new community event on the meaning of Ayyew has been listed.  <a href="https://gobrik.com/en/register.php?id=913">Register</a></span>
+                <span>On July 19th we're offering a free Zoom intro to ecobricks learning event!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">
