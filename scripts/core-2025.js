@@ -3,11 +3,11 @@ function openProfile() {
 }
 
 function logoutUser() {
-    // Extracts only the part of the URL after the last slash, including query parameters
     const path = window.location.pathname.split("/").pop() + window.location.search;
     const redirectUrl = encodeURIComponent(path);
     window.location.href = `logout.php?redirect=${redirectUrl}`;
 }
+
 
 // Safely escape HTML for dynamic content
 function escapeHTML(str) {
@@ -22,40 +22,6 @@ function escapeHTML(str) {
 
 
 
-
-//
-//function switchLanguage(langCode) {
-// currentLanguage = langCode; // Update the global language variable
-//
-//    // Dynamic selection of the correct translations object
-//    const languageMappings = {
-//        'en': {...en_Translations, ...en_Page_Translations},
-//        'fr': {...fr_Translations, ...fr_Page_Translations},
-//        'es': {...es_Translations, ...es_Page_Translations},
-//        'id': {...id_Translations, ...id_Page_Translations}
-//    };
-//
-//    const currentTranslations = languageMappings[currentLanguage];
-//
-//
-//    const elements = document.querySelectorAll('[data-lang-id]');
-//    elements.forEach(element => {
-//        const langId = element.getAttribute('data-lang-id');
-//        const translation = currentTranslations[langId]; // Access the correct translations
-//        if (translation) {
-//            if (element.tagName.toLowerCase() === 'input' && element.type !== 'submit') {
-//                element.placeholder = translation;
-//            } else if (element.hasAttribute('aria-label')) {
-//                element.setAttribute('aria-label', translation);
-//            } else if (element.tagName.toLowerCase() === 'img') {
-//                element.alt = translation;
-//            } else {
-//                element.innerHTML = translation; // Directly set innerHTML for other elements
-//            }
-//        }
-//    });
-//
-//}
 
 
 
@@ -120,111 +86,6 @@ function modalCloseCurtains ( e ) {
 
   }
 }
-
-
-    //Blur out background
-//    document.getElementById('page-content')?.classList.add('blurred');
-//    document.getElementById('footer-full')?.classList.add('blurred');
-//    document.body.classList.add('modal-open');
-//
-//
-//
-//document.addEventListener('keydown', modalCloseCurtains);
-//
-
-
-//
-///* ---------- ------------------------------
-//LANGUAGE SELECTOR
-//-------------------------------------------*/
-//
-//function showLangSelector() {
-//    hideLoginSelector();
-//
-//    var slider = document.getElementById('language-menu-slider');
-//    var currentMarginTop = window.getComputedStyle(slider).marginTop;
-//    slider.style.display = 'flex';
-//    slider.style.marginTop = currentMarginTop === '70px' ? '0px' : '70px';
-//
-//    // Set zIndex of top-page-image
-//    var topPageImage = document.querySelector('.top-page-image');
-//    if (topPageImage) {
-//        topPageImage.style.zIndex = '25';
-//    }
-//
-//    // Prevent event from bubbling to document
-//    event.stopPropagation();
-//
-//    // Add named event listener for click on the document
-//    document.addEventListener('click', documentClickListener);
-//}
-//
-//function hideLangSelector() {
-//    var slider = document.getElementById('language-menu-slider');
-//    slider.style.marginTop = '0px'; // Reset margin-top to 0px
-//
-//    // Set zIndex of top-page-image
-//    var topPageImage = document.querySelector('.top-page-image');
-//    if (topPageImage) {
-//        topPageImage.style.zIndex = '35';
-//    }
-//
-//    // Remove the named event listener from the document
-//    document.removeEventListener('click', documentClickListener);
-//}
-//
-//// Named function to be used as an event listener
-//function documentClickListener() {
-//    hideLangSelector();
-//}
-//
-///* ---------- ------------------------------
-//SERVICE SELECTOR
-//-------------------------------------------*/
-//
-//function showLoginSelector() {
-//    hideLangSelector();
-//
-//    var slider = document.getElementById('login-menu-slider');
-//    var currentMarginTop = window.getComputedStyle(slider).marginTop;
-//    slider.style.display = 'flex';
-//    slider.style.marginTop = currentMarginTop === '70px' ? '0px' : '70px';
-//
-//    // Set zIndex of top-page-image
-//    var topPageImage = document.querySelector('.top-page-image');
-//    if (topPageImage) {
-//        topPageImage.style.zIndex = '25';
-//    }
-//
-//    // Prevent event from bubbling to document
-//    event.stopPropagation();
-//
-//    // Add named event listener for click on the document
-//    document.addEventListener('click', documentClickListenerLogin);
-//}
-//
-//function hideLoginSelector() {
-//    var slider = document.getElementById('login-menu-slider');
-//    slider.style.marginTop = '0px'; // Reset margin-top to 0px
-//
-//    // Set zIndex of top-page-image
-//    var topPageImage = document.querySelector('.top-page-image');
-//    if (topPageImage) {
-//        topPageImage.style.zIndex = '35';
-//    }
-//
-//    // Remove the named event listener from the document
-//    document.removeEventListener('click', documentClickListenerLogin);
-//}
-//
-//// Named function to be used as an event listener
-//function documentClickListenerLogin() {
-//    hideLoginSelector();
-//}
-
-
-
-
 
 
 // 2025 TOP RIGHT SETTINGS PANEL
@@ -580,30 +441,33 @@ document.addEventListener("DOMContentLoaded", function() {
 
 -------------------------------------------*/
 
-function handleLogout(event) {
-    event.preventDefault(); // Prevent default link behavior
+// function handleLogout(event) {
+//     event.preventDefault(); // Prevent default link behavior
+//
+//     // Perform logout via AJAX
+//     fetch(event.target.href)
+//         .then(response => {
+//             if (response.ok) {
+//                 // Redirect to the login page with the appropriate parameters
+//                 window.location.href = response.url;
+//             } else {
+//                 console.error('Failed to log out:', response.statusText);
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error during logout:', error);
+//         });
+// }
+//
+//
+// // Function to handle the shaking animation
+//     function shakeElement(element) {
+//         element.classList.add('shake');
+//         setTimeout(() => element.classList.remove('shake'), 400);
+//     }
 
-    // Perform logout via AJAX
-    fetch(event.target.href)
-        .then(response => {
-            if (response.ok) {
-                // Redirect to the login page with the appropriate parameters
-                window.location.href = response.url;
-            } else {
-                console.error('Failed to log out:', response.statusText);
-            }
-        })
-        .catch(error => {
-            console.error('Error during logout:', error);
-        });
-}
 
 
-// Function to handle the shaking animation
-    function shakeElement(element) {
-        element.classList.add('shake');
-        setTimeout(() => element.classList.remove('shake'), 400);
-    }
 
 // Close notices when X is clicked
 document.addEventListener('DOMContentLoaded', function() {

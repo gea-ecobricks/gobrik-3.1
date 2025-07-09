@@ -237,7 +237,7 @@
 
 
 
-<script src="../scripts/core-2024.js?v=3<?php echo ($version); ;?>"></script>
+<script src="../scripts/core-2025.js?v=3<?php echo ($version); ;?>"></script>
 
 
 <!--This enables the Light and Dark mode switching-->

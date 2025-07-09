@@ -71,5 +71,5 @@ $_SESSION['buwana_user'] = [
 $_SESSION['buwana_id'] = $claims['buwana_id'] ?? null;
 
 // 7. Redirect to dashboard
-header('Location: /en/dash.php');
+header('Location: ../en/dashboard.php');
 exit;
