@@ -30,33 +30,46 @@ try {
         exit();
     }
 
-    // Begin transaction to safely select recipient
+    // 🔒 Begin transaction for safe locking
     $buwana_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 
-    // First check if there is already a recipient marked as processing
-    $processing_sql = "
+    $sql = "
         SELECT id, email, name
         FROM earthen_members_tb
-        WHERE test_sent = 0 AND processing = 1
-        ORDER BY created_at ASC
+        WHERE test_sent = 0
+          AND (processing IS NULL OR processing = 0)
+          AND email IS NOT NULL
+          AND email <> ''
+        ORDER BY created_at DESC
         LIMIT 1
         FOR UPDATE
     ";
 
-    $result = $buwana_conn->query($processing_sql);
+    $result = $buwana_conn->query($sql);
 
     if ($result && $result->num_rows > 0) {
         $subscriber = $result->fetch_assoc();
-        $_SESSION['locked_subscriber_id'] = $subscriber['id'];
 
-        // Commit lock
+        // Mark the record as being processed to avoid duplicate fetches
+        $update = $buwana_conn->prepare(
+            "UPDATE earthen_members_tb SET processing = 1 WHERE id = ?"
+        );
+        if ($update) {
+            $update->bind_param('i', $subscriber['id']);
+            $update->execute();
+            $update->close();
+        }
+
         $buwana_conn->commit();
 
-        // ✅ Optional: fetch email stats for real-time updates
-        $stats = $buwana_conn->query("SELECT COUNT(*) AS total, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent FROM earthen_members_tb")->fetch_assoc();
+        // Fetch updated stats
+        $stats_result = $buwana_conn->query(
+            "SELECT COUNT(*) AS total, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent FROM earthen_members_tb"
+        );
+        $stats = $stats_result->fetch_assoc();
         $percentage = ($stats['total'] > 0) ? round(($stats['sent'] / $stats['total']) * 100, 2) : 0;
 
-        error_log("[EARTHEN] LOCKED: {$subscriber['email']} via get-next-recipient");
+        error_log("[EARTHEN] ✅ LOCKED: {$subscriber['email']}");
 
         echo json_encode([
             'success' => true,
@@ -65,51 +78,14 @@ try {
                 'total' => (int)$stats['total'],
                 'sent' => (int)$stats['sent'],
                 'percentage' => $percentage
-            ],
-            'has_alerts' => false,
+            ]
         ]);
     } else {
-        // No current processing recipient, fetch a new one
-        $new_sql = "
-            SELECT id, email, name
-            FROM earthen_members_tb
-            WHERE test_sent = 0 AND processing IS NULL
-            ORDER BY created_at ASC
-            LIMIT 1
-            FOR UPDATE
-        ";
-
-        $new_res = $buwana_conn->query($new_sql);
-
-        if ($new_res && $new_res->num_rows > 0) {
-            $subscriber = $new_res->fetch_assoc();
-            $_SESSION['locked_subscriber_id'] = $subscriber['id'];
-
-            $buwana_conn->commit();
-
-            $stats = $buwana_conn->query("SELECT COUNT(*) AS total, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent FROM earthen_members_tb")->fetch_assoc();
-            $percentage = ($stats['total'] > 0) ? round(($stats['sent'] / $stats['total']) * 100, 2) : 0;
-
-            error_log("[EARTHEN] LOCKED: {$subscriber['email']} via get-next-recipient");
-
-            echo json_encode([
-                'success' => true,
-                'subscriber' => $subscriber,
-                'stats' => [
-                    'total' => (int)$stats['total'],
-                    'sent' => (int)$stats['sent'],
-                    'percentage' => $percentage
-                ],
-                'has_alerts' => false,
-            ]);
-        } else {
-            $buwana_conn->commit();
-            echo json_encode([
-                'success' => false,
-                'message' => 'No more recipients',
-                'has_alerts' => false
-            ]);
-        }
+        $buwana_conn->commit();
+        echo json_encode([
+            'success' => false,
+            'message' => 'No more recipients'
+        ]);
     }
 
 } catch (Exception $e) {

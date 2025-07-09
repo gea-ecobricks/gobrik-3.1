@@ -645,7 +645,7 @@ function sendEmail() {
                 send_email: "1",
                 email_to: targetEmail,
                 email_html: emailBody,
-                test_mode: isTestMode ? 1 : 0
+                test_mode: isTestMode ? 1 : 0,
                 subscriber_id: recipientId
             },
             success: function (resp) {
