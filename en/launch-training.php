@@ -114,8 +114,11 @@ $training_language = 'en';
 $zoom_link = '';
 $zoom_link_full = '';
 $feature_photo1_main = '';
+$feature_photo1_tmb = '';
 $feature_photo2_main = '';
+$feature_photo2_tmb = '';
 $feature_photo3_main = '';
+$feature_photo3_tmb = '';
 $training_subtitle = '';
 $training_time_txt = '';
 $registration_scope = '';
@@ -129,7 +132,7 @@ if ($editing) {
                   training_type, training_language, briks_made, avg_brik_weight, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, show_report, show_signup_count, featured_description, community_id,
-                  zoom_link, zoom_link_full, feature_photo1_main, feature_photo2_main, feature_photo3_main, registration_scope, trainer_contact_email
+                  zoom_link, zoom_link_full, feature_photo1_main, feature_photo1_tmb, feature_photo2_main, feature_photo2_tmb, feature_photo3_main, feature_photo3_tmb, registration_scope, trainer_contact_email
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -139,7 +142,7 @@ if ($editing) {
                             $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $show_signup_count, $featured_description, $community_id,
-                            $zoom_link, $zoom_link_full, $feature_photo1_main, $feature_photo2_main, $feature_photo3_main, $registration_scope, $trainer_contact_email);
+                            $zoom_link, $zoom_link_full, $feature_photo1_main, $feature_photo1_tmb, $feature_photo2_main, $feature_photo2_tmb, $feature_photo3_main, $feature_photo3_tmb, $registration_scope, $trainer_contact_email);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
@@ -490,13 +493,17 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 1 ======================= -->
     <div class="form-item">
 <?php if ($editing && !empty($feature_photo1_main)): ?>
-    <div>
-        <img src="<?php echo htmlspecialchars($feature_photo1_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 1">
+    <div id="feature_photo1_preview_container">
+        <img src="<?php echo htmlspecialchars(!empty($feature_photo1_tmb) ? $feature_photo1_tmb : $feature_photo1_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 1" id="feature_photo1_preview">
+    </div>
+<?php else: ?>
+    <div id="feature_photo1_preview_container" style="display:none;">
+        <img id="feature_photo1_preview" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 1">
     </div>
 <?php endif; ?>
         <label for="feature_photo1_main">Set Feature Photo</label><br>
-
         <input type="url" id="feature_photo1_main" name="feature_photo1_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo1_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="file" id="feature_photo1_file" name="feature_photo1_main" class="feature-photo-file" accept="image/*">
         <p class="form-caption">
             This is the image that will be used to list your training on GoBrik.
         </p>
@@ -505,12 +512,17 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 2 ======================= -->
     <div class="form-item">
 <?php if ($editing && !empty($feature_photo2_main)): ?>
-    <div><img src="<?php echo htmlspecialchars($feature_photo2_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 2">
+    <div id="feature_photo2_preview_container">
+        <img src="<?php echo htmlspecialchars(!empty($feature_photo2_tmb) ? $feature_photo2_tmb : $feature_photo2_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 2" id="feature_photo2_preview">
+    </div>
+<?php else: ?>
+    <div id="feature_photo2_preview_container" style="display:none;">
+        <img id="feature_photo2_preview" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 2">
     </div>
 <?php endif; ?>
         <label for="feature_photo2_main">Set a Second Training Feature Photo</label><br>
-
         <input type="url" id="feature_photo2_main" name="feature_photo2_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo2_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="file" id="feature_photo2_file" name="feature_photo2_main" class="feature-photo-file" accept="image/*">
         <p class="form-caption">
             This image will be visible on the training registration page.
         </p>
@@ -519,11 +531,17 @@ if (!empty($community_id)) {
     <!-- ======================= Feature Photo 3 ======================= -->
     <div class="form-item">
 <?php if ($editing && !empty($feature_photo3_main)): ?>
-    <div><img src="<?php echo htmlspecialchars($feature_photo3_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 3">
+    <div id="feature_photo3_preview_container">
+        <img src="<?php echo htmlspecialchars(!empty($feature_photo3_tmb) ? $feature_photo3_tmb : $feature_photo3_main, ENT_QUOTES, 'UTF-8'); ?>" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 3" id="feature_photo3_preview">
+    </div>
+<?php else: ?>
+    <div id="feature_photo3_preview_container" style="display:none;">
+        <img id="feature_photo3_preview" style="max-width:300px;max-height:180px;margin-bottom:5px;" alt="Feature Photo 3">
     </div>
 <?php endif; ?>
         <label for="feature_photo3_main">Set a Third Training Feature Photo</label><br>
         <input type="url" id="feature_photo3_main" name="feature_photo3_main" class="form-field-style" value="<?php echo htmlspecialchars($feature_photo3_main ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="file" id="feature_photo3_file" name="feature_photo3_main" class="feature-photo-file" accept="image/*">
         <p class="form-caption">
             This image will also be visible on the training registration page.
         </p>
@@ -609,11 +627,6 @@ if (!empty($community_id)) {
     <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
     <!-- ======================= Submit Button ======================= -->
-    <?php if ($editing): ?>
-    <div>
-        <button type='submit' id='save-progress' class='confirm-button' style='background:grey;width: 100%;margin: 30px 0px -15px 0px;'>💾 Save Progress</button>
-    </div>
-    <?php endif; ?>
     <div>
         <input type="submit" value="<?php echo $editing ? '💾 Save Changes to Training' : '➕ Create Training!'; ?>" data-lang-id="100-submit-report-1">
     </div>
@@ -1098,6 +1111,43 @@ Course registration is free / by donation so no payment is required to register.
 }
 
 document.getElementById('starterPresetBtn')?.addEventListener('click', presetForStarterWorkshop);
+
+// ===== Feature Photo Uploads =====
+document.querySelectorAll('.feature-photo-file').forEach(input => {
+    input.addEventListener('change', function() {
+        if (!this.files || this.files.length === 0) return;
+        const trainingId = document.getElementById('training_id').value;
+        if (!trainingId) return;
+        const formData = new FormData();
+        formData.append('training_id', trainingId);
+        formData.append(this.name, this.files[0]);
+
+        fetch('add-images_process.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.error || 'Upload failed');
+                return;
+            }
+            const urlInput = document.getElementById(this.name);
+            if (data[this.name]) urlInput.value = data[this.name];
+            const preview = document.getElementById(this.name + '_preview');
+            const container = document.getElementById(this.name + '_preview_container');
+            if (preview) {
+                const thumbKey = this.name.replace('_main', '_tmb');
+                preview.src = data[thumbKey] || data[this.name];
+                if (container) container.style.display = 'block';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Upload error');
+        });
+    });
+});
 
 
 
