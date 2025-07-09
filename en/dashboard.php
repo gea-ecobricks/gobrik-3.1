@@ -1,80 +1,73 @@
 <?php
-require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
-// Set up page variables
+// 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.61';
+$version = '1.02';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-startSecureSession(); // Start a secure session with regeneration to prevent session fixation
+// 🔐 Start session and verify Buwana JWT (auto-redirects if not logged in)
+require_once '../auth/session_start.php';
 
+// 🆔 Retrieve the authenticated user's Buwana ID
+$buwana_id = $_SESSION['buwana_id'] ?? '';
 
-// Check if user is logged in and session active
-if ($is_logged_in) {
-    $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
+// 🔗 Establish DB connections to GoBrik and Buwana
+require_once '../gobrikconn_env.php';
+require_once '../buwanaconn_env.php';
 
-    // Include database connections
-    require_once '../gobrikconn_env.php';
-    require_once '../buwanaconn_env.php';
-
-    // Fetch the user's location data
-
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+// 🌎 Fetch user meta from Buwana database
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
 $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
-    $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_roles = getUser_Role($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_roles = getUser_Role($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
 
-    // Fetch user details from the GoBrik database
-    $sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt FROM tb_ecobrickers WHERE buwana_id = ?";
-    $stmt_lookup_user = $gobrik_conn->prepare($sql_lookup_user);
+// 👤 Look up user's GoBrik account info
+$sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt FROM tb_ecobrickers WHERE buwana_id = ?";
+$stmt_lookup_user = $gobrik_conn->prepare($sql_lookup_user);
+if ($stmt_lookup_user) {
+    $stmt_lookup_user->bind_param("i", $buwana_id);
+    $stmt_lookup_user->execute();
+    $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt);
+    $stmt_lookup_user->fetch();
+    $stmt_lookup_user->close();
+} else {
+    die("Error preparing statement for tb_ecobrickers: " . $gobrik_conn->error);
+}
 
-    if ($stmt_lookup_user) {
-        $stmt_lookup_user->bind_param("i", $buwana_id);
-        $stmt_lookup_user->execute();
-        $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt);
-        $stmt_lookup_user->fetch();
-        $stmt_lookup_user->close();
-    } else {
-        die("Error preparing statement for tb_ecobrickers: " . $gobrik_conn->error);
-    }
+// 🪪 Set maker_id for further lookups
+$maker_id = $ecobricker_id;
 
-    // Set maker_id for use in JavaScript
-    $maker_id = $ecobricker_id;
+// 📦 Fetch summary of ecobricks logged by user
+$sql_summary = "SELECT COUNT(*) as total_ecobricks, SUM(weight_g) / 1000 as total_weight_kg, SUM(volume_ml) as total_volume_ml
+                FROM tb_ecobricks
+                WHERE maker_id = ? AND status != 'not ready'";
+$stmt_summary = $gobrik_conn->prepare($sql_summary);
+if ($stmt_summary) {
+    $stmt_summary->bind_param("s", $maker_id);
+    $stmt_summary->execute();
+    $stmt_summary->bind_result($total_ecobricks, $total_weight_kg, $total_volume_ml);
+    $stmt_summary->fetch();
+    $stmt_summary->close();
+} else {
+    die("Error preparing statement for ecobricks summary: " . $gobrik_conn->error);
+}
 
-    // Calculate the user's ecobricks summary data
-    $sql_summary = "SELECT COUNT(*) as total_ecobricks, SUM(weight_g) / 1000 as total_weight_kg, SUM(volume_ml) as total_volume_ml FROM tb_ecobricks WHERE maker_id = ? AND status != 'not ready'";
-    $stmt_summary = $gobrik_conn->prepare($sql_summary);
+// ⚖️ Calculate net density (g/ml)
+$net_density = $total_volume_ml > 0 ? ($total_weight_kg * 1000) / $total_volume_ml : 0;
 
-    if ($stmt_summary) {
-        $stmt_summary->bind_param("s", $maker_id);
-        $stmt_summary->execute();
-        $stmt_summary->bind_result($total_ecobricks, $total_weight_kg, $total_volume_ml);
-        $stmt_summary->fetch();
-        $stmt_summary->close();
-    } else {
-        die("Error preparing statement for ecobricks summary: " . $gobrik_conn->error);
-    }
-
-    // Calculate net density (total weight divided by total volume)
-    $net_density = $total_volume_ml > 0 ? ($total_weight_kg * 1000) / $total_volume_ml : 0; // Convert weight back to grams for density calculation
-
-    // Process locationFullTxt by extracting the last and third-last elements
-    // Ensure $location_full_txt is a string
-$location_full_txt = $location_full_txt ?? ''; // Default to an empty string if null
-
-// Process locationFullTxt by extracting the last and third-last elements
-$location_parts = explode(',', $location_full_txt);
-$location_parts = array_map('trim', $location_parts); // Trim whitespace from each part
+// 📍 Process user location
+$location_full_txt = $location_full_txt ?? '';
+$location_parts = array_map('trim', explode(',', $location_full_txt));
 $location_last = $location_parts[count($location_parts) - 1] ?? '';
 $location_third_last = $location_parts[count($location_parts) - 3] ?? '';
 $locationFullTxt = $location_third_last . ', ' . $location_last;
 
-// Fetch trainings where the user is a trainer, including trainee count
+// 🎓 Fetch trainings where user is trainer
 $trainings = [];
 $sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type, t.ready_to_show,
                          (SELECT COUNT(*) FROM tb_training_trainees WHERE training_id = t.training_id) AS trainee_count
@@ -82,12 +75,10 @@ $sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.tra
                   INNER JOIN tb_training_trainers tt ON t.training_id = tt.training_id
                   WHERE tt.ecobricker_id = ?";
 $stmt_trainings = $gobrik_conn->prepare($sql_trainings);
-
 if ($stmt_trainings) {
     $stmt_trainings->bind_param("i", $ecobricker_id);
     $stmt_trainings->execute();
     $result_trainings = $stmt_trainings->get_result();
-
     while ($row = $result_trainings->fetch_assoc()) {
         $trainings[] = $row;
     }
@@ -96,7 +87,7 @@ if ($stmt_trainings) {
     die("Error preparing statement for trainer trainings: " . $gobrik_conn->error);
 }
 
-// Fetch trainings where the user is a registered trainee
+// 📋 Fetch trainings where user is a registered trainee
 $registered_trainings = [];
 $sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location,
                                     t.training_country, t.training_type, t.zoom_link, t.zoom_link_full
@@ -104,12 +95,10 @@ $sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_
                              INNER JOIN tb_training_trainees tt ON t.training_id = tt.training_id
                              WHERE tt.ecobricker_id = ?";
 $stmt_registered_trainings = $gobrik_conn->prepare($sql_registered_trainings);
-
 if ($stmt_registered_trainings) {
     $stmt_registered_trainings->bind_param("i", $ecobricker_id);
     $stmt_registered_trainings->execute();
     $result_registered_trainings = $stmt_registered_trainings->get_result();
-
     while ($row = $result_registered_trainings->fetch_assoc()) {
         $registered_trainings[] = $row;
     }
@@ -118,11 +107,14 @@ if ($stmt_registered_trainings) {
     die("Error preparing statement for registered trainings: " . $gobrik_conn->error);
 }
 
-// Fetch featured ecobricks for the slider
+// 🧱 Fetch featured ecobricks for homepage slider
 $featured_ecobricks = [];
-$sql_featured = "SELECT ecobrick_full_photo_url, serial_no, photo_version FROM tb_ecobricks WHERE feature = 1 AND status != 'not ready' ORDER BY date_logged_ts DESC LIMIT 10";
+$sql_featured = "SELECT ecobrick_full_photo_url, serial_no, photo_version
+                 FROM tb_ecobricks
+                 WHERE feature = 1 AND status != 'not ready'
+                 ORDER BY date_logged_ts DESC
+                 LIMIT 10";
 $stmt_featured = $gobrik_conn->prepare($sql_featured);
-
 if ($stmt_featured) {
     $stmt_featured->execute();
     $result_featured = $stmt_featured->get_result();
@@ -134,27 +126,11 @@ if ($stmt_featured) {
     die("Error preparing statement for featured ecobricks: " . $gobrik_conn->error);
 }
 
-
-
-    // Close the database connections
-    $buwana_conn->close();
-    $gobrik_conn->close();
-} else {
-    // Redirect to login page with the redirect parameter set to the current page
-    echo '<script>
-        alert("Please login before viewing this page.");
-        window.location.href = "login.php?redirect=' . urlencode($page) . '.php";
-    </script>';
-    exit();
-}
-
-// Output the HTML structure
-echo '<!DOCTYPE html>
-<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
-<head>
-<meta charset="UTF-8">
-';
+// 🔒 Clean exit: close DB connections
+$buwana_conn->close();
+$gobrik_conn->close();
 ?>
+
 
 
 
