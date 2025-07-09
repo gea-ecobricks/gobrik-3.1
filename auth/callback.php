@@ -19,9 +19,8 @@ $secrets = require __DIR__ . '../gbrk_private_env.php';
 $client_secret = $secrets['GBRK_CLIENT_SECRET'] ?? null;
 
 if (!$client_secret) {
-    exit('Client secret not configured.');
+    exit('Client secret not yet configured it seems.');
 }
-
 
 $params = [
     'grant_type' => 'authorization_code',
