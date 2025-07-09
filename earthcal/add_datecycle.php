@@ -9,7 +9,7 @@ $allowed_origins = [
     'https://cal.earthen.io',
     'https://cycles.earthen.io',
     'https://ecobricks.org',
-    'https://gobrik.com',
+    'https://earthcal.app',
     'http://localhost',
     'file://'
 ];
