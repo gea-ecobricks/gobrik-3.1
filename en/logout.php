@@ -20,7 +20,7 @@ setcookie('buwana_id', '', time() - 3600, '/');
 
 // Redirect target
 $redirect = isset($_GET['redirect']) ? filter_var($_GET['redirect'], FILTER_SANITIZE_SPECIAL_CHARS) : '';
-$redirect_url = 'login.php?status=logout';
+$redirect_url = 'https://buwana.ecobricks.org/en/login.php?app=gbrk_f2c61a85a4cd4b8b89a7?status=logout';
 if (!empty($redirect)) {
     $redirect_url .= '&redirect=' . urlencode($redirect);
 }
@@ -29,3 +29,5 @@ if (!empty($redirect)) {
 header('Location: ' . $redirect_url);
 exit();
 ?>
+
+
