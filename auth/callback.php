@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// 1. Verify `state` matches
+// 1. Verify `state` to prevent CSRF
 if (!isset($_GET['state']) || $_GET['state'] !== $_SESSION['oidc_state']) {
     exit('Invalid state. Possible CSRF attempt.');
 }
@@ -15,7 +15,11 @@ if (!$code) {
 // 3. Prepare token request
 $token_url = 'https://buwana.ecobricks.org/token';
 $client_id = 'gbrk_f2c61a85a4cd4b8b89a7';
-$client_secret = 'your_gobrik_client_secret_here'; // 🔐 store securely
+$client_secret = getenv('GBRK_CLIENT_SECRET'); // 🔐 Loaded securely
+
+if (!$client_secret) {
+    exit('Client secret not configured.');
+}
 
 $params = [
     'grant_type' => 'authorization_code',
@@ -25,20 +29,28 @@ $params = [
     'client_secret' => $client_secret
 ];
 
-// 4. Exchange code for tokens
-$options = ['http' => [
-    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-    'method'  => 'POST',
-    'content' => http_build_query($params)
-]];
-$response = file_get_contents($token_url, false, stream_context_create($options));
-$tokens = json_decode($response, true);
+// 4. Exchange code for tokens using cURL
+$ch = curl_init($token_url);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Content-Type: application/x-www-form-urlencoded'
+]);
 
+$response = curl_exec($ch);
+
+if (curl_errno($ch)) {
+    exit('cURL error: ' . curl_error($ch));
+}
+curl_close($ch);
+
+// 5. Decode and validate ID token
+$tokens = json_decode($response, true);
 if (!isset($tokens['id_token'])) {
     exit('Failed to receive ID token.');
 }
 
-// 5. Validate the ID token (JWT)
 require_once 'verify_jwt.php';
 $claims = verify_id_token($tokens['id_token'], $client_id);
 
@@ -54,6 +66,6 @@ $_SESSION['buwana_user'] = [
     'jwt' => $tokens['id_token']
 ];
 
-// 7. Redirect to GoBrik dashboard or landing page
-header('Location: /dashboard.php');
+// 7. Redirect to dashboard
+header('Location: /en/dash.php');
 exit;
