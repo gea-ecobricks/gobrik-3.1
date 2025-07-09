@@ -29,6 +29,12 @@ $params = [
     'client_secret' => $client_secret
 ];
 
+echo "<pre>";
+echo "Client Secret: " . htmlspecialchars($client_secret) . "\n";
+echo "Client ID: " . $client_id . "\n";
+echo "</pre>";
+
+
 // 4. Exchange code for tokens using cURL
 $ch = curl_init($token_url);
 curl_setopt($ch, CURLOPT_POST, true);
