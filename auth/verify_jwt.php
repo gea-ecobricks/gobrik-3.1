@@ -3,7 +3,7 @@ use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 function verify_id_token($id_token, $expected_aud) {
     // Decode token header to get kid
