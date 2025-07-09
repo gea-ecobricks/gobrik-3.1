@@ -67,6 +67,9 @@ $_SESSION['buwana_user'] = [
     'jwt' => $tokens['id_token']
 ];
 
+// Save buwana_id from token claim explicitly
+$_SESSION['buwana_id'] = $claims['buwana_id'] ?? null;
+
 // 7. Redirect to dashboard
 header('Location: /en/dash.php');
 exit;
