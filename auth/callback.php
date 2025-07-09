@@ -15,7 +15,7 @@ if (!$code) {
 // 3. Prepare token request
 $token_url = 'https://buwana.ecobricks.org/token';
 $client_id = 'gbrk_f2c61a85a4cd4b8b89a7';
-$secrets = require __DIR__ . '/../gbrk_private_env.php';
+$secrets = require __DIR__ . '../gbrk_private_env.php';
 $client_secret = $secrets['GBRK_CLIENT_SECRET'] ?? null;
 
 if (!$client_secret) {
