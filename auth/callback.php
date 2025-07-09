@@ -15,11 +15,10 @@ if (!$code) {
 // 3. Prepare token request
 $token_url = 'https://buwana.ecobricks.org/token';
 $client_id = 'gbrk_f2c61a85a4cd4b8b89a7';
-$secrets = require __DIR__ . '/../gbrk_private_env.php';
-$client_secret = $secrets['GBRK_CLIENT_SECRET'] ?? null;
+$client_secret = getenv('GBRK_CLIENT_SECRET'); // 🔐 Loaded securely
 
 if (!$client_secret) {
-    exit('Client secret not yet configured it seems.');
+    exit('Client secret not configured.');
 }
 
 $params = [
@@ -29,12 +28,6 @@ $params = [
     'client_id' => $client_id,
     'client_secret' => $client_secret
 ];
-
-echo "<pre>";
-echo "Client Secret: " . htmlspecialchars($client_secret) . "\n";
-echo "Client ID: " . $client_id . "\n";
-echo "</pre>";
-
 
 // 4. Exchange code for tokens using cURL
 $ch = curl_init($token_url);
