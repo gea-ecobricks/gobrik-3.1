@@ -1,33 +1,31 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start();
 
-// Retrieve the redirect parameter from the query string, if it exists
-$redirect = isset($_GET['redirect']) ? filter_var($_GET['redirect'], FILTER_SANITIZE_SPECIAL_CHARS) : '';
-
-// Log the action for debugging purposes
+// Optional: log logout activity
 file_put_contents('debug.log', "Logging out user with session ID: " . session_id() . "\n", FILE_APPEND);
 
-// Unset all session variables
+// Blow away all session data including the JWT
 $_SESSION = [];
-
-// Destroy the session
-if (session_id() !== "" || isset($_COOKIE[session_name()])) {
-    setcookie(session_name(), '', time() - 3600, '/'); // Clear the session cookie
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000,
+        $params["path"], $params["domain"],
+        $params["secure"], $params["httponly"]
+    );
 }
-session_destroy(); // Destroy the session
+session_destroy();
 
-// Clear all cookies related to session or user data
-if (isset($_COOKIE['buwana_id'])) {
-    setcookie('buwana_id', '', time() - 3600, '/');
-}
+// Optional: clear additional auth-related cookies
+setcookie('buwana_id', '', time() - 3600, '/');
 
-// Build the redirect URL with status and redirect parameters
+// Redirect target
+$redirect = isset($_GET['redirect']) ? filter_var($_GET['redirect'], FILTER_SANITIZE_SPECIAL_CHARS) : '';
 $redirect_url = 'login.php?status=logout';
 if (!empty($redirect)) {
     $redirect_url .= '&redirect=' . urlencode($redirect);
 }
 
-// Redirect to the login page
+// Redirect
 header('Location: ' . $redirect_url);
 exit();
 ?>
