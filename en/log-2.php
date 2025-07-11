@@ -1,6 +1,7 @@
 <?php
 ob_start(); // Start output buffering
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require_once '../auth/session_start.php';
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));

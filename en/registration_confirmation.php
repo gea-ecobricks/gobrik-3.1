@@ -1,5 +1,6 @@
 <?php
 require_once '../earthenAuth_helper.php';
+require_once '../auth/session_start.php';
 require '../vendor/autoload.php';
 
 use GuzzleHttp\Client;
