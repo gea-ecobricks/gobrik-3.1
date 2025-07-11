@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '../auth/session_start.php';
+require_once __DIR__ . './../auth/session_start.php';
 
 // Determine language dynamically
 $lang = $lang ?? 'en'; // fallback if not already set
