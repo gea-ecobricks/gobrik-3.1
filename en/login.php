@@ -1,12 +1,12 @@
 <?php
-require_once __DIR__ . '/auth/session_start.php';
+require_once __DIR__ . '../auth/session_start.php';
 
 // Determine language dynamically
 $lang = $lang ?? 'en'; // fallback if not already set
 
 // If user is logged in, redirect to dashboard
 if ($is_logged_in) {
-    header("Location: /$lang/dashboard.php");
+    header("Location: dashboard.php");
     exit;
 }
 
