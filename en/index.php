@@ -74,7 +74,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <div class="welcome-text" data-lang-id="001-welcome-text">GoBrik helps manage your ecobricks, plastic and projects so that together we can build our greenest visions.</div>
         <div class="sign-buttons" style="display:flex;flex-flow:row;justify-content: center;">
             <div>
-                <button type="button" aria-label="sign in" class="sign-innn" onclick="location.href='login.php" title="Click here to sign in" style="cursor:pointer;">
+                <button type="button" aria-label="sign in" class="sign-innn" onclick="location.href='login.php'" title="Click here to sign in" style="cursor:pointer;">
                     <i style="background: url(../svgs/bottle-icon.svg) no-repeat; width:20px; height:26px; display: inline-block; background-size:contain; margin-bottom:-5px; margin-right:4px;"></i>
                     <span data-lang-id="002-sign-in">Log in</span>
                 </button>
