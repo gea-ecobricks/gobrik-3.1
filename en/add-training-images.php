@@ -3,6 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 ini_set('memory_limit', '256M'); // Increase memory limit
 require_once '../earthenAuth_helper.php'; // Authentication helper
+require_once '../auth/session_start.php';
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));

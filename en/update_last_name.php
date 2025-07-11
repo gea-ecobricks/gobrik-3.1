@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once '../auth/session_start.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
