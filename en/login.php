@@ -1,10 +1,14 @@
 <?php
 require_once __DIR__ . './../auth/session_start.php';
 
+session_start();
+
 // Determine language dynamically
 $lang = $lang ?? 'en'; // fallback if not already set
 
-// If user is logged in, redirect to dashboard
+// Check login state properly
+$is_logged_in = isset($_SESSION['buwana_user']) && !empty($_SESSION['buwana_user']['jwt']);
+
 if ($is_logged_in) {
     header("Location: dashboard.php");
     exit;
