@@ -1,6 +1,6 @@
 <?php
 require_once '../earthenAuth_helper.php';
-startSecureSession();
+require_once '../auth/session_start.php';
 
 header('Content-Type: application/json');
 

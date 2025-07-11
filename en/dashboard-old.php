@@ -1,5 +1,6 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require_once '../auth/session_start.php';
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
@@ -7,7 +8,6 @@ $version = '0.61';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-startSecureSession(); // Start a secure session with regeneration to prevent session fixation
 
 
 // Check if user is logged in and session active

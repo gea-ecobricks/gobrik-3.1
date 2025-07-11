@@ -1,5 +1,6 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require_once '../auth/session_start.php';
 require '../vendor/autoload.php'; // Path to Composer's autoloader
 
 use GuzzleHttp\Client;

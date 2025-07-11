@@ -1,5 +1,6 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+require_once '../auth/session_start.php';
 
 // Ensure the user is logged in (handled by $is_logged_in from helper)
 if (!$is_logged_in) {

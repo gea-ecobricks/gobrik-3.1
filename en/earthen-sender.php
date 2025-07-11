@@ -1,5 +1,6 @@
 <?php
 require_once '../earthenAuth_helper.php'; // Authentication helper
+require_once '../auth/session_start.php';
 require '../vendor/autoload.php'; // Composer autoload
 
 use GuzzleHttp\Client;
@@ -12,7 +13,6 @@ $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 
-startSecureSession(); // Start a secure session with regeneration to prevent session fixation
 
 
 // Check if user is logged in and session active

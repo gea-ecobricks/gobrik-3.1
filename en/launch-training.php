@@ -1,6 +1,7 @@
 <?php
 
 require_once '../earthenAuth_helper.php'; // Authentication helper
+require_once '../auth/session_start.php';
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
