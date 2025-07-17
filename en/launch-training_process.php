@@ -155,7 +155,7 @@ if ($editing) {
     $types = '';
     for ($i = 1; $i <= 3; $i++) {
         $name = "feature_photo{$i}_main";
-        if (!empty($_POST[$name])) {
+        if (!empty($_POST[$name] ?? '')) {
             $fields[] = "$name=?";
             $values[] = trim($_POST[$name]);
             $types .= 's';
@@ -202,7 +202,7 @@ if ($editing) {
     $types = '';
     for ($i = 1; $i <= 3; $i++) {
         $name = "feature_photo{$i}_main";
-        if (!empty($_POST[$name])) {
+        if (!empty($_POST[$name] ?? '')) {
             $fields[] = "$name=?";
             $values[] = trim($_POST[$name]);
             $types .= 's';
