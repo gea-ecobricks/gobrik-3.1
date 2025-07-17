@@ -80,7 +80,12 @@ Alright, see you soon!
 EOT;
 
     if ($override !== '') {
-        $body = $override;
+        // Replace any $first_name placeholder in the custom message
+        $body = str_replace([
+            '$first_name',
+            '{first_name}',
+            '{$first_name}'
+        ], $first_name, $override);
     }
 
     $html = nl2br($body);
