@@ -486,6 +486,8 @@ if (!empty($community_id)) {
            </p>
        </div>
 
+   <?php if ($editing): ?>
+
    <br><hr><br>
 
    <h4>Training Feature Images</h4>
@@ -623,6 +625,7 @@ if (!empty($community_id)) {
         </label>
 
     </div>
+    <?php endif; ?>
 
     <!-- Hidden Training ID -->
     <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
