@@ -64,6 +64,7 @@ $zoom_link = trim($_POST['zoom_link'] ?? '');
 $zoom_link_full = trim($_POST['zoom_link_full'] ?? '');
 $registration_scope = trim($_POST['registration_scope'] ?? '');
 $trainer_contact_email = trim($_POST['trainer_contact_email'] ?? '');
+$earthcal_event_url = trim($_POST['earthcal_event_url'] ?? '');
 
 $cost = isset($_POST["cost"]) ? intval($_POST["cost"]) : null;
 $currency = trim($_POST["currency"] ?? "");
@@ -127,19 +128,19 @@ if ($editing) {
             training_location=?, training_summary=?, training_agenda=?,
             training_success=?, training_challenges=?, training_lessons_learned=?,
             youtube_result_video=?, moodle_url=?, ready_to_show=?, show_report=?, show_signup_count=?, featured_description=?, community_id=?,
-            zoom_link=?, zoom_link_full=?, registration_scope=?, trainer_contact_email=?, cost=?, currency=?, display_cost=?
+            zoom_link=?, zoom_link_full=?, registration_scope=?, trainer_contact_email=?, earthcal_event_url=?, cost=?, currency=?, display_cost=?
             WHERE training_id=?";
     $stmt = $gobrik_conn->prepare($sql);
     if (!$stmt) {
         echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
         exit();
     }
-    $stmt->bind_param("sssississiissssssssiiisissssissi",
+    $stmt->bind_param("sssississiissssssssiiisisssssissi",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
         $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $show_signup_count,
-        $featured_description, $community_id, $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email, $cost, $currency, $display_cost,
+        $featured_description, $community_id, $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email, $earthcal_event_url, $cost, $currency, $display_cost,
         $training_id
     );
     if ($stmt->execute()) {
@@ -175,19 +176,19 @@ if ($editing) {
             (training_title, training_subtitle, lead_trainer, country_id, training_date, training_time_txt, no_participants,
             training_type, training_language, briks_made, avg_brik_weight, training_location, training_summary, training_agenda, training_success, training_challenges,
             training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, show_report, show_signup_count, featured_description, community_id,
-            zoom_link, zoom_link_full, registration_scope, trainer_contact_email, cost, currency, display_cost)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            zoom_link, zoom_link_full, registration_scope, trainer_contact_email, earthcal_event_url, cost, currency, display_cost)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $gobrik_conn->prepare($sql);
     if (!$stmt) {
         echo json_encode(['success' => false, 'error' => 'Statement preparation failed.']);
         exit();
     }
-    $stmt->bind_param("sssississiissssssssiiisissssiss",
+    $stmt->bind_param("sssississiissssssssiiisisssssiss",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $training_time_txt, $no_participants,
         $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
         $training_summary, $training_agenda, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $show_signup_count, $featured_description, $community_id,
-        $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email, $cost, $currency, $display_cost
+        $zoom_link, $zoom_link_full, $registration_scope, $trainer_contact_email, $earthcal_event_url, $cost, $currency, $display_cost
     );
     if ($stmt->execute()) {
         $new_training_id = $gobrik_conn->insert_id;
