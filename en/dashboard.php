@@ -146,7 +146,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
                 <span style="margin-right:10px;">🌟</span>
-                <span>On July 19th we're offering a free Zoom intro to ecobricks learning event!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
+                <span>'What Should Green Really mean?' Free GEA webinar on August 10th!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">
