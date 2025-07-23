@@ -124,6 +124,7 @@ $training_subtitle = '';
 $training_time_txt = '';
 $registration_scope = '';
 $trainer_contact_email = '';
+$earthcal_event_url = '';
 $show_report = 0;
 $show_signup_count = 0;
 
@@ -133,7 +134,7 @@ if ($editing) {
                   training_type, training_language, briks_made, avg_brik_weight, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, show_report, show_signup_count, featured_description, community_id,
-                  zoom_link, zoom_link_full, feature_photo1_main, feature_photo1_tmb, feature_photo2_main, feature_photo2_tmb, feature_photo3_main, feature_photo3_tmb, registration_scope, trainer_contact_email
+                  zoom_link, zoom_link_full, earthcal_event_url, feature_photo1_main, feature_photo1_tmb, feature_photo2_main, feature_photo2_tmb, feature_photo3_main, feature_photo3_tmb, registration_scope, trainer_contact_email
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -143,7 +144,7 @@ if ($editing) {
                             $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $show_signup_count, $featured_description, $community_id,
-                            $zoom_link, $zoom_link_full, $feature_photo1_main, $feature_photo1_tmb, $feature_photo2_main, $feature_photo2_tmb, $feature_photo3_main, $feature_photo3_tmb, $registration_scope, $trainer_contact_email);
+                            $zoom_link, $zoom_link_full, $earthcal_event_url, $feature_photo1_main, $feature_photo1_tmb, $feature_photo2_main, $feature_photo2_tmb, $feature_photo3_main, $feature_photo3_tmb, $registration_scope, $trainer_contact_email);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
@@ -471,8 +472,18 @@ if (!empty($community_id)) {
     <div class="form-item">
         <label for="zoom_link_full">Zoom Link Full:</label><br>
         <textarea id="zoom_link_full" name="zoom_link_full" class="form-field-style"><?php echo htmlspecialchars($zoom_link_full ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+       <p class="form-caption">
+           Paste the full Zoom link with as much accompanying text as you think appropriate.
+       </p>
+   </div>
+
+    <!-- ======================= Earthcal Event Link ======================= -->
+    <div class="form-item">
+        <label for="earthcal_event_url">📆 Earthcal Event Link</label><br>
+        <input type="url" id="earthcal_event_url" name="earthcal_event_url" class="form-field-style"
+               value="<?php echo htmlspecialchars($earthcal_event_url ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p class="form-caption">
-            Paste the full Zoom link with as much accompanying text as you think appropriate.
+            Grab a Share-Event-Link from your Earthcal so that participants can easily add this training to their personal calendars
         </p>
     </div>
 
@@ -485,6 +496,8 @@ if (!empty($community_id)) {
                Set the contact email for this course that folks can reply to.
            </p>
        </div>
+
+   <?php if ($editing): ?>
 
    <br><hr><br>
 
@@ -623,6 +636,7 @@ if (!empty($community_id)) {
         </label>
 
     </div>
+    <?php endif; ?>
 
     <!-- Hidden Training ID -->
     <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">

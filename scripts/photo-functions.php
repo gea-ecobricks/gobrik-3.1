@@ -74,7 +74,8 @@ function createTrainingThumbnail($source_path, $destination_path, $target_height
             $source_image = imagecreatefromwebp($source_path);
             break;
         default:
-            echo "<script>console.log('Unsupported image type for $source_path');</script>";
+            // Log instead of outputting to keep JSON responses clean
+            error_log('Unsupported image type for ' . $source_path);
             return false;
     }
 
@@ -88,10 +89,12 @@ function createTrainingThumbnail($source_path, $destination_path, $target_height
             imagedestroy($thumbnail);
             return true;
         } else {
-            echo "<script>console.log('Failed to save thumbnail to $destination_path');</script>";
+            // Log instead of echoing to the output
+            error_log('Failed to save thumbnail to ' . $destination_path);
         }
     } else {
-        echo "<script>console.log('Failed to create thumbnail for $source_path');</script>";
+        // Log instead of echoing to the output
+        error_log('Failed to create thumbnail for ' . $source_path);
     }
     imagedestroy($source_image);
     imagedestroy($thumbnail);
@@ -182,7 +185,8 @@ function resizeAndConvertTrainingToWebP($sourcePath, $targetPath, $maxWidth, $co
             $src = imagecreatefrompng($sourcePath);
             break;
         default:
-            echo "<script>console.log('Unsupported image type');</script>";
+            // Log to server instead of outputting script tags
+            error_log('Unsupported image type');
             return false;
     }
 
@@ -197,9 +201,11 @@ function resizeAndConvertTrainingToWebP($sourcePath, $targetPath, $maxWidth, $co
 
         // Save the resized image as WebP
         if (imagewebp($dst, $targetPath, $compressionQuality)) {
-            echo "<script>console.log('Image resized to: {$newWidth}px x {$newHeight}px and saved to {$targetPath}');</script>";
+            // Log to server instead of outputting script tags
+            error_log('Image resized to: ' . $newWidth . 'px x ' . $newHeight . 'px and saved to ' . $targetPath);
         } else {
-            echo "<script>console.log('Failed to save image as WebP');</script>";
+            // Log the failure instead of echoing script tags
+            error_log('Failed to save image as WebP');
             imagedestroy($src);
             imagedestroy($dst);
             return false;
@@ -211,9 +217,11 @@ function resizeAndConvertTrainingToWebP($sourcePath, $targetPath, $maxWidth, $co
 
         // Verify the resized image
         list($newWidthVerified, $newHeightVerified) = getimagesize($targetPath);
-        echo "<script>console.log('Verified resized dimensions: {$newWidthVerified}px x {$newHeightVerified}px');</script>";
+        // Log verification info instead of echoing script tags
+        error_log('Verified resized dimensions: ' . $newWidthVerified . 'px x ' . $newHeightVerified . 'px');
     } else {
-        echo "<script>console.log('Failed to create image resource');</script>";
+        // Log instead of echoing to keep response clean
+        error_log('Failed to create image resource');
         return false;
     }
 
@@ -278,10 +286,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $training_id = $_POST['training_id'];
     $deleteResult = deleteTraining($training_id, $conn);
     if ($deleteResult === true) {
-        echo "<script>alert('Training has been successfully deleted.'); window.location.href='training-report.php';</script>";
+        // Simple JSON confirmation for AJAX handlers
+        echo json_encode(['success' => true]);
         exit;
     } else {
-        echo "<script>alert('" . $deleteResult . "');</script>";
+        echo json_encode(['success' => false, 'error' => $deleteResult]);
         exit;
     }
 }
