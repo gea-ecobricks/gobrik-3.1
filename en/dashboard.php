@@ -69,7 +69,7 @@ $locationFullTxt = $location_third_last . ', ' . $location_last;
 
 // 🎓 Fetch trainings where user is trainer
 $trainings = [];
-$sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type, t.ready_to_show,
+$sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type, t.ready_to_show, t.show_report,
                          (SELECT COUNT(*) FROM tb_training_trainees WHERE training_id = t.training_id) AS trainee_count
                   FROM tb_trainings t
                   INNER JOIN tb_training_trainers tt ON t.training_id = tt.training_id
@@ -262,9 +262,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                         </a>
                     </td>
 
-                    <!-- Status column showing publication status -->
+                    <!-- Status column with show_report toggle -->
                     <td style="text-align:center;">
-                        <?php echo ($training['ready_to_show'] == 1) ? '🟢' : '⚪'; ?>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="training-status-toggle" data-training-id="<?php echo $training['training_id']; ?>" <?php echo ($training['show_report'] == 1) ? 'checked' : ''; ?>>
+                            <span class="slider"></span>
+                        </label>
                     </td>
 
                     <!-- Actions column -->
@@ -1182,7 +1185,7 @@ function copyCourseListingURL(trainingId, button) {
 
 function deleteTraining(trainingId) {
     if (confirm('Are you sure you want to delete this training? This cannot be undone.')) {
-        fetch('process/delete_training.php', {
+        fetch('processes/delete_training.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1206,6 +1209,35 @@ function deleteTraining(trainingId) {
         });
     }
 }
+
+// Toggle show_report status for trainings
+document.querySelectorAll('.training-status-toggle').forEach(function(toggle) {
+    toggle.addEventListener('change', function() {
+        const trainingId = this.dataset.trainingId;
+        const showReport = this.checked ? 1 : 0;
+        fetch('api/toggle_training_status.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'training_id': trainingId,
+                'show_report': showReport
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert('Error updating status: ' + data.error);
+                toggle.checked = !toggle.checked; // revert on failure
+            }
+        })
+        .catch(() => {
+            alert('There was an error processing your request.');
+            toggle.checked = !toggle.checked;
+        });
+    });
+});
 
 
 
