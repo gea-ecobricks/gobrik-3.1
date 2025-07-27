@@ -1279,6 +1279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSlide = 0;
 
     function showSlide(index) {
+        console.log('Showing slide', index);
         slides[currentSlide].classList.remove('active');
         dots[currentSlide].classList.remove('active');
         currentSlide = (index + slides.length) % slides.length;
@@ -1287,6 +1288,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function nextSlide() {
+        console.log('Auto advancing to next slide');
         showSlide(currentSlide + 1);
     }
 
