@@ -239,11 +239,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <tr>
                 <th>Training</th>
                 <th>Date</th>
-                <th>Location</th>
                 <th>Type</th>
-                <th>Registered</th> <!-- Updated Column Name -->
-                <th>Edit</th>
-                <th>Report</th> <!-- New Column -->
+                <th>Registered</th>
+                <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -254,9 +253,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <!-- Format the date to remove time -->
                     <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
 
-                    <td><?php echo htmlspecialchars($training['training_location']); ?></td>
                     <td><?php echo htmlspecialchars($training['training_type']); ?></td>
-
+                    
                     <!-- Updated Registered Column -->
                     <td style="text-align:center;">
                         <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
@@ -264,18 +262,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                         </a>
                     </td>
 
-                    <!-- Edit column showing publication status -->
+                    <!-- Status column showing publication status -->
                     <td style="text-align:center;">
-                        <a href="launch-training.php?id=<?php echo $training['training_id']; ?>">
-                            <?php echo ($training['ready_to_show'] == 1) ? '🟢' : '⚪'; ?>
-                        </a>
+                        <?php echo ($training['ready_to_show'] == 1) ? '🟢' : '⚪'; ?>
                     </td>
 
-                    <!-- New Report Column -->
+                    <!-- Actions column -->
                     <td style="text-align:center;">
-                        <a href="training-report.php?training_id=<?php echo $training['training_id']; ?>" class="log-report-btn">
-                            Log Report
-                        </a>
+                        <button class="serial-button" onclick="actionsTrainingModal(<?php echo $training['training_id']; ?>)">⚙️</button>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -658,10 +652,10 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [4, 5, 6] }, // Disable sorting on "Registered", "Edit" and "Report" columns
-            { "targets": [1, 2, 3], "visible": true }, // Show Date, Location, Type
-            { "targets": [1, 2, 3], "visible": false, "responsivePriority": 1 }, // Hide on small screens
-            { "className": "all", "targets": [5] } // Always show Edit column
+            { "orderable": false, "targets": [3, 4, 5] }, // Disable sorting on Registered, Status and Actions columns
+            { "targets": [1, 2], "visible": true }, // Show Date and Type
+            { "targets": [1, 2], "visible": false, "responsivePriority": 1 }, // Hide on small screens
+            { "className": "all", "targets": [5] } // Always show Actions column
         ]
     });
 
@@ -669,12 +663,10 @@ $(document).ready(function() {
     function adjustTableColumns() {
         if (window.innerWidth < 769) {
             table.column(1).visible(false); // Hide Date
-            table.column(2).visible(false); // Hide Location
-            table.column(3).visible(false); // Hide Type
+            table.column(2).visible(false); // Hide Type
         } else {
             table.column(1).visible(true);
             table.column(2).visible(true);
-            table.column(3).visible(true);
         }
     }
 
@@ -1136,6 +1128,76 @@ function deleteEcobrick(serial_no) {
                 window.location.href = 'dashboard.php'; // Redirect after deletion
             } else {
                 alert('There was an error deleting the ecobrick: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error processing your request.');
+        });
+    }
+}
+
+function actionsTrainingModal(trainingId) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+    const messageContainer = document.querySelector('.modal-message');
+
+    let url = `register.php?id=${trainingId}`;
+    let content = '';
+    content += `<a class="ecobrick-action-button" href="${url}" target="_blank">🔍 View Course Listing</a>`;
+    content += `<a class="ecobrick-action-button" href="launch-training.php?id=${trainingId}">✏️ Edit Course</a>`;
+    content += `<a class="ecobrick-action-button" href="training-report.php?training_id=${trainingId}">📝 Edit Report</a>`;
+    content += `<a class="ecobrick-action-button" href="javascript:void(0);" onclick="copyCourseListingURL(${trainingId}, this)">🔗 Copy Course Listing URL</a>`;
+    content += `<a class="ecobrick-action-button deleter-button" href="javascript:void(0);" onclick="deleteTraining(${trainingId})">❌ Delete Training</a>`;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    modalBox.style.background = 'none';
+    document.getElementById('page-content').classList.add('blurred');
+    document.getElementById('footer-full').classList.add('blurred');
+    document.body.classList.add('modal-open');
+}
+
+function copyCourseListingURL(trainingId, button) {
+    const url = `https://gobrik.com/en/register.php?id=${trainingId}`;
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(() => {
+            button.innerHTML = 'URL Copied!';
+            setTimeout(closeInfoModal, 1000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Error copying URL. Please try again.');
+        });
+    } else {
+        const tempInput = document.createElement('input');
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        button.innerHTML = 'URL Copied!';
+        setTimeout(closeInfoModal, 1000);
+    }
+}
+
+function deleteTraining(trainingId) {
+    if (confirm('Are you sure you want to delete this training? This cannot be undone.')) {
+        fetch('process/delete_training.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'training_id': trainingId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Training deleted successfully.');
+                window.location.reload();
+            } else {
+                alert('Error deleting training: ' + data.error);
             }
         })
         .catch(error => {
