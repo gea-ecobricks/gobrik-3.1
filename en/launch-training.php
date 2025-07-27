@@ -612,11 +612,11 @@ if (!empty($community_id)) {
 
         <div id="right-column" style="width:100px; justify-content:center;">
             <label class="toggle-switch">
-            <input type="checkbox" id="show_report" name="show_report" value="1"
-                   <?php echo (isset($show_report) && $show_report) ? 'checked' : ''; ?>>
-            <span class="slider"></span>
+                <input type="checkbox" id="show_report" name="show_report" value="1"
+                       <?php echo (isset($show_report) && $show_report) ? 'checked' : ''; ?>>
+                <span class="slider"></span>
+            </label>
         </div>
-        </label>
 
     </div>
 
@@ -629,11 +629,11 @@ if (!empty($community_id)) {
 
         <div id="right-column" style="width:100px; justify-content:center;">
             <label class="toggle-switch">
-            <input type="checkbox" id="show_signup_count" name="show_signup_count" value="1"
-                   <?php echo (isset($show_signup_count) && $show_signup_count) ? 'checked' : ''; ?>>
-            <span class="slider"></span>
+                <input type="checkbox" id="show_signup_count" name="show_signup_count" value="1"
+                       <?php echo (isset($show_signup_count) && $show_signup_count) ? 'checked' : ''; ?>>
+                <span class="slider"></span>
+            </label>
         </div>
-        </label>
 
     </div>
     <?php endif; ?>
