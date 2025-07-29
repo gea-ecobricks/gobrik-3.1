@@ -244,13 +244,26 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($trainings as $training): ?>
+            <?php $pendingReport = null; foreach ($trainings as $training): ?>
                 <?php
                     $training_date_ts = strtotime($training['training_date']);
-                    $show_green = $training['ready_to_show'] == 1 && $training_date_ts <= time();
+                    $is_listed = $training['ready_to_show'] == 1;
+                    if ($is_listed && $training_date_ts < time()) {
+                        $circle = '🟢';
+                    } elseif ($is_listed && $training_date_ts > time()) {
+                        $circle = '🔴';
+                        if (!isset($pendingReport)) {
+                            $pendingReport = [
+                                'id' => $training['training_id'],
+                                'title' => $training['training_title']
+                            ];
+                        }
+                    } else {
+                        $circle = '⚪';
+                    }
                 ?>
                 <tr>
-                    <td><?php echo ($show_green ? '🟢' : '⚪') . ' ' . htmlspecialchars($training['training_title']); ?></td>
+                    <td><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
 
                     <!-- Format the date to remove time -->
                     <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
@@ -1365,6 +1378,26 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<?php if (isset($pendingReport)): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+    const firstName = <?php echo json_encode($first_name); ?>;
+    const courseName = <?php echo json_encode($pendingReport['title']); ?>;
+    const trainingId = <?php echo json_encode($pendingReport['id']); ?>;
+    modalBox.innerHTML = `<p>Hi there ${firstName}! It looks like your course ${courseName} is complete! Be sure to complete your GEA Training Report</p>` +
+        `<a href="training-report.php?training_id=${trainingId}" class="confirm-button" style="margin-top:10px;">Complete Report</a>`;
+    modal.classList.remove('modal-hidden');
+});
+</script>
+<?php endif; ?>
 
 </body>
 </html>
