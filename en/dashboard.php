@@ -254,10 +254,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                         $circle = '⚪';
                     } elseif ($training_date_ts > time()) {
                         // Listed and upcoming
-                        $circle = '🔴';
+                        $circle = '🟢';
                     } else {
                         // Listed and in the past
-                        $circle = '🟢';
+                        $circle = '🔴';
                         if (!isset($pendingReport)) {
                             $pendingReport = [
                                 'id' => $training['training_id'],
