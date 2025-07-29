@@ -248,15 +248,19 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <?php
                     $training_date_ts = strtotime($training['training_date']);
                     $is_listed = $training['ready_to_show'] == 1;
+                    $show_report = $training['show_report'] == 1;
 
                     if (!$is_listed) {
-                        // Not listed yet
+                        // Training not listed yet
                         $circle = '⚪';
+                    } elseif ($show_report) {
+                        // Report complete and public
+                        $circle = '✅';
                     } elseif ($training_date_ts > time()) {
                         // Listed and upcoming
                         $circle = '🟢';
                     } else {
-                        // Listed and in the past
+                        // Listed, past and no report yet
                         $circle = '🔴';
                         if (!isset($pendingReport)) {
                             $pendingReport = [
