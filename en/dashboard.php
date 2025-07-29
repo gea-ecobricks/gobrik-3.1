@@ -239,7 +239,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <tr>
                 <th>Training</th>
                 <th>Date</th>
-                <th>Type</th>
                 <th>Registered</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -253,8 +252,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <!-- Format the date to remove time -->
                     <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
 
-                    <td><?php echo htmlspecialchars($training['training_type']); ?></td>
-                    
                     <!-- Updated Registered Column -->
                     <td style="text-align:center;">
                         <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
@@ -655,10 +652,10 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [3, 4, 5] }, // Disable sorting on Registered, Status and Actions columns
-            { "targets": [1, 2], "visible": true }, // Show Date and Type
-            { "targets": [1, 2], "visible": false, "responsivePriority": 1 }, // Hide on small screens
-            { "className": "all", "targets": [5] } // Always show Actions column
+            { "orderable": false, "targets": [2, 3, 4] }, // Disable sorting on Registered, Status and Actions columns
+            { "targets": [1], "visible": true }, // Show Date
+            { "targets": [1], "visible": false, "responsivePriority": 1 }, // Hide on small screens
+            { "className": "all", "targets": [4] } // Always show Actions column
         ]
     });
 
@@ -666,10 +663,8 @@ $(document).ready(function() {
     function adjustTableColumns() {
         if (window.innerWidth < 769) {
             table.column(1).visible(false); // Hide Date
-            table.column(2).visible(false); // Hide Type
         } else {
             table.column(1).visible(true);
-            table.column(2).visible(true);
         }
     }
 
@@ -1185,7 +1180,7 @@ function copyCourseListingURL(trainingId, button) {
 
 function deleteTraining(trainingId) {
     if (confirm('Are you sure you want to delete this training? This cannot be undone.')) {
-        fetch('processes/delete_training.php', {
+        fetch('../processes/delete_training.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1215,7 +1210,7 @@ document.querySelectorAll('.training-status-toggle').forEach(function(toggle) {
     toggle.addEventListener('change', function() {
         const trainingId = this.dataset.trainingId;
         const showReport = this.checked ? 1 : 0;
-        fetch('api/toggle_training_status.php', {
+        fetch('../api/toggle_training_status.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
