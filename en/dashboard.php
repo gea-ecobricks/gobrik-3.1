@@ -256,7 +256,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <!-- Updated Signups Column -->
                     <td style="text-align:center;">
                         <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
-                            👥 <?php echo (int) $training['trainee_count']; ?>
+                            <?php echo (int) $training['trainee_count']; ?> 👥
                         </a>
                     </td>
 
@@ -278,7 +278,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
                     <!-- Actions column -->
                     <td style="text-align:center;">
-                        <button class="serial-button" onclick="actionsTrainingModal(<?php echo $training['training_id']; ?>)">⚙️</button>
+                        <button class="serial-button settings-button" onclick="actionsTrainingModal(<?php echo $training['training_id']; ?>)">⚙️</button>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -1157,7 +1157,27 @@ function actionsTrainingModal(trainingId) {
     content += `<a class="ecobrick-action-button" href="javascript:void(0);" onclick="copyCourseListingURL(${trainingId}, this)">🔗 Copy Course Listing URL</a>`;
     content += `<a class="ecobrick-action-button deleter-button" href="javascript:void(0);" onclick="deleteTraining(${trainingId})">❌ Delete Training</a>`;
 
+    const reportChecked = document.querySelector('.training-report-toggle[data-training-id="' + trainingId + '"]')?.checked ? 'checked' : '';
+    const listingChecked = document.querySelector('.training-listing-toggle[data-training-id="' + trainingId + '"]')?.checked ? 'checked' : '';
+
+    content += `<div style="margin-top:10px;">Training Report
+                    <label class="toggle-switch" style="margin-left:10px;">
+                        <input type="checkbox" class="training-report-toggle" data-training-id="${trainingId}" ${reportChecked}>
+                        <span class="slider"></span>
+                    </label>
+                </div>`;
+    content += `<div style="margin-top:10px;">Training Listing
+                    <label class="toggle-switch" style="margin-left:10px;">
+                        <input type="checkbox" class="training-listing-toggle" data-training-id="${trainingId}" ${listingChecked}>
+                        <span class="slider"></span>
+                    </label>
+                </div>`;
+
     messageContainer.innerHTML = content;
+    const newReportToggle = messageContainer.querySelector('.training-report-toggle');
+    const newListingToggle = messageContainer.querySelector('.training-listing-toggle');
+    if (newReportToggle) addReportToggleListener(newReportToggle);
+    if (newListingToggle) addListingToggleListener(newListingToggle);
     modal.style.display = 'flex';
     modalBox.style.background = 'none';
     document.getElementById('page-content').classList.add('blurred');
@@ -1214,8 +1234,7 @@ function deleteTraining(trainingId) {
     }
 }
 
-// Toggle show_report status for trainings
-document.querySelectorAll('.training-report-toggle').forEach(function(toggle) {
+function addReportToggleListener(toggle) {
     toggle.addEventListener('change', function() {
         const trainingId = this.dataset.trainingId;
         const showReport = this.checked ? 1 : 0;
@@ -1241,10 +1260,9 @@ document.querySelectorAll('.training-report-toggle').forEach(function(toggle) {
             toggle.checked = !toggle.checked;
         });
     });
-});
+}
 
-// Toggle ready_to_show status for trainings
-document.querySelectorAll('.training-listing-toggle').forEach(function(toggle) {
+function addListingToggleListener(toggle) {
     toggle.addEventListener('change', function() {
         const trainingId = this.dataset.trainingId;
         const readyToShow = this.checked ? 1 : 0;
@@ -1270,7 +1288,10 @@ document.querySelectorAll('.training-listing-toggle').forEach(function(toggle) {
             toggle.checked = !toggle.checked;
         });
     });
-});
+}
+
+document.querySelectorAll('.training-report-toggle').forEach(addReportToggleListener);
+document.querySelectorAll('.training-listing-toggle').forEach(addListingToggleListener);
 
 
 
