@@ -219,6 +219,22 @@ margin-top:-100px !important;
     color: white;          /* White text for contrast */
 }
 
+/* Toggle rows inside the training actions modal */
+.training-toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--same);
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.training-toggle-title {
+    font-size: 1em;
+    color: grey;
+}
+
 </style>
 
 

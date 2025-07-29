@@ -240,15 +240,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <th>Training</th>
                 <th>Date</th>
                 <th>Signups</th>
-                <th>Report</th>
-                <th>Listing</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($trainings as $training): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($training['training_title']); ?></td>
+                    <td><?php echo ($training['ready_to_show'] == 1 ? '🟢' : '⚪') . ' ' . htmlspecialchars($training['training_title']); ?></td>
 
                     <!-- Format the date to remove time -->
                     <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
@@ -258,22 +256,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                         <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
                             <?php echo (int) $training['trainee_count']; ?> 👥
                         </a>
-                    </td>
-
-                    <!-- Report column with show_report toggle -->
-                    <td style="text-align:center;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" class="training-report-toggle" data-training-id="<?php echo $training['training_id']; ?>" <?php echo ($training['show_report'] == 1) ? 'checked' : ''; ?>>
-                            <span class="slider"></span>
-                        </label>
-                    </td>
-
-                    <!-- Listing column with ready_to_show toggle -->
-                    <td style="text-align:center;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" class="training-listing-toggle" data-training-id="<?php echo $training['training_id']; ?>" <?php echo ($training['ready_to_show'] == 1) ? 'checked' : ''; ?>>
-                            <span class="slider"></span>
-                        </label>
                     </td>
 
                     <!-- Actions column -->
@@ -661,10 +643,10 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [2, 3, 4, 5] }, // Disable sorting on Signups, Report, Listing and Actions columns
+            { "orderable": false, "targets": [2, 3] }, // Disable sorting on Signups and Actions columns
             { "targets": [1], "visible": true }, // Show Date
             { "targets": [1], "visible": false, "responsivePriority": 1 }, // Hide on small screens
-            { "className": "all", "targets": [5] } // Always show Actions column
+            { "className": "all", "targets": [3] } // Always show Actions column
         ]
     });
 
@@ -1160,14 +1142,16 @@ function actionsTrainingModal(trainingId) {
     const reportChecked = document.querySelector('.training-report-toggle[data-training-id="' + trainingId + '"]')?.checked ? 'checked' : '';
     const listingChecked = document.querySelector('.training-listing-toggle[data-training-id="' + trainingId + '"]')?.checked ? 'checked' : '';
 
-    content += `<div style="margin-top:10px;">Training Report
-                    <label class="toggle-switch" style="margin-left:10px;">
+    content += `<div class="training-toggle-row">
+                    <span class="training-toggle-title">Publish report on ecobricks.org:</span>
+                    <label class="toggle-switch">
                         <input type="checkbox" class="training-report-toggle" data-training-id="${trainingId}" ${reportChecked}>
                         <span class="slider"></span>
                     </label>
                 </div>`;
-    content += `<div style="margin-top:10px;">Training Listing
-                    <label class="toggle-switch" style="margin-left:10px;">
+    content += `<div class="training-toggle-row">
+                    <span class="training-toggle-title">List on GoBrik courses:</span>
+                    <label class="toggle-switch">
                         <input type="checkbox" class="training-listing-toggle" data-training-id="${trainingId}" ${listingChecked}>
                         <span class="slider"></span>
                     </label>
@@ -1290,8 +1274,7 @@ function addListingToggleListener(toggle) {
     });
 }
 
-document.querySelectorAll('.training-report-toggle').forEach(addReportToggleListener);
-document.querySelectorAll('.training-listing-toggle').forEach(addListingToggleListener);
+
 
 
 
