@@ -245,8 +245,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </thead>
         <tbody>
             <?php foreach ($trainings as $training): ?>
+                <?php
+                    $training_date_ts = strtotime($training['training_date']);
+                    $show_green = $training['ready_to_show'] == 1 && $training_date_ts <= time();
+                ?>
                 <tr>
-                    <td><?php echo ($training['ready_to_show'] == 1 ? '🟢' : '⚪') . ' ' . htmlspecialchars($training['training_title']); ?></td>
+                    <td><?php echo ($show_green ? '🟢' : '⚪') . ' ' . htmlspecialchars($training['training_title']); ?></td>
 
                     <!-- Format the date to remove time -->
                     <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
@@ -1137,7 +1141,6 @@ function actionsTrainingModal(trainingId) {
     content += `<a class="ecobrick-action-button" href="launch-training.php?id=${trainingId}">✏️ Edit Course</a>`;
     content += `<a class="ecobrick-action-button" href="training-report.php?training_id=${trainingId}">📝 Edit Report</a>`;
     content += `<a class="ecobrick-action-button" href="javascript:void(0);" onclick="copyCourseListingURL(${trainingId}, this)">🔗 Copy Course Listing URL</a>`;
-    content += `<a class="ecobrick-action-button deleter-button" href="javascript:void(0);" onclick="deleteTraining(${trainingId})">❌ Delete Training</a>`;
 
     const reportChecked = document.querySelector('.training-report-toggle[data-training-id="' + trainingId + '"]')?.checked ? 'checked' : '';
     const listingChecked = document.querySelector('.training-listing-toggle[data-training-id="' + trainingId + '"]')?.checked ? 'checked' : '';
@@ -1156,6 +1159,8 @@ function actionsTrainingModal(trainingId) {
                         <span class="slider"></span>
                     </label>
                 </div>`;
+
+    content += `<a class="ecobrick-action-button deleter-button" href="javascript:void(0);" onclick="deleteTraining(${trainingId})">❌ Delete Training</a>`;
 
     messageContainer.innerHTML = content;
     const newReportToggle = messageContainer.querySelector('.training-report-toggle');
