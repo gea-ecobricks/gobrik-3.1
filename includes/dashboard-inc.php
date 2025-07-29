@@ -228,11 +228,12 @@ margin-top:-100px !important;
     padding: 10px 20px;
     border-radius: 10px;
     margin-bottom: 10px;
+    width: 100%;
 }
 
 .training-toggle-title {
     font-size: 1em;
-    color: grey;
+    color: var(--text-color);
 }
 
 </style>
