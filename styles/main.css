@@ -2746,6 +2746,11 @@ position:relative;
     opacity: 1; /* Show the magnifying glass */
 }
 
+/* Use a pencil icon for settings buttons */
+.serial-button.settings-button::before {
+    content: "✏️";
+}
+
 
 
 

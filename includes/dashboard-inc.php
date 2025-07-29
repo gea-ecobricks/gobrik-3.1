@@ -25,15 +25,17 @@ margin-top:-100px !important;
 .log-report-btn {
     display: inline-block;
     padding: 5px 10px;
-    background-color: #007BFF;
-    color: white;
+    background-color: #e0e0e0;
+    color: black;
+    border: 1px solid grey;
     text-decoration: none;
     border-radius: 4px;
     font-size: 14px;
 }
 
 .log-report-btn:hover {
-    background-color: #0056b3;
+    background-color: darkgrey;
+    color: white;
 }
 
 
