@@ -239,8 +239,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <tr>
                 <th>Training</th>
                 <th>Date</th>
-                <th>Registered</th>
-                <th>Status</th>
+                <th>Signups</th>
+                <th>Report</th>
+                <th>Listing</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -252,17 +253,25 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <!-- Format the date to remove time -->
                     <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
 
-                    <!-- Updated Registered Column -->
+                    <!-- Updated Signups Column -->
                     <td style="text-align:center;">
                         <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
-                            <?php echo (int) $training['trainee_count']; ?>
+                            👥 <?php echo (int) $training['trainee_count']; ?>
                         </a>
                     </td>
 
-                    <!-- Status column with show_report toggle -->
+                    <!-- Report column with show_report toggle -->
                     <td style="text-align:center;">
                         <label class="toggle-switch">
-                            <input type="checkbox" class="training-status-toggle" data-training-id="<?php echo $training['training_id']; ?>" <?php echo ($training['show_report'] == 1) ? 'checked' : ''; ?>>
+                            <input type="checkbox" class="training-report-toggle" data-training-id="<?php echo $training['training_id']; ?>" <?php echo ($training['show_report'] == 1) ? 'checked' : ''; ?>>
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+
+                    <!-- Listing column with ready_to_show toggle -->
+                    <td style="text-align:center;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="training-listing-toggle" data-training-id="<?php echo $training['training_id']; ?>" <?php echo ($training['ready_to_show'] == 1) ? 'checked' : ''; ?>>
                             <span class="slider"></span>
                         </label>
                     </td>
@@ -652,10 +661,10 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [2, 3, 4] }, // Disable sorting on Registered, Status and Actions columns
+            { "orderable": false, "targets": [2, 3, 4, 5] }, // Disable sorting on Signups, Report, Listing and Actions columns
             { "targets": [1], "visible": true }, // Show Date
             { "targets": [1], "visible": false, "responsivePriority": 1 }, // Hide on small screens
-            { "className": "all", "targets": [4] } // Always show Actions column
+            { "className": "all", "targets": [5] } // Always show Actions column
         ]
     });
 
@@ -1206,11 +1215,11 @@ function deleteTraining(trainingId) {
 }
 
 // Toggle show_report status for trainings
-document.querySelectorAll('.training-status-toggle').forEach(function(toggle) {
+document.querySelectorAll('.training-report-toggle').forEach(function(toggle) {
     toggle.addEventListener('change', function() {
         const trainingId = this.dataset.trainingId;
         const showReport = this.checked ? 1 : 0;
-        fetch('../api/toggle_training_status.php', {
+        fetch('../api/toggle_training_report.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1224,6 +1233,35 @@ document.querySelectorAll('.training-status-toggle').forEach(function(toggle) {
         .then(data => {
             if (!data.success) {
                 alert('Error updating status: ' + data.error);
+                toggle.checked = !toggle.checked; // revert on failure
+            }
+        })
+        .catch(() => {
+            alert('There was an error processing your request.');
+            toggle.checked = !toggle.checked;
+        });
+    });
+});
+
+// Toggle ready_to_show status for trainings
+document.querySelectorAll('.training-listing-toggle').forEach(function(toggle) {
+    toggle.addEventListener('change', function() {
+        const trainingId = this.dataset.trainingId;
+        const readyToShow = this.checked ? 1 : 0;
+        fetch('../api/toggle_training_listing.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'training_id': trainingId,
+                'ready_to_show': readyToShow
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert('Error updating listing status: ' + data.error);
                 toggle.checked = !toggle.checked; // revert on failure
             }
         })
