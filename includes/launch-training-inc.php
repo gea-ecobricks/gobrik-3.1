@@ -128,10 +128,6 @@
 
 }
 
-#main {
-  background-color: #0003 !important;
-}
-
 /*  
 #form-submission-box {
   font-family: "Mulish", sans-serif;

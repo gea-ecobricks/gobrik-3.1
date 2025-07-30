@@ -275,7 +275,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div id="form-submission-box" class="landing-page-form" style="height:auto !important">
         <div class="form-container">
-            <div class="form-top-header" style="display:flex;flex-flow:row;">
+            <div class="form-top-header" style="display:flex;flex-flow:row;margin-top: 20px">
                 <div class="step-graphic" style="width:fit-content;margin:auto;">
                     <img src="../svgs/step2-log-project.svg" style="height:25px;">
                 </div>

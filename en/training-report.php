@@ -202,6 +202,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
      <div id="form-submission-box" class="landing-page-form" style="height:auto !important">
             <div class="form-container">
+                <div class="form-top-header" style="display:flex;flex-flow:row;margin-top: 20px">
+                                <div class="step-graphic" style="width:fit-content;margin:auto;">
+                                    <img src="../svgs/step1-log-project.svg" style="height:25px;">
+                                </div>
+                            </div>
             <div class="splash-form-content-block">
                 <div class="splash-box">
                     <div class="splash-heading" data-lang-id="001-splash-title-post">Post a GEA Training Report</div>
