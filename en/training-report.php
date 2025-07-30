@@ -298,6 +298,19 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                     <div id="weight-error-range" class="form-field-error" data-lang-id="000-field-weight-number-error">Your estimated average brick weight (in grams) must be a number between 100 and 2000.</div>
                 </div>
 
+<!-- ======================= Training Location ======================= -->
+<div class="form-item">
+    <label for="training_location" data-lang-id="021-title-location">Training Location:</label><br>
+    <input type="text" id="training_location" name="training_location" aria-label="Training Location"
+           value="<?php echo htmlspecialchars($training_location ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <p class="form-caption" data-lang-id="020-location-caption">
+        Please provide the general location where the training was conducted.
+    </p>
+
+    <!-- Errors -->
+    <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+</div>
+
 <div class="form-item">
     <label for="country_id" data-lang-id="013-title-country">Country:</label><br>
     <select id="country_id" name="country_id"  class="form-field-style">
@@ -373,17 +386,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                     <div id="lessons-error-invalid" class="form-field-error" data-lang-id="005b-training-lessons-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
                 </div>
 
-<div class="form-item">
-    <label for="training_location" data-lang-id="021-title-location">Training Location:</label><br>
-    <input type="text" id="training_location" name="training_location" aria-label="Training Location" 
-        value="<?php echo htmlspecialchars($training_location ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <p class="form-caption" data-lang-id="020-location-caption">
-        Please provide the general location where the training was conducted.
-    </p>
-
-     <!--ERRORS-->
-             <div id="location-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                </div>
 
 
 <!-- Moodle URL -->
