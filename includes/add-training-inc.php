@@ -6,6 +6,12 @@
 
 
 
+@media screen and (max-width: 700px) {
+  .landing-page-form {
+    padding-top: 20px !important;
+  }
+}
+
 .form-item input {
   background: var(--input-background) !important;
   font-size: 1.5em;
