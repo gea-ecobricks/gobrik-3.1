@@ -287,7 +287,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
                     <!-- Actions column -->
                     <td style="text-align:center;">
-                        <button class="serial-button settings-button" onclick="actionsTrainingModal(<?php echo $training['training_id']; ?>)">
+                        <button class="serial-button settings-button" data-show-report="<?php echo $training['show_report']; ?>" data-ready-to-show="<?php echo $training['ready_to_show']; ?>" onclick="actionsTrainingModal(this, <?php echo $training['training_id']; ?>)">
                             <span class="default-emoji">✏️</span><span class="hover-emoji">⚙️</span>
                         </button>
                     </td>
@@ -1140,7 +1140,7 @@ function deleteEcobrick(serial_no) {
     }
 }
 
-function actionsTrainingModal(trainingId) {
+function actionsTrainingModal(buttonElem, trainingId) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
     modalBox.innerHTML = '';
@@ -1155,8 +1155,10 @@ function actionsTrainingModal(trainingId) {
     content += `<a class="ecobrick-action-button" href="training-report.php?training_id=${trainingId}">📝 Edit Report</a>`;
     content += `<a class="ecobrick-action-button" href="javascript:void(0);" onclick="copyCourseListingURL(${trainingId}, this)">🔗 Copy Course Listing URL</a>`;
 
-    const reportChecked = document.querySelector('.training-report-toggle[data-training-id="' + trainingId + '"]')?.checked ? 'checked' : '';
-    const listingChecked = document.querySelector('.training-listing-toggle[data-training-id="' + trainingId + '"]')?.checked ? 'checked' : '';
+    const showReport = buttonElem.getAttribute('data-show-report') === '1';
+    const readyToShow = buttonElem.getAttribute('data-ready-to-show') === '1';
+    const reportChecked = showReport ? 'checked' : '';
+    const listingChecked = readyToShow ? 'checked' : '';
 
     content += `<div class="training-toggle-row">
                     <span class="training-toggle-title">Publish report on ecobricks.org:</span>
@@ -1178,8 +1180,8 @@ function actionsTrainingModal(trainingId) {
     messageContainer.innerHTML = content;
     const newReportToggle = messageContainer.querySelector('.training-report-toggle');
     const newListingToggle = messageContainer.querySelector('.training-listing-toggle');
-    if (newReportToggle) addReportToggleListener(newReportToggle);
-    if (newListingToggle) addListingToggleListener(newListingToggle);
+    if (newReportToggle) addReportToggleListener(newReportToggle, buttonElem);
+    if (newListingToggle) addListingToggleListener(newListingToggle, buttonElem);
     modal.style.display = 'flex';
     modalBox.style.background = 'none';
     document.getElementById('page-content').classList.add('blurred');
@@ -1236,7 +1238,7 @@ function deleteTraining(trainingId) {
     }
 }
 
-function addReportToggleListener(toggle) {
+function addReportToggleListener(toggle, buttonElem) {
     toggle.addEventListener('change', function() {
         const trainingId = this.dataset.trainingId;
         const showReport = this.checked ? 1 : 0;
@@ -1252,7 +1254,9 @@ function addReportToggleListener(toggle) {
         })
         .then(response => response.json())
         .then(data => {
-            if (!data.success) {
+            if (data.success) {
+                buttonElem.setAttribute('data-show-report', showReport);
+            } else {
                 alert('Error updating status: ' + data.error);
                 toggle.checked = !toggle.checked; // revert on failure
             }
@@ -1264,7 +1268,7 @@ function addReportToggleListener(toggle) {
     });
 }
 
-function addListingToggleListener(toggle) {
+function addListingToggleListener(toggle, buttonElem) {
     toggle.addEventListener('change', function() {
         const trainingId = this.dataset.trainingId;
         const readyToShow = this.checked ? 1 : 0;
@@ -1280,7 +1284,9 @@ function addListingToggleListener(toggle) {
         })
         .then(response => response.json())
         .then(data => {
-            if (!data.success) {
+            if (data.success) {
+                buttonElem.setAttribute('data-ready-to-show', readyToShow);
+            } else {
                 alert('Error updating listing status: ' + data.error);
                 toggle.checked = !toggle.checked; // revert on failure
             }
