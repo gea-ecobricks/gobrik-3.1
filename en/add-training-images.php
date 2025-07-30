@@ -273,13 +273,12 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
   <!-- PAGE CONTENT-->
 
-    <div id="form-submission-box">
+    <div id="form-submission-box" class="landing-page-form" style="height:auto !important">
         <div class="form-container">
             <div class="form-top-header" style="display:flex;flex-flow:row;">
-                <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
+                <div class="step-graphic" style="width:fit-content;margin:auto;">
                     <img src="../svgs/step2-log-project.svg" style="height:25px;">
                 </div>
-                <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages"><span data-lang-id="000-language-code">🌐 EN</span></div>
             </div>
 
             <div class="splash-form-content-block">
@@ -358,7 +357,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <?php endfor; ?>
 
     <div data-lang-id="013-submit-upload-button">
-        <input type="submit" value="⬆️ Upload Photos" id="upload-progress-button" aria-label="Submit photos for upload">
+        <input type="submit" value="💾 Save Report" id="upload-progress-button" aria-label="Submit photos for upload">
     </div>
 
 </form> <!-- ✅ FORM ENDS HERE -->
@@ -450,11 +449,16 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     var formData = new FormData(form);
     var fileSelected = false;
     var deletedImages = [];
+    var hasExistingImages = false;
 
     // ✅ Check for selected or deleted images
     for (var i = 0; i <= 6; i++) {
         var fileInput = document.getElementById(`training_photo${i}_main`);
         var clearButton = document.getElementById(`clear-btn-${i}`);
+
+        if (fileInput && fileInput.getAttribute("data-has-image") === "true") {
+            hasExistingImages = true;
+        }
 
         if (fileInput && fileInput.files.length > 0) {
             fileSelected = true; // ✅ A file is selected
@@ -464,7 +468,7 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     }
 
     // ✅ If no file is selected and no image was deleted, prevent submission
-    if (!fileSelected && deletedImages.length === 0) {
+    if (!fileSelected && deletedImages.length === 0 && !hasExistingImages) {
         showFormModal(chooseFileMessage);
         button.innerHTML = originalButtonText; // Restore button text
         button.disabled = false; // Enable button
@@ -692,6 +696,13 @@ function uploadSuccess(data) {
         }
 
     </script>
+
+    <br><br>
+    </div> <!--closes main-->
+
+    <!--FOOTER STARTS HERE-->
+    <?php require_once ("../footer-2025.php");?>
+    </div>
 
     </body>
 </html>

@@ -257,6 +257,7 @@ input[type="submit"]:hover {
   z-index: 20;
   font-family: "Mulish", sans-serif;
   position: relative;
+  padding-top: 0;
 
 }
 
@@ -269,6 +270,7 @@ input[type="submit"]:hover {
     padding: 20px 20px 0 20px;
     max-width: 600px;
     padding: 20px;
+    padding-top: 0;
     position: relative;
     margin-top: 60px;
 
@@ -302,6 +304,7 @@ input[type="submit"]:hover {
     margin-top: auto;
     margin-bottom: auto;
     padding: 30px;
+    padding-top: 0;
     margin-top: 100px;
 
   }
