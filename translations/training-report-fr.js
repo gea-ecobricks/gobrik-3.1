@@ -13,11 +13,14 @@ const fr_Page_Translations = {
     "004-form-description-post": "Votre atelier, événement ou formation est-il terminé ? Partagez votre succès social avec le monde ! Utilisez ce formulaire pour soumettre et publier le rapport de votre événement ou formation complété. Les formations seront mises en avant sur notre page principale et archivées dans notre base de données des formations.",
     "005-title-title": "Titre de la formation :",
     "005-training-give-title": "Donnez un titre à votre formation. C'est ainsi que votre rapport sera présenté.",
+    "025-title-subtitle": "Ajoutez un sous-titre optionnel à votre formation...",
     "006-title-date": "Date de la formation :",
     "006-training-date": "À quelle date et à quelle heure cette formation a-t-elle eu lieu ?",
     "007-title-participants": "Nombre de participants :",
     "007-training-count": "Combien de personnes ont participé (y compris les formateurs) ?",
     "008-lead-trainer": "Formateur principal :",
+    "005b-title-trainers": "Qui sont les formateurs dirigeant cette formation ?",
+    "005b-trainers-caption": "Sélectionnez les formateurs qui dirigent cette formation.",
     "008-training-trainers": "Qui a dirigé la formation ? Vous pouvez écrire plusieurs noms ici si nécessaire, par exemple, Lucie Mann et Ani Himawati.",
     "009-title-community": "Communauté formée :",
     "008-community-trained": "Pour quelle communauté cette formation a-t-elle été réalisée ? Commencez à taper pour voir et sélectionner une communauté GoBrik. <a href=\"#\" onclick=\"openAddCommunityModal(); return false;\" style=\"color: #007BFF; text-decoration: underline;\">Vous ne trouvez pas votre communauté ? Ajoutez-la.</a>",
@@ -49,8 +52,10 @@ const fr_Page_Translations = {
     "022-moodle-caption": "Un cours Moodle a-t-il été créé pour cette formation sur learning.ecobricks.org ? Si oui, incluez l'URL ici.",
     "023-title-youtube": "URL de la vidéo YouTube :",
     "023-training-youtube": "Une vidéo YouTube de cette formation a-t-elle été publiée ? Si oui, incluez l'URL ici.",
-    "024-title-show": "Publier cette formation publiquement ?",
+    "024-title-show": "🚀 Publier cette formation ?",
+    "024-show-caption": "Afficher le rapport final de cette formation sur ecobricks.org",
     "022-training-show": "Cette formation est-elle prête à être affichée sur ecobricks.org ? Si oui, nous publierons l'atelier complété sur le flux en direct des formations GEA. Ne vous inquiétez pas, vous pouvez toujours revenir ici pour modifier la liste affichée !",
+    "099-save-progress": "💾 Enregistrer la progression",
     "100-submit-report-1": "Suivant : Télécharger les photos ➡️"
 };
 

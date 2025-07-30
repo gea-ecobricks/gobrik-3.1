@@ -237,7 +237,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
         </div>
 
     <div class="form-item">
-        <label for="training_subtitle">Add an optional subtitle to your training...</label><br>
+        <label for="training_subtitle" data-lang-id="025-title-subtitle">Add an optional subtitle to your training...</label><br>
         <input type="text" id="training_subtitle" name="training_subtitle"
                value="<?php echo htmlspecialchars($training_subtitle ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                aria-label="Training Subtitle">
@@ -263,7 +263,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </div>
 
     <div class="form-item">
-    <label for="training_date" datal-lang-id="006-title-date">Training Date:</label><br>
+    <label for="training_date" data-lang-id="006-title-date">Training Date:</label><br>
     <input type="datetime-local" id="training_date" name="training_date"
     value="<?php echo isset($training_date) ? date('Y-m-d\TH:i', strtotime($training_date)) : date('Y-m-d\T12:00'); ?>"
     aria-label="Training Date"  class="form-field-style">
@@ -459,8 +459,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     <!-- ======================= Show Report Toggle ======================= -->
     <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
         <div id="left-colum" style="width: 100%;">
-            <label>🚀 Publish this training publicly?</label>
-            <p class="form-caption" style="margin-top:10px;">Display the final training report of this training on ecobricks.org</p>
+            <label data-lang-id="024-title-show">🚀 Publish this training?</label>
+            <p class="form-caption" style="margin-top:10px;" data-lang-id="024-show-caption">Display the final training report of this training on ecobricks.org</p>
         </div>
 
         <div id="right-column" style="width:100px; justify-content:center;">
@@ -479,7 +479,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <!--     <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude ?? '', ENT_QUOTES, 'UTF-8'); ?>"> -->
 <?php if ($editing): ?>
 <div>
-    <button type='submit' id='save-progress' class='confirm-button' style='background:grey;width: 100%;margin: 30px 0px -15px 0px;'>💾 Save Progress</button>
+    <button type='submit' id='save-progress' class='confirm-button' data-lang-id='099-save-progress' style='background:grey;width: 100%;margin: 30px 0px -15px 0px;'>💾 Save Progress</button>
 </div>
 <?php endif; ?>
 
