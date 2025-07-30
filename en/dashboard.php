@@ -1018,8 +1018,13 @@ window.onload = function() {
 function viewEcobrickActions(serial_no, status, lang) {
     console.log("Button clicked with serial number:", serial_no);
     const modal = document.getElementById('form-modal-message');
-    const messageContainer = document.querySelector('.modal-message');
     const modalBox = document.getElementById('modal-content-box');
+    let messageContainer = document.querySelector('.modal-message');
+    if (!messageContainer) {
+        messageContainer = document.createElement('div');
+        messageContainer.className = 'modal-message';
+        modalBox.appendChild(messageContainer);
+    }
 
     // Clear existing content in the modal
     messageContainer.innerHTML = '';
@@ -1154,7 +1159,12 @@ function deleteEcobrick(serial_no) {
 function actionsTrainingModal(trainingId) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
-    const messageContainer = document.querySelector('.modal-message');
+    let messageContainer = document.querySelector('.modal-message');
+    if (!messageContainer) {
+        messageContainer = document.createElement('div');
+        messageContainer.className = 'modal-message';
+        modalBox.appendChild(messageContainer);
+    }
 
     let url = `register.php?id=${trainingId}`;
     let content = '';
