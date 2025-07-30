@@ -58,13 +58,14 @@ require_once '../gobrikconn_env.php';
 // ✅ Get training_id from URL (for editing)
 $training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
 $editing = ($training_id > 0);
+$show_report = 0;
 
 // ✅ If editi   ng, fetch existing training details
 if ($editing) {
     $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
                   training_type, briks_made, avg_brik_weight, location_lat, location_long, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
-                  youtube_result_video, moodle_url, ready_to_show, featured_description, community_id
+                  youtube_result_video, moodle_url, ready_to_show, show_report, featured_description, community_id
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -73,7 +74,7 @@ if ($editing) {
     $stmt_fetch->bind_result($training_title, $lead_trainer, $country_id, $training_date, $no_participants,
                             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
-                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $featured_description, $community_id);
+                            $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $featured_description, $community_id);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
@@ -391,7 +392,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
     </p>
     </div>
 
-    <!-- ======================= Ready to Show Toggle ======================= -->
+    <!-- ======================= Show Report Toggle ======================= -->
     <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
         <div id="left-colum" style="width: 100%;">
             <label>🚀 Publish this training publicly?</label>
@@ -400,8 +401,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
         <div id="right-column" style="width:100px; justify-content:center;">
             <label class="toggle-switch">
-            <input type="checkbox" id="ready_to_show" name="ready_to_show" value="1"
-                   <?php echo (isset($ready_to_show) && $ready_to_show) ? 'checked' : ''; ?>>
+            <input type="checkbox" id="show_report" name="show_report" value="1"
+                   <?php echo (isset($show_report) && $show_report) ? 'checked' : ''; ?>>
             <span class="slider"></span>
         </div>
         </label>
