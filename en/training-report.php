@@ -19,6 +19,7 @@ if (!isLoggedIn()) {
 
 $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
+$user_ecobricker_id = getEcobrickerID($buwana_id);
 
 // ✅ Fetch User Role
 $gea_status = getGEA_status($buwana_id);
@@ -137,7 +138,7 @@ if ($editing) {
     }
     $stmt_tr->close();
 } else {
-    $selected_trainers[] = $buwana_id;
+    $selected_trainers[] = $user_ecobricker_id;
 }
 
 $selected_trainers_data = [];
@@ -199,7 +200,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <!-- PAGE CONTENT-->
 
-     <div id="form-submission-box" class="landing-page-form">
+     <div id="form-submission-box" class="landing-page-form" style="height:auto !important">
             <div class="form-container">
             <div class="splash-form-content-block">
                 <div class="splash-box">
@@ -429,10 +430,10 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
 <!-- Moodle URL -->
     <div class="form-item">
-        <label for="moodle_url" data-lang-id="022-title-moodle">Moodle Course URL:</label><br>
+        <label for="moodle_url" data-lang-id="022-title-moodle">Learning Course URL:</label><br>
         <input type="url" id="moodle_url" name="moodle_url"
                value="<?php echo htmlspecialchars($moodle_url ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-               placeholder="Enter Moodle Course Link" class="form-field-style">
+               placeholder="http://learning.ecobricks.org" class="form-field-style">
         <p class="form-caption" data-lang-id="022-moodle-caption">
         Was there a moodle course created for this training on learning.ecobricks.org?  If so, include the URL here.
     </p>
@@ -722,7 +723,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
         displayError('trainer-error-required', true);
     } else {
         displayError('trainer-error-required', false);
-        var userId = <?php echo json_encode($buwana_id); ?>;
+        var userId = <?php echo json_encode($user_ecobricker_id); ?>;
         var userIncluded = Array.from(trainerBoxes).some(box => box.dataset.id == userId);
         if (!userIncluded) {
             alert("You have not set your own account as one of the leaders of the training!  If you submit this report as-is you will not have access to edit it later if you're account is not set as a training leader.");
