@@ -234,7 +234,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <h3 data-lang-id="002-my-trainings">My Trainings</h3>
     <p>Trainings that you are managing.</p>
 
-    <table id="trainer-trainings" class="display responsive nowrap" style="width:100%;">
+    <table id="trainer-trainings" class="display" style="width:100%;">
         <thead>
             <tr>
                 <th>Training</th>
@@ -253,32 +253,33 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     if (!$is_listed) {
                         // Training not listed yet
                         $circle = '⚪';
-                    } elseif ($show_report) {
-                        // Report complete and public
-                        $circle = '✅';
                     } elseif ($training_date_ts > time()) {
                         // Listed and upcoming
                         $circle = '🟢';
+                    } elseif ($show_report && $is_listed) {
+                        // Report complete and public after the date
+                        $circle = '✅';
                     } else {
                         // Listed, past and no report yet
                         $circle = '🔴';
                         if (!isset($pendingReport)) {
                             $pendingReport = [
                                 'id' => $training['training_id'],
-                                'title' => $training['training_title']
+                                'title' => $training['training_title'],
+                                'date' => date('Y-m-d', $training_date_ts)
                             ];
                         }
                     }
                 ?>
                 <tr>
-                    <td><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
+                    <td style="white-space:normal;"><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
 
                     <!-- Format the date to remove time -->
                     <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
 
                     <!-- Updated Signups Column -->
-                    <td style="text-align:center;">
-                        <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
+                    <td style="text-align:center;padding:10px;">
+                        <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
                             <?php echo (int) $training['trainee_count']; ?> 👥
                         </a>
                     </td>
@@ -649,7 +650,7 @@ function sendTraineeEmails(trainingId, isTest) {
 
 
 $(document).ready(function() {
-    let table = $("#trainer-trainings").DataTable({
+    $("#trainer-trainings").DataTable({
         "pageLength": 10,
         "searching": false,
         "lengthChange": false,
@@ -668,28 +669,8 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [2, 3] }, // Disable sorting on Signups and Actions columns
-            { "targets": [1], "visible": true }, // Show Date
-            { "targets": [1], "visible": false, "responsivePriority": 1 }, // Hide on small screens
-            { "className": "all", "targets": [3] } // Always show Actions column
+            { "orderable": false, "targets": [2, 3] }
         ]
-    });
-
-    // Adjust visibility based on screen size
-    function adjustTableColumns() {
-        if (window.innerWidth < 769) {
-            table.column(1).visible(false); // Hide Date
-        } else {
-            table.column(1).visible(true);
-        }
-    }
-
-    // Run on page load
-    adjustTableColumns();
-
-    // Run on window resize
-    $(window).resize(function() {
-        adjustTableColumns();
     });
 });
 
@@ -1397,22 +1378,45 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script>
+function trainerReportAlert(firstName, trainingName, trainingDate, geaStatus, trainingId) {
+    const notice = document.getElementById('registered-notice');
+    if (!notice) return;
+    const icon = document.getElementById('notice-icon');
+    const textSpan = document.getElementById('notice-text');
+    const closeBtn = notice.querySelector('.notice-close');
+
+    if (!notice.dataset.originalBg) {
+        notice.dataset.originalBg = notice.style.backgroundColor || window.getComputedStyle(notice).backgroundColor;
+        notice.dataset.originalIcon = icon.textContent;
+        notice.dataset.originalText = textSpan.innerHTML;
+    }
+
+    notice.style.backgroundColor = 'orange';
+    icon.textContent = '⚠️';
+    textSpan.innerHTML = `${firstName}! It looks like your course ${trainingName} is complete as of ${trainingDate}! As a GEA ${geaStatus} its important to complete and publish your Training Report. ` +
+        `<a href="training-report.php?training_id=${trainingId}" style="margin-left:5px;text-decoration:underline;color:white;font-weight:bold;">Complete Report</a>`;
+
+    closeBtn.addEventListener('click', function(e) {
+        e.stopImmediatePropagation();
+        notice.style.display = 'flex';
+        notice.style.backgroundColor = notice.dataset.originalBg;
+        icon.textContent = notice.dataset.originalIcon;
+        textSpan.innerHTML = notice.dataset.originalText;
+    }, { once: true });
+}
+</script>
+
 <?php if (isset($pendingReport)): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('form-modal-message');
-    const modalBox = document.getElementById('modal-content-box');
-    modal.style.display = 'flex';
-    modalBox.style.flexFlow = 'column';
-    document.getElementById('page-content')?.classList.add('blurred');
-    document.getElementById('footer-full')?.classList.add('blurred');
-    document.body.classList.add('modal-open');
-    const firstName = <?php echo json_encode($first_name); ?>;
-    const courseName = <?php echo json_encode($pendingReport['title']); ?>;
-    const trainingId = <?php echo json_encode($pendingReport['id']); ?>;
-    modalBox.innerHTML = `<p>Hi there ${firstName}! It looks like your course ${courseName} is complete! Be sure to complete your GEA Training Report</p>` +
-        `<a href="training-report.php?training_id=${trainingId}" class="confirm-button" style="margin-top:10px;">Complete Report</a>`;
-    modal.classList.remove('modal-hidden');
+    trainerReportAlert(
+        <?php echo json_encode($first_name); ?>,
+        <?php echo json_encode($pendingReport['title']); ?>,
+        <?php echo json_encode($pendingReport['date']); ?>,
+        <?php echo json_encode($gea_status); ?>,
+        <?php echo json_encode($pendingReport['id']); ?>
+    );
 });
 </script>
 <?php endif; ?>
