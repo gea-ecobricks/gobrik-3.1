@@ -234,7 +234,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <h3 data-lang-id="002-my-trainings">My Trainings</h3>
     <p>Trainings that you are managing.</p>
 
-    <table id="trainer-trainings" class="display responsive nowrap" style="width:100%;">
+    <table id="trainer-trainings" class="display" style="width:100%;">
         <thead>
             <tr>
                 <th>Training</th>
@@ -253,32 +253,33 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     if (!$is_listed) {
                         // Training not listed yet
                         $circle = '⚪';
-                    } elseif ($show_report) {
-                        // Report complete and public
-                        $circle = '✅';
                     } elseif ($training_date_ts > time()) {
                         // Listed and upcoming
                         $circle = '🟢';
+                    } elseif ($show_report) {
+                        // Report complete and public (past training)
+                        $circle = '✅';
                     } else {
                         // Listed, past and no report yet
                         $circle = '🔴';
                         if (!isset($pendingReport)) {
                             $pendingReport = [
                                 'id' => $training['training_id'],
-                                'title' => $training['training_title']
+                                'title' => $training['training_title'],
+                                'date' => $training['training_date']
                             ];
                         }
                     }
                 ?>
                 <tr>
-                    <td><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
+                    <td style="white-space:normal;"><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
 
                     <!-- Format the date to remove time -->
                     <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
 
                     <!-- Updated Signups Column -->
-                    <td style="text-align:center;">
-                        <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
+                    <td style="text-align:center;padding:10px;">
+                        <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
                             <?php echo (int) $training['trainee_count']; ?> 👥
                         </a>
                     </td>
@@ -668,10 +669,7 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [2, 3] }, // Disable sorting on Signups and Actions columns
-            { "targets": [1], "visible": true }, // Show Date
-            { "targets": [1], "visible": false, "responsivePriority": 1 }, // Hide on small screens
-            { "className": "all", "targets": [3] } // Always show Actions column
+            { "orderable": false, "targets": [2, 3] }
         ]
     });
 
@@ -1399,20 +1397,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <?php if (isset($pendingReport)): ?>
 <script>
+function trainerReportAlert(firstName, trainingName, trainingDate, trainingId, geaStatus) {
+    const notice = document.getElementById('registered-notice');
+    const icon = document.getElementById('notice-icon');
+    const text = document.getElementById('notice-text');
+    const closeBtn = notice.querySelector('.notice-close');
+
+    const originalBg = notice.dataset.origBg || window.getComputedStyle(notice).backgroundColor;
+    const originalIcon = icon.dataset.origIcon || icon.textContent;
+    const originalText = text.dataset.origText || text.innerHTML;
+
+    notice.dataset.origBg = originalBg;
+    icon.dataset.origIcon = originalIcon;
+    text.dataset.origText = originalText;
+
+    notice.style.background = 'orange';
+    icon.textContent = '⚠️';
+    text.innerHTML = `${firstName}! It looks like your course ${trainingName} is complete as of ${trainingDate}! As a GEA ${geaStatus} its important to complete and publish your Training Report. <a href="training-report.php?training_id=${trainingId}" class="confirm-button" style="margin-left:10px;padding:2px 6px;font-size:0.8em;">Report</a>`;
+
+    function resetNotice(e) {
+        e.stopImmediatePropagation();
+        notice.style.background = notice.dataset.origBg;
+        icon.textContent = icon.dataset.origIcon;
+        text.innerHTML = text.dataset.origText;
+        closeBtn.removeEventListener('click', resetNotice);
+    }
+
+    closeBtn.addEventListener('click', resetNotice);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('form-modal-message');
-    const modalBox = document.getElementById('modal-content-box');
-    modal.style.display = 'flex';
-    modalBox.style.flexFlow = 'column';
-    document.getElementById('page-content')?.classList.add('blurred');
-    document.getElementById('footer-full')?.classList.add('blurred');
-    document.body.classList.add('modal-open');
-    const firstName = <?php echo json_encode($first_name); ?>;
-    const courseName = <?php echo json_encode($pendingReport['title']); ?>;
-    const trainingId = <?php echo json_encode($pendingReport['id']); ?>;
-    modalBox.innerHTML = `<p>Hi there ${firstName}! It looks like your course ${courseName} is complete! Be sure to complete your GEA Training Report</p>` +
-        `<a href="training-report.php?training_id=${trainingId}" class="confirm-button" style="margin-top:10px;">Complete Report</a>`;
-    modal.classList.remove('modal-hidden');
+    trainerReportAlert(
+        <?php echo json_encode($first_name); ?>,
+        <?php echo json_encode($pendingReport['title']); ?>,
+        <?php echo json_encode(date('Y-m-d', strtotime($pendingReport['date']))); ?>,
+        <?php echo json_encode($pendingReport['id']); ?>,
+        <?php echo json_encode($gea_status); ?>
+    );
 });
 </script>
 <?php endif; ?>
