@@ -11,6 +11,7 @@ $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
 include '../scripts/photo-functions.php';
+$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     echo json_encode(['success' => false, 'error' => 'Invalid request']);
@@ -44,12 +45,43 @@ $training_challenges = trim($_POST['training_challenges'] ?? '');
 $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
 $training_location = trim($_POST['training_location'] ?? '');
 $training_type = trim($_POST['training_type'] ?? '');
+$trainers = isset($_POST['trainers']) && is_array($_POST['trainers']) ? array_map('intval', $_POST['trainers']) : [];
 
 $no_participants = filter_var($_POST['no_participants'], FILTER_VALIDATE_INT) ?? 0;
 $briks_made = filter_var($_POST['briks_made'], FILTER_VALIDATE_INT) ?? 0;
 $avg_brik_weight = filter_var($_POST['avg_brik_weight'], FILTER_VALIDATE_INT) ?? 0;
 $country_id = filter_var($_POST['country_id'], FILTER_VALIDATE_INT) ?? null;
 $community_id = filter_var($_POST['community_id'], FILTER_VALIDATE_INT) ?? null;
+
+function buildLeadTrainerString($conn, $trainerIds, $language) {
+    if (empty($trainerIds)) return '';
+
+    $names = [];
+    $stmt = $conn->prepare("SELECT full_name FROM tb_ecobrickers WHERE ecobricker_id = ?");
+    foreach ($trainerIds as $id) {
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->bind_result($name);
+        if ($stmt->fetch()) {
+            $names[] = $name;
+        }
+        $stmt->reset();
+    }
+    $stmt->close();
+
+    $andWord = 'and';
+    if ($language === 'fr') { $andWord = 'et'; }
+    elseif ($language === 'es') { $andWord = 'y'; }
+    elseif ($language === 'id') { $andWord = 'dan'; }
+
+    $count = count($names);
+    if ($count === 1) return $names[0];
+    if ($count === 2) return $names[0] . ' ' . $andWord . ' ' . $names[1];
+    $last = array_pop($names);
+    return implode(', ', $names) . ' ' . $andWord . ' ' . $last;
+}
+
+$lead_trainer = buildLeadTrainerString($gobrik_conn, $trainers, $lang);
 
 if ($community_id !== null) {
     $stmt = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE community_id = ?");
@@ -119,6 +151,23 @@ if ($editing) {
     } else {
         echo json_encode(['success' => false, 'error' => 'Insert failed.']);
         exit();
+    }
+}
+
+// ✅ Update trainers association
+if ($new_training_id) {
+    $del = $gobrik_conn->prepare("DELETE FROM tb_training_trainers WHERE training_id = ?");
+    $del->bind_param("i", $new_training_id);
+    $del->execute();
+    $del->close();
+
+    if (!empty($trainers)) {
+        $ins = $gobrik_conn->prepare("INSERT INTO tb_training_trainers (training_id, ecobricker_id) VALUES (?, ?)");
+        $ins->bind_param("ii", $new_training_id, $trainer_id);
+        foreach ($trainers as $trainer_id) {
+            $ins->execute();
+        }
+        $ins->close();
     }
 }
 

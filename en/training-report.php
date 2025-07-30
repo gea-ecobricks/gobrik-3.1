@@ -117,6 +117,36 @@ if (!empty($community_id)) {
     $stmt->close();
 }
 
+// ✅ Fetch Trainer List
+$trainers_list = [];
+$result_trainers = $gobrik_conn->query("SELECT ecobricker_id, full_name FROM tb_ecobrickers WHERE gea_status LIKE '%trainer%' ORDER BY full_name ASC");
+if ($result_trainers) {
+    while ($row = $result_trainers->fetch_assoc()) {
+        $trainers_list[] = $row;
+    }
+}
+
+$selected_trainers = [];
+if ($editing) {
+    $stmt_tr = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_training_trainers WHERE training_id = ?");
+    $stmt_tr->bind_param("i", $training_id);
+    $stmt_tr->execute();
+    $res_tr = $stmt_tr->get_result();
+    while ($row = $res_tr->fetch_assoc()) {
+        $selected_trainers[] = $row['ecobricker_id'];
+    }
+    $stmt_tr->close();
+} else {
+    $selected_trainers[] = $buwana_id;
+}
+
+$selected_trainers_data = [];
+foreach ($trainers_list as $trainer) {
+    if (in_array($trainer['ecobricker_id'], $selected_trainers)) {
+        $selected_trainers_data[] = $trainer;
+    }
+}
+
 
 ?>
 
@@ -207,6 +237,24 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                aria-label="Training Subtitle">
     </div>
 
+    <!-- ======================= Trainers ======================= -->
+    <div class="form-item">
+        <label for="trainer_search" data-lang-id="005b-title-trainers">Who are the trainers leading this training?</label><br>
+        <input type="text" id="trainer_search" placeholder="Type to search..." autocomplete="off" class="form-field-style">
+        <div id="trainer_results" class="autocomplete-results"></div>
+
+        <div id="selected_trainers" class="trainer-tag-container">
+            <?php foreach ($selected_trainers_data as $trainer): ?>
+                <div class="trainer-tag-box" data-id="<?php echo $trainer['ecobricker_id']; ?>">
+                    <span class="remove-trainer">&times;</span>
+                    <span><?php echo htmlspecialchars($trainer['full_name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <input type="hidden" name="trainers[]" value="<?php echo $trainer['ecobricker_id']; ?>" id="trainer-hidden-<?php echo $trainer['ecobricker_id']; ?>">
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <p class="form-caption" data-lang-id="005b-trainers-caption">Select the trainers leading this training.</p>
+        <div id="trainer-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
+    </div>
 
     <div class="form-item">
     <label for="training_date" datal-lang-id="006-title-date">Training Date:</label><br>
@@ -228,15 +276,6 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                     <div id="participants-error-range" class="form-field-error" data-lang-id="000-field-participants-number-error">A number (between 1 and 5000).</div>
              </div>
 
-    <div class="form-item">
-        <label for="lead_trainer" data-lang-id="008-lead-trainer">Lead Trainer:</label><br>
-        <input type="text" id="lead_trainer" name="lead_trainer"
-            value="<?php echo htmlspecialchars($lead_trainer ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            aria-label="Lead Trainer" >
-            <p class="form-caption" data-lang-id="008-training-trainers">Who lead the training?  You can write multiple names here if you want.  i.e. Lucie Mann and Ani Himawati</p>
-             <!--ERRORS-->
-                    <div id="trainer-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
-                </div>
 
 
 <div class="form-item">
@@ -474,6 +513,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <script>
 const userLanguageId = "<?php echo $lang; ?>";
 const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_QUOTES, 'UTF-8'); ?>";
+var preselectedTrainers = <?php echo json_encode($selected_trainers_data); ?>;
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -522,6 +562,91 @@ document.addEventListener("DOMContentLoaded", function() {
             resultsDiv.innerHTML = "";
         }
     });
+
+    // Trainer search autocomplete
+    const trainerInput = document.getElementById("trainer_search");
+    const trainerResults = document.getElementById("trainer_results");
+    const trainerContainer = document.getElementById("selected_trainers");
+
+    function fetchTrainers(query) {
+        if (query.length >= 3) {
+            fetch(`../api/search_trainers.php?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    trainerResults.innerHTML = "";
+                    if (data.length === 0) {
+                        trainerResults.innerHTML = "<div class='autocomplete-item' style='color: gray;'>No results found</div>";
+                    } else {
+                        data.forEach(trainer => {
+                            let div = document.createElement("div");
+                            div.textContent = trainer.full_name;
+                            div.dataset.id = trainer.ecobricker_id;
+                            div.classList.add("autocomplete-item");
+                            div.addEventListener("mousedown", function(event) {
+                                event.preventDefault();
+                                addTrainer(trainer.ecobricker_id, trainer.full_name);
+                                trainerInput.value = "";
+                                trainerResults.innerHTML = "";
+                            });
+                            trainerResults.appendChild(div);
+                        });
+                    }
+                });
+        } else {
+            trainerResults.innerHTML = "";
+        }
+    }
+
+    function addTrainer(id, name) {
+        if (document.getElementById('trainer-hidden-' + id)) return;
+        let box = document.createElement('div');
+        box.className = 'trainer-tag-box';
+        box.dataset.id = id;
+
+        let remove = document.createElement('span');
+        remove.className = 'remove-trainer';
+        remove.textContent = '\u00D7';
+        remove.addEventListener('click', function() {
+            box.remove();
+        });
+
+        let text = document.createElement('span');
+        text.textContent = name;
+
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'trainers[]';
+        hidden.value = id;
+        hidden.id = 'trainer-hidden-' + id;
+
+        box.appendChild(remove);
+        box.appendChild(text);
+        box.appendChild(hidden);
+        trainerContainer.appendChild(box);
+    }
+
+    document.querySelectorAll('#selected_trainers .trainer-tag-box').forEach(function(box) {
+        var removeBtn = box.querySelector('.remove-trainer');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                box.remove();
+            });
+        }
+    });
+
+    trainerInput.addEventListener('input', function() {
+        fetchTrainers(trainerInput.value.trim());
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!trainerInput.contains(event.target) && !trainerResults.contains(event.target)) {
+            trainerResults.innerHTML = '';
+        }
+    });
+
+    if (preselectedTrainers && Array.isArray(preselectedTrainers)) {
+        preselectedTrainers.forEach(tr => addTrainer(tr.ecobricker_id, tr.full_name));
+    }
 });
 
 
@@ -565,7 +690,6 @@ document.getElementById('submit-form').addEventListener('submit', function(event
         displayError('participants-error-range', false);
     }
 
-    var leadTrainer = document.getElementById('lead_trainer').value.trim();
     var communityId = document.getElementById('community_id').value.trim();
     var trainingType = document.getElementById('training_type').value;
 
@@ -591,6 +715,19 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     displayError('lessons-error-invalid', hasInvalidChars(trainingLessons));
 
     var trainingLocation = document.getElementById('training_location').value.trim();
+
+    var trainerBoxes = document.querySelectorAll('#selected_trainers .trainer-tag-box');
+    if (trainerBoxes.length === 0) {
+        alert('Please select at least one trainer.');
+        displayError('trainer-error-required', true);
+    } else {
+        displayError('trainer-error-required', false);
+        var userId = <?php echo json_encode($buwana_id); ?>;
+        var userIncluded = Array.from(trainerBoxes).some(box => box.dataset.id == userId);
+        if (!userIncluded) {
+            alert("You have not set your own account as one of the leaders of the training!  If you submit this report as-is you will not have access to edit it later if you're account is not set as a training leader.");
+        }
+    }
 
     if (!isValid) {
         var firstError = document.querySelector('.form-field-error:not([style*="display: none"])');
