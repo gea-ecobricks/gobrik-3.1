@@ -236,6 +236,32 @@ margin-top:-100px !important;
     color: var(--text-color);
 }
 
+/* Notice button inside header notice */
+.notice-button {
+    margin-left: 10px;
+    padding: 4px 8px;
+    background: #fff;
+    color: #000;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+/* Trainer trainings table tweaks */
+#trainer-trainings td:first-child {
+    white-space: normal;
+}
+#trainer-trainings td:nth-child(3) a {
+    padding: 10px;
+    min-width: unset;
+}
+@media screen and (max-width: 768px) {
+    #trainer-trainings th:nth-child(2),
+    #trainer-trainings td:nth-child(2) {
+        display: none;
+    }
+}
+
 </style>
 
 
