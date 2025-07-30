@@ -462,7 +462,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function fetchCommunities(query) {
         if (query.length >= 3) {
-            fetch(`../api/search_communities.php?query=${encodeURIComponent(query)}`)
+            fetch(`https://buwana.ecobricks.org/api/api/search_communities_by_id.php?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     resultsDiv.innerHTML = "";
@@ -751,7 +751,7 @@ function addCommunity2Buwana(event) {
     const form = document.getElementById('addCommunityForm');
     const formData = new FormData(form);
 
-    fetch('../scripts/add_community.php', {
+    fetch('https://buwana.ecobricks.org/api/add_community.php', {
         method: 'POST',
         body: formData
     })

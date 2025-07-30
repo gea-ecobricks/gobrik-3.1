@@ -697,7 +697,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const query = communityNameInput.value.trim();
         communityIdInput.value = "";
         if (query.length >= 3) {
-            fetch(`../api/search_communities.php?query=${encodeURIComponent(query)}`)
+            fetch(`https://buwana.ecobricks.org/api/api/search_communities_by_id.php?query=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(list => showCommunitySuggestions(list, suggestionsBox, communityNameInput, communityIdInput))
                 .catch(err => console.error('Error loading communities:', err));
