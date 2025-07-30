@@ -32,6 +32,7 @@ if (!$gea_status || stripos($gea_status, 'trainer') === false) {
 
 
 // PART 3: ✅ Fetch User Details
+$user_country_id = null;
 require_once '../buwanaconn_env.php';
 $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
 $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
@@ -51,6 +52,17 @@ if ($result_languages && $result_languages->num_rows > 0) {
     }
 }
 
+// Fetch user's country_id
+$sql_country_lookup = "SELECT country_id FROM users_tb WHERE buwana_id = ?";
+$stmt_country_lookup = $buwana_conn->prepare($sql_country_lookup);
+if ($stmt_country_lookup) {
+    $stmt_country_lookup->bind_param('i', $buwana_id);
+    $stmt_country_lookup->execute();
+    $stmt_country_lookup->bind_result($user_country_id);
+    $stmt_country_lookup->fetch();
+    $stmt_country_lookup->close();
+}
+
 
 
 require_once '../gobrikconn_env.php';
@@ -59,10 +71,11 @@ require_once '../gobrikconn_env.php';
 $training_id = isset($_GET['training_id']) ? intval($_GET['training_id']) : 0;
 $editing = ($training_id > 0);
 $show_report = 0;
+$training_subtitle = '';
 
 // ✅ If editi   ng, fetch existing training details
 if ($editing) {
-    $sql_fetch = "SELECT training_title, lead_trainer, country_id, training_date, no_participants,
+    $sql_fetch = "SELECT training_title, training_subtitle, lead_trainer, country_id, training_date, no_participants,
                   training_type, briks_made, avg_brik_weight, location_lat, location_long, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, show_report, featured_description, community_id
@@ -71,7 +84,7 @@ if ($editing) {
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
     $stmt_fetch->bind_param("i", $training_id);
     $stmt_fetch->execute();
-    $stmt_fetch->bind_result($training_title, $lead_trainer, $country_id, $training_date, $no_participants,
+    $stmt_fetch->bind_result($training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $no_participants,
                             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $featured_description, $community_id);
@@ -187,6 +200,13 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                     <div id="title-error-invalid" class="form-field-error" data-lang-id="005b-training-title-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs please.</div>
         </div>
 
+    <div class="form-item">
+        <label for="training_subtitle">Add an optional subtitle to your training...</label><br>
+        <input type="text" id="training_subtitle" name="training_subtitle"
+               value="<?php echo htmlspecialchars($training_subtitle ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+               aria-label="Training Subtitle">
+    </div>
+
 
     <div class="form-item">
     <label for="training_date" datal-lang-id="006-title-date">Training Date:</label><br>
@@ -230,14 +250,11 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div id="community_results" class="autocomplete-results"></div>
 
-    <!-- "Add a new community" text link
-    <p class="form-caption" data-lang-id="008-community-trained">
-        What community was this training for?  Start typing to see and select a GoBrik community.
-         <a href="#" onclick="openAddCommunityModal(); return false;"
-             style="color: #007BFF; text-decoration: underline;">
-              Don't see your community? Add it.
-          </a>
-    </p>-->
+    <p class="form-caption"><span data-lang-id="008-start-typing-community">
+        Start typing to see and select a community. There's a good chance someone local to you has already set one up!</span>
+    <br> ➕
+        <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;" data-lang-id="009-add-community">Don't see your community? Add it.</a>
+    </p>
 
 <div id="community-error-required" class="form-field-error" data-lang-id="000-field-too-long-error">A community must be selected</div>
                 </div>
@@ -453,6 +470,8 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 -->
 
 <script>
+const userLanguageId = "<?php echo $lang; ?>";
+const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_QUOTES, 'UTF-8'); ?>";
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -742,6 +761,17 @@ document.getElementById('submit-form').addEventListener('submit', function(event
             <button type="submit" style="margin-top:10px;width:100%;" class="submit-button enabled">Submit</button>
         </form>
     `;
+
+    setTimeout(() => {
+        const countrySelect = document.getElementById('communityCountry');
+        const languageSelect = document.getElementById('communityLanguage');
+        if (countrySelect && userCountryId) {
+            countrySelect.value = userCountryId;
+        }
+        if (languageSelect && userLanguageId) {
+            languageSelect.value = userLanguageId;
+        }
+    }, 100);
 }
 
 
