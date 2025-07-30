@@ -136,7 +136,7 @@ $gobrik_conn->close();
 
 
 <!--
-GoBrik.com site version 3.0
+GoBrik.com site version 3.1
 Developed and made open source by the Global Ecobrick Alliance
 See our git hub repository for the full code and to help out:
 https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
@@ -145,8 +145,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
-                <span style="margin-right:10px;">🌟</span>
-                <span>'What Should Green Really mean?' Free GEA webinar on August 10th!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
+                <span id="notice-icon" style="margin-right:10px;">🌟</span>
+                <span id="notice-text">'What Should Green Really mean?' Free GEA webinar on August 10th!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">
