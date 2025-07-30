@@ -45,7 +45,7 @@ const en_Page_Translations = {
     "020-training-lessons": "Share the lessons learned from leading your training. Max 1000 words. Avoid special characters.",
     "021-title-location": "Training Location:",
     "020-location-caption": "Please provide the general location where the training was conducted.",
-    "022-title-moodle": "Moodle Course URL:",
+    "022-title-moodle": "Learning Course URL:",
     "022-moodle-caption": "Was there a Moodle course created for this training on learning.ecobricks.org? If so, include the URL here.",
     "023-title-youtube": "YouTube Video URL:",
     "023-training-youtube": "Was a YouTube video of this training posted? If so, include the URL here please.",
