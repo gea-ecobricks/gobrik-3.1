@@ -13,11 +13,14 @@ const en_Page_Translations = {
     "004-form-description-post": "Is your workshop, event or training complete?  Share your social success with the world! Use this form to file and post your completed event or training report. Trainings will be featured on our main page and archived in our trainings database.",
     "005-title-title":"Training Title:",
     "005-training-give-title": "Give your training a title.  This will be how your report is featured.",
+    "025-title-subtitle": "Add an optional subtitle to your training...",
     "006-title-date":"Training Date:",
     "006-training-date":"On what date and time did this training run?",
     "007-title-participants": "Number of Participants:",
     "007-training-count": "How many people participated (including trainers)?",
     "008-lead-trainer": "Lead Trainer:",
+    "005b-title-trainers": "Who are the trainers leading this training?",
+    "005b-trainers-caption": "Select the trainers leading this training.",
     "008-training-trainers": "Who led the training? You can write multiple names here if you want. i.e. Lucie Mann and Ani Himawati",
     "009-title-community": "Trained Community:",
     "008-community-trained": "What community was this training for? Start typing to see and select a GoBrik community. <a href=\"#\" onclick=\"openAddCommunityModal(); return false;\" style=\"color: #007BFF; text-decoration: underline;\">Don't see your community? Add it.</a>",
@@ -49,8 +52,10 @@ const en_Page_Translations = {
     "022-moodle-caption": "Was there a Moodle course created for this training on learning.ecobricks.org? If so, include the URL here.",
     "023-title-youtube": "YouTube Video URL:",
     "023-training-youtube": "Was a YouTube video of this training posted? If so, include the URL here please.",
-    "024-title-show": "🚀 Publish this training publicly?",
+    "024-title-show": "🚀 Publish this training?",
+    "024-show-caption": "Display the final training report of this training on ecobricks.org",
     "022-training-show": "Is this training ready to be displayed on ecobricks.org? If so, we'll post the completed workshop to the live feed of GEA trainings. Don't worry, you can always come back here to edit the live listing!",
+    "099-save-progress": "💾 Save Progress",
     "100-submit-report-1": "Next: Upload Photos ➡️"
 };
 

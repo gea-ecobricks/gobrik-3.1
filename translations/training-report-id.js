@@ -13,11 +13,14 @@ const id_Page_Translations = {
     "004-form-description-post": "Apakah lokakarya, acara, atau pelatihan Anda telah selesai? Bagikan keberhasilan sosial Anda dengan dunia! Gunakan formulir ini untuk mengajukan dan mengunggah laporan acara atau pelatihan yang telah selesai. Pelatihan akan ditampilkan di halaman utama kami dan diarsipkan dalam database pelatihan kami.",
     "005-title-title": "Judul Pelatihan:",
     "005-training-give-title": "Beri judul pada pelatihan Anda. Ini akan menjadi cara laporan Anda ditampilkan.",
+    "025-title-subtitle": "Tambahkan subjudul opsional untuk pelatihan Anda...",
     "006-title-date": "Tanggal Pelatihan:",
     "006-training-date": "Pada tanggal dan waktu berapa pelatihan ini berlangsung?",
     "007-title-participants": "Jumlah Peserta:",
     "007-training-count": "Berapa banyak orang yang berpartisipasi (termasuk pelatih)?",
     "008-lead-trainer": "Pelatih Utama:",
+    "005b-title-trainers": "Siapa pelatih yang memimpin pelatihan ini?",
+    "005b-trainers-caption": "Pilih pelatih yang memimpin pelatihan ini.",
     "008-training-trainers": "Siapa yang memimpin pelatihan? Anda dapat menuliskan beberapa nama di sini jika diperlukan, misalnya, Lucie Mann dan Ani Himawati.",
     "009-title-community": "Komunitas yang Dilatih:",
     "008-community-trained": "Komunitas mana yang mengikuti pelatihan ini? Mulai mengetik untuk melihat dan memilih komunitas GoBrik. <a href=\"#\" onclick=\"openAddCommunityModal(); return false;\" style=\"color: #007BFF; text-decoration: underline;\">Tidak melihat komunitas Anda? Tambahkan.</a>",
@@ -49,8 +52,10 @@ const id_Page_Translations = {
     "022-moodle-caption": "Apakah ada kursus Moodle yang dibuat untuk pelatihan ini di learning.ecobricks.org? Jika ada, masukkan URL di sini.",
     "023-title-youtube": "URL Video YouTube:",
     "023-training-youtube": "Apakah ada video YouTube yang diposting tentang pelatihan ini? Jika ada, silakan masukkan URL di sini.",
-    "024-title-show": "Publikasikan pelatihan ini secara publik?",
+    "024-title-show": "🚀 Publikasikan pelatihan ini?",
+    "024-show-caption": "Tampilkan laporan akhir pelatihan ini di ecobricks.org",
     "022-training-show": "Apakah pelatihan ini siap ditampilkan di ecobricks.org? Jika ya, kami akan memposting lokakarya yang telah selesai ke umpan langsung pelatihan GEA. Jangan khawatir, Anda selalu dapat kembali ke sini untuk mengedit daftar yang ditampilkan!",
+    "099-save-progress": "💾 Simpan Progres",
     "100-submit-report-1": "Lanjut: Unggah Foto ➡️"
 };
 
