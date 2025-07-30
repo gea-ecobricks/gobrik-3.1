@@ -279,14 +279,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
                     <!-- Updated Signups Column -->
                     <td style="text-align:center;padding:10px;">
-                        <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
-                            <?php echo (int) $training['trainee_count']; ?> 👥
+                        <a href="javascript:void(0);" class="log-report-btn signup-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
+                            <?php echo (int) $training['trainee_count']; ?>
+                            <span class="default-emoji">👥</span><span class="hover-emoji">🔍</span>
                         </a>
                     </td>
 
                     <!-- Actions column -->
                     <td style="text-align:center;">
-                        <button class="serial-button settings-button" onclick="actionsTrainingModal(<?php echo $training['training_id']; ?>)">⚙️</button>
+                        <button class="serial-button settings-button" onclick="actionsTrainingModal(<?php echo $training['training_id']; ?>)">
+                            <span class="default-emoji">✏️</span><span class="hover-emoji">⚙️</span>
+                        </button>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -1140,12 +1143,10 @@ function deleteEcobrick(serial_no) {
 function actionsTrainingModal(trainingId) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
-    let messageContainer = document.querySelector('.modal-message');
-    if (!messageContainer) {
-        messageContainer = document.createElement('div');
-        messageContainer.className = 'modal-message';
-        modalBox.appendChild(messageContainer);
-    }
+    modalBox.innerHTML = '';
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'modal-message';
+    modalBox.appendChild(messageContainer);
 
     let url = `register.php?id=${trainingId}`;
     let content = '';

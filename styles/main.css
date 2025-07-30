@@ -2749,6 +2749,27 @@ position:relative;
 /* Use a pencil icon for settings buttons */
 .serial-button.settings-button::before {
     content: "✏️";
+    opacity: 1;
+}
+
+.serial-button.settings-button:hover::before {
+    content: "⚙️";
+}
+
+.serial-button.settings-button .hover-emoji {
+    display: none;
+}
+
+.serial-button.settings-button:hover .default-emoji {
+    display: none;
+}
+
+.serial-button.settings-button:hover .hover-emoji {
+    display: inline;
+}
+
+.serial-button.settings-button:hover span {
+    opacity: 1;
 }
 
 
