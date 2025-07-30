@@ -263,7 +263,13 @@ margin-top:-100px !important;
 }
 #trainer-trainings td:nth-child(3) a {
     padding: 10px;
-    min-width: unset;
+    min-width: 50px;
+}
+#trainer-trainings td:nth-child(3),
+#trainer-trainings th:nth-child(3),
+#trainer-trainings td:nth-child(4),
+#trainer-trainings th:nth-child(4) {
+    max-width: 60px;
 }
 @media screen and (max-width: 768px) {
     #trainer-trainings th:nth-child(2),

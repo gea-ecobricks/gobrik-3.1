@@ -179,11 +179,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         <!-- TRAINER TRAININGS -->
 <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-        <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+        <div id="my-trainings-panel" class="dashboard-panel" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
             <h3 data-lang-id="002-my-trainings">My Trainings</h3>
             <p>Trainings that you are managing.</p>
             <div class="menu-buttons-row">
-                <a href="launch-training.php" class="page-button">Launch a training</a>
+                <a href="launch-training.php" class="page-button" style="margin: 10px;">Launch a training</a>
                 <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">Log Training Report</a>
             </div>
 
