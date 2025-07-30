@@ -8,7 +8,7 @@
 
 @media screen and (max-width: 700px) {
   .landing-page-form {
-    padding-top: 20px !important;
+    padding-top: 30px !important;
   }
 }
 
