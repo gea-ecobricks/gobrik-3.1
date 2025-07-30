@@ -1930,7 +1930,8 @@ color: red;
 
 
     #main {
-        height: fit-content;
+        height: auto;
+        min-height: 100%;
     }
 
     .preview-text {
