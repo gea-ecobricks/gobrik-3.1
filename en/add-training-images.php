@@ -267,8 +267,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 <!--PART 5 TOP DECORATION-->
     <?php require_once ("../includes/add-training-inc.php");?>
 
-    <div class="splash-content-block"></div>
-    <div id="splash-bar"></div>
+
 
 
   <!-- PAGE CONTENT-->
