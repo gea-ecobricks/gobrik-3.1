@@ -145,10 +145,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
-                <span style="margin-right:10px;">🌟</span>
-                <span>'What Should Green Really mean?' Free GEA webinar on August 10th!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
-                <button class="notice-close" aria-label="Close">&times;</button>
-            </div>
+        <?php if (isset($pendingReport)): ?>
+            <span style="margin-right:10px;">⚠️</span>
+            <span>Hi there <?php echo htmlspecialchars($first_name); ?>! It looks like your course <?php echo htmlspecialchars($pendingReport['title']); ?> is complete as of <?php echo date('Y-m-d', strtotime($pendingReport['date'])); ?>! As a GEA <?php echo htmlspecialchars($gea_status); ?> its important to complete and publish your Training Report.</span>
+            <a class="notice-button" href="training-report.php?training_id=<?php echo urlencode($pendingReport['id']); ?>">Report</a>
+            <button class="notice-close" aria-label="Close">&times;</button>
+        <?php else: ?>
+            <span style="margin-right:10px;">🌟</span>
+            <span>'What Should Green Really mean?' Free GEA webinar on August 10th!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
+            <button class="notice-close" aria-label="Close">&times;</button>
+        <?php endif; ?>
+    </div>
     <div id="ecobrick-slider">
         <?php foreach ($featured_ecobricks as $index => $brick): ?>
             <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
@@ -253,19 +260,20 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     if (!$is_listed) {
                         // Training not listed yet
                         $circle = '⚪';
-                    } elseif ($show_report) {
-                        // Report complete and public
-                        $circle = '✅';
                     } elseif ($training_date_ts > time()) {
                         // Listed and upcoming
                         $circle = '🟢';
+                    } elseif ($show_report) {
+                        // Report complete and public
+                        $circle = '✅';
                     } else {
                         // Listed, past and no report yet
                         $circle = '🔴';
                         if (!isset($pendingReport)) {
                             $pendingReport = [
                                 'id' => $training['training_id'],
-                                'title' => $training['training_title']
+                                'title' => $training['training_title'],
+                                'date' => $training['training_date']
                             ];
                         }
                     }
@@ -278,7 +286,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
                     <!-- Updated Signups Column -->
                     <td style="text-align:center;">
-                        <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="min-width:60px;display:inline-block;">
+                        <a href="javascript:void(0);" class="log-report-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;padding:10px;">
                             <?php echo (int) $training['trainee_count']; ?> 👥
                         </a>
                     </td>
@@ -668,28 +676,8 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [2, 3] }, // Disable sorting on Signups and Actions columns
-            { "targets": [1], "visible": true }, // Show Date
-            { "targets": [1], "visible": false, "responsivePriority": 1 }, // Hide on small screens
-            { "className": "all", "targets": [3] } // Always show Actions column
+            { "orderable": false, "targets": [2, 3] }
         ]
-    });
-
-    // Adjust visibility based on screen size
-    function adjustTableColumns() {
-        if (window.innerWidth < 769) {
-            table.column(1).visible(false); // Hide Date
-        } else {
-            table.column(1).visible(true);
-        }
-    }
-
-    // Run on page load
-    adjustTableColumns();
-
-    // Run on window resize
-    $(window).resize(function() {
-        adjustTableColumns();
     });
 });
 
@@ -1397,25 +1385,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php if (isset($pendingReport)): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('form-modal-message');
-    const modalBox = document.getElementById('modal-content-box');
-    modal.style.display = 'flex';
-    modalBox.style.flexFlow = 'column';
-    document.getElementById('page-content')?.classList.add('blurred');
-    document.getElementById('footer-full')?.classList.add('blurred');
-    document.body.classList.add('modal-open');
-    const firstName = <?php echo json_encode($first_name); ?>;
-    const courseName = <?php echo json_encode($pendingReport['title']); ?>;
-    const trainingId = <?php echo json_encode($pendingReport['id']); ?>;
-    modalBox.innerHTML = `<p>Hi there ${firstName}! It looks like your course ${courseName} is complete! Be sure to complete your GEA Training Report</p>` +
-        `<a href="training-report.php?training_id=${trainingId}" class="confirm-button" style="margin-top:10px;">Complete Report</a>`;
-    modal.classList.remove('modal-hidden');
-});
-</script>
-<?php endif; ?>
+
 
 </body>
 </html>
