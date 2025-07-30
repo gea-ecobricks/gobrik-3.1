@@ -5,6 +5,7 @@ require_once '../auth/session_start.php';
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
+$current_lang_dir = $lang;
 $version = '0.63';
 $page = 'launch-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
@@ -103,6 +104,18 @@ if ($result_languages && $result_languages->num_rows > 0) {
     while ($row = $result_languages->fetch_assoc()) {
         $languages[] = $row;
     }
+}
+
+// Fetch user's country_id
+$user_country_id = null;
+$sql_country_lookup = "SELECT country_id FROM users_tb WHERE buwana_id = ?";
+$stmt_country_lookup = $buwana_conn->prepare($sql_country_lookup);
+if ($stmt_country_lookup) {
+    $stmt_country_lookup->bind_param('i', $buwana_id);
+    $stmt_country_lookup->execute();
+    $stmt_country_lookup->bind_result($user_country_id);
+    $stmt_country_lookup->fetch();
+    $stmt_country_lookup->close();
 }
 
 
@@ -407,7 +420,11 @@ if (!empty($community_id)) {
 
            <div id="community_results" class="autocomplete-results"></div>
 
-           <p class="form-caption">For general course select the Global Ecobrick Movement community.</p>
+           <p class="form-caption"><span data-lang-id="008-start-typing-community">
+        Start typing to see and select a community. There's a good chance someone local to you has already set one up!</span>
+    <br> ➕
+        <a href="#" onclick="openAddCommunityModal(); return false;" style="color: #007BFF; text-decoration: underline;" data-lang-id="009-add-community">Don't see your community? Add it.</a>
+    </p>
 
            <div id="community-error-required" class="form-field-error" data-lang-id="000-field-too-long-error">A community must be selected</div>
        </div>
@@ -666,51 +683,32 @@ if (!empty($community_id)) {
 
 <script>
 var preselectedTrainers = <?php echo json_encode($selected_trainers_data); ?>;
+var countries = <?php echo json_encode($countries); ?>;
+var languages = <?php echo json_encode($languages); ?>;
+const userLanguageId = "<?php echo $current_lang_dir; ?>";
+const userCountryId = "<?php echo htmlspecialchars($user_country_id ?? '', ENT_QUOTES, 'UTF-8'); ?>";
 
 document.addEventListener("DOMContentLoaded", function() {
-    const communityInput = document.getElementById("community_search");
-    const communityIdField = document.getElementById("community_id");
-    const resultsDiv = document.getElementById("community_results");
+    const communityNameInput = document.getElementById("community_search");
+    const communityIdInput = document.getElementById("community_id");
+    const suggestionsBox = document.getElementById("community_results");
 
-    function fetchCommunities(query) {
+    communityNameInput.addEventListener("input", function() {
+        const query = communityNameInput.value.trim();
+        communityIdInput.value = "";
         if (query.length >= 3) {
             fetch(`../api/search_communities.php?query=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(data => {
-                    resultsDiv.innerHTML = "";
-                    if (data.length === 0) {
-                        resultsDiv.innerHTML = "<div class='autocomplete-item' style='color: gray;'>No results found</div>";
-                    } else {
-                        data.forEach(community => {
-                            let div = document.createElement("div");
-                            div.textContent = community.com_name;
-                            div.dataset.id = community.community_id; // Store the ID
-                            div.classList.add("autocomplete-item");
-
-                            div.addEventListener("mousedown", function(event) {
-                                event.preventDefault();
-                                communityInput.value = community.com_name;
-                                communityIdField.value = community.community_id; // Ensure correct ID is set
-                                resultsDiv.innerHTML = "";
-                                console.log("Selected Community ID: ", community.community_id);
-                            });
-
-                            resultsDiv.appendChild(div);
-                        });
-                    }
-                });
+                .then(res => res.json())
+                .then(list => showCommunitySuggestions(list, suggestionsBox, communityNameInput, communityIdInput))
+                .catch(err => console.error('Error loading communities:', err));
         } else {
-            resultsDiv.innerHTML = "";
+            suggestionsBox.innerHTML = '';
         }
-    }
-
-    communityInput.addEventListener("input", function() {
-        fetchCommunities(communityInput.value.trim());
     });
 
     document.addEventListener("click", function(event) {
-        if (!communityInput.contains(event.target) && !resultsDiv.contains(event.target)) {
-            resultsDiv.innerHTML = "";
+        if (!communityNameInput.contains(event.target) && !suggestionsBox.contains(event.target)) {
+            suggestionsBox.innerHTML = "";
         }
     });
 
@@ -949,99 +947,7 @@ function showTrainingSavedModal(trainingId) {
 
 
 
- function openAddCommunityModal() {
-    const modal = document.getElementById('form-modal-message');
-    const modalBox = document.getElementById('modal-content-box');
 
-    modal.style.display = 'flex';
-    modalBox.style.flexFlow = 'column';
-    document.getElementById('page-content')?.classList.add('blurred');
-    document.getElementById('footer-full')?.classList.add('blurred');
-    document.body.classList.add('modal-open');
-
-    modalBox.style.maxHeight = '80vh';
-    modalBox.style.overflowY = 'auto';
-
-    modalBox.innerHTML = `
-        <h2 style="text-align:center;">Add Your Community</h2>
-        <p>Add your community to GoBrik so you can manage local projects and ecobricks.</p>
-
-        <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
-            <label for="newCommunityName">Name of Community:</label>
-            <input type="text" id="newCommunityName" name="newCommunityName" >
-
-            <label for="newCommunityType">Type of Community:</label>
-            <select id="newCommunityType" name="newCommunityType" >
-                <option value="">Select Type</option>
-                <option value="neighborhood">Neighborhood</option>
-                <option value="city">City</option>
-                <option value="school">School</option>
-                <option value="organization">Organization</option>
-            </select>
-
-            <label for="communityCountry">Country:</label>
-            <select id="communityCountry" name="communityCountry" >
-                <option value="">Select Country</option>
-                <?php foreach ($countries as $country) : ?>
-                    <option value="<?php echo $country['country_id']; ?>">
-                        <?php echo htmlspecialchars($country['country_name'], ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <label for="communityLanguage">Preferred Language:</label>
-            <select id="communityLanguage" name="communityLanguage" >
-                <option value="">Select Language</option>
-                <?php foreach ($languages as $language) : ?>
-                    <option value="<?php echo $language['language_id']; ?>">
-                        <?php echo htmlspecialchars($language['languages_native_name'], ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <button type="submit" style="margin-top:10px;width:100%;" class="submit-button enabled">Submit</button>
-        </form>
-    `;
-}
-
-
-function addCommunity2Buwana(event) {
-    event.preventDefault(); // Prevent normal form submission
-
-    const form = document.getElementById('addCommunityForm');
-    const formData = new FormData(form);
-
-    fetch('../scripts/add_community.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message); // Show success or error message
-
-        if (data.success) {
-            // Close modal
-            closeInfoModal();
-
-            // Add the new community to the dropdown
-            const communityInput = document.getElementById('community_name');
-            const communityList = document.getElementById('community_list');
-
-            // Create new option
-            const newOption = document.createElement('option');
-            newOption.value = data.community_name;
-            newOption.textContent = data.community_name;
-            communityList.appendChild(newOption);
-
-            // Set selected value
-            communityInput.value = data.community_name;
-        }
-    })
-    .catch(error => {
-        alert('Error adding community. Please try again.');
-        console.error('Error:', error);
-    });
-}
 
 // Preset fields for the Starter Workshop
 function setFileInputFromUrl(inputId, url) {

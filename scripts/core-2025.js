@@ -480,3 +480,113 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// -----------------------------------------------
+// Shared community functions
+// -----------------------------------------------
+document.addEventListener('DOMContentLoaded', function() {
+    window.showCommunitySuggestions = function(communities, suggestionsBox, nameInput, idInput) {
+        suggestionsBox.innerHTML = '';
+        communities.forEach(function(comm) {
+            const item = document.createElement('div');
+            item.textContent = comm.com_name;
+            item.classList.add('suggestion-item');
+            item.addEventListener('click', function() {
+                nameInput.value = comm.com_name;
+                idInput.value = comm.community_id;
+                suggestionsBox.innerHTML = '';
+            });
+            suggestionsBox.appendChild(item);
+        });
+    };
+
+    window.openAddCommunityModal = function() {
+        const modal = document.getElementById('form-modal-message');
+        const modalBox = document.getElementById('modal-content-box');
+
+        modal.style.display = 'flex';
+        modalBox.style.flexFlow = 'column';
+        document.getElementById('page-content')?.classList.add('blurred');
+        document.getElementById('footer-full')?.classList.add('blurred');
+        document.body.classList.add('modal-open');
+
+        modalBox.style.maxHeight = '100vh';
+        modalBox.style.overflowY = 'auto';
+
+        const countryOptions = (window.countries || []).map(c => `<option value="${c.country_id}">${c.country_name}</option>`).join('');
+        const languageOptions = (window.languages || []).map(l => `<option value="${l.language_id}">${l.languages_native_name}</option>`).join('');
+
+        modalBox.innerHTML = `
+            <h4 style="text-align:center;" data-lang-id="014-add-community-title">Add Your Community</h4>
+            <p data-lang-id="015-add-community-desc">Add your community to Buwana so that others can connect across regenerative apps.</p>
+            <form id="addCommunityForm" onsubmit="addCommunity2Buwana(event)">
+                <label for="newCommunityName" data-lang-id="016-community-name-label">Name of Community:</label>
+                <input type="text" id="newCommunityName" name="newCommunityName" required>
+                <label for="newCommunityType" data-lang-id="017-community-type-label">Type of Community:</label>
+                <select id="newCommunityType" name="newCommunityType" required>
+                    <option value="" data-lang-id="018-select-type-option">Select Type</option>
+                    <option value="neighborhood" data-lang-id="019-type-neighborhood">Neighborhood</option>
+                    <option value="city" data-lang-id="020-type-city">City</option>
+                    <option value="school" data-lang-id="021-type-school">School</option>
+                    <option value="organization" data-lang-id="022-type-organization">Organization</option>
+                </select>
+                <label for="communityCountry" data-lang-id="023-country-label">Country:</label>
+                <select id="communityCountry" name="communityCountry" required>
+                    <option value="" data-lang-id="024-select-country-option">Select Country...</option>
+                    ${countryOptions}
+                </select>
+                <label for="communityLanguage" data-lang-id="025-language-label">Preferred Language:</label>
+                <select id="communityLanguage" name="communityLanguage" required>
+                    <option value="" data-lang-id="026-select-language-option">Select Language...</option>
+                    ${languageOptions}
+                </select>
+                <button type="submit" style="margin-top:10px;" class="confirm-button enabled" data-lang-id="027-submit-button">Create Community</button>
+            </form>
+        `;
+
+        if (typeof applyTranslations === 'function') {
+            applyTranslations();
+        }
+
+        setTimeout(() => {
+            const ctry = document.getElementById('communityCountry');
+            const lang = document.getElementById('communityLanguage');
+            if (ctry) ctry.value = window.userCountryId || '';
+            if (lang) lang.value = window.userLanguageId || '';
+        }, 100);
+    };
+
+    window.addCommunity2Buwana = function(event) {
+        event.preventDefault();
+        const form = document.getElementById('addCommunityForm');
+        const formData = new FormData(form);
+
+        fetch('../scripts/add_community.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                closeInfoModal();
+                const communityInput = document.getElementById('community_search') || document.getElementById('community_name');
+                const communityIdInput = document.getElementById('community_id');
+                if (communityInput) communityInput.value = data.community_name;
+                if (communityIdInput) {
+                    fetch('../api/search_communities.php?query=' + encodeURIComponent(data.community_name))
+                        .then(r => r.json())
+                        .then(list => {
+                            const match = list.find(c => c.com_name === data.community_name);
+                            if (match) communityIdInput.value = match.community_id;
+                        })
+                        .catch(err => console.error('Error fetching community ID:', err));
+                }
+            }
+        })
+        .catch(error => {
+            alert('Error adding community. Please try again.');
+            console.error('Error:', error);
+        });
+    };
+});

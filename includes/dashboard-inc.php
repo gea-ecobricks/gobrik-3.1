@@ -38,6 +38,16 @@ margin-top:-100px !important;
     color: white;
 }
 
+.signup-btn .hover-emoji {
+    display: none;
+}
+.signup-btn:hover .default-emoji {
+    display: none;
+}
+.signup-btn:hover .hover-emoji {
+    display: inline;
+}
+
 
 
 
