@@ -41,7 +41,7 @@ margin-top:-100px !important;
 .signup-btn .hover-emoji {
     display: none;
 }
-.signup-btn:hover .default-emoji {
+.signup-btn:hover .signup-count {
     display: none;
 }
 .signup-btn:hover .hover-emoji {

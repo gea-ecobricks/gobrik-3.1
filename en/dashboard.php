@@ -177,6 +177,80 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         </div>
 
+        <!-- TRAINER TRAININGS -->
+<?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
+        <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+            <h3 data-lang-id="002-my-trainings">My Trainings</h3>
+            <p>Trainings that you are managing.</p>
+            <div class="menu-buttons-row">
+                <a href="launch-training.php" class="page-button">Launch a training</a>
+                <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">Log Training Report</a>
+            </div>
+
+            <table id="trainer-trainings" class="display" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>Training</th>
+                        <th>Date</th>
+                        <th>Signups</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $pendingReport = null; foreach ($trainings as $training): ?>
+                        <?php
+                            $training_date_ts = strtotime($training['training_date']);
+                            $is_listed = $training['ready_to_show'] == 1;
+                            $show_report = $training['show_report'] == 1;
+
+                            if (!$is_listed) {
+                                // Training not listed yet
+                                $circle = '⚪';
+                            } elseif ($training_date_ts > time()) {
+                                // Listed and upcoming
+                                $circle = '🟢';
+                            } elseif ($show_report && $is_listed) {
+                                // Report complete and public after the date
+                                $circle = '✅';
+                            } else {
+                                // Listed, past and no report yet
+                                $circle = '🔴';
+                                if (!isset($pendingReport)) {
+                                    $pendingReport = [
+                                        'id' => $training['training_id'],
+                                        'title' => $training['training_title'],
+                                        'date' => date('Y-m-d', $training_date_ts)
+                                    ];
+                                }
+                            }
+                        ?>
+                        <tr>
+                            <td style="white-space:normal;"><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
+
+                            <!-- Format the date to remove time -->
+                            <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
+
+                            <!-- Updated Signups Column -->
+                            <td style="text-align:center;padding:10px;">
+                                <a href="javascript:void(0);" class="log-report-btn signup-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
+                                    <span class="signup-count"><?php echo (int) $training['trainee_count']; ?></span>
+                                    <span class="hover-emoji">👥</span>
+                                </a>
+                            </td>
+
+                            <!-- Actions column -->
+                            <td style="text-align:center;">
+                                <button class="serial-button settings-button" data-show-report="<?php echo $training['show_report']; ?>" data-ready-to-show="<?php echo $training['ready_to_show']; ?>" onclick="actionsTrainingModal(this, <?php echo $training['training_id']; ?>)">
+                                    <span class="default-emoji">✏️</span><span class="hover-emoji">⚙️</span>
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+<?php endif; ?>
+
 
 
 <!--ADMIN-->
@@ -217,91 +291,16 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
             <a href="bug-report.php" class="page-button">Report a Bug</a>
             <a href="accounting.php" class="page-button">GEA Accounting</a>
-            <a href="launch-training.php" class="page-button">Launch a training</a>
-            <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">Log Training Report</a>
+            <!-- Training management buttons moved below -->
             <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training" style="margin: 10px;">+ Set Buwana Totem</a>
 
 
 
         </div>
     </div>
-
-
-<!-- TRAINER TRAININGS -->
-
-<!-- TRAINER TRAININGS -->
-<div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-    <h3 data-lang-id="002-my-trainings">My Trainings</h3>
-    <p>Trainings that you are managing.</p>
-
-    <table id="trainer-trainings" class="display" style="width:100%;">
-        <thead>
-            <tr>
-                <th>Training</th>
-                <th>Date</th>
-                <th>Signups</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php $pendingReport = null; foreach ($trainings as $training): ?>
-                <?php
-                    $training_date_ts = strtotime($training['training_date']);
-                    $is_listed = $training['ready_to_show'] == 1;
-                    $show_report = $training['show_report'] == 1;
-
-                    if (!$is_listed) {
-                        // Training not listed yet
-                        $circle = '⚪';
-                    } elseif ($training_date_ts > time()) {
-                        // Listed and upcoming
-                        $circle = '🟢';
-                    } elseif ($show_report && $is_listed) {
-                        // Report complete and public after the date
-                        $circle = '✅';
-                    } else {
-                        // Listed, past and no report yet
-                        $circle = '🔴';
-                        if (!isset($pendingReport)) {
-                            $pendingReport = [
-                                'id' => $training['training_id'],
-                                'title' => $training['training_title'],
-                                'date' => date('Y-m-d', $training_date_ts)
-                            ];
-                        }
-                    }
-                ?>
-                <tr>
-                    <td style="white-space:normal;"><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
-
-                    <!-- Format the date to remove time -->
-                    <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
-
-                    <!-- Updated Signups Column -->
-                    <td style="text-align:center;padding:10px;">
-                        <a href="javascript:void(0);" class="log-report-btn signup-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
-                            <?php echo (int) $training['trainee_count']; ?>
-                            <span class="default-emoji">👥</span><span class="hover-emoji">🔍</span>
-                        </a>
-                    </td>
-
-                    <!-- Actions column -->
-                    <td style="text-align:center;">
-                        <button class="serial-button settings-button" data-show-report="<?php echo $training['show_report']; ?>" data-ready-to-show="<?php echo $training['ready_to_show']; ?>" onclick="actionsTrainingModal(this, <?php echo $training['training_id']; ?>)">
-                            <span class="default-emoji">✏️</span><span class="hover-emoji">⚙️</span>
-                        </button>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
-
-
-
-
-
 <?php endif; ?>
+
+
 
 
 
