@@ -2884,3 +2884,14 @@ padding: 10px;
 
 /* Material Design theme for DataTables */
 @import url('https://cdn.datatables.net/plug-ins/1.13.5/integration/material/dataTables.material.min.css');
+
+/* Dashboard trainer table mobile adjustments */
+@media screen and (max-width: 769px) {
+    #trainer-trainings td:nth-child(2),
+    #trainer-trainings th:nth-child(2) {
+        display: none;
+    }
+    #trainer-trainings td:nth-child(1) {
+        white-space: normal;
+    }
+}
