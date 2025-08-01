@@ -270,7 +270,7 @@ margin-top:-100px !important;
 #trainer-trainings th:nth-child(3),
 #trainer-trainings td:nth-child(4),
 #trainer-trainings th:nth-child(4) {
-    max-width: 25px;
+    max-width: 50px;
 }
 @media screen and (max-width: 768px) {
     #trainer-trainings th:nth-child(2),
