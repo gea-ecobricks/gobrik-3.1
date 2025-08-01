@@ -40,6 +40,7 @@ $show_report = isset($_POST['show_report']) ? 1 : 0;
 $featured_description = trim($_POST['featured_description'] ?? '');
 $training_summary = isset($_POST['training_summary']) ? trim($_POST['training_summary']) : null;
 $training_agenda = isset($_POST['training_agenda']) ? trim($_POST['training_agenda']) : null;
+$training_agenda_for_report = isset($_POST['training_agenda_for_report']) ? trim($_POST['training_agenda_for_report']) : null;
 $training_success = trim($_POST['training_success'] ?? '');
 $training_challenges = trim($_POST['training_challenges'] ?? '');
 $training_lessons_learned = trim($_POST['training_lessons_learned'] ?? '');
@@ -95,10 +96,10 @@ if ($community_id !== null) {
 
 // Preserve existing fields when not provided in the form
 if ($editing) {
-    $stmt = $gobrik_conn->prepare("SELECT training_summary, training_agenda FROM tb_trainings WHERE training_id = ?");
+    $stmt = $gobrik_conn->prepare("SELECT training_summary, training_agenda, training_agenda_for_report FROM tb_trainings WHERE training_id = ?");
     $stmt->bind_param("i", $training_id);
     $stmt->execute();
-    $stmt->bind_result($existing_summary, $existing_agenda);
+    $stmt->bind_result($existing_summary, $existing_agenda, $existing_agenda_report);
     $stmt->fetch();
     $stmt->close();
 
@@ -108,21 +109,24 @@ if ($editing) {
     if ($training_agenda === null) {
         $training_agenda = $existing_agenda;
     }
+    if ($training_agenda_for_report === null) {
+        $training_agenda_for_report = $existing_agenda_report;
+    }
 }
 
 if ($editing) {
     $sql = "UPDATE tb_trainings SET
             training_title=?, training_subtitle=?, lead_trainer=?, country_id=?, training_date=?,
             no_participants=?, training_type=?, briks_made=?, avg_brik_weight=?,
-            location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?,
+            location_lat=?, location_long=?, training_location=?, training_summary=?, training_agenda=?, training_agenda_for_report=?,
             training_success=?, training_challenges=?, training_lessons_learned=?,
             youtube_result_video=?, moodle_url=?, ready_to_show=?, show_report=?, featured_description=?, community_id=?
             WHERE training_id=?";
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("sssisisiiddssssssssiisii",
+    $stmt->bind_param("sssisisiiddsssssssssiisii",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-        $training_summary, $training_agenda, $training_success, $training_challenges,
+        $training_summary, $training_agenda, $training_agenda_for_report, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report,
         $featured_description, $community_id, $training_id
     );
@@ -136,14 +140,14 @@ if ($editing) {
     $sql = "INSERT INTO tb_trainings
             (training_title, training_subtitle, lead_trainer, country_id, training_date, no_participants,
             training_type, briks_made, avg_brik_weight, location_lat, location_long,
-            training_location, training_summary, training_agenda, training_success, training_challenges,
+            training_location, training_summary, training_agenda, training_agenda_for_report, training_success, training_challenges,
             training_lessons_learned, youtube_result_video, moodle_url, ready_to_show, show_report, featured_description, community_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param("sssisisiiddssssssssiisi",
+    $stmt->bind_param("sssisisiiddsssssssssiisi",
         $training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $no_participants,
         $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-        $training_summary, $training_agenda, $training_success, $training_challenges,
+        $training_summary, $training_agenda, $training_agenda_for_report, $training_success, $training_challenges,
         $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $featured_description, $community_id
     );
     if ($stmt->execute()) {
