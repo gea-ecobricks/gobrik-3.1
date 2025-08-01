@@ -535,7 +535,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function fetchCommunities(query) {
         if (query.length >= 3) {
-            fetch(`https://buwana.ecobricks.org/api/api/search_communities_by_id.php?query=${encodeURIComponent(query)}`)
+            fetch(`https://buwana.ecobricks.org/api/search_communities_by_id.php?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     resultsDiv.innerHTML = "";
