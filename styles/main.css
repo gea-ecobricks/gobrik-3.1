@@ -2760,6 +2760,15 @@ position:relative;
     display: none;
 }
 
+@media screen and (max-width: 700px) {
+    .serial-button.settings-button .hover-emoji {
+        display: none !important;
+    }
+    .serial-button.settings-button:hover::before {
+        content: "✏️";
+    }
+}
+
 .serial-button.settings-button:hover .default-emoji {
     display: none;
 }

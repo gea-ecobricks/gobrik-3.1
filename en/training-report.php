@@ -78,7 +78,7 @@ $training_subtitle = '';
 if ($editing) {
     $sql_fetch = "SELECT training_title, training_subtitle, lead_trainer, country_id, training_date, no_participants,
                   training_type, briks_made, avg_brik_weight, location_lat, location_long, training_location,
-                  training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
+                  training_summary, training_agenda_for_report, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, show_report, featured_description, community_id
                   FROM tb_trainings WHERE training_id = ?";
 
@@ -87,7 +87,7 @@ if ($editing) {
     $stmt_fetch->execute();
     $stmt_fetch->bind_result($training_title, $training_subtitle, $lead_trainer, $country_id, $training_date, $no_participants,
                             $training_type, $briks_made, $avg_brik_weight, $latitude, $longitude, $training_location,
-                            $training_summary, $training_agenda, $training_success, $training_challenges,
+                            $training_summary, $training_agenda_for_report, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $featured_description, $community_id);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
@@ -390,7 +390,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div class="form-item">
         <label for="training_summary" data-lang-id="017-title-summary">Training Summary:</label><br>
-        <textarea id="training_summary" name="training_summary" ><?php echo htmlspecialchars($training_summary ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <textarea id="training_summary" name="training_summary" rows="6" ><?php echo htmlspecialchars($training_summary ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         <p class="form-caption" data-lang-id="017-training-summary">Provide a summary of the training. Max 150 words. Avoid special characters..</p>
     <!--ERRORS-->
                     <div id="summary-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
@@ -398,10 +398,16 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
                     <div id="summary-error-invalid" class="form-field-error" data-lang-id="005b-training-summary-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs.</div>
                 </div>
 
+    <div class="form-item">
+        <label for="training_agenda_for_report">Training Agenda:</label><br>
+        <textarea id="training_agenda_for_report" name="training_agenda_for_report" rows="6" ><?php echo htmlspecialchars($training_agenda_for_report ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <p class="form-caption">Describe the main elements of the timeline of your workshop event.</p>
+    </div>
+
 
     <div class="form-item">
         <label for="training_success" data-lang-id="018-title-successes">Training Successes:</label><br>
-        <textarea id="training_success" name="training_success" ><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <textarea id="training_success" name="training_success" rows="6" ><?php echo htmlspecialchars($training_success ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
       <p class="form-caption" data-lang-id="018-training-success">Share the successes of the training. Max 500 words. Avoid special characters..</p>
    <!--ERRORS-->
                     <div id="success-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
@@ -411,7 +417,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div class="form-item">
         <label for="training_challenges" data-lang-id="019-title-challenges">Training Challenges:</label><br>
-        <textarea id="training_challenges" name="training_challenges" ><?php echo htmlspecialchars($training_challenges ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <textarea id="training_challenges" name="training_challenges" rows="6" ><?php echo htmlspecialchars($training_challenges ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
               <p class="form-caption" data-lang-id="019-training-challenges">Share the challenges you faced leading your training. Max 500 words. Avoid special characters.</p>
 
             <!--ERRORS-->
@@ -423,7 +429,7 @@ $og_image = !empty($feature_photo1_main) ? $feature_photo1_main : "https://gobri
 
     <div class="form-item">
         <label for="training_lessons_learned" data-lang-id="020-title-lessons">Lessons Learned:</label><br>
-        <textarea id="training_lessons_learned" name="training_lessons_learned" ><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <textarea id="training_lessons_learned" name="training_lessons_learned" rows="6" ><?php echo htmlspecialchars($training_lessons_learned ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         <p class="form-caption" data-lang-id="020-training-lessons">Share the lessons learned from leading your training. Max 1000 words. Avoid special characters.</p>
  <!--ERRORS-->
                     <div id="lessons-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is .</div>
