@@ -257,6 +257,10 @@ margin-top:-100px !important;
     font-size: 0.9em;
 }
 
+#my-trainings-panel {
+    box-sizing: border-box;
+}
+
 /* Trainer trainings table tweaks */
 #trainer-trainings td:first-child {
     white-space: normal;
