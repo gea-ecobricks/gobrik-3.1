@@ -67,13 +67,14 @@ $location_last = $location_parts[count($location_parts) - 1] ?? '';
 $location_third_last = $location_parts[count($location_parts) - 3] ?? '';
 $locationFullTxt = $location_third_last . ', ' . $location_last;
 
-// 🎓 Fetch trainings where user is trainer
+// 🎓 Fetch trainings where user is trainer, ordered by most recent first
 $trainings = [];
 $sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type, t.ready_to_show, t.show_report,
                          (SELECT COUNT(*) FROM tb_training_trainees WHERE training_id = t.training_id) AS trainee_count
                   FROM tb_trainings t
                   INNER JOIN tb_training_trainers tt ON t.training_id = tt.training_id
-                  WHERE tt.ecobricker_id = ?";
+                  WHERE tt.ecobricker_id = ?
+                  ORDER BY t.training_date DESC";
 $stmt_trainings = $gobrik_conn->prepare($sql_trainings);
 if ($stmt_trainings) {
     $stmt_trainings->bind_param("i", $ecobricker_id);
@@ -657,6 +658,7 @@ $(document).ready(function() {
         "pageLength": 10,
         "searching": false,
         "lengthChange": false,
+        "order": [[1, "desc"]],
         "language": {
             "emptyTable": "You are not a trainer for any trainings yet.",
             "lengthMenu": "Show _MENU_ trainings",

@@ -279,6 +279,18 @@ margin-top:-100px !important;
     }
 }
 
+/* Ensure the trainer trainings table has equal margins on mobile */
+@media screen and (max-width: 700px) {
+    #trainer-trainings_wrapper {
+        padding: 0 7px;
+        box-sizing: border-box;
+    }
+    #trainer-trainings {
+        margin: 0;
+        width: 100%;
+    }
+}
+
 </style>
 
 
