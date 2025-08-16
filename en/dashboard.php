@@ -180,7 +180,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         <!-- TRAINER TRAININGS -->
 <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-        <div id="my-trainings-panel" class="dashboard-panel" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
+        <div id="my-trainings-panel" class="dashboard-panel" style="text-align:center;width:100%;margin:25px auto 0;">
             <h3 data-lang-id="002-my-trainings">My Trainings</h3>
             <div class="menu-buttons-row">
                             <a href="launch-training.php" class="page-button" style="margin: 10px;">🚀 New Training</a>
@@ -674,6 +674,7 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
+            { "type": "date", "targets": 1 },
             { "orderable": false, "targets": [2, 3] }
         ]
     });
