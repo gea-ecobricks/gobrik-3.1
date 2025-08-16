@@ -1,3 +1,7 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['buwana_user']) && isset($_SESSION['buwana_user']['jwt']);
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -148,7 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
             langDir = 'en/';
         }
 
-        window.location.href = langDir;
+        const target = <?php echo $isLoggedIn ? "'dashboard.php'" : "'index.php'"; ?>;
+        window.location.href = langDir + target;
     }, 600); // 10 seconds
 });
 
