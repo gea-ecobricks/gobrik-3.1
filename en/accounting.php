@@ -255,8 +255,8 @@ function transactionActionsModal(transactionId) {
     modalBox.appendChild(messageContainer);
 
     let content = '';
-    content += `<button class="ecobrick-action-button deleter-button" onclick="deleteTransaction(${transactionId})">Delete Transaction</button>`;
-    content += `<button class="ecobrick-action-button cancel-button" onclick="closeInfoModal()">Cancel</button>`;
+    content += `<button class="ecobrick-action-button deleter-button" style="min-width:300px;" onclick="deleteTransaction(${transactionId})">Delete Transaction</button>`;
+    content += `<button class="ecobrick-action-button cancel-button" style="min-width:300px;" onclick="closeInfoModal()">Cancel</button>`;
 
     messageContainer.innerHTML = content;
     modal.style.display = 'flex';
@@ -270,19 +270,20 @@ function deleteTransaction(transactionId) {
     $.ajax({
         url: '../processes/delete_transaction.php',
         type: 'POST',
+        dataType: 'json',
         data: { cash_tran_id: transactionId },
-        success: function (response) {
-            let res;
-            try { res = JSON.parse(response); } catch (e) { res = { success: false, error: 'Invalid response' }; }
-            if (res.success) {
+        success: function (res) {
+            if (res && res.success) {
                 transactionsTable.ajax.reload();
             } else {
                 alert(res.error || 'Failed to delete transaction.');
             }
-            closeInfoModal();
         },
         error: function () {
             alert('Error deleting transaction.');
+            transactionsTable.ajax.reload();
+        },
+        complete: function () {
             closeInfoModal();
         }
     });
@@ -598,9 +599,10 @@ function submitRevenueTrans(event) {
         success: function (response) {
             const data = JSON.parse(response);
             if (data.success) {
-                alert('Revenue transaction added successfully!');
-                closeInfoModal(); // Close the modal
-                location.reload(); // Reload the page to refresh data
+                const modalBox = document.getElementById('modal-content-box');
+                modalBox.innerHTML = '<h1>✅</h1><p>Your transaction has been added!</p>';
+                transactionsTable.ajax.reload();
+                setTimeout(() => { closeInfoModal(); }, 1000);
             } else {
                 alert(`Error: ${data.error}`);
             }
@@ -758,9 +760,10 @@ function submitExpenseTrans(event) {
         success: function (response) {
             const data = JSON.parse(response);
             if (data.success) {
-                alert('Expense transaction added successfully!');
-                closeInfoModal(); // Close the modal
-                location.reload(); // Reload the page to refresh data
+                const modalBox = document.getElementById('modal-content-box');
+                modalBox.innerHTML = '<h1>✅</h1><p>Your transaction has been added!</p>';
+                transactionsTable.ajax.reload();
+                setTimeout(() => { closeInfoModal(); }, 1000);
             } else {
                 alert(`Error: ${data.error}`);
             }
