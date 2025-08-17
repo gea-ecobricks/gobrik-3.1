@@ -158,6 +158,18 @@ $subject = "Please activate your 2025 GoBrik account";
     // Show the modal
     modal.style.display = 'flex';
     modalBox.style.flexFlow = 'column';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
 
     // Lock scrolling for the body and blur the background
     document.getElementById('page-content')?.classList.add('blurred');
@@ -193,6 +205,8 @@ $subject = "Please activate your 2025 GoBrik account";
                 return;
             }
 
+            const formattedAmount = Number(data.native_ccy_amt).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
             // Construct the HTML for the transaction details
             let transactionDetailsHTML = `
                 <div id="main-details">
@@ -202,8 +216,8 @@ $subject = "Please activate your 2025 GoBrik account";
                         </div>
                     ` : ''}
                     <div class="serial"><b>Amount:</b> <br>
-                    <h2><var>${data.native_ccy_amt} ${data.currency_code}</var></h2></div>
-                    <div class="general-field"><b>Transaction Name:</b> ${data.tran_name_desc}</div>
+                    <h2><var>${formattedAmount} ${data.currency_code}</var></h2></div>
+                    <div class="general-field"><b>Transaction:</b> ${data.tran_name_desc}</div>
                     <div class="main"><b>Sender:</b> <var>${data.sender_for_display}</var></div>
                     <div class="main"><b>Sent:</b> <var>${data.datetime_sent_ts}</var></div>
                     <div class="main"><b>Type:</b> <var>${data.type_of_transaction}</var></div>
@@ -215,11 +229,10 @@ $subject = "Please activate your 2025 GoBrik account";
                     ` : ''}
                     <div class="ecobrick-data">
                         <p><b>>> Raw Cash Transaction Record</b></p>
-                        <p><b>Record ID:</b> ${data.knack_record_id}</p>
                         <p><b>Cash Transaction ID:</b> ${data.cash_tran_id}</p>
-                        <p><b>Sender (for display):</b> ${data.sender_for_display}</p>
-                        <p><b>Date Time Sent:</b> ${data.datetime_sent_ts}</p>
-                        <p><b>Transaction Name:</b> ${data.tran_name_desc}</p>
+                        <p><b>Sender:</b> ${data.sender_for_display}</p>
+                        <p><b>Sent:</b> ${data.datetime_sent_ts}</p>
+                        <p><b>Transaction:</b> ${data.tran_name_desc}</p>
                         <p><b>Amount USD:</b> ${data.usd_amount}</p>
                         ${data.native_ccy_amt_display !== "0.00" ? `
                             <p><b>Native Currency Amount:</b> ${data.native_ccy_amt_display}</p>
@@ -250,6 +263,9 @@ function transactionActionsModal(transactionId) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
     modalBox.innerHTML = '';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
     const messageContainer = document.createElement('div');
     messageContainer.className = 'modal-message';
     modalBox.appendChild(messageContainer);
@@ -601,6 +617,11 @@ function submitRevenueTrans(event) {
             if (data.success) {
                 const modalBox = document.getElementById('modal-content-box');
                 modalBox.innerHTML = '<h1>✅</h1><p>Your transaction has been added!</p>';
+                modalBox.style.display = 'flex';
+                modalBox.style.flexDirection = 'column';
+                modalBox.style.justifyContent = 'center';
+                modalBox.style.alignItems = 'center';
+                modalBox.style.textAlign = 'center';
                 transactionsTable.ajax.reload();
                 setTimeout(() => { closeInfoModal(); }, 1000);
             } else {
@@ -762,6 +783,11 @@ function submitExpenseTrans(event) {
             if (data.success) {
                 const modalBox = document.getElementById('modal-content-box');
                 modalBox.innerHTML = '<h1>✅</h1><p>Your transaction has been added!</p>';
+                modalBox.style.display = 'flex';
+                modalBox.style.flexDirection = 'column';
+                modalBox.style.justifyContent = 'center';
+                modalBox.style.alignItems = 'center';
+                modalBox.style.textAlign = 'center';
                 transactionsTable.ajax.reload();
                 setTimeout(() => { closeInfoModal(); }, 1000);
             } else {
