@@ -22,6 +22,7 @@ const es_Page_Translations = {
     "003-no-ecobricks-yet": "¡Parece que aún no has registrado ningún ecoladrillo! Cuando lo hagas, aparecerán aquí para que los administres.",
     "005-newest-ecobricks": "📅 Ecoladrillos más nuevos",
     "welcomeBeta": `¡Bienvenido al nuevo GoBrik 3.0! Comience registrando un ecoladrillo o realizando el recorrido.`,
-    "loggedEcobricks": `Hasta ahora has registrado {ecobricksMade} ecoladrillos en {locationFullTxt}! En total has registrado {totalWeight} gramos con una densidad neta de {netDensity} g/ml.`
+    "loggedEcobricks": `Hasta ahora has registrado {ecobricksMade} ecoladrillos en {locationFullTxt}! En total has registrado {totalWeight} gramos con una densidad neta de {netDensity} g/ml.`,
+    "course-notice": "¡Nuevo curso de Introducción a los Ecobricks del 21 de septiembre listado! <a href=\"https://gobrik.com/en/courses.php\">Regístrate</a>"
 };
 

@@ -22,7 +22,8 @@ const en_Page_Translations = {
     "003-no-ecobricks-yet": "It looks like you haven't logged any ecobricks yet! When you do, they will appear here for you to manage.",
     "005-newest-ecobricks": "📅 Newest Ecobricks",
     "welcomeBeta": `Welcome to your GoBrik dashboard.  Start by logging an ecobrick or taking the tour.`,
-    "loggedEcobricks": `So far you've logged {ecobricksMade} ecobricks. In total you've logged {totalWeight} kg with a net density of {netDensity} g/ml.`
+    "loggedEcobricks": `So far you've logged {ecobricksMade} ecobricks. In total you've logged {totalWeight} kg with a net density of {netDensity} g/ml.`,
+    "course-notice": "New September 21 Intro to Ecobricks course listed! <a href=\"https://gobrik.com/en/courses.php\">Register</a>"
 };
 
 
