@@ -147,7 +147,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
                 <span id="notice-icon" style="margin-right:10px;">🌟</span>
-                <span id="notice-text">'What Should Green Really mean?' GEA webinar on August 10th!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
+                <span id="notice-text" data-lang-id="course-notice">New September 21 Intro to Ecobricks course listed!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">

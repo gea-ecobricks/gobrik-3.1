@@ -22,6 +22,7 @@ const id_Page_Translations = {
     "003-no-ecobricks-yet": "Sepertinya Anda belum mencatat ecobrick apapun! Setelah Anda melakukannya, ecobrick akan muncul di sini untuk Anda kelola.",
     "005-newest-ecobricks": "📅 Ecobrick Terbaru",
     "welcomeBeta": `Selamat datang di GoBrik 3.0 baru! Mulailah dengan menebang ecobrick atau mengikuti tur.`,
-    "loggedEcobricks": `Sejauh ini Anda telah mencatat {ecobricksMade} ecobrick di {locationFullTxt}! Secara total Anda telah mencatat {totalWeight} gram dengan kepadatan bersih {netDensity} g/ml.`
+    "loggedEcobricks": `Sejauh ini Anda telah mencatat {ecobricksMade} ecobrick di {locationFullTxt}! Secara total Anda telah mencatat {totalWeight} gram dengan kepadatan bersih {netDensity} g/ml.`,
+    "course-notice": "Kursus Intro to Ecobricks baru tanggal 21 September tersedia! <a href=\"https://gobrik.com/en/courses.php\">Daftar</a>"
 };
 
