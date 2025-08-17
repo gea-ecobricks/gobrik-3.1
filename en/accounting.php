@@ -127,6 +127,7 @@ $subject = "Please activate your 2025 GoBrik account";
                 <th data-lang-id="016-tran-name-column">Transaction</th>
                 <th data-lang-id="017-amount-usd-column">Amount USD</th> <!-- Hide and show only on overflow -->
                 <th data-lang-id="019-type-column">Account Note</th> <!-- Renamed column title -->
+                <th>Edit</th>
             </tr>
         </thead>
     </table>
@@ -167,9 +168,11 @@ $subject = "Please activate your 2025 GoBrik account";
     const modalContentBox = document.getElementById('modal-content-box');
     modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
     modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
+    modalContentBox.style.position = 'relative';
 
     // Clear previous modal content and set up the structure
-    modalContentBox.innerHTML = `<h4>Transaction Details - ID: ${transactionId}</h4>
+    modalContentBox.innerHTML = `<img src="../svgs/gea-logo-full-light.svg" alt="Global Ecobrick Alliance logo" style="position:absolute; top:10px; right:10px; width:250px;">
+                                  <h4>Transaction Details - ID: ${transactionId}</h4>
                                   <div id="transaction-table-container"><p>Loading transaction details...</p></div>`;
 
     // Show the modal
@@ -243,11 +246,52 @@ $subject = "Please activate your 2025 GoBrik account";
     });
 }
 
+function transactionActionsModal(transactionId) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+    modalBox.innerHTML = '';
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'modal-message';
+    modalBox.appendChild(messageContainer);
 
+    let content = '';
+    content += `<button class="ecobrick-action-button deleter-button" onclick="deleteTransaction(${transactionId})">Delete Transaction</button>`;
+    content += `<button class="ecobrick-action-button cancel-button" onclick="closeInfoModal()">Cancel</button>`;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    modalBox.style.background = 'none';
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+}
+
+function deleteTransaction(transactionId) {
+    $.ajax({
+        url: '../processes/delete_transaction.php',
+        type: 'POST',
+        data: { cash_tran_id: transactionId },
+        success: function (response) {
+            let res;
+            try { res = JSON.parse(response); } catch (e) { res = { success: false, error: 'Invalid response' }; }
+            if (res.success) {
+                transactionsTable.ajax.reload();
+            } else {
+                alert(res.error || 'Failed to delete transaction.');
+            }
+            closeInfoModal();
+        },
+        error: function () {
+            alert('Error deleting transaction.');
+            closeInfoModal();
+        }
+    });
+}
 
 /* ALL TRANSACTIONS */
+let transactionsTable;
 $(document).ready(function () {
-    $('#all-transactions').DataTable({
+    transactionsTable = $('#all-transactions').DataTable({
         ajax: '../api/fetch_all_transactions.php', // URL of the new PHP file
         columns: [
             {
@@ -281,6 +325,14 @@ $(document).ready(function () {
                 render: function (data) {
                     return data || 'N/A'; // Show 'N/A' if no account note exists
                 }
+            },
+            {
+                data: null,
+                orderable: false,
+                render: function (data, type, row) {
+                    return `<button class="serial-button settings-button" onclick="transactionActionsModal(${row.ID})">✏️</button>`;
+                },
+                className: 'dt-center'
             }
         ],
         columnDefs: [
