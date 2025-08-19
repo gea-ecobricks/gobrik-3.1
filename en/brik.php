@@ -220,40 +220,89 @@ if (!empty($selfie_photo_url)) {
 					<p>--------------------</p>
 					<p data-lang-id="126">BEGIN BRIK RECORD ></p>';
 
-			echo ' <p><b data-lang-id="127">Logged:</b> ' . $array["date_logged_ts"] .'</p>' ;
-			echo ' <p><b data-lang-id="128">Volume:</b> <var>'. $array["volume_ml"] .' &#8202;ml</var></p>' ;
-			echo ' <p><b data-lang-id="129">Weight:</b> <var>' . $array["weight_g"] .'&#8202;g</var></p>' ;
-			echo ' <p><b data-lang-id="130">Density:</b> <var>' . $array["density"] .'&#8202;g/ml</var></p>' ;
-			echo ' <p><b data-lang-id="131">CO2e:</b><var>' . $array["CO2_kg"] .' &#8202;kg</var></p>' ;
-			echo ' <p><b data-lang-id="132">Brikcoin value:</b> <var>' . $array["ecobrick_dec_brk_val"] .'&#8202;ß</var></p>' ;
+                        if (!empty($array["date_logged_ts"])) {
+                            echo ' <p><b data-lang-id="127">Logged:</b> ' . htmlspecialchars($array["date_logged_ts"], ENT_QUOTES, 'UTF-8') . '</p>';
+                        }
+                        if (!empty($array["volume_ml"])) {
+                            echo ' <p><b data-lang-id="128">Volume:</b> <var>' . htmlspecialchars($array["volume_ml"], ENT_QUOTES, 'UTF-8') . ' &#8202;ml</var></p>';
+                        }
+                        if (!empty($array["weight_g"])) {
+                            echo ' <p><b data-lang-id="129">Weight:</b> <var>' . htmlspecialchars($array["weight_g"], ENT_QUOTES, 'UTF-8') . '&#8202;g</var></p>';
+                        }
+                        if (!empty($array["density"])) {
+                            echo ' <p><b data-lang-id="130">Density:</b> <var>' . htmlspecialchars($array["density"], ENT_QUOTES, 'UTF-8') . '&#8202;g/ml</var></p>';
+                        }
+                        if (!empty($array["CO2_kg"])) {
+                            echo ' <p><b data-lang-id="131">CO2e:</b><var>' . htmlspecialchars($array["CO2_kg"], ENT_QUOTES, 'UTF-8') . ' &#8202;kg</var></p>';
+                        }
+                        if (!empty($array["ecobrick_dec_brk_val"])) {
+                            echo ' <p><b data-lang-id="132">Brikcoin value:</b> <var>' . htmlspecialchars($array["ecobrick_dec_brk_val"], ENT_QUOTES, 'UTF-8') . '&#8202;ß</var></p>';
+                        }
 
-			echo ' <p><b data-lang-id="133">Maker:</b> <var><i>' . $array["owner"] .'</i></var> </p>' ;
-			echo ' <p><b data-lang-id="134">Sequestration:</b> <var>' . $array["sequestration_type"].'</var></p>' ;
-			echo ' <p><b data-lang-id="135">Brand:</b> <var>' . $array["brand_name"] .'</var></p>' ;
-			echo ' <p><b data-lang-id="136">Bottom colour:</b> ' . $array["bottom_colour"] .'</p>' ;
+                        if (!empty($array["owner"])) {
+                            echo ' <p><b data-lang-id="133">Maker:</b> <var><i>' . htmlspecialchars($array["owner"], ENT_QUOTES, 'UTF-8') . '</i></var> </p>';
+                        }
+                        if (!empty($array["sequestration_type"])) {
+                            echo ' <p><b data-lang-id="134">Sequestration:</b> <var>' . htmlspecialchars($array["sequestration_type"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
+                        if (!empty($array["brand_name"])) {
+                            echo ' <p><b data-lang-id="135">Brand:</b> <var>' . htmlspecialchars($array["brand_name"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
+                        if (!empty($array["bottom_colour"])) {
+                            echo ' <p><b data-lang-id="136">Bottom colour:</b> ' . htmlspecialchars($array["bottom_colour"], ENT_QUOTES, 'UTF-8') . '</p>';
+                        }
 
-			echo ' <p><b data-lang-id="137">Plastic source:</b>' . $array["plastic_from"] .'</p>' ;
+                        if (!empty($array["plastic_from"])) {
+                            echo ' <p><b data-lang-id="137">Plastic source:</b>' . htmlspecialchars($array["plastic_from"], ENT_QUOTES, 'UTF-8') . '</p>';
+                        }
 
-			echo ' <p><b data-lang-id="138">Community:</b> <var>' . $array["community_name"] .'</var></p>' ;
-			echo ' <p><b data-lang-id="139">City:</b> <var>' . $array["location_city"] .'</var></p>' ;
-			echo ' <p><b data-lang-id="140">Region:</b> <var>' . $array["location_region"] .'</var></p>' ;
-			echo ' <p><b data-lang-id="141">Country:</b> ' . $array["location_country"] .'</p>' ;
-			echo ' <p><b data-lang-id="142">Full location:</b> <var>' . $array["location_full"] .'</var></p>' ;
+                        if (!empty($array["community_name"])) {
+                            echo ' <p><b data-lang-id="138">Community:</b> <var>' . htmlspecialchars($array["community_name"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
+                        if (!empty($array["location_city"])) {
+                            echo ' <p><b data-lang-id="139">City:</b> <var>' . htmlspecialchars($array["location_city"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
+                        if (!empty($array["location_region"])) {
+                            echo ' <p><b data-lang-id="140">Region:</b> <var>' . htmlspecialchars($array["location_region"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
+                        if (!empty($array["location_country"])) {
+                            echo ' <p><b data-lang-id="141">Country:</b> ' . htmlspecialchars($array["location_country"], ENT_QUOTES, 'UTF-8') . '</p>';
+                        }
+                        if (!empty($array["location_full"])) {
+                            echo ' <p><b data-lang-id="142">Full location:</b> <var>' . htmlspecialchars($array["location_full"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
 
 
-			echo ' <p><b data-lang-id="143">Validation:</b> ' . $array["last_validation_ts"] .'</var></p>' ;
-			echo ' <p><b data-lang-id="144">Validator 1:</b> <var>' . $array["validator_1"] .'</var> </p>' ;
-			echo ' <p><b data-lang-id="145">Validator 2:</b> <var>' . $array["validator_2"] .'</var> </p>' ;
-			echo ' <p><b data-lang-id="146">Validator 3:</b> <var>' . $array["validator_3"] .'</var> </p>' ;
-			echo ' <p><b data-lang-id="147">Validation score avg.:</b> <var>' . $array["validation_score_avg"] .'</var></p>' ;
-        echo ' <p><b data-lang-id="147b">Catalyst:</b> <var>' . $array["catalyst"] .'</var></p>' ;
+                        if (!empty($array["last_validation_ts"])) {
+                            echo ' <p><b data-lang-id="143">Validation:</b> ' . htmlspecialchars($array["last_validation_ts"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
+                        if (!empty($array["validator_1"])) {
+                            echo ' <p><b data-lang-id="144">Validator 1:</b> <var>' . htmlspecialchars($array["validator_1"], ENT_QUOTES, 'UTF-8') . '</var> </p>';
+                        }
+                        if (!empty($array["validator_2"])) {
+                            echo ' <p><b data-lang-id="145">Validator 2:</b> <var>' . htmlspecialchars($array["validator_2"], ENT_QUOTES, 'UTF-8') . '</var> </p>';
+                        }
+                        if (!empty($array["validator_3"])) {
+                            echo ' <p><b data-lang-id="146">Validator 3:</b> <var>' . htmlspecialchars($array["validator_3"], ENT_QUOTES, 'UTF-8') . '</var> </p>';
+                        }
+                        if (!empty($array["validation_score_avg"])) {
+                            echo ' <p><b data-lang-id="147">Validation score avg.:</b> <var>' . htmlspecialchars($array["validation_score_avg"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
+                        if (!empty($array["catalyst"])) {
+                            echo ' <p><b data-lang-id="147b">Catalyst:</b> <var>' . htmlspecialchars($array["catalyst"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
 
-			echo ' <p><b data-lang-id="148">Validation score final:</b> <var>' . $array["final_validation_score"] .'</var></p>' ;
-			echo ' <p><b data-lang-id="149">Authenticated weight:</b> <var> ' . $array["weight_authenticated_kg"] .'&#8202;kg</p>
-			<p data-lang-id="150"> ||| END RECORD.</p>
-				</div>
-			</div>
-			' ;
+                        if (!empty($array["final_validation_score"])) {
+                            echo ' <p><b data-lang-id="148">Validation score final:</b> <var>' . htmlspecialchars($array["final_validation_score"], ENT_QUOTES, 'UTF-8') . '</var></p>';
+                        }
+                        if (!empty($array["weight_authenticated_kg"])) {
+                            echo ' <p><b data-lang-id="149">Authenticated weight:</b> <var> ' . htmlspecialchars($array["weight_authenticated_kg"], ENT_QUOTES, 'UTF-8') . '&#8202;kg</var></p>';
+                        }
+
+                        echo ' <p data-lang-id="150"> ||| END RECORD.</p>
+                                </div>
+                        </div>
+                        ';
 				}
 
 
