@@ -127,6 +127,7 @@ $subject = "Please activate your 2025 GoBrik account";
                 <th data-lang-id="016-tran-name-column">Transaction</th>
                 <th data-lang-id="017-amount-usd-column">Amount USD</th> <!-- Hide and show only on overflow -->
                 <th data-lang-id="019-type-column">Account Note</th> <!-- Renamed column title -->
+                <th>Edit</th>
             </tr>
         </thead>
     </table>
@@ -157,6 +158,18 @@ $subject = "Please activate your 2025 GoBrik account";
     // Show the modal
     modal.style.display = 'flex';
     modalBox.style.flexFlow = 'column';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
 
     // Lock scrolling for the body and blur the background
     document.getElementById('page-content')?.classList.add('blurred');
@@ -167,9 +180,11 @@ $subject = "Please activate your 2025 GoBrik account";
     const modalContentBox = document.getElementById('modal-content-box');
     modalContentBox.style.maxHeight = '80vh'; // Ensure it doesn’t exceed 80% of the viewport height
     modalContentBox.style.overflowY = 'auto'; // Make the modal scrollable if content overflows
+    modalContentBox.style.position = 'relative';
 
     // Clear previous modal content and set up the structure
-    modalContentBox.innerHTML = `<h4>Transaction Details - ID: ${transactionId}</h4>
+    modalContentBox.innerHTML = `<img src="../svgs/gea-logo-full-light.svg" alt="Global Ecobrick Alliance logo" style="position:absolute; top:10px; right:10px; width:250px;">
+                                  <h4>Transaction Details - ID: ${transactionId}</h4>
                                   <div id="transaction-table-container"><p>Loading transaction details...</p></div>`;
 
     // Show the modal
@@ -190,6 +205,8 @@ $subject = "Please activate your 2025 GoBrik account";
                 return;
             }
 
+            const formattedAmount = Number(data.native_ccy_amt).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
             // Construct the HTML for the transaction details
             let transactionDetailsHTML = `
                 <div id="main-details">
@@ -199,8 +216,8 @@ $subject = "Please activate your 2025 GoBrik account";
                         </div>
                     ` : ''}
                     <div class="serial"><b>Amount:</b> <br>
-                    <h2><var>${data.native_ccy_amt} ${data.currency_code}</var></h2></div>
-                    <div class="general-field"><b>Transaction Name:</b> ${data.tran_name_desc}</div>
+                    <h2><var>${formattedAmount} ${data.currency_code}</var></h2></div>
+                    <div class="general-field"><b>Transaction:</b> ${data.tran_name_desc}</div>
                     <div class="main"><b>Sender:</b> <var>${data.sender_for_display}</var></div>
                     <div class="main"><b>Sent:</b> <var>${data.datetime_sent_ts}</var></div>
                     <div class="main"><b>Type:</b> <var>${data.type_of_transaction}</var></div>
@@ -212,11 +229,10 @@ $subject = "Please activate your 2025 GoBrik account";
                     ` : ''}
                     <div class="ecobrick-data">
                         <p><b>>> Raw Cash Transaction Record</b></p>
-                        <p><b>Record ID:</b> ${data.knack_record_id}</p>
                         <p><b>Cash Transaction ID:</b> ${data.cash_tran_id}</p>
-                        <p><b>Sender (for display):</b> ${data.sender_for_display}</p>
-                        <p><b>Date Time Sent:</b> ${data.datetime_sent_ts}</p>
-                        <p><b>Transaction Name:</b> ${data.tran_name_desc}</p>
+                        <p><b>Sender:</b> ${data.sender_for_display}</p>
+                        <p><b>Sent:</b> ${data.datetime_sent_ts}</p>
+                        <p><b>Transaction:</b> ${data.tran_name_desc}</p>
                         <p><b>Amount USD:</b> ${data.usd_amount}</p>
                         ${data.native_ccy_amt_display !== "0.00" ? `
                             <p><b>Native Currency Amount:</b> ${data.native_ccy_amt_display}</p>
@@ -243,11 +259,56 @@ $subject = "Please activate your 2025 GoBrik account";
     });
 }
 
+function transactionActionsModal(transactionId) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+    modalBox.innerHTML = '';
+    modalBox.style.justifyContent = 'flex-start';
+    modalBox.style.alignItems = 'flex-start';
+    modalBox.style.textAlign = 'left';
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'modal-message';
+    modalBox.appendChild(messageContainer);
 
+    let content = '';
+    content += `<button class="ecobrick-action-button deleter-button" style="min-width:300px;" onclick="deleteTransaction(${transactionId})">Delete Transaction</button>`;
+    content += `<button class="ecobrick-action-button cancel-button" style="min-width:300px;" onclick="closeInfoModal()">Cancel</button>`;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    modalBox.style.background = 'none';
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+}
+
+function deleteTransaction(transactionId) {
+    $.ajax({
+        url: '../processes/delete_transaction.php',
+        type: 'POST',
+        dataType: 'json',
+        data: { cash_tran_id: transactionId },
+        success: function (res) {
+            if (res && res.success) {
+                transactionsTable.ajax.reload();
+            } else {
+                alert(res.error || 'Failed to delete transaction.');
+            }
+        },
+        error: function () {
+            alert('Error deleting transaction.');
+            transactionsTable.ajax.reload();
+        },
+        complete: function () {
+            closeInfoModal();
+        }
+    });
+}
 
 /* ALL TRANSACTIONS */
+let transactionsTable;
 $(document).ready(function () {
-    $('#all-transactions').DataTable({
+    transactionsTable = $('#all-transactions').DataTable({
         ajax: '../api/fetch_all_transactions.php', // URL of the new PHP file
         columns: [
             {
@@ -281,6 +342,14 @@ $(document).ready(function () {
                 render: function (data) {
                     return data || 'N/A'; // Show 'N/A' if no account note exists
                 }
+            },
+            {
+                data: null,
+                orderable: false,
+                render: function (data, type, row) {
+                    return `<button class="serial-button settings-button" onclick="transactionActionsModal(${row.ID})">✏️</button>`;
+                },
+                className: 'dt-center'
             }
         ],
         columnDefs: [
@@ -546,9 +615,15 @@ function submitRevenueTrans(event) {
         success: function (response) {
             const data = JSON.parse(response);
             if (data.success) {
-                alert('Revenue transaction added successfully!');
-                closeInfoModal(); // Close the modal
-                location.reload(); // Reload the page to refresh data
+                const modalBox = document.getElementById('modal-content-box');
+                modalBox.innerHTML = '<h1>✅</h1><p>Your transaction has been added!</p>';
+                modalBox.style.display = 'flex';
+                modalBox.style.flexDirection = 'column';
+                modalBox.style.justifyContent = 'center';
+                modalBox.style.alignItems = 'center';
+                modalBox.style.textAlign = 'center';
+                transactionsTable.ajax.reload();
+                setTimeout(() => { closeInfoModal(); }, 1000);
             } else {
                 alert(`Error: ${data.error}`);
             }
@@ -706,9 +781,15 @@ function submitExpenseTrans(event) {
         success: function (response) {
             const data = JSON.parse(response);
             if (data.success) {
-                alert('Expense transaction added successfully!');
-                closeInfoModal(); // Close the modal
-                location.reload(); // Reload the page to refresh data
+                const modalBox = document.getElementById('modal-content-box');
+                modalBox.innerHTML = '<h1>✅</h1><p>Your transaction has been added!</p>';
+                modalBox.style.display = 'flex';
+                modalBox.style.flexDirection = 'column';
+                modalBox.style.justifyContent = 'center';
+                modalBox.style.alignItems = 'center';
+                modalBox.style.textAlign = 'center';
+                transactionsTable.ajax.reload();
+                setTimeout(() => { closeInfoModal(); }, 1000);
             } else {
                 alert(`Error: ${data.error}`);
             }

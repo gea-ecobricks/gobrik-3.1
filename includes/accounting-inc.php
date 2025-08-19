@@ -114,6 +114,17 @@
     color: white;          /* White text for contrast */
 }
 
+/* Styling for cancel button */
+.ecobrick-action-button.cancel-button {
+    background-color: grey;
+    color: white;
+}
+
+.ecobrick-action-button.cancel-button:hover {
+    background-color: #6e6e6e;
+    color: white;
+}
+
 
 
 #splash-bar {
