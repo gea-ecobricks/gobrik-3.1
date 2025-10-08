@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '1.03';
+$version = '1.04';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -154,7 +154,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
                 <span id="notice-icon" style="margin-right:10px;">👉</span>
-                <span id="notice-text" data-lang-id="course-notice">Updated: October 20th Ecobrick Intro course.  <a href="https://gobrik.com/en/courses.php">Register</a></span>
+                <span id="notice-text" data-lang-id="course-notice">Updated: Free October 20th Ecobrick Intro course.   <a href="https://gobrik.com/en/courses.php">Register</a></span>
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">
