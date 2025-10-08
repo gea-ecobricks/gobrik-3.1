@@ -2277,7 +2277,7 @@ font-family: 'Mulish', sans-serif;
     overflow: hidden;
     margin: auto;
     max-width:777px;
-    margin-top: 70px;
+    margin-top: 7px;
 }
 
 #ecobrick-slider {
@@ -2300,7 +2300,7 @@ font-family: 'Mulish', sans-serif;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 5px;
+    border-radius: 10px;
 }
 
 #ecobrick-slider .slide.active {
