@@ -144,10 +144,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php require_once("../includes/dashboard-inc.php"); ?>
 
+<style>
+    #header.top-menu {
+        position: relative !important;
+        top: auto !important;
+    }
+</style>
+
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
-                <span id="notice-icon" style="margin-right:10px;">🌟</span>
-                <span id="notice-text" data-lang-id="course-notice">New September 21 Intro to Ecobricks course listed!  <a href="https://gobrik.com/en/courses.php">Register</a></span>
+                <span id="notice-icon" style="margin-right:10px;">👉</span>
+                <span id="notice-text" data-lang-id="course-notice">Updated: October 20th Ecobrick Intro course.  <a href="https://gobrik.com/en/courses.php">Register</a></span>
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
     <div id="ecobrick-slider">
