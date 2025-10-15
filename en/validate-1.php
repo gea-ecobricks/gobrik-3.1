@@ -217,20 +217,32 @@ echo '<!DOCTYPE html>
 
             <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?></h2>
 
-            <p>🚧 The ecobrick validation process is currently under construction!  However, in the meantime designated admins can fix the rotation of photos and update the status of "step 2 complete" ecobricks to "Awaiting validation".</p>
+            <p>Welcome to beta authentications!  This is for admins only to manually force the authentication of an ecobrick.  Validation records and brikchain updates are generated, but not a 3-party authentication with detailed revisions.  Thus, please be sure to leave some feedback for the ecobricker, especially on rejections.</p>
 
 
-        <form id="status-update-form" method="POST" action="../scripts/validation_process.php" style="margin-top: 20px;">
-    <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Ecobrick Status:</label>
+        <form id="status-update-form" method="POST" action="../api/forced_validation.php" style="margin-top: 20px;">
+    <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Final Status:</label>
     <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px; max-width:300px;">
-        <option value="" disabled selected>Select status...</option>
-        <option value="Awaiting validation">Awaiting validation</option>
-        <option value="Step 2 complete">Step 2 complete</option>
-        <option value="Not ready">Not ready</option>
+        <option value="" disabled selected>Set final status...</option>
+        <option value="Authenticated">Authenticated</option>
         <option value="Rejected">Rejected</option>
     </select>
+
+    <label for="star-rating" style="display: block; margin: 10px 0;">Star Rating:</label>
+    <select id="star-rating" name="star_rating" required style="margin-bottom: 20px; padding: 10px; max-width:300px;">
+        <option value="" disabled selected>Select a rating...</option>
+        <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+        <option value="4">⭐⭐⭐⭐ (4)</option>
+        <option value="3">⭐⭐⭐ (3)</option>
+        <option value="2">⭐⭐ (2)</option>
+        <option value="1">⭐ (1)</option>
+    </select>
+
+    <label for="validator-feedback" style="display: block; margin: 10px 0;">Feedback for the Ecobricker:</label>
+    <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..." style="margin-bottom: 20px; padding: 10px; max-width:500px; width:100%;"></textarea>
+
     <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
-    <button type="submit" id="submit-button" class="submit-button enabled">✅ Save</button>
+    <button type="submit" id="submit-button" class="submit-button enabled">✅ Confirm</button>
     <a href="admin-review.php" id="cancel-button" class="submit-button cancel" style="text-decoration:none;">Cancel</a>
 </form>
 
@@ -257,33 +269,50 @@ echo '<!DOCTYPE html>
     document.getElementById("status-update-form").addEventListener("submit", function(event) {
         event.preventDefault(); // Prevent default form submission
         const submitButton = document.getElementById("submit-button");
-        submitButton.textContent = "Processing...";
+        const statusField = document.getElementById("ecobrick-status");
+        const feedbackField = document.getElementById("validator-feedback");
+        const ratingField = document.getElementById("star-rating");
+
+        if (statusField.value && statusField.value.toLowerCase() === "rejected" && feedbackField.value.trim() === "") {
+            alert("Please provide feedback when rejecting an ecobrick.");
+            feedbackField.focus();
+            return;
+        }
+
+        if (!ratingField.value) {
+            alert("Please select a star rating before confirming.");
+            ratingField.focus();
+            return;
+        }
+
+        submitButton.textContent = "Confirming...";
         submitButton.disabled = true;
 
-        // Prepare the form data
         const formData = new FormData(this);
+        if (statusField.value) {
+            formData.set("status", statusField.value.trim());
+        }
 
-        // Send the request to the validation_process.php
-        fetch("../scripts/validation_process.php", {
+        fetch(this.action, {
             method: "POST",
             body: formData
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                submitButton.textContent = "Status Updated!";
-                setTimeout(() => {
-                    window.location.href = "admin-review.php";
-                }, 2000); // Redirect after 2 seconds
+                submitButton.textContent = "Confirmed!";
+                window.location.href = "admin-review.php";
             } else {
-                submitButton.textContent = "Request Failed";
-                submitButton.disabled = false; // Re-enable the button
+                submitButton.textContent = "✅ Confirm";
+                submitButton.disabled = false;
+                alert(data.error || "Failed to update the ecobrick.");
             }
         })
         .catch(error => {
             console.error("Error:", error);
-            submitButton.textContent = "Request Failed";
-            submitButton.disabled = false; // Re-enable the button
+            submitButton.textContent = "✅ Confirm";
+            submitButton.disabled = false;
+            alert("An unexpected error occurred. Please try again.");
         });
     });
 </script>
