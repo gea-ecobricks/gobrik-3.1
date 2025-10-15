@@ -77,7 +77,7 @@ if ($status_normalized === 'rejected' && $feedback === '') {
     exit;
 }
 
-$ecobrick_stmt = $gobrik_conn->prepare('SELECT serial_no, weight_g FROM tb_ecobricks WHERE ecobrick_unique_id = ?');
+$ecobrick_stmt = $gobrik_conn->prepare('SELECT serial_no, weight_g, maker_id, ecobricker_maker, ecobrick_brk_amt FROM tb_ecobricks WHERE ecobrick_unique_id = ?');
 if (!$ecobrick_stmt) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Failed to prepare ecobrick lookup.'], JSON_UNESCAPED_UNICODE);
@@ -85,7 +85,7 @@ if (!$ecobrick_stmt) {
 }
 $ecobrick_stmt->bind_param('i', $ecobrick_id);
 $ecobrick_stmt->execute();
-$ecobrick_stmt->bind_result($serial_no, $weight_g);
+$ecobrick_stmt->bind_result($serial_no, $weight_g, $maker_id, $ecobricker_maker, $existing_brk_amt);
 if (!$ecobrick_stmt->fetch()) {
     http_response_code(404);
     echo json_encode(['success' => false, 'error' => 'Ecobrick not found.'], JSON_UNESCAPED_UNICODE);
@@ -93,6 +93,26 @@ if (!$ecobrick_stmt->fetch()) {
     exit;
 }
 $ecobrick_stmt->close();
+
+$maker_id = $maker_id !== null ? trim((string) $maker_id) : '';
+$existing_brk_amt = $existing_brk_amt !== null ? (float) $existing_brk_amt : 0.0;
+
+$maker_ecobricker_id = null;
+if ($maker_id !== '') {
+    $maker_lookup = $gobrik_conn->prepare('SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1');
+    if ($maker_lookup) {
+        $maker_lookup->bind_param('s', $maker_id);
+        $maker_lookup->execute();
+        $maker_lookup->bind_result($matched_ecobricker_id);
+        if ($maker_lookup->fetch()) {
+            $maker_ecobricker_id = (int) $matched_ecobricker_id;
+        }
+        $maker_lookup->close();
+    }
+}
+if ($maker_ecobricker_id === null && ctype_digit($maker_id)) {
+    $maker_ecobricker_id = (int) $maker_id;
+}
 
 if ($serial_no === null || $serial_no === '') {
     http_response_code(400);
@@ -120,7 +140,9 @@ $count_stmt->close();
 
 $authenticator_version = '2.0';
 $validation_status = 'forced';
-$validation_note = '';
+$validation_note = 'Manual admin validation';
+
+$status_label = ucfirst($status_normalized);
 
 $insert_sql = 'INSERT INTO validations_tb (authenticator_version, created, recorded_serial, ecobricker_id, recorded_weight, preset_brk_value, star_rating, validations_count, validation_status, validator_comments, validation_note, admin_forced_status, revision_date, brk_trans_no) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)';
 $insert_stmt = $gobrik_conn->prepare($insert_sql);
@@ -164,7 +186,7 @@ if ($status_normalized === 'authenticated') {
         echo json_encode(['success' => false, 'error' => 'Failed to prepare ecobrick update.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $update_stmt->bind_param('sssddi', $admin_name, $now_ts, $status_normalized, $weight_kg, $weight_kg, $ecobrick_id);
+    $update_stmt->bind_param('sssddi', $admin_name, $now_ts, $status_label, $weight_kg, $weight_kg, $ecobrick_id);
 } else {
     $update_sql = 'UPDATE tb_ecobricks SET validator_1 = ?, last_validation_ts = ?, status = ?, final_validation_score = NULL, weight_authenticated_kg = NULL, ecobrick_brk_amt = 0 WHERE ecobrick_unique_id = ?';
     $update_stmt = $gobrik_conn->prepare($update_sql);
@@ -173,7 +195,7 @@ if ($status_normalized === 'authenticated') {
         echo json_encode(['success' => false, 'error' => 'Failed to prepare ecobrick update.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $update_stmt->bind_param('sssi', $admin_name, $now_ts, $status_normalized, $ecobrick_id);
+    $update_stmt->bind_param('sssi', $admin_name, $now_ts, $status_label, $ecobrick_id);
 }
 if (!$update_stmt->execute()) {
     http_response_code(500);
@@ -184,8 +206,19 @@ if (!$update_stmt->execute()) {
 $update_stmt->close();
 
 $brk_trans_no = null;
+$brk_tran_legacy_id = null;
 if ($status_normalized === 'authenticated') {
-    $tran_sql = 'INSERT INTO tb_brk_transaction (tran_name, individual_amt, status, send_ts, sender_ecobricker, block_tran_type, block_amt, sender, receiver_or_receivers, sender_central_reserve, ecobrick_serial_no, tran_sender_note, send_dt, authenticator_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    $next_tran_id = 1;
+    $tran_id_result = $gobrik_conn->query('SELECT MAX(tran_id) AS max_tran FROM tb_brk_transaction');
+    if ($tran_id_result && ($tran_id_row = $tran_id_result->fetch_assoc())) {
+        $max_tran = isset($tran_id_row['max_tran']) ? (int) $tran_id_row['max_tran'] : 0;
+        $next_tran_id = $max_tran + 1;
+    }
+    if ($tran_id_result) {
+        $tran_id_result->free();
+    }
+
+    $tran_sql = 'INSERT INTO tb_brk_transaction (tran_id, tran_name, individual_amt, status, send_ts, sender_ecobricker, block_tran_type, block_amt, sender, receiver_or_receivers, sender_central_reserve, ecobrick_serial_no, tran_sender_note, send_dt, authenticator_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     $tran_stmt = $gobrik_conn->prepare($tran_sql);
     if (!$tran_stmt) {
         http_response_code(500);
@@ -203,7 +236,8 @@ if ($status_normalized === 'authenticated') {
     $auth_version = '2.0';
 
     $tran_stmt->bind_param(
-        'sdssssssssisss',
+        'isdsssssdssisss',
+        $next_tran_id,
         $tran_name,
         $preset_brk_value,
         $status_text,
@@ -227,6 +261,7 @@ if ($status_normalized === 'authenticated') {
         exit;
     }
     $brk_trans_no = $gobrik_conn->insert_id;
+    $brk_tran_legacy_id = $next_tran_id;
     $tran_stmt->close();
 
     $link_stmt = $gobrik_conn->prepare('UPDATE validations_tb SET brk_trans_no = ? WHERE validation_id = ?');
@@ -241,8 +276,19 @@ echo json_encode([
     'success' => true,
     'message' => 'Validation saved successfully.',
     'status' => $status_normalized,
+    'status_label' => $status_label,
     'validation_id' => $validation_id,
-    'brk_trans_no' => $brk_trans_no
+    'brk_trans_no' => $brk_trans_no,
+    'brk_legacy_tran_id' => $brk_tran_legacy_id,
+    'serial_no' => $serial_no,
+    'maker_id' => $maker_id,
+    'maker_ecobricker_id' => $maker_ecobricker_id,
+    'validator_name' => $admin_name,
+    'authenticator_version' => $authenticator_version,
+    'validator_comments' => $feedback,
+    'validation_note' => $validation_note,
+    'brk_value' => $status_normalized === 'authenticated' ? $preset_brk_value : 0.0,
+    'existing_brk_amt' => $existing_brk_amt
 ], JSON_UNESCAPED_UNICODE);
 
 $gobrik_conn->close();

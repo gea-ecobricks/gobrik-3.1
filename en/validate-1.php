@@ -71,6 +71,9 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $gea_status = getGEA_status($buwana_id);
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $ecobrick_unique_id = '';
+    $maker_id = '';
+    $maker_ecobricker_id = null;
+    $existing_brk_amt = 0.0;
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
 
@@ -102,7 +105,7 @@ $status_check_stmt->fetch();
 $status_check_stmt->close();
 
 // Redirect if status is 'Awaiting validation'
-if ($status === "authenticated") {
+if ($status !== null && strcasecmp($status, "authenticated") === 0) {
     echo "<script>
         alert('Oops! This ecobrick has already been authenticated.');
         window.location.href = 'admin-review.php';
@@ -111,7 +114,7 @@ if ($status === "authenticated") {
 }
 
 // Fetch ecobrick details including photo_version
-$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version
+$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt
         FROM tb_ecobricks
         WHERE ecobrick_unique_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
@@ -122,7 +125,7 @@ if (!$stmt) {
 }
 $stmt->bind_param("i", $ecobrick_unique_id);
 if ($stmt->execute()) {
-    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version);
+    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $maker_id, $ecobricker_maker, $existing_brk_amt);
     if (!$stmt->fetch()) {
         // No ecobrick found
         $alert_message = getNoEcobrickAlert($lang);
@@ -133,6 +136,24 @@ if ($stmt->execute()) {
         exit();
     }
     $stmt->close();
+    $maker_id = $maker_id !== null ? trim((string) $maker_id) : '';
+    $existing_brk_amt = $existing_brk_amt !== null ? (float) $existing_brk_amt : 0.0;
+
+    if ($maker_id !== '') {
+        $maker_lookup = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1");
+        if ($maker_lookup) {
+            $maker_lookup->bind_param("s", $maker_id);
+            $maker_lookup->execute();
+            $maker_lookup->bind_result($matched_ecobricker_id);
+            if ($maker_lookup->fetch()) {
+                $maker_ecobricker_id = (int) $matched_ecobricker_id;
+            }
+            $maker_lookup->close();
+        }
+    }
+    if ($maker_ecobricker_id === null && $maker_id !== '' && ctype_digit($maker_id)) {
+        $maker_ecobricker_id = (int) $maker_id;
+    }
 } else {
     error_log("Error executing query: " . $stmt->error);
     echo "An error occurred while fetching ecobrick details.";
@@ -242,8 +263,8 @@ echo '<!DOCTYPE html>
     <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..." style="margin-bottom: 20px; padding: 10px; max-width:500px; width:100%;"></textarea>
 
     <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
-    <button type="submit" id="submit-button" class="submit-button enabled">✅ Confirm</button>
-    <a href="admin-review.php" id="cancel-button" class="submit-button cancel" style="text-decoration:none;">Cancel</a>
+    <button type="submit" id="submit-button" class="submit-button enabled" style="display:block;width:100%;margin:0 0 12px 0;">✅ Confirm</button>
+    <a href="admin-review.php" id="cancel-button" class="submit-button cancel" style="display:block;width:100%;text-decoration:none;text-align:center;margin-top:8px;">Cancel</a>
 </form>
 
 
@@ -301,7 +322,40 @@ echo '<!DOCTYPE html>
         .then(data => {
             if (data.success) {
                 submitButton.textContent = "Confirmed!";
-                window.location.href = "admin-review.php";
+
+                const notifyPayload = {
+                    status: data.status_label || statusField.value,
+                    serial_no: data.serial_no || "<?php echo htmlspecialchars($serial_no ?? '', ENT_QUOTES, 'UTF-8'); ?>",
+                    ecobricker_id: data.maker_ecobricker_id,
+                    validator_comments: feedbackField.value.trim(),
+                    validation_note: data.validation_note || "",
+                    authenticator_version: data.authenticator_version || "",
+                    validator_name: data.validator_name || "",
+                    maker_id: data.maker_id || "",
+                    brk_value: data.brk_value || 0,
+                    brk_tran_id: data.brk_legacy_tran_id,
+                    existing_brk_amt: data.existing_brk_amt || 0
+                };
+
+                return fetch("../api/notify_ecobricker.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(notifyPayload)
+                })
+                .then(response => response.json())
+                .then(notification => {
+                    if (!notification.success) {
+                        console.warn("Notification warning:", notification.error || "Unable to notify ecobricker.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Notification error:", error);
+                })
+                .finally(() => {
+                    window.location.href = "admin-review.php";
+                });
             } else {
                 submitButton.textContent = "✅ Confirm";
                 submitButton.disabled = false;
