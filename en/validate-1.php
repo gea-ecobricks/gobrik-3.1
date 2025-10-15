@@ -220,7 +220,7 @@ echo '<!DOCTYPE html>
             <p>Welcome to beta authentications!  This is for admins only to manually force the authentication of an ecobrick.  Validation records and brikchain updates are generated, but not a 3-party authentication with detailed revisions.  Thus, please be sure to leave some feedback for the ecobricker, especially on rejections.</p>
 
 
-        <form id="status-update-form" method="POST" action="../api/forced_valition.php" style="margin-top: 20px;">
+        <form id="status-update-form" method="POST" action="../api/forced_validation.php" style="margin-top: 20px;">
     <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Final Status:</label>
     <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px; max-width:300px;">
         <option value="" disabled selected>Set final status...</option>
