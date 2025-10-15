@@ -86,16 +86,9 @@ $result = $stmt->get_result();
 $data = [];
 while ($row = $result->fetch_assoc()) {
     // Process the location into $location_brik
-    $location_parts = explode(',', $row['location_full']);
-    $location_parts = array_map('trim', $location_parts);
-
-    $location_last = $location_parts[count($location_parts) - 1] ?? '';
-    $location_third_last = $location_parts[count($location_parts) - 3] ?? '';
-    $location_brik = $location_third_last . ', ' . $location_last;
-
-    if (!empty($row['location_watershed'])) {
-        $location_brik = $row['location_watershed'] . ', ' . $location_brik;
-    }
+    $location_parts = array_filter(array_map('trim', explode(',', $row['location_full'] ?? '')));
+    $location_tail = array_slice($location_parts, -2);
+    $location_brik = implode(', ', $location_tail);
 
     $serial_url = "brik.php?serial_no=" . urlencode($row['serial_no']);
 

@@ -247,6 +247,8 @@ function viewEcobrickActions(serial_no, status, lang) {
     const messageContainer = document.querySelector('.modal-message');
     const modalBox = document.getElementById('modal-content-box');
 
+    const normalizedStatus = (status || '').toLowerCase();
+
     // Clear existing content in the modal
     messageContainer.innerHTML = '';
 
@@ -278,7 +280,7 @@ content += '🔍 ' + translations['013-view-ecobrick-post'];
 content += '</a>';
 
 // Conditionally display the "Edit Ecobrick" button if the status is not authenticated
-if (status !== "authenticated") {
+if (normalizedStatus !== "authenticated") {
     content += '<a class="ecobrick-action-button" href="log.php?retry=' + encodedSerialNo + '" data-lang-id="015-edit-ecobrick">';
     content += '✏️ ' + translations['015-edit-ecobrick'];
     content += '</a>';
@@ -290,7 +292,7 @@ content += '🔗 ' + (translations['016-share-ecobrick'] || 'Share Ecobrick');
 content += '</a>';
 
 // Conditionally display the "Validate" Ecobrick" button if the status is not authenticated
-if (status !== "authenticated") {
+if (normalizedStatus !== "authenticated") {
     content += '<a class="ecobrick-action-button" href="validate-1.php?id=' + encodedSerialNo + '" data-lang-id="015-validate-ecobrick">';
     content += '🧐 ' + (translations['018-validate'] || 'Validate');
     content += '</a>';
