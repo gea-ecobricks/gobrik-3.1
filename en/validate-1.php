@@ -257,9 +257,13 @@ echo '<!DOCTYPE html>
 
 
 
-            <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?></h2>
-
             <div id="ecobrick-data-chart" class="ecobrick-data-chart">
+                <div class="data-row">
+                    <span class="data-label">Serial Number</span>
+                    <span class="data-value" style="font-weight:bold; font-size:1.15em;">
+                        <?php echo htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8'); ?>
+                    </span>
+                </div>
                 <div class="data-row">
                     <span class="data-label">Owner</span>
                     <span class="data-value"><?php echo htmlspecialchars($owner ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
@@ -294,37 +298,44 @@ echo '<!DOCTYPE html>
 
 
         <form id="status-update-form" method="POST" action="../api/forced_validation.php">
-    <label for="ecobrick-status">Set Final Status:</label>
-    <select id="ecobrick-status" name="status" required>
-        <option value="" disabled selected>Set final status...</option>
-        <option value="Authenticated">Authenticated</option>
-        <option value="Rejected">Rejected</option>
-    </select>
+    <div class="form-item">
+        <label for="ecobrick-status">Set Final Status:</label>
+        <select id="ecobrick-status" name="status" required>
+            <option value="" disabled selected>Set final status...</option>
+            <option value="Authenticated">Authenticated</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+    </div>
 
-    <label for="star-rating">Star Rating:</label>
-    <select id="star-rating" name="star_rating" required>
-        <option value="" disabled selected>Select a rating...</option>
-        <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-        <option value="4">⭐⭐⭐⭐ (4)</option>
-        <option value="3">⭐⭐⭐ (3)</option>
-        <option value="2">⭐⭐ (2)</option>
-        <option value="1">⭐ (1)</option>
-    </select>
+    <div class="form-item">
+        <label for="star-rating">Star Rating:</label>
+        <select id="star-rating" name="star_rating" required>
+            <option value="" disabled selected>Select a rating...</option>
+            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+            <option value="4">⭐⭐⭐⭐ (4)</option>
+            <option value="3">⭐⭐⭐ (3)</option>
+            <option value="2">⭐⭐ (2)</option>
+            <option value="1">⭐ (1)</option>
+        </select>
+    </div>
 
-    <label for="validator-feedback">Feedback for the Ecobricker:</label>
-    <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..."></textarea>
+    <div class="form-item">
+        <label for="validator-feedback">Feedback for the Ecobricker:</label>
+        <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..."></textarea>
+        <label for="preset-answers" style="font-size:0.9em;">👆 Pre-set answers:</label>
+        <select id="preset-answers" style="font-size:0.9em;">
+            <option value="">Select a quick response...</option>
+            <option value="Sorry, no-paper.">Sorry, no-paper.</option>
+            <option value="Sorry, plastic can't be dirty.">Sorry, plastic can't be dirty.</option>
+            <option value="Your ecobrick needs to be packed tight.">Your ecobrick needs to be packed tight.</option>
+        </select>
+    </div>
 
-    <label for="preset-answers">Pre-set answers:</label>
-    <select id="preset-answers">
-        <option value="">Select a quick response...</option>
-        <option value="Sorry, no-paper.">Sorry, no-paper.</option>
-        <option value="Sorry, plastic can't be dirty.">Sorry, plastic can't be dirty.</option>
-        <option value="Your ecobrick needs to be packed tight.">Your ecobrick needs to be packed tight.</option>
-    </select>
-
-    <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
-    <button type="submit" id="submit-button" class="submit-button enabled">✅ Confirm</button>
-    <a href="admin-review.php" id="cancel-button" class="submit-button cancel">Cancel</a>
+    <div class="form-item">
+        <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
+        <button type="submit" id="submit-button" class="submit-button enabled">✅ Confirm</button>
+        <a href="admin-review.php" id="cancel-button" class="submit-button cancel">Cancel</a>
+    </div>
 </form>
 
 
