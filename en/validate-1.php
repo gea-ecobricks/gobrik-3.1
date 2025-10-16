@@ -75,6 +75,11 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $maker_ecobricker_id = null;
     $existing_brk_amt = 0.0;
     $first_name = getFirstName($buwana_conn, $buwana_id);
+    $ecobrick_owner = '';
+    $ecobrick_weight_g = null;
+    $ecobrick_volume_ml = null;
+    $ecobrick_date_logged = '';
+    $ecobrick_sequestration_type = '';
 
 
     $error_message = '';
@@ -114,7 +119,7 @@ if ($status !== null && strcasecmp($status, "authenticated") === 0) {
 }
 
 // Fetch ecobrick details including photo_version
-$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt
+$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, ecobrick_owner, weight_g, volume_ml, date_logged, sequestration_type
         FROM tb_ecobricks
         WHERE ecobrick_unique_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
@@ -125,7 +130,7 @@ if (!$stmt) {
 }
 $stmt->bind_param("i", $ecobrick_unique_id);
 if ($stmt->execute()) {
-    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $maker_id, $ecobricker_maker, $existing_brk_amt);
+    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $maker_id, $ecobricker_maker, $existing_brk_amt, $ecobrick_owner, $ecobrick_weight_g, $ecobrick_volume_ml, $ecobrick_date_logged, $ecobrick_sequestration_type);
     if (!$stmt->fetch()) {
         // No ecobrick found
         $alert_message = getNoEcobrickAlert($lang);
@@ -138,6 +143,11 @@ if ($stmt->execute()) {
     $stmt->close();
     $maker_id = $maker_id !== null ? trim((string) $maker_id) : '';
     $existing_brk_amt = $existing_brk_amt !== null ? (float) $existing_brk_amt : 0.0;
+    $ecobrick_owner = $ecobrick_owner !== null ? trim((string) $ecobrick_owner) : '';
+    $ecobrick_weight_g = $ecobrick_weight_g !== null ? (float) $ecobrick_weight_g : null;
+    $ecobrick_volume_ml = $ecobrick_volume_ml !== null ? (float) $ecobrick_volume_ml : null;
+    $ecobrick_date_logged = $ecobrick_date_logged !== null ? trim((string) $ecobrick_date_logged) : '';
+    $ecobrick_sequestration_type = $ecobrick_sequestration_type !== null ? trim((string) $ecobrick_sequestration_type) : '';
 
     if ($maker_id !== '') {
         $maker_lookup = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1");
@@ -238,6 +248,29 @@ echo '<!DOCTYPE html>
 
             <h2 id="ecobrick-logged-title"><span data-lang-id="000-Ecobrick">Ecobrick</span> <?php echo $serial_no; ?></h2>
 
+            <div id="ecobrick-data-chart" class="ecobrick-data-chart">
+                <div class="data-row">
+                    <span class="data-label">Owner</span>
+                    <span class="data-value"><?php echo htmlspecialchars($ecobrick_owner ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Weight</span>
+                    <span class="data-value"><?php echo $ecobrick_weight_g !== null ? htmlspecialchars(number_format($ecobrick_weight_g) . ' g', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Volume</span>
+                    <span class="data-value"><?php echo $ecobrick_volume_ml !== null ? htmlspecialchars(number_format($ecobrick_volume_ml) . ' ml', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Date Logged</span>
+                    <span class="data-value"><?php echo htmlspecialchars($ecobrick_date_logged ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Sequestration</span>
+                    <span class="data-value"><?php echo htmlspecialchars($ecobrick_sequestration_type ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
+                </div>
+            </div>
+
             <p>Welcome to beta authentications!  This is for admins only to manually force the authentication of an ecobrick.  Validation records and brikchain updates are generated, but not a 3-party authentication with detailed revisions.  Thus, please be sure to leave some feedback for the ecobricker, especially on rejections.</p>
 
 
@@ -260,11 +293,19 @@ echo '<!DOCTYPE html>
     </select>
 
     <label for="validator-feedback" style="display: block; margin: 10px 0;">Feedback for the Ecobricker:</label>
-    <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..." style="margin-bottom: 20px; padding: 10px; max-width:500px; width:100%;"></textarea>
+    <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..." style="margin-bottom: 10px; padding: 10px; max-width:500px; width:100%;"></textarea>
+
+    <label for="preset-answers" style="display:block; margin: 0 0 6px 0;">Pre-set answers:</label>
+    <select id="preset-answers" style="margin-bottom: 20px; padding: 10px; max-width:500px; width:100%;">
+        <option value="">Select a quick response...</option>
+        <option value="Sorry, no-paper.">Sorry, no-paper.</option>
+        <option value="Sorry, plastic can't be dirty.">Sorry, plastic can't be dirty.</option>
+        <option value="Your ecobrick needs to be packed tight.">Your ecobrick needs to be packed tight.</option>
+    </select>
 
     <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
-    <button type="submit" id="submit-button" class="submit-button enabled" style="display:block;width:100%;margin:0 0 12px 0;">✅ Confirm</button>
-    <a href="admin-review.php" id="cancel-button" class="submit-button cancel" style="display:block;width:100%;text-decoration:none;text-align:center;margin-top:8px;">Cancel</a>
+    <button type="submit" id="submit-button" class="submit-button enabled" style="display:block;width:100%;max-width:300px;margin:0 auto 12px auto;">✅ Confirm</button>
+    <a href="admin-review.php" id="cancel-button" class="submit-button cancel" style="display:block;width:100%;max-width:300px;text-decoration:none;text-align:center;margin:8px auto 0 auto;">Cancel</a>
 </form>
 
 
@@ -287,14 +328,31 @@ echo '<!DOCTYPE html>
 
 
 <script>
+    const feedbackField = document.getElementById("validator-feedback");
+    const presetSelect = document.getElementById("preset-answers");
+    const presetResponses = {
+        "Sorry, no-paper.": "Oh no!  It looks like you've put paper into your ecobrick.  Ecobricks are for plastic only.  Paper will mold and decay inside your ecobrick (plus its not an environmental toxin like loose-plastic).  Its plastic that makes an ecobrick dense and sturdy (and its an ecobrick that helps keep the plastic from getting loose in the biosphere and contaminating things!).   For more on this please see https://ecobricks.org/how",
+        "Sorry, plastic can't be dirty.": "Oh no!  It looks like some of your plastic still has dirt or food on it.  Ecobricks thrive on clean, dry plastic.  Any organic bits will rot, smell, and weaken your hard work (plus grime keeps the plastic from staying sequestered).  Please wash, dry, and trim your plastic before packing so the ecobrick shines for the long term!  For more inspiration see https://ecobricks.org/how",
+        "Your ecobrick needs to be packed tight.": "Oh wow!  There's still plenty of squish space inside your ecobrick.  Ecobricks do their best work when they are packed solid with plastic from top to bottom.  Loose spots make them bend and invite them to break open (letting that plastic back into the biosphere).  Keep pressing with a stick and add more small pieces until your ecobrick feels rock hard!  For packing tips visit https://ecobricks.org/how"
+    };
+
+    if (presetSelect && feedbackField) {
+        presetSelect.addEventListener("change", function() {
+            const response = presetResponses[this.value];
+            if (response) {
+                feedbackField.value = response;
+                feedbackField.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+
     document.getElementById("status-update-form").addEventListener("submit", function(event) {
         event.preventDefault(); // Prevent default form submission
         const submitButton = document.getElementById("submit-button");
         const statusField = document.getElementById("ecobrick-status");
-        const feedbackField = document.getElementById("validator-feedback");
         const ratingField = document.getElementById("star-rating");
 
-        if (statusField.value && statusField.value.toLowerCase() === "rejected" && feedbackField.value.trim() === "") {
+        if (statusField.value && statusField.value.toLowerCase() === "rejected" && feedbackField && feedbackField.value.trim() === "") {
             alert("Please provide feedback when rejecting an ecobrick.");
             feedbackField.focus();
             return;
@@ -327,7 +385,7 @@ echo '<!DOCTYPE html>
                     status: data.status_label || statusField.value,
                     serial_no: data.serial_no || "<?php echo htmlspecialchars($serial_no ?? '', ENT_QUOTES, 'UTF-8'); ?>",
                     ecobricker_id: data.maker_ecobricker_id,
-                    validator_comments: feedbackField.value.trim(),
+                    validator_comments: feedbackField ? feedbackField.value.trim() : '',
                     validation_note: data.validation_note || "",
                     authenticator_version: data.authenticator_version || "",
                     validator_name: data.validator_name || "",

@@ -145,6 +145,25 @@ echo '<!DOCTYPE html>
     $(document).ready(function() {
         var userLang = "<?php echo htmlspecialchars($lang); ?>"; // Get the user's language
 
+        const getStatusEmoji = (statusLabel) => {
+            if (!statusLabel) {
+                return "";
+            }
+            const normalized = statusLabel.trim().toLowerCase();
+            switch (normalized) {
+                case "authenticated":
+                    return "✅";
+                case "rejected":
+                    return "🔴";
+                case "awaiting validation":
+                    return "⏱️";
+                case "step 2":
+                    return "🚧";
+                default:
+                    return "ℹ️";
+            }
+        };
+
         $("#latest-ecobricks").DataTable({
             "responsive": true,
             "serverSide": true,
@@ -171,7 +190,18 @@ echo '<!DOCTYPE html>
             "columns": [
                 { "data": "ecobrick_thumb_photo_url" }, // Brik thumbnail
                 { "data": "ecobricker_maker" }, // Maker
-                { "data": "status" }, // Status
+                {
+                    "data": "status",
+                    "render": function(data, type) {
+                        if (type === 'display') {
+                            const label = data || '';
+                            const emoji = getStatusEmoji(label);
+                            const safeLabel = $('<div>').text(label).html();
+                            return `<span class="status-cell"><span class="status-emoji" aria-hidden="true">${emoji}</span><span class="status-text">${safeLabel}</span></span>`;
+                        }
+                        return data;
+                    }
+                }, // Status
                 { "data": "weight_g" }, // Weight
                 { "data": "volume_ml" }, // Volume
                 { "data": "density" }, // Density
@@ -212,8 +242,8 @@ echo '<!DOCTYPE html>
             ],
             "columnDefs": [
                 { "orderable": false, "targets": [0, 3, 4, 5, 8] }, // Make the image and certain columns unsortable
-                { "className": "all", "targets": [0, 1, 2, 7, 8] }, // Ensure Brik (thumbnail), Maker, Status, Serial and Feature always display
-                { "className": "min-tablet", "targets": [1, 4, 5, 6] }, // These fields can be hidden first on smaller screens
+                { "className": "all", "targets": [0, 2, 7] }, // Ensure Brik (thumbnail), Status, and Serial always display
+                { "className": "min-tablet", "targets": [1, 3, 4, 5, 6, 8] } // Hide these first on smaller screens
             ],
             "initComplete": function() {
                 var searchBox = $("div.dataTables_filter input");

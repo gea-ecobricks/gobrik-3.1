@@ -35,22 +35,6 @@
 
 
 
-
-/* Media query for screens less than 769px wide */
-@media screen and (max-width: 768px) {
-    /* Hide the "Location" and "Weight" table headers */
-    #latest-ecobricks th:nth-child(2), /* Weight column header */
-    #latest-ecobricks th:nth-child(3)  /* Location column header */ {
-        display: none;
-    }
-
-    /* Hide the "Location" and "Weight" table cells */
-    #latest-ecobricks td:nth-child(2), /* Weight column cell */
-    #latest-ecobricks td:nth-child(3)  /* Location column cell */ {
-        display: none;
-    }
-}
-
     #main {
         height: fit-content;
     }
@@ -99,6 +83,27 @@
   background-color: var(--top-header);
   filter: none !important;
   margin-bottom: -200px !important;
+}
+
+.status-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.status-emoji {
+    font-size: 1.1em;
+}
+
+@media screen and (max-width: 768px) {
+    .status-cell {
+        justify-content: center;
+        gap: 0;
+    }
+
+    .status-text {
+        display: none;
+    }
 }
 
 
