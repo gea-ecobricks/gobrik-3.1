@@ -119,7 +119,7 @@ if ($status !== null && strcasecmp($status, "authenticated") === 0) {
 }
 
 // Fetch ecobrick details including photo_version
-$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, ecobrick_owner, weight_g, volume_ml, date_logged, sequestration_type
+$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, owner, weight_g, volume_ml, date_logged, sequestration_type
         FROM tb_ecobricks
         WHERE ecobrick_unique_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
@@ -130,7 +130,7 @@ if (!$stmt) {
 }
 $stmt->bind_param("i", $ecobrick_unique_id);
 if ($stmt->execute()) {
-    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $maker_id, $ecobricker_maker, $existing_brk_amt, $ecobrick_owner, $ecobrick_weight_g, $ecobrick_volume_ml, $ecobrick_date_logged, $ecobrick_sequestration_type);
+    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $maker_id, $ecobricker_maker, $ecobrick_brk_amt, $owner, $weight_g, $volume_ml, $date_logged_ts, $sequestration_type);
     if (!$stmt->fetch()) {
         // No ecobrick found
         $alert_message = getNoEcobrickAlert($lang);
@@ -143,11 +143,11 @@ if ($stmt->execute()) {
     $stmt->close();
     $maker_id = $maker_id !== null ? trim((string) $maker_id) : '';
     $existing_brk_amt = $existing_brk_amt !== null ? (float) $existing_brk_amt : 0.0;
-    $ecobrick_owner = $ecobrick_owner !== null ? trim((string) $ecobrick_owner) : '';
-    $ecobrick_weight_g = $ecobrick_weight_g !== null ? (float) $ecobrick_weight_g : null;
-    $ecobrick_volume_ml = $ecobrick_volume_ml !== null ? (float) $ecobrick_volume_ml : null;
-    $ecobrick_date_logged = $ecobrick_date_logged !== null ? trim((string) $ecobrick_date_logged) : '';
-    $ecobrick_sequestration_type = $ecobrick_sequestration_type !== null ? trim((string) $ecobrick_sequestration_type) : '';
+    $owner = $owner !== null ? trim((string) $owner) : '';
+    $weight_g = $weight_g !== null ? (float) $weight_g : null;
+    $volume_ml = $volume_ml !== null ? (float) $volume_ml : null;
+    $date_logged_ts = $date_logged_ts !== null ? trim((string) $date_logged_ts) : '';
+    $sequestration_type = $sequestration_type !== null ? trim((string) $sequestration_type) : '';
 
     if ($maker_id !== '') {
         $maker_lookup = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1");
@@ -251,27 +251,27 @@ echo '<!DOCTYPE html>
             <div id="ecobrick-data-chart" class="ecobrick-data-chart">
                 <div class="data-row">
                     <span class="data-label">Owner</span>
-                    <span class="data-value"><?php echo htmlspecialchars($ecobrick_owner ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="data-value"><?php echo htmlspecialchars($owner ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Weight</span>
-                    <span class="data-value"><?php echo $ecobrick_weight_g !== null ? htmlspecialchars(number_format($ecobrick_weight_g) . ' g', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
+                    <span class="data-value"><?php echo $ecobrick_weight_g !== null ? htmlspecialchars(number_format($weight_g) . ' g', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Volume</span>
-                    <span class="data-value"><?php echo $ecobrick_volume_ml !== null ? htmlspecialchars(number_format($ecobrick_volume_ml) . ' ml', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
+                    <span class="data-value"><?php echo $ecobrick_volume_ml !== null ? htmlspecialchars(number_format($volume_ml) . ' ml', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Date Logged</span>
-                    <span class="data-value"><?php echo htmlspecialchars($ecobrick_date_logged ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="data-value"><?php echo htmlspecialchars($date_logged_ts ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Sequestration</span>
-                    <span class="data-value"><?php echo htmlspecialchars($ecobrick_sequestration_type ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="data-value"><?php echo htmlspecialchars($sequestration_type ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
             </div>
 
-            <p>Welcome to beta authentications!  This is for admins only to manually force the authentication of an ecobrick.  Validation records and brikchain updates are generated, but not a 3-party authentication with detailed revisions.  Thus, please be sure to leave some feedback for the ecobricker, especially on rejections.</p>
+            <p>Welcome to beta authentications!  This is for admins only to manually force the authentication of an ecobrick.</p>
 
 
         <form id="status-update-form" method="POST" action="../api/forced_validation.php" style="margin-top: 20px;">
