@@ -6,6 +6,40 @@
 <STYLE>
 
 
+.splash-form-content-block {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+}
+
+.splash-form-content-block > * {
+    width: 100%;
+}
+
+@media screen and (max-width: 769px) {
+    .splash-form-content-block {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media screen and (min-width: 770px) and (max-width: 1200px) {
+    .splash-form-content-block {
+        width: 77%;
+        max-width: 77%;
+    }
+}
+
+@media screen and (min-width: 1201px) {
+    .splash-form-content-block {
+        width: 100%;
+        max-width: 777px;
+    }
+}
+
+
  /* Ensure the parent container can resize and show content that expands */
 #validate-introduction {
     position: relative;
