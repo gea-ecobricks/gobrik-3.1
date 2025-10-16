@@ -73,13 +73,13 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $ecobrick_unique_id = '';
     $maker_id = '';
     $maker_ecobricker_id = null;
-    $existing_brk_amt = 0.0;
+    $ecobrick_brk_amt = 0.0;
     $first_name = getFirstName($buwana_conn, $buwana_id);
     $ecobrick_owner = '';
     $ecobrick_weight_g = null;
     $ecobrick_volume_ml = null;
-    $ecobrick_date_logged = '';
-    $ecobrick_sequestration_type = '';
+    $date_logged_ts = '';
+    $sequestration_type = '';
 
 
     $error_message = '';
@@ -142,7 +142,7 @@ if ($stmt->execute()) {
     }
     $stmt->close();
     $maker_id = $maker_id !== null ? trim((string) $maker_id) : '';
-    $existing_brk_amt = $existing_brk_amt !== null ? (float) $existing_brk_amt : 0.0;
+    $ecobrick_brk_amt = $ecobrick_brk_amt !== null ? (float) $ecobrick_brk_amt : 0.0;
     $owner = $owner !== null ? trim((string) $owner) : '';
     $weight_g = $weight_g !== null ? (float) $weight_g : null;
     $volume_ml = $volume_ml !== null ? (float) $volume_ml : null;
@@ -392,7 +392,7 @@ echo '<!DOCTYPE html>
                     maker_id: data.maker_id || "",
                     brk_value: data.brk_value || 0,
                     brk_tran_id: data.brk_legacy_tran_id,
-                    existing_brk_amt: data.existing_brk_amt || 0
+                    ecobrick_brk_amt: data.ecobrick_brk_amt || 0
                 };
 
                 return fetch("../api/notify_ecobricker.php", {
