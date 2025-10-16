@@ -101,6 +101,37 @@
   filter: none !important;
   margin-bottom: -200px !important;
 }
+
+.ecobrick-data-chart {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 12px;
+    background: var(--lighter);
+    text-align: left;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.ecobrick-data-chart .data-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.ecobrick-data-chart .data-row:last-child {
+    border-bottom: none;
+}
+
+.ecobrick-data-chart .data-label {
+    font-weight: 600;
+    color: var(--h1);
+}
+
+.ecobrick-data-chart .data-value {
+    color: var(--text-color);
+}
 .photo-upload-container {
     width: 100%;
     padding: 10px;
