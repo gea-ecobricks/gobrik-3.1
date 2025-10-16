@@ -119,7 +119,7 @@ if ($status !== null && strcasecmp($status, "authenticated") === 0) {
 }
 
 // Fetch ecobrick details including photo_version
-$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, owner, weight_g, volume_ml, date_logged, sequestration_type
+$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, owner, weight_g, volume_ml, date_logged_ts, sequestration_type
         FROM tb_ecobricks
         WHERE ecobrick_unique_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
