@@ -200,7 +200,7 @@ echo '<!DOCTYPE html>
 
 <div id="form-submission-box" style="margin-top:83px;">
     <div class="form-container" style="padding-top:75px;">
-        <div class="splash-form-content-block" style="text-align:center; display:flex;flex-flow:column;">
+        <div id="validation-content" class="new-form-styling">
 
 
 
@@ -293,16 +293,16 @@ echo '<!DOCTYPE html>
             <p>Welcome to beta authentications!  This is for admins only to manually force the authentication of an ecobrick.</p>
 
 
-        <form id="status-update-form" method="POST" action="../api/forced_validation.php" style="margin-top: 20px;">
-    <label for="ecobrick-status" style="display: block; margin-bottom: 10px;">Set Final Status:</label>
-    <select id="ecobrick-status" name="status" required style="margin-bottom: 20px; padding: 10px; max-width:300px;">
+        <form id="status-update-form" method="POST" action="../api/forced_validation.php">
+    <label for="ecobrick-status">Set Final Status:</label>
+    <select id="ecobrick-status" name="status" required>
         <option value="" disabled selected>Set final status...</option>
         <option value="Authenticated">Authenticated</option>
         <option value="Rejected">Rejected</option>
     </select>
 
-    <label for="star-rating" style="display: block; margin: 10px 0;">Star Rating:</label>
-    <select id="star-rating" name="star_rating" required style="margin-bottom: 20px; padding: 10px; max-width:300px;">
+    <label for="star-rating">Star Rating:</label>
+    <select id="star-rating" name="star_rating" required>
         <option value="" disabled selected>Select a rating...</option>
         <option value="5">⭐⭐⭐⭐⭐ (5)</option>
         <option value="4">⭐⭐⭐⭐ (4)</option>
@@ -311,11 +311,11 @@ echo '<!DOCTYPE html>
         <option value="1">⭐ (1)</option>
     </select>
 
-    <label for="validator-feedback" style="display: block; margin: 10px 0;">Feedback for the Ecobricker:</label>
-    <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..." style="margin-bottom: 10px; padding: 10px; max-width:500px; width:100%;"></textarea>
+    <label for="validator-feedback">Feedback for the Ecobricker:</label>
+    <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..."></textarea>
 
-    <label for="preset-answers" style="display:block; margin: 0 0 6px 0;">Pre-set answers:</label>
-    <select id="preset-answers" style="margin-bottom: 20px; padding: 10px; max-width:500px; width:100%;">
+    <label for="preset-answers">Pre-set answers:</label>
+    <select id="preset-answers">
         <option value="">Select a quick response...</option>
         <option value="Sorry, no-paper.">Sorry, no-paper.</option>
         <option value="Sorry, plastic can't be dirty.">Sorry, plastic can't be dirty.</option>
@@ -323,8 +323,8 @@ echo '<!DOCTYPE html>
     </select>
 
     <input type="hidden" name="ecobrick_id" value="<?php echo $ecobrick_unique_id; ?>">
-    <button type="submit" id="submit-button" class="submit-button enabled" style="display:block;width:100%;max-width:300px;margin:0 auto 12px auto;">✅ Confirm</button>
-    <a href="admin-review.php" id="cancel-button" class="submit-button cancel" style="display:block;width:100%;max-width:300px;text-decoration:none;text-align:center;margin:8px auto 0 auto;">Cancel</a>
+    <button type="submit" id="submit-button" class="submit-button enabled">✅ Confirm</button>
+    <a href="admin-review.php" id="cancel-button" class="submit-button cancel">Cancel</a>
 </form>
 
 

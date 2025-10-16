@@ -21,10 +21,14 @@
 
 <style>
     .location-column {
-        max-width: 200px; /* Set max width */
-        white-space: nowrap; /* Prevent wrapping */
-        overflow: hidden; /* Hide overflow content */
-        text-overflow: ellipsis; /* Add ellipsis for overflow text */
+        max-width: 220px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    #latest-ecobricks_wrapper {
+        width: 100%;
+        overflow-x: auto;
     }
 
 

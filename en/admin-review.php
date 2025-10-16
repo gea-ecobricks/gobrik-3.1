@@ -109,7 +109,7 @@ echo '<!DOCTYPE html>
                     Review and authenticate the latest ecobricks.
                 </p>
 
-                <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
+                <table id="latest-ecobricks" class="display responsive" style="width:100%">
                     <thead>
                         <tr>
                             <th data-lang-id="1103-brik">Brik</th>
@@ -164,7 +164,7 @@ echo '<!DOCTYPE html>
             }
         };
 
-        $("#latest-ecobricks").DataTable({
+        var table = $("#latest-ecobricks").DataTable({
             "responsive": true,
             "serverSide": true,
             "processing": true,
@@ -243,7 +243,15 @@ echo '<!DOCTYPE html>
             "columnDefs": [
                 { "orderable": false, "targets": [0, 3, 4, 5, 8] }, // Make the image and certain columns unsortable
                 { "className": "all", "targets": [0, 2, 7] }, // Ensure Brik (thumbnail), Status, and Serial always display
-                { "className": "min-tablet", "targets": [1, 3, 4, 5, 6, 8] } // Hide these first on smaller screens
+                { "responsivePriority": 1, "targets": 0 },
+                { "responsivePriority": 2, "targets": 2 },
+                { "responsivePriority": 3, "targets": 7 },
+                { "responsivePriority": 4, "targets": 1 },
+                { "responsivePriority": 5, "targets": 8 },
+                { "responsivePriority": 6, "targets": 3 },
+                { "responsivePriority": 7, "targets": 4 },
+                { "responsivePriority": 8, "targets": 5 },
+                { "responsivePriority": 9, "targets": 6 }
             ],
             "initComplete": function() {
                 var searchBox = $("div.dataTables_filter input");
@@ -263,7 +271,30 @@ echo '<!DOCTYPE html>
                     var newVal = featureVal === 1 ? 0 : 1;
                     setBrikFeatured(serialNo, newVal, $(this));
                 });
+                adjustColumnVisibility();
             }
+        });
+
+        function adjustColumnVisibility() {
+            var containerWidth = $('#latest-ecobricks_wrapper').outerWidth() || $(window).width();
+            var showMetrics = containerWidth >= 1100;
+            var showDensity = containerWidth >= 1220;
+            var showLocation = containerWidth >= 1360;
+
+            table.column(3).visible(showMetrics);
+            table.column(4).visible(showMetrics);
+            table.column(5).visible(showDensity);
+            table.column(6).visible(showLocation);
+        }
+
+        table.on('responsive-resize', function() {
+            adjustColumnVisibility();
+        });
+
+        var resizeTimer;
+        $(window).on('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(adjustColumnVisibility, 150);
         });
     });
 </script>

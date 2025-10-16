@@ -18,22 +18,104 @@
     width: 100%;
 }
 
+.new-form-styling {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+    gap: 20px;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+#validation-content > * {
+    width: 100%;
+    max-width: 100%;
+}
+
+#validation-content #status-update-form {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    text-align: left;
+}
+
+#validation-content label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+#validation-content select,
+#validation-content textarea,
+#validation-content input,
+#validation-content button,
+#validation-content a.submit-button {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+}
+
+#validation-content input[type="hidden"] {
+    margin-bottom: 0;
+}
+
+#validation-content select,
+#validation-content textarea {
+    padding: 10px;
+}
+
+#validation-content textarea {
+    resize: vertical;
+    min-height: 140px;
+}
+
+#validation-content button.submit-button,
+#validation-content a.submit-button {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#validation-content button.submit-button {
+    margin-bottom: 12px;
+}
+
+#validation-content a.submit-button {
+    text-decoration: none;
+}
+
+#validation-content a.submit-button.cancel {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 @media screen and (max-width: 769px) {
-    .splash-form-content-block {
+    .splash-form-content-block,
+    .new-form-styling {
         width: 100%;
         max-width: 100%;
+        padding: 0 0.75rem;
     }
 }
 
 @media screen and (min-width: 770px) and (max-width: 1200px) {
-    .splash-form-content-block {
+    .splash-form-content-block,
+    .new-form-styling {
         width: 77%;
         max-width: 77%;
     }
 }
 
 @media screen and (min-width: 1201px) {
-    .splash-form-content-block {
+    .splash-form-content-block,
+    .new-form-styling {
         width: 100%;
         max-width: 777px;
     }
