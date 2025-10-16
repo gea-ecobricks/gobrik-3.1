@@ -78,6 +78,8 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $ecobrick_owner = '';
     $ecobrick_weight_g = null;
     $ecobrick_volume_ml = null;
+    $ecobrick_density = null;
+    $ecobrick_status = '';
     $date_logged_ts = '';
     $sequestration_type = '';
 
@@ -119,7 +121,7 @@ if ($status !== null && strcasecmp($status, "authenticated") === 0) {
 }
 
 // Fetch ecobrick details including photo_version
-$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, owner, weight_g, volume_ml, date_logged_ts, sequestration_type
+$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, owner, weight_g, volume_ml, density, date_logged_ts, sequestration_type
         FROM tb_ecobricks
         WHERE ecobrick_unique_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
@@ -130,7 +132,7 @@ if (!$stmt) {
 }
 $stmt->bind_param("i", $ecobrick_unique_id);
 if ($stmt->execute()) {
-    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $maker_id, $ecobricker_maker, $ecobrick_brk_amt, $owner, $weight_g, $volume_ml, $date_logged_ts, $sequestration_type);
+    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $maker_id, $ecobricker_maker, $ecobrick_brk_amt, $owner, $weight_g, $volume_ml, $density, $date_logged_ts, $sequestration_type);
     if (!$stmt->fetch()) {
         // No ecobrick found
         $alert_message = getNoEcobrickAlert($lang);
@@ -146,8 +148,17 @@ if ($stmt->execute()) {
     $owner = $owner !== null ? trim((string) $owner) : '';
     $weight_g = $weight_g !== null ? (float) $weight_g : null;
     $volume_ml = $volume_ml !== null ? (float) $volume_ml : null;
+    $ecobrick_weight_g = $weight_g;
+    $ecobrick_volume_ml = $volume_ml;
+    $density = $density !== null ? (float) $density : null;
+    if ($density === null && $weight_g !== null && $volume_ml !== null) {
+        $calculated_density = $volume_ml != 0 ? $weight_g / $volume_ml : null;
+        $density = $calculated_density !== null ? round($calculated_density, 2) : null;
+    }
+    $ecobrick_density = $density;
     $date_logged_ts = $date_logged_ts !== null ? trim((string) $date_logged_ts) : '';
     $sequestration_type = $sequestration_type !== null ? trim((string) $sequestration_type) : '';
+    $ecobrick_status = $status !== null ? trim((string) $status) : '';
 
     if ($maker_id !== '') {
         $maker_lookup = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1");
@@ -255,11 +266,19 @@ echo '<!DOCTYPE html>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Weight</span>
-                    <span class="data-value"><?php echo $ecobrick_weight_g !== null ? htmlspecialchars(number_format($weight_g) . ' g', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
+                    <span class="data-value"><?php echo $ecobrick_weight_g !== null ? htmlspecialchars(number_format($ecobrick_weight_g) . ' g', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Volume</span>
-                    <span class="data-value"><?php echo $ecobrick_volume_ml !== null ? htmlspecialchars(number_format($volume_ml) . ' ml', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
+                    <span class="data-value"><?php echo $ecobrick_volume_ml !== null ? htmlspecialchars(number_format($ecobrick_volume_ml) . ' ml', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Density</span>
+                    <span class="data-value"><?php echo $ecobrick_density !== null ? htmlspecialchars(number_format($ecobrick_density, 2) . ' g/ml', ENT_QUOTES, 'UTF-8') : '—'; ?></span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Status</span>
+                    <span class="data-value"><?php echo htmlspecialchars($ecobrick_status !== '' ? $ecobrick_status : '—', ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Date Logged</span>
