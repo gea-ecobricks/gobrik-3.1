@@ -76,6 +76,8 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $ecobrick_brk_amt = 0.0;
     $first_name = getFirstName($buwana_conn, $buwana_id);
     $ecobrick_owner = '';
+    $owner_language_id = 'Unknown';
+    $owner_ecobricker_id = null;
     $ecobrick_weight_g = null;
     $ecobrick_volume_ml = null;
     $ecobrick_density = null;
@@ -174,6 +176,29 @@ if ($stmt->execute()) {
     }
     if ($maker_ecobricker_id === null && $maker_id !== '' && ctype_digit($maker_id)) {
         $maker_ecobricker_id = (int) $maker_id;
+    }
+
+    if ($owner !== '') {
+        if (ctype_digit($owner)) {
+            $owner_ecobricker_id = (int) $owner;
+        }
+    }
+
+    if ($owner_ecobricker_id === null && $maker_ecobricker_id !== null) {
+        $owner_ecobricker_id = $maker_ecobricker_id;
+    }
+
+    if ($owner_ecobricker_id !== null) {
+        $language_lookup = $gobrik_conn->prepare("SELECT language_id FROM tb_ecobrickers WHERE ecobricker_id = ? LIMIT 1");
+        if ($language_lookup) {
+            $language_lookup->bind_param("i", $owner_ecobricker_id);
+            $language_lookup->execute();
+            $language_lookup->bind_result($language_id_result);
+            if ($language_lookup->fetch()) {
+                $owner_language_id = $language_id_result !== null ? trim((string) $language_id_result) : 'Unknown';
+            }
+            $language_lookup->close();
+        }
     }
 } else {
     error_log("Error executing query: " . $stmt->error);
@@ -321,6 +346,7 @@ echo '<!DOCTYPE html>
 
     <div class="form-item">
         <label for="validator-feedback">Feedback for the Ecobricker:</label>
+        <div style="font-size:0.9em; color:#555; margin:4px 0 8px;">Ecobrickers language: <?php echo htmlspecialchars($owner_language_id, ENT_QUOTES, 'UTF-8'); ?></div>
         <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..."></textarea>
         <label for="preset-answers" style="font-size:0.9em;">👆 Pre-set answers:</label>
         <select id="preset-answers" style="font-size:0.9em;">
