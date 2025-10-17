@@ -26,7 +26,7 @@
     align-items: center;
     text-align: center;
     margin: 0 auto;
-    gap: 20px;
+    gap: 16px;
     padding: 0 1rem;
     box-sizing: border-box;
 }
@@ -123,21 +123,15 @@
 
 
  /* Ensure the parent container can resize and show content that expands */
-#validate-introduction {
-    position: relative;
-    overflow: visible; /* Allows content to grow beyond its bounds */
-    transition: height 0.3s ease; /* Smooth transition for height change */
-}
-
 .photo-container {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: visible; /* Make sure the container grows with the rotated image */
-    margin: 0 auto;
+    margin: 0 auto 12px;
     text-align: center;
-    background: var(--lighter);
+    background: transparent;
     width: 100%;  /* Adjust as needed */
     height: auto; /* Adjust as needed */
 }
@@ -220,12 +214,39 @@
 
 .ecobrick-data-chart {
     max-width: 500px;
-    margin: 20px auto;
+    margin: 20px auto 12px;
     padding: 15px;
     border-radius: 12px;
     background: var(--lighter);
     text-align: left;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.ecobrick-data-chart #basic-ecobrick-photo {
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.ecobrick-data-chart #basic-ecobrick-photo img {
+    width: 500px;
+    max-width: 100%;
+}
+
+#selfie-ecobrick-photo {
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.language-caption {
+    font-size: 0.95em;
+    color: var(--h1);
+    margin: 4px 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .ecobrick-data-chart .data-row {

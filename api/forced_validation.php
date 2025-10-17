@@ -5,6 +5,9 @@
 session_start();
 header('Content-Type: application/json');
 
+// -----------------------------------------------------------------------------
+// 1. Session & Request Validation
+// -----------------------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Invalid request method.'], JSON_UNESCAPED_UNICODE);
@@ -21,6 +24,9 @@ if (!isset($_SESSION['buwana_id'])) {
 
 $buwana_id = intval($_SESSION['buwana_id']);
 
+// -----------------------------------------------------------------------------
+// 2. Admin Verification & Context
+// -----------------------------------------------------------------------------
 $admin_query = $gobrik_conn->prepare('SELECT ecobricker_id, full_name, user_roles FROM tb_ecobrickers WHERE buwana_id = ?');
 if (!$admin_query) {
     http_response_code(500);
@@ -44,11 +50,17 @@ if (stripos($admin_roles ?? '', 'admin') === false) {
     exit;
 }
 
+// -----------------------------------------------------------------------------
+// 3. Payload Extraction
+// -----------------------------------------------------------------------------
 $ecobrick_id    = isset($_POST['ecobrick_id']) ? intval($_POST['ecobrick_id']) : 0;
 $status_input   = isset($_POST['status']) ? trim($_POST['status']) : '';
 $star_rating    = isset($_POST['star_rating']) ? intval($_POST['star_rating']) : 0;
 $feedback       = isset($_POST['validator_feedback']) ? trim($_POST['validator_feedback']) : '';
 
+// -----------------------------------------------------------------------------
+// 4. Input Validation
+// -----------------------------------------------------------------------------
 if ($ecobrick_id <= 0) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Missing ecobrick identifier.'], JSON_UNESCAPED_UNICODE);
@@ -77,6 +89,9 @@ if ($status_normalized === 'rejected' && $feedback === '') {
     exit;
 }
 
+// -----------------------------------------------------------------------------
+// 5. Ecobrick Lookup & Preparation
+// -----------------------------------------------------------------------------
 $ecobrick_stmt = $gobrik_conn->prepare('SELECT serial_no, weight_g, maker_id, ecobricker_maker, ecobrick_brk_amt FROM tb_ecobricks WHERE ecobrick_unique_id = ?');
 if (!$ecobrick_stmt) {
     http_response_code(500);
@@ -144,6 +159,9 @@ $validation_note = 'Manual admin validation';
 
 $status_label = ucfirst($status_normalized);
 
+// -----------------------------------------------------------------------------
+// 6. Record Validation Event
+// -----------------------------------------------------------------------------
 $insert_sql = 'INSERT INTO validations_tb (authenticator_version, created, recorded_serial, ecobricker_id, recorded_weight, preset_brk_value, star_rating, validations_count, validation_status, validator_comments, validation_note, admin_forced_status, revision_date, brk_trans_no) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)';
 $insert_stmt = $gobrik_conn->prepare($insert_sql);
 if (!$insert_stmt) {
@@ -177,6 +195,9 @@ $insert_stmt->close();
 $now_ts = date('Y-m-d H:i:s');
 $today_d = date('Y-m-d');
 
+// -----------------------------------------------------------------------------
+// 7. Update Ecobrick Status & Metrics
+// -----------------------------------------------------------------------------
 if ($status_normalized === 'authenticated') {
     $update_sql = 'UPDATE tb_ecobricks SET validator_1 = ?, last_validation_ts = ?, status = ?, final_validation_score = 35, weight_authenticated_kg = ?, ecobrick_brk_amt = ? WHERE ecobrick_unique_id = ?';
     $weight_kg = $recorded_weight / 1000;
@@ -208,6 +229,9 @@ $update_stmt->close();
 $brk_trans_no = null;
 $brk_tran_legacy_id = null;
 if ($status_normalized === 'authenticated') {
+    // -------------------------------------------------------------------------
+    // 8. Create Brikcoin Transaction for Authenticated Ecobricks
+    // -------------------------------------------------------------------------
     $next_tran_id = 1;
     $tran_id_result = $gobrik_conn->query('SELECT MAX(tran_id) AS max_tran FROM tb_brk_transaction');
     if ($tran_id_result && ($tran_id_row = $tran_id_result->fetch_assoc())) {
@@ -272,6 +296,9 @@ if ($status_normalized === 'authenticated') {
     }
 }
 
+// -----------------------------------------------------------------------------
+// 9. Response Payload
+// -----------------------------------------------------------------------------
 echo json_encode([
     'success' => true,
     'message' => 'Validation saved successfully.',

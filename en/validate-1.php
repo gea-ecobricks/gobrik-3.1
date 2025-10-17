@@ -200,6 +200,31 @@ if ($stmt->execute()) {
             $language_lookup->close();
         }
     }
+
+    $language_map = [
+        'en' => ['name' => 'English', 'flag' => '🇬🇧'],
+        'fr' => ['name' => 'French', 'flag' => '🇫🇷'],
+        'es' => ['name' => 'Spanish', 'flag' => '🇪🇸'],
+        'de' => ['name' => 'German', 'flag' => '🇩🇪'],
+        'zh' => ['name' => 'Chinese', 'flag' => '🇨🇳'],
+        'id' => ['name' => 'Indonesian', 'flag' => '🇮🇩']
+    ];
+
+    $owner_language_code = strtolower(trim((string) $owner_language_id));
+    $owner_language_flag = '';
+    $owner_language_name = 'Unknown';
+
+    if (isset($language_map[$owner_language_code])) {
+        $owner_language_name = $language_map[$owner_language_code]['name'];
+        $owner_language_flag = $language_map[$owner_language_code]['flag'];
+    } elseif ($owner_language_code !== '' && $owner_language_code !== 'unknown') {
+        $owner_language_name = strtoupper($owner_language_code);
+    }
+
+    $owner_language_display = trim(($owner_language_flag ? $owner_language_flag . ' ' : '') . $owner_language_name);
+    if ($owner_language_display === '') {
+        $owner_language_display = 'Unknown';
+    }
 } else {
     error_log("Error executing query: " . $stmt->error);
     echo "An error occurred while fetching ecobrick details.";
@@ -229,60 +254,25 @@ echo '<!DOCTYPE html>
 
 
 
-            <div id="validate-introduction">
-    <!-- Ecobrick Full Photo -->
-<?php if (!empty($ecobrick_full_photo_url) && $ecobrick_full_photo_url !== 'url missing'): ?>
-    <div class="photo-container" id="basic-ecobrick-photo">
-        <img src="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>?v=<?php echo htmlspecialchars($photo_version); ?>"
-     title="Version <?php echo htmlspecialchars($photo_version); ?>" alt="Basic Ecobrick Photo" style="width:500px; max-width:95%" class="rotatable-photo" id="ecobrick-photo-<?php echo $serial_no; ?>" data-rotation="0">
-
-        <!-- Rotate buttons for the full ecobrick photo -->
-        <div class="rotate-controls">
-            <button class="rotate-button rotate-left" data-direction="left" data-photo-url="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>" data-photo-id="ecobrick-photo-<?php echo $serial_no; ?>">↪️</button>
-            <button class="confirm-rotate-button"
-                    id="confirm-rotation-<?php echo $serial_no; ?>"
-                    style="display:none;"
-                    data-thumb-url="<?php echo htmlspecialchars($ecobrick_thumb_photo_url); ?>">
-                ✅
-            </button>
-            <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>" data-photo-id="ecobrick-photo-<?php echo $serial_no; ?>">↩️</button>
-        </div>
-    </div>
-<?php endif; ?>
-
-<!-- Selfie Photo -->
-<?php if ($selfie_photo_url): ?>
-    <div class="photo-container" id="selfie-ecobrick-photo">
-        <img src="<?php echo htmlspecialchars($selfie_photo_url); ?>?v=<?php echo htmlspecialchars($photo_version); ?>"
-     title="Version <?php echo htmlspecialchars($photo_version); ?>"
-     alt="Ecobrick Selfie Photo"
-     style="max-width:500px;"
-     class="rotatable-photo"
-     id="selfie-photo-<?php echo $serial_no; ?>"
-     data-rotation="0">
-
-
-        <!-- Rotate buttons for the selfie photo -->
-        <div class="rotate-controls">
-            <button class="rotate-button rotate-left" data-direction="left" data-photo-url="<?php echo htmlspecialchars($selfie_photo_url); ?>" data-photo-id="selfie-photo-<?php echo $serial_no; ?>">↪️</button>
-            <button class="confirm-rotate-button"
-                    id="confirm-rotation-selfie-<?php echo $serial_no; ?>"
-                    style="display:none;"
-                    data-thumb-url="<?php echo htmlspecialchars($selfie_thumb_url); ?>">
-                ✅
-            </button>
-            <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($selfie_photo_url); ?>" data-photo-id="selfie-photo-<?php echo $serial_no; ?>">↩️</button>
-        </div>
-    </div>
-<?php endif; ?>
-
-</div>
-
-
-
-
-
             <div id="ecobrick-data-chart" class="ecobrick-data-chart">
+            <?php if (!empty($ecobrick_full_photo_url) && $ecobrick_full_photo_url !== 'url missing'): ?>
+                <div class="photo-container" id="basic-ecobrick-photo">
+                    <img src="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>?v=<?php echo htmlspecialchars($photo_version); ?>"
+                 title="Version <?php echo htmlspecialchars($photo_version); ?>" alt="Basic Ecobrick Photo" style="width:500px; max-width:95%" class="rotatable-photo" id="ecobrick-photo-<?php echo $serial_no; ?>" data-rotation="0">
+
+                    <!-- Rotate buttons for the full ecobrick photo -->
+                    <div class="rotate-controls">
+                        <button class="rotate-button rotate-left" data-direction="left" data-photo-url="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>" data-photo-id="ecobrick-photo-<?php echo $serial_no; ?>">↪️</button>
+                        <button class="confirm-rotate-button"
+                                id="confirm-rotation-<?php echo $serial_no; ?>"
+                                style="display:none;"
+                                data-thumb-url="<?php echo htmlspecialchars($ecobrick_thumb_photo_url); ?>">
+                            ✅
+                        </button>
+                        <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($ecobrick_full_photo_url); ?>" data-photo-id="ecobrick-photo-<?php echo $serial_no; ?>">↩️</button>
+                    </div>
+                </div>
+            <?php endif; ?>
                 <div class="data-row">
                     <span class="data-label">Serial Number</span>
                     <span class="data-value" style="font-weight:bold; font-size:1.15em;">
@@ -318,8 +308,30 @@ echo '<!DOCTYPE html>
                     <span class="data-value"><?php echo htmlspecialchars($sequestration_type ?: '—', ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
             </div>
+            <?php if ($selfie_photo_url): ?>
+            <div class="photo-container" id="selfie-ecobrick-photo">
+                <img src="<?php echo htmlspecialchars($selfie_photo_url); ?>?v=<?php echo htmlspecialchars($photo_version); ?>"
+             title="Version <?php echo htmlspecialchars($photo_version); ?>"
+             alt="Ecobrick Selfie Photo"
+             style="max-width:500px;"
+             class="rotatable-photo"
+             id="selfie-photo-<?php echo $serial_no; ?>"
+             data-rotation="0">
 
-            <p>Welcome to beta authentications!  This is for admins only to manually force the authentication of an ecobrick.</p>
+
+                <!-- Rotate buttons for the selfie photo -->
+                <div class="rotate-controls">
+                    <button class="rotate-button rotate-left" data-direction="left" data-photo-url="<?php echo htmlspecialchars($selfie_photo_url); ?>" data-photo-id="selfie-photo-<?php echo $serial_no; ?>">↪️</button>
+                    <button class="confirm-rotate-button"
+                            id="confirm-rotation-selfie-<?php echo $serial_no; ?>"
+                            style="display:none;"
+                            data-thumb-url="<?php echo htmlspecialchars($selfie_thumb_url); ?>">
+                        ✅
+                    </button>
+                    <button class="rotate-button rotate-right" data-direction="right" data-photo-url="<?php echo htmlspecialchars($selfie_photo_url); ?>" data-photo-id="selfie-photo-<?php echo $serial_no; ?>">↩️</button>
+                </div>
+            </div>
+            <?php endif; ?>
 
 
         <form id="status-update-form" method="POST" action="../api/forced_validation.php">
@@ -345,12 +357,11 @@ echo '<!DOCTYPE html>
     </div>
 
     <div class="form-item">
-        <label for="validator-feedback">Feedback for the Ecobricker:</label>
-        <div style="font-size:0.9em; color:#555; margin:4px 0 8px;">Ecobrickers language: <?php echo htmlspecialchars($owner_language_id, ENT_QUOTES, 'UTF-8'); ?></div>
+        <label for="validator-feedback">Feedback</label>
+        <div class="language-caption">⚠️ The ecobricker's language is <?php echo htmlspecialchars($owner_language_display, ENT_QUOTES, 'UTF-8'); ?></div>
         <textarea id="validator-feedback" name="validator_feedback" rows="4" placeholder="Share feedback or guidance for the ecobricker..."></textarea>
-        <label for="preset-answers" style="font-size:0.9em;">👆 Pre-set answers:</label>
-        <select id="preset-answers" style="font-size:0.9em;">
-            <option value="">Select a quick response...</option>
+        <select id="preset-answers" style="font-size:0.9em;" aria-label="Quick preset responses">
+            <option value="" disabled selected>👆EN - Preset Answers</option>
             <option value="Sorry, no-paper.">Sorry, no-paper.</option>
             <option value="Sorry, plastic can't be dirty.">Sorry, plastic can't be dirty.</option>
             <option value="Your ecobrick needs to be packed tight.">Your ecobrick needs to be packed tight.</option>
@@ -373,7 +384,6 @@ echo '<!DOCTYPE html>
 
         </div>
     </div>
-    <br><br>
 </div>
 
 </div>

@@ -20,11 +20,18 @@
 
 
 <style>
-    .location-column {
-        max-width: 220px;
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
+th.metric-column,
+td.metric-column {
+    max-width: 125px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.location-column {
+    max-width: 220px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
 
     #latest-ecobricks_wrapper {
         width: 100%;
