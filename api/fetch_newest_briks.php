@@ -58,8 +58,30 @@ $stmtTotal->execute();
 $totalRecordsResult = $stmtTotal->get_result();
 $totalRecords = $totalRecordsResult->fetch_assoc()['total'] ?? 0;
 
+// Determine ordering (default newest first)
+$orderColumn = 'date_logged_ts';
+$orderDirection = 'DESC';
+$columnMap = [
+    1 => 'ecobricker_maker',
+    2 => 'status',
+    3 => 'weight_g',
+    4 => 'volume_ml',
+    5 => 'density',
+    6 => 'location_full',
+    7 => 'serial_no'
+];
+
+if (isset($_POST['order'][0]['column'])) {
+    $orderColumnIndex = intval($_POST['order'][0]['column']);
+    if (isset($columnMap[$orderColumnIndex])) {
+        $orderColumn = $columnMap[$orderColumnIndex];
+        $requestedDir = strtolower($_POST['order'][0]['dir'] ?? 'desc');
+        $orderDirection = $requestedDir === 'asc' ? 'ASC' : 'DESC';
+    }
+}
+
 // Prepare the statement for the main query
-$sql .= " ORDER BY date_logged_ts DESC LIMIT ?, ?";
+$sql .= " ORDER BY {$orderColumn} {$orderDirection} LIMIT ?, ?";
 $bindTypes .= "ii";
 $bindValues[] = $start;
 $bindValues[] = $length;

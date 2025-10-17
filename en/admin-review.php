@@ -116,8 +116,8 @@ echo '<!DOCTYPE html>
                             <th data-lang-id="1111-maker">Maker</th>
                             <th data-lang-id="1106-status">Status</th>
 
-                            <th data-lang-id="1104-weight">Weight</th>
-                            <th data-lang-id="1108-volume">Volume</th>
+                            <th data-lang-id="1104-weight" class="metric-column">Weight</th>
+                            <th data-lang-id="1108-volume" class="metric-column">Volume</th>
                             <th data-lang-id="1109-density">Density</th>
                             <th data-lang-id="1105-location">Location</th>
                             <th data-lang-id="1107-serial">Serial</th>
@@ -202,8 +202,8 @@ echo '<!DOCTYPE html>
                         return data;
                     }
                 }, // Status
-                { "data": "weight_g" }, // Weight
-                { "data": "volume_ml" }, // Volume
+                { "data": "weight_g", "className": "metric-column" }, // Weight
+                { "data": "volume_ml", "className": "metric-column" }, // Volume
                 { "data": "density" }, // Density
 
                 {
@@ -277,7 +277,7 @@ echo '<!DOCTYPE html>
 
         function adjustColumnVisibility() {
             var containerWidth = $('#latest-ecobricks_wrapper').outerWidth() || $(window).width();
-            var showMetrics = containerWidth >= 1100;
+            var showMetrics = containerWidth >= 992;
             var showDensity = containerWidth >= 1220;
             var showLocation = containerWidth >= 1360;
 
