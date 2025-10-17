@@ -130,10 +130,38 @@ $statusNormalized = strtolower($status);
 $statusLabel = ucfirst($statusNormalized);
 $authenticatorVersion = $authenticatorVersion !== '' ? $authenticatorVersion : '2.0';
 
-$commentsBlock = trim($validatorComments . "\n" . $validationNote);
-if ($commentsBlock === '') {
-    $commentsBlock = 'No additional comments were provided.';
+$commentsDisplayText = $validatorComments !== ''
+    ? $validatorComments
+    : 'No validator comments were provided.';
+$commentsHtmlSafe = nl2br(htmlspecialchars($commentsDisplayText, ENT_QUOTES, 'UTF-8'));
+$commentsTextBlock = "They left you the following comments:\n\"{$commentsDisplayText}\"\n\n";
+$commentsHtmlBlock = '<p style="margin-bottom:1.5em;">They left you the following comments:<br><span style="display:inline-block;font-size:1.1em;margin-top:0.35em;">&ldquo;' .
+    $commentsHtmlSafe .
+    '&rdquo;</span></p>';
+
+$validationNoteDisplay = $validationNote !== ''
+    ? $validationNote
+    : 'No validation note provided.';
+$validatorDisplayName = $validatorName !== '' ? $validatorName : 'Not specified';
+$brikTranDisplay = $brkTranId !== null ? (string) $brkTranId : 'Not available';
+
+$infoItems = [
+    'Validation note' => $validationNoteDisplay,
+    'Status' => $statusLabel,
+    'Ecobrick Serial' => $serialNo,
+    'Validator' => $validatorDisplayName,
+    'Authenticator Version' => $authenticatorVersion,
+    'Brik Tran ID' => $brikTranDisplay
+];
+
+$infoHtml = '<div class="validation-summary" style="margin:1.5em 0;">';
+$infoTextLines = [];
+foreach ($infoItems as $label => $value) {
+    $infoHtml .= '<p><strong>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . ':</strong> ' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '</p>';
+    $infoTextLines[] = $label . ': ' . $value;
 }
+$infoHtml .= '</div>';
+$infoTextBlock = implode("\n", $infoTextLines) . "\n\n";
 
 $imageHtml = '';
 if ($ecobrickFullPhotoUrl !== '' && $ecobrickFullPhotoUrl !== 'url missing') {
@@ -141,61 +169,42 @@ if ($ecobrickFullPhotoUrl !== '' && $ecobrickFullPhotoUrl !== 'url missing') {
 }
 
 $textIntro = "Hi there {$makerFirstName},\n\n" .
-    "Heads up!  Your ecobrick has just been validated by a GEA admin.  While we implement our new v{$authenticatorVersion} Authentication system, ecobricks are being manually reviewed.\n\n" .
-    "They left you the following comments:\n{$commentsBlock}\n\n";
+    "Heads up!  Your ecobrick has just been validated by a GEA admin.  While we implement our new v{$authenticatorVersion} Authentication system, ecobricks are being manually reviewed.\n\n";
 
-$htmlComments = nl2br(htmlspecialchars($commentsBlock, ENT_QUOTES, 'UTF-8'));
 $htmlIntro = '<p>Hi there ' . htmlspecialchars($makerFirstName, ENT_QUOTES, 'UTF-8') . ',</p>' .
     '<p>Heads up!  Your ecobrick has just been validated by a GEA admin.  While we implement our new v' .
     htmlspecialchars($authenticatorVersion, ENT_QUOTES, 'UTF-8') . ' Authentication system, ecobricks are being manually reviewed.</p>' .
-    '<p>They left you the following comments:<br>' . $htmlComments . '</p>';
+    $commentsHtmlBlock .
+    $infoHtml;
+
+$textBodyBase = $textIntro .
+    $commentsTextBlock .
+    $infoTextBlock;
+
+$additionalText = '';
+$additionalHtml = '';
 
 if ($statusNormalized === 'authenticated') {
     $subject = "Your ecobrick {$serialNo} has been authenticated";
-    $textBody = $textIntro .
-        "Status: Authenticated\n" .
-        "Ecobrick Serial: {$serialNo}\n\n" .
-        "With the authentication of your ecobrick, {$formattedBrkValue} brikcoins have been generated on the Brikchain.  The generative block can be viewed at https://ecobricks.org/en/brikchain.php";
-
-    $htmlBody = $imageHtml .
-        $htmlIntro .
-        '<p><strong>Status:</strong> Authenticated<br>' .
-        '<strong>Ecobrick Serial:</strong> ' . htmlspecialchars($serialNo, ENT_QUOTES, 'UTF-8') . '</p>' .
-        '<p>With the authentication of your ecobrick, ' . htmlspecialchars($formattedBrkValue, ENT_QUOTES, 'UTF-8') . ' brikcoins have been generated on the Brikchain.  The generative block can be viewed at <a href="https://ecobricks.org/en/brikchain.php">https://ecobricks.org/en/brikchain.php</a></p>';
+    $additionalText .= "With the authentication of your ecobrick, {$formattedBrkValue} brikcoins have been generated on the Brikchain.  The generative block can be viewed at https://ecobricks.org/en/brikchain.php\n\n";
+    $additionalHtml .= '<p>With the authentication of your ecobrick, ' . htmlspecialchars($formattedBrkValue, ENT_QUOTES, 'UTF-8') . ' brikcoins have been generated on the Brikchain.  The generative block can be viewed at <a href="https://ecobricks.org/en/brikchain.php">https://ecobricks.org/en/brikchain.php</a></p>';
 } elseif ($statusNormalized === 'rejected') {
     $subject = "Update on ecobrick {$serialNo}: rejected";
-    $textBody = $textIntro .
-        "Status: Rejected\n" .
-        "Ecobrick Serial: {$serialNo}";
-
-    $htmlBody = $imageHtml .
-        $htmlIntro .
-        '<p><strong>Status:</strong> Rejected<br>' .
-        '<strong>Ecobrick Serial:</strong> ' . htmlspecialchars($serialNo, ENT_QUOTES, 'UTF-8') . '</p>';
 } else {
     $subject = "Your ecobrick {$serialNo} has been {$statusLabel}";
-    $textBody = $textIntro .
-        "Status: {$statusLabel}\n" .
-        "Ecobrick Serial: {$serialNo}";
-
-    $htmlBody = $imageHtml .
-        $htmlIntro .
-        '<p><strong>Status:</strong> ' . htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') . '<br>' .
-        '<strong>Ecobrick Serial:</strong> ' . htmlspecialchars($serialNo, ENT_QUOTES, 'UTF-8') . '</p>';
 }
 
-if ($validatorName !== '') {
-    $textBody .= "\nValidator: {$validatorName}";
-    $htmlBody .= '<p><strong>Validator:</strong> ' . htmlspecialchars($validatorName, ENT_QUOTES, 'UTF-8') . '</p>';
-}
 if ($brkValue !== null && $statusNormalized !== 'authenticated') {
-    $textBody .= "\nBrik Value: {$formattedBrkValue}";
-    $htmlBody .= '<p><strong>Brik Value:</strong> ' . htmlspecialchars($formattedBrkValue, ENT_QUOTES, 'UTF-8') . '</p>';
+    $additionalText .= "Brik Value: {$formattedBrkValue}\n\n";
+    $additionalHtml .= '<p><strong>Brik Value:</strong> ' . htmlspecialchars($formattedBrkValue, ENT_QUOTES, 'UTF-8') . '</p>';
 }
-if ($brkTranId !== null) {
-    $textBody .= "\nBrik Tran ID: {$brkTranId}";
-    $htmlBody .= '<p><strong>Brik Tran ID:</strong> ' . htmlspecialchars((string) $brkTranId, ENT_QUOTES, 'UTF-8') . '</p>';
-}
+
+$signOffText = "Towards a transition in our households, communities and enterprises from plastic to an ever greener harmony with Earth's cycles.\n\n- The GoBrik Team";
+$signOffHtml = '<p>Towards a transition in our households, communities and enterprises from plastic to an ever greener harmony with Earth\'s cycles.</p>' .
+    '<p>- The GoBrik Team</p>';
+
+$textBody = $textBodyBase . $additionalText . $signOffText;
+$htmlBody = $imageHtml . $htmlIntro . $additionalHtml . $signOffHtml;
 
 // -----------------------------------------------------------------------------
 // 5. Notification Dispatch

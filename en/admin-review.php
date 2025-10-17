@@ -145,11 +145,23 @@ echo '<!DOCTYPE html>
     $(document).ready(function() {
         var userLang = "<?php echo htmlspecialchars($lang); ?>"; // Get the user's language
 
-        const getStatusEmoji = (statusLabel) => {
+        const statusOrder = new Map([
+            ["awaiting validation", 0],
+            ["authenticated", 1],
+            ["step 2", 2],
+            ["step 2 complete", 2],
+            ["rejected", 3]
+        ]);
+
+        const normalizeStatusLabel = (statusLabel) => {
             if (!statusLabel) {
                 return "";
             }
-            const normalized = statusLabel.trim().toLowerCase();
+            return statusLabel.trim().toLowerCase().replace(/^[^a-z0-9]+/, "");
+        };
+
+        const getStatusEmoji = (statusLabel) => {
+            const normalized = normalizeStatusLabel(statusLabel);
             switch (normalized) {
                 case "authenticated":
                     return "✅";
@@ -158,10 +170,16 @@ echo '<!DOCTYPE html>
                 case "awaiting validation":
                     return "⏱️";
                 case "step 2":
-                    return "🚧";
+                case "step 2 complete":
+                    return "2️⃣";
                 default:
                     return "ℹ️";
             }
+        };
+
+        const getStatusOrder = (statusLabel) => {
+            const normalized = normalizeStatusLabel(statusLabel);
+            return statusOrder.has(normalized) ? statusOrder.get(normalized) : 99;
         };
 
         var table = $("#latest-ecobricks").DataTable({
@@ -193,13 +211,16 @@ echo '<!DOCTYPE html>
                 {
                     "data": "status",
                     "render": function(data, type) {
+                        const label = data || '';
                         if (type === 'display') {
-                            const label = data || '';
                             const emoji = getStatusEmoji(label);
                             const safeLabel = $('<div>').text(label).html();
                             return `<span class="status-cell"><span class="status-emoji" aria-hidden="true">${emoji}</span><span class="status-text">${safeLabel}</span></span>`;
                         }
-                        return data;
+                        if (type === 'sort') {
+                            return getStatusOrder(label);
+                        }
+                        return label;
                     }
                 }, // Status
                 { "data": "weight_g", "className": "metric-column" }, // Weight
