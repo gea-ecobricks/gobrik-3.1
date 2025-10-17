@@ -249,7 +249,7 @@ echo '<!DOCTYPE html>
 <!-- PAGE CONTENT-->
 
 <div id="form-submission-box" style="margin-top:83px;">
-    <div class="form-container" style="padding-top:75px;">
+    <div class="form-container" style="padding-top:5px;">
         <div id="validation-content" class="new-form-styling">
 
 

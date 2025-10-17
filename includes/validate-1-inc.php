@@ -46,10 +46,10 @@
     text-align: left;
 }
 
-#validation-content label {
-    display: block;
-    margin-bottom: 6px;
-}
+/* #validation-content label { */
+/*     display: block; */
+/*     margin-bottom: 6px; */
+/* } */
 
 #validation-content select,
 #validation-content textarea,
@@ -224,9 +224,9 @@
 
 .ecobrick-data-chart #basic-ecobrick-photo {
     margin-bottom: 12px;
-    padding: 10px;
+
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .ecobrick-data-chart #basic-ecobrick-photo img {
