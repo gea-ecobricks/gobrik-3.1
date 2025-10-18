@@ -36,6 +36,16 @@ $validatorName = trim((string) ($data['validator_name'] ?? ''));
 $brkValue = isset($data['brk_value']) ? (float) $data['brk_value'] : null;
 $formattedBrkValue = $brkValue !== null ? number_format($brkValue, 2) : '0.00';
 $brkTranId = isset($data['brk_tran_id']) && $data['brk_tran_id'] !== '' ? (int) $data['brk_tran_id'] : null;
+$starRatingRaw = $data['star_rating'] ?? null;
+$starRating = null;
+if ($starRatingRaw !== null && $starRatingRaw !== '') {
+    $starRating = (int) $starRatingRaw;
+    if ($starRating < 0) {
+        $starRating = 0;
+    } elseif ($starRating > 5) {
+        $starRating = 5;
+    }
+}
 $existingBrkAmt = isset($data['existing_brk_amt']) ? (float) $data['existing_brk_amt'] : null;
 $ecobrickFullPhotoUrl = trim((string) ($data['ecobrick_full_photo_url'] ?? ''));
 
@@ -134,10 +144,32 @@ $commentsDisplayText = $validatorComments !== ''
     ? $validatorComments
     : 'No validator comments were provided.';
 $commentsHtmlSafe = nl2br(htmlspecialchars($commentsDisplayText, ENT_QUOTES, 'UTF-8'));
-$commentsTextBlock = "They left you the following comments:\n\"{$commentsDisplayText}\"\n\n";
-$commentsHtmlBlock = '<p style="margin-bottom:1.5em;">They left you the following comments:<br><span style="display:inline-block;font-size:1.1em;margin-top:0.35em;">&ldquo;' .
-    $commentsHtmlSafe .
-    '&rdquo;</span></p>';
+$commentsTextBlock = "They left you the following comments:\n\"{$commentsDisplayText}\"\n";
+
+$starRatingDisplay = null;
+if ($starRating !== null) {
+    $starSymbols = [];
+    for ($i = 1; $i <= 5; $i++) {
+        $starSymbols[] = $i <= $starRating ? '★' : '☆';
+    }
+    $starRatingDisplay = implode(' ', $starSymbols);
+    $commentsTextBlock .= "Their rating: {$starRatingDisplay}\n";
+}
+
+$commentsTextBlock .= "\n";
+
+$commentsHtmlBlock = '<div class="validator-comments" style="margin-bottom:1.5em;">'
+    . '<p style="margin:0 0 0.5em;">They left you the following comments:</p>'
+    . '<p style="margin:0;font-size:1.1em;">&ldquo;' . $commentsHtmlSafe . '&rdquo;</p>';
+
+if ($starRatingDisplay !== null) {
+    $commentsHtmlBlock .= '<p style="margin:0.75em 0 0;font-size:1.1em;">Their rating: '
+        . '<span style="display:inline-block;font-size:1.25em;letter-spacing:0.1em;">'
+        . htmlspecialchars($starRatingDisplay, ENT_QUOTES, 'UTF-8')
+        . '</span></p>';
+}
+
+$commentsHtmlBlock .= '</div>';
 
 $validationNoteDisplay = $validationNote !== ''
     ? $validationNote
@@ -146,18 +178,18 @@ $validatorDisplayName = $validatorName !== '' ? $validatorName : 'Not specified'
 $brikTranDisplay = $brkTranId !== null ? (string) $brkTranId : 'Not available';
 
 $infoItems = [
-    'Validation note' => $validationNoteDisplay,
-    'Status' => $statusLabel,
     'Ecobrick Serial' => $serialNo,
-    'Validator' => $validatorDisplayName,
+    'Status' => $statusLabel,
     'Authenticator Version' => $authenticatorVersion,
-    'Brik Tran ID' => $brikTranDisplay
+    'Validator' => $validatorDisplayName,
+    'Brik Tran ID' => $brikTranDisplay,
+    'Note' => $validationNoteDisplay
 ];
 
 $infoHtml = '<div class="validation-summary" style="margin:1.5em 0;">';
 $infoTextLines = [];
 foreach ($infoItems as $label => $value) {
-    $infoHtml .= '<p><strong>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . ':</strong> ' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '</p>';
+    $infoHtml .= '<div style="margin:0;line-height:1.4;"><strong>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . ':</strong> ' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '</div>';
     $infoTextLines[] = $label . ': ' . $value;
 }
 $infoHtml .= '</div>';
@@ -180,7 +212,7 @@ if ($ecobrickFullPhotoUrl !== '' && $ecobrickFullPhotoUrl !== 'url missing') {
         $normalizedPhotoUrl = 'https://gobrik.com' . $normalizedPhotoUrl;
     }
 
-    $imageHtml = '<p><img src="' . htmlspecialchars($normalizedPhotoUrl, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick photo" style="max-width:555px;width:100%;height:auto;"></p>';
+    $imageHtml = '<p><img src="' . htmlspecialchars($normalizedPhotoUrl, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick photo" style="max-width:467px;width:100%;height:auto;"></p>';
 }
 
 

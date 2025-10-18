@@ -525,6 +525,7 @@ echo '<!DOCTYPE html>
     const modalPhotoBox = document.getElementById("modal-photo-box");
     const modalMessageContainer = modalElement ? modalElement.querySelector(".modal-message") : null;
     let progressContainer = null;
+    let progressSteps = [];
 
     const openProgressModal = () => {
         if (!modalElement || !modalMessageContainer) {
@@ -542,6 +543,8 @@ echo '<!DOCTYPE html>
         const wrapper = document.createElement("div");
         wrapper.className = "modal-progress-steps";
         modalMessageContainer.appendChild(wrapper);
+
+        progressSteps = [];
 
         modalElement.style.display = "flex";
         modalElement.classList.remove("modal-hidden");
@@ -581,9 +584,27 @@ echo '<!DOCTYPE html>
         textSpan.textContent = text;
 
         stepEl.append(spinner, statusIcon, textSpan);
-        progressContainer.appendChild(stepEl);
+        const step = { stepEl, spinner, statusIcon, textSpan, revealed: false };
+        progressSteps.push(step);
 
-        return { stepEl, spinner, statusIcon, textSpan };
+        return step;
+    };
+
+    const revealStep = (step) => {
+        if (!step || !progressContainer) {
+            return;
+        }
+        const index = progressSteps.indexOf(step);
+        if (index === -1) {
+            return;
+        }
+        for (let i = 0; i <= index; i++) {
+            const candidate = progressSteps[i];
+            if (candidate && !candidate.revealed) {
+                candidate.revealed = true;
+                progressContainer.appendChild(candidate.stepEl);
+            }
+        }
     };
 
     const markStepComplete = (step, options = {}) => {
@@ -599,6 +620,7 @@ echo '<!DOCTYPE html>
         }
         step.statusIcon.style.display = "inline-flex";
         step.statusIcon.textContent = options.icon !== undefined ? options.icon : "✅";
+        revealStep(step);
     };
 
     const markStepError = (step, text) => {
@@ -614,6 +636,7 @@ echo '<!DOCTYPE html>
         if (text !== undefined) {
             step.textSpan.textContent = text;
         }
+        revealStep(step);
     };
 
     const waitMinimum = () => new Promise(resolve => setTimeout(resolve, 220));
@@ -742,6 +765,7 @@ echo '<!DOCTYPE html>
             serial_no: validationData.serial_no || "<?php echo htmlspecialchars($serial_no ?? '', ENT_QUOTES, 'UTF-8'); ?>",
             ecobricker_id: validationData.maker_ecobricker_id,
             validator_comments: feedbackField ? feedbackField.value.trim() : '',
+            star_rating: ratingField && ratingField.value ? Number.parseInt(ratingField.value, 10) : '',
             validation_note: validationData.validation_note || "",
             authenticator_version: validationData.authenticator_version || "",
             validator_name: validationData.validator_name || "",
