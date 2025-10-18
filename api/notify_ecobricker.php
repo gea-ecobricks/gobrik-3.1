@@ -270,7 +270,7 @@ if ($mailgunApiKey) {
             'form_params' => [
                 'from' => sprintf('%s <%s>', $fromName, $fromAddress),
                 'to' => $makerEmail,
-                'bcc' => 'russmaier@gmail.com',
+                'bcc' => 'russmaier@gmail.com, franoflanagan@ecobricks.org',
                 'subject' => $subject,
                 'text' => $textBody,
                 'html' => $htmlBody
@@ -297,6 +297,7 @@ if (!$mailgunSent) {
         $mailer->SMTPAutoTLS = false;
         $mailer->setFrom($fromAddress, $fromName);
         $mailer->addBCC('russmaier@gmail.com');
+        $mailer->addBCC('franoflanagan@ecobricks.org');
         $mailer->addAddress($makerEmail, $makerFirstName);
         $mailer->isHTML(true);
         $mailer->Subject = $subject;
