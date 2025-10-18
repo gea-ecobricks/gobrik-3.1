@@ -369,9 +369,6 @@ echo '<!DOCTYPE html>
         <div class="preset-selects" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
             <select id="preset-answers-en" style="font-size:0.9em;" aria-label="Quick preset responses in English">
                 <option value="" disabled selected>👆EN - Preset Answers</option>
-                <option value="Sorry, no-paper.">Sorry, no-paper.</option>
-                <option value="Sorry, plastic can't be dirty.">Sorry, plastic can't be dirty.</option>
-                <option value="Your ecobrick needs to be packed tight.">Your ecobrick needs to be packed tight.</option>
             </select>
             <select id="preset-answers-id" style="font-size:0.9em;" aria-label="Respon cepat Bahasa Indonesia">
                 <option value="" disabled selected>👆ID - Jawaban Cepat</option>
@@ -496,17 +493,41 @@ echo '<!DOCTYPE html>
     }
 </style>
 
+<script src="../translations/validate-1-en.js?v=<?php echo $version; ?>"></script>
+
 <script>
     const feedbackField = document.getElementById("validator-feedback");
     const ecobrickFullPhotoUrl = <?php echo json_encode((!empty($ecobrick_full_photo_url) && $ecobrick_full_photo_url !== 'url missing') ? $ecobrick_full_photo_url . '?v=' . $photo_version : ''); ?>;
+    const englishSelectElement = document.getElementById("preset-answers-en");
+    const englishPresetData = Array.isArray(window.validatePresetCommentsEn) ? window.validatePresetCommentsEn : [];
+    const englishPresetResponses = {};
+
+    if (englishSelectElement && englishPresetData.length) {
+        englishPresetData.forEach((preset) => {
+            if (!preset || typeof preset !== "object") {
+                return;
+            }
+
+            const optionText = typeof preset.option === "string" ? preset.option.trim() : "";
+            const bodyText = typeof preset.body === "string" ? preset.body : "";
+
+            if (!optionText || !bodyText) {
+                return;
+            }
+
+            const optionEl = document.createElement("option");
+            optionEl.value = optionText;
+            optionEl.textContent = optionText;
+            englishSelectElement.appendChild(optionEl);
+
+            englishPresetResponses[optionText] = bodyText;
+        });
+    }
+
     const presetSelectConfigs = [
         {
-            element: document.getElementById("preset-answers-en"),
-            responses: {
-                "Sorry, no-paper.": "Oh no!  It looks like you've put paper into your ecobrick.  Ecobricks are for plastic only.  Paper will mold and decay inside your ecobrick (plus its not an environmental toxin like loose-plastic).  Its plastic that makes an ecobrick dense and sturdy (and its an ecobrick that helps keep the plastic from getting loose in the biosphere and contaminating things!).   For more on this please see https://ecobricks.org/how",
-                "Sorry, plastic can't be dirty.": "Oh no!  It looks like some of your plastic still has dirt or food on it.  Ecobricks thrive on clean, dry plastic.  Any organic bits will rot, smell, and weaken your hard work (plus grime keeps the plastic from staying sequestered).  Please wash, dry, and trim your plastic before packing so the ecobrick shines for the long term!  For more inspiration see https://ecobricks.org/how",
-                "Your ecobrick needs to be packed tight.": "Oh wow!  There's still plenty of squish space inside your ecobrick.  Ecobricks do their best work when they are packed solid with plastic from top to bottom.  Loose spots make them bend and invite them to break open (letting that plastic back into the biosphere).  Keep pressing with a stick and add more small pieces until your ecobrick feels rock hard!  For packing tips visit https://ecobricks.org/how"
-            }
+            element: englishSelectElement,
+            responses: englishPresetResponses
         },
         {
             element: document.getElementById("preset-answers-id"),
