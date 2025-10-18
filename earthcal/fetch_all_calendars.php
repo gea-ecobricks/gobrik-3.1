@@ -78,7 +78,7 @@ try {
     }
 
     // Fetch personal calendars
-    $sqlPersonalCalendars = "SELECT calendar_id, calendar_name FROM calendars_tb WHERE buwana_id = ?";
+    $sqlPersonalCalendars = "SELECT calendar_id, calendar_name, COALESCE(calendar_active, 1) AS calendar_active FROM calendars_tb WHERE buwana_id = ?";
     $stmtPersonal = $cal_conn->prepare($sqlPersonalCalendars);
     $stmtPersonal->bind_param("i", $buwana_id);
     $stmtPersonal->execute();
@@ -86,7 +86,7 @@ try {
     $stmtPersonal->close();
 
     // Fetch subscribed calendars
-    $sqlSubscribedCalendars = "SELECT c.calendar_id, c.calendar_name FROM cal_subscriptions_tb s
+    $sqlSubscribedCalendars = "SELECT c.calendar_id, c.calendar_name, COALESCE(c.calendar_active, 1) AS calendar_active FROM cal_subscriptions_tb s
                                JOIN calendars_tb c ON s.calendar_id = c.calendar_id
                                WHERE s.buwana_id = ?";
     $stmtSubscribed = $cal_conn->prepare($sqlSubscribedCalendars);
@@ -96,7 +96,7 @@ try {
     $stmtSubscribed->close();
 
     // Fetch public calendars
-    $sqlPublicCalendars = "SELECT calendar_id, calendar_name FROM calendars_tb WHERE calendar_public = 1";
+    $sqlPublicCalendars = "SELECT calendar_id, calendar_name, COALESCE(calendar_active, 1) AS calendar_active FROM calendars_tb WHERE calendar_public = 1";
     $stmtPublic = $cal_conn->prepare($sqlPublicCalendars);
     $stmtPublic->execute();
     $publicCalendars = $stmtPublic->get_result()->fetch_all(MYSQLI_ASSOC);

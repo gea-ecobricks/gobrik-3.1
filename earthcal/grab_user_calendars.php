@@ -61,7 +61,13 @@ if (empty($buwana_id) || !is_numeric($buwana_id)) {
 try {
     // 1. Fetch personal calendars (owned by the user)
     $sqlPersonal = "
-        SELECT calendar_id, calendar_name, calendar_color, calendar_public, last_updated, created_at
+        SELECT calendar_id,
+               calendar_name,
+               calendar_color,
+               calendar_public,
+               COALESCE(calendar_active, 1) AS calendar_active,
+               last_updated,
+               created_at
         FROM calendars_tb
         WHERE buwana_id = ? AND deleted = 0
     ";
@@ -81,7 +87,13 @@ try {
     // 2. Fetch subscribed public calendars.
     // This returns calendars that are public and to which the user has subscribed.
     $sqlSubscribedPublic = "
-        SELECT c.calendar_id, c.calendar_name, c.calendar_color, c.calendar_public, c.last_updated, c.created_at
+        SELECT c.calendar_id,
+               c.calendar_name,
+               c.calendar_color,
+               c.calendar_public,
+               COALESCE(c.calendar_active, 1) AS calendar_active,
+               c.last_updated,
+               c.created_at
         FROM cal_subscriptions_tb s
         JOIN calendars_tb c ON s.calendar_id = c.calendar_id
         WHERE s.buwana_id = ? AND c.deleted = 0 AND c.calendar_public = 1
