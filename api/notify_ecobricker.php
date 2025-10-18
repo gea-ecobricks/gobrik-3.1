@@ -165,7 +165,11 @@ $infoTextBlock = implode("\n", $infoTextLines) . "\n\n";
 
 $imageHtml = '';
 if ($ecobrickFullPhotoUrl !== '' && $ecobrickFullPhotoUrl !== 'url missing') {
-    $imageHtml = '<p><img src="' . htmlspecialchars($ecobrickFullPhotoUrl, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick photo" style="max-width:555px;width:100%;height:auto;"></p>';
+    $normalizedPhotoUrl = $ecobrickFullPhotoUrl;
+    if (stripos($ecobrickFullPhotoUrl, 'https://gobrik.com') !== 0) {
+        $normalizedPhotoUrl = 'https://gobrik.com' . (strpos($ecobrickFullPhotoUrl, '/') === 0 ? '' : '/') . $ecobrickFullPhotoUrl;
+    }
+    $imageHtml = '<p><img src="' . htmlspecialchars($normalizedPhotoUrl, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick photo" style="max-width:555px;width:100%;height:auto;"></p>';
 }
 
 $textIntro = "Hi there {$makerFirstName},\n\n" .

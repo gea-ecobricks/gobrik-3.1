@@ -170,8 +170,9 @@ echo '<!DOCTYPE html>
                 case "awaiting validation":
                     return "⏱️";
                 case "step 2":
-                case "step 2 complete":
                     return "2️⃣";
+                case "step 2 complete":
+                    return "";
                 default:
                     return "ℹ️";
             }
