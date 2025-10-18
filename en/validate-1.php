@@ -84,6 +84,7 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $ecobrick_status = '';
     $date_logged_ts = '';
     $sequestration_type = '';
+    $owner_display_name = '';
 
 
     $error_message = '';
@@ -161,6 +162,11 @@ if ($stmt->execute()) {
     $date_logged_ts = $date_logged_ts !== null ? trim((string) $date_logged_ts) : '';
     $sequestration_type = $sequestration_type !== null ? trim((string) $sequestration_type) : '';
     $ecobrick_status = $status !== null ? trim((string) $status) : '';
+
+    $owner_display_name = trim((string) ($ecobricker_maker ?? ''));
+    if ($owner_display_name === '' && $owner !== '') {
+        $owner_display_name = $owner;
+    }
 
     if ($maker_id !== '') {
         $maker_lookup = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1");
@@ -400,6 +406,95 @@ echo '<!DOCTYPE html>
 <!--FOOTER STARTS HERE-->
 <?php require_once ("../footer-2025.php");?>
 
+<style>
+    .modal-progress-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        font-size: 1.05em;
+        line-height: 1.4;
+    }
+
+    .modal-progress-step {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        color: var(--text-color, #1f1f1f);
+    }
+
+    .modal-progress-step .step-text {
+        flex: 1;
+    }
+
+    .modal-progress-spinner {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 3px solid rgba(0, 0, 0, 0.15);
+        border-top-color: var(--emblem-pink, #e91e63);
+        animation: spin 0.8s linear infinite;
+    }
+
+    .modal-progress-step.complete .modal-progress-spinner,
+    .modal-progress-step.error .modal-progress-spinner {
+        display: none;
+    }
+
+    .modal-progress-step .step-status-icon {
+        display: none;
+        font-size: 1.1em;
+    }
+
+    .modal-progress-step.complete .step-status-icon,
+    .modal-progress-step.error .step-status-icon {
+        display: inline-flex;
+    }
+
+    .modal-progress-step.error {
+        color: #c0392b;
+    }
+
+    .modal-progress-actions {
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .modal-progress-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 999px;
+        background: var(--emblem-blue, #0057a4);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .modal-progress-button:hover,
+    .modal-progress-button:focus {
+        transform: translateY(-1px);
+        background: var(--emblem-blue-mid, #0a6cc5);
+    }
+
+    .modal-progress-button.secondary {
+        background: var(--subdued-text, #4a4a4a);
+    }
+
+    .modal-progress-button.secondary:hover,
+    .modal-progress-button.secondary:focus {
+        background: var(--subdued-text-strong, #2f2f2f);
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 
 <script>
     const feedbackField = document.getElementById("validator-feedback");
@@ -423,6 +518,111 @@ echo '<!DOCTYPE html>
         }
     ];
 
+    const ownerDisplayName = <?php echo json_encode($owner_display_name ?? ''); ?>;
+    const ownerNameDisplay = ownerDisplayName && ownerDisplayName.trim() !== '' ? ownerDisplayName.trim() : 'the ecobrick owner';
+    const modalElement = document.getElementById("form-modal-message");
+    const modalContentBox = document.getElementById("modal-content-box");
+    const modalPhotoBox = document.getElementById("modal-photo-box");
+    const modalMessageContainer = modalElement ? modalElement.querySelector(".modal-message") : null;
+    let progressContainer = null;
+
+    const openProgressModal = () => {
+        if (!modalElement || !modalMessageContainer) {
+            return null;
+        }
+        if (modalPhotoBox) {
+            modalPhotoBox.style.display = "none";
+        }
+        if (modalContentBox) {
+            modalContentBox.style.display = "flex";
+            modalContentBox.style.background = "var(--main-background, #ffffff)";
+        }
+        modalMessageContainer.innerHTML = "";
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "modal-progress-steps";
+        modalMessageContainer.appendChild(wrapper);
+
+        modalElement.style.display = "flex";
+        modalElement.classList.remove("modal-hidden");
+        modalElement.classList.add("modal-shown");
+
+        const pageContent = document.getElementById("page-content");
+        if (pageContent) {
+            pageContent.classList.add("blurred");
+        }
+        const footerFull = document.getElementById("footer-full");
+        if (footerFull) {
+            footerFull.classList.add("blurred");
+        }
+        document.body.classList.add("modal-open");
+
+        return wrapper;
+    };
+
+    const createProgressStep = (text) => {
+        if (!progressContainer) {
+            return null;
+        }
+
+        const stepEl = document.createElement("div");
+        stepEl.className = "modal-progress-step";
+
+        const spinner = document.createElement("span");
+        spinner.className = "modal-progress-spinner";
+        spinner.setAttribute("aria-hidden", "true");
+
+        const statusIcon = document.createElement("span");
+        statusIcon.className = "step-status-icon";
+        statusIcon.setAttribute("aria-hidden", "true");
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "step-text";
+        textSpan.textContent = text;
+
+        stepEl.append(spinner, statusIcon, textSpan);
+        progressContainer.appendChild(stepEl);
+
+        return { stepEl, spinner, statusIcon, textSpan };
+    };
+
+    const markStepComplete = (step, options = {}) => {
+        if (!step) {
+            return;
+        }
+        if (step.spinner && step.spinner.parentElement) {
+            step.spinner.remove();
+        }
+        step.stepEl.classList.add("complete");
+        if (options.text !== undefined) {
+            step.textSpan.textContent = options.text;
+        }
+        step.statusIcon.style.display = "inline-flex";
+        step.statusIcon.textContent = options.icon !== undefined ? options.icon : "✅";
+    };
+
+    const markStepError = (step, text) => {
+        if (!step) {
+            return;
+        }
+        if (step.spinner && step.spinner.parentElement) {
+            step.spinner.remove();
+        }
+        step.stepEl.classList.add("error");
+        step.statusIcon.style.display = "inline-flex";
+        step.statusIcon.textContent = "❌";
+        if (text !== undefined) {
+            step.textSpan.textContent = text;
+        }
+    };
+
+    const waitMinimum = () => new Promise(resolve => setTimeout(resolve, 220));
+
+    const formatBrikValue = (value) => {
+        const num = Number.parseFloat(value);
+        return Number.isFinite(num) ? num.toFixed(2) : "0.00";
+    };
+
     if (feedbackField) {
         presetSelectConfigs.forEach(({ element, responses }) => {
             if (!element) {
@@ -443,8 +643,8 @@ echo '<!DOCTYPE html>
         });
     }
 
-    document.getElementById("status-update-form").addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent default form submission
+    document.getElementById("status-update-form").addEventListener("submit", async function(event) {
+        event.preventDefault();
         const submitButton = document.getElementById("submit-button");
         const statusField = document.getElementById("ecobrick-status");
         const ratingField = document.getElementById("star-rating");
@@ -469,61 +669,132 @@ echo '<!DOCTYPE html>
             formData.set("status", statusField.value.trim());
         }
 
-        fetch(this.action, {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                submitButton.textContent = "Confirmed!";
-
-                const notifyPayload = {
-                    status: data.status_label || statusField.value,
-                    serial_no: data.serial_no || "<?php echo htmlspecialchars($serial_no ?? '', ENT_QUOTES, 'UTF-8'); ?>",
-                    ecobricker_id: data.maker_ecobricker_id,
-                    validator_comments: feedbackField ? feedbackField.value.trim() : '',
-                    validation_note: data.validation_note || "",
-                    authenticator_version: data.authenticator_version || "",
-                    validator_name: data.validator_name || "",
-                    maker_id: data.maker_id || "",
-                    brk_value: data.brk_value || 0,
-                    brk_tran_id: data.brk_legacy_tran_id,
-                    ecobrick_brk_amt: data.ecobrick_brk_amt || 0,
-                    ecobrick_full_photo_url: ecobrickFullPhotoUrl
-                };
-
-                return fetch("../api/notify_ecobricker.php", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(notifyPayload)
-                })
-                .then(response => response.json())
-                .then(notification => {
-                    if (!notification.success) {
-                        console.warn("Notification warning:", notification.error || "Unable to notify ecobricker.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Notification error:", error);
-                })
-                .finally(() => {
-                    window.location.href = "admin-review.php";
-                });
-            } else {
-                submitButton.textContent = "✅ Confirm";
-                submitButton.disabled = false;
-                alert(data.error || "Failed to update the ecobrick.");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
+        progressContainer = null;
+        progressContainer = openProgressModal();
+        if (!progressContainer) {
+            alert("Unable to open the validation progress window. Please try again.");
             submitButton.textContent = "✅ Confirm";
             submitButton.disabled = false;
-            alert("An unexpected error occurred. Please try again.");
-        });
+            return;
+        }
+
+        const steps = {
+            admin: createProgressStep("Admin status confirmed..."),
+            payload: createProgressStep("Validation payload extracted..."),
+            saved: createProgressStep("Validation saved to GoBrik database..."),
+            status: createProgressStep("Ecobrick status updated..."),
+            brikcoins: createProgressStep("Checking Brikcoin issuance..."),
+            email: createProgressStep("Heads up email sent to ecobrick owner " + ownerNameDisplay),
+            thanks: createProgressStep("Thank you for your validation.")
+        };
+
+        const orderedSteps = [steps.admin, steps.payload, steps.saved, steps.status, steps.brikcoins, steps.email, steps.thanks];
+        const findPendingStep = () => orderedSteps.find(step => step && !step.stepEl.classList.contains("complete") && !step.stepEl.classList.contains("error"));
+
+        const handleFailure = async (message) => {
+            const pending = findPendingStep() || steps.admin;
+            await waitMinimum();
+            markStepError(pending, message);
+        };
+
+        let validationData;
+        try {
+            const response = await fetch(this.action, {
+                method: "POST",
+                body: formData
+            });
+            const json = await response.json();
+            if (!response.ok || !json.success) {
+                throw new Error(json.error || "Failed to update the ecobrick.");
+            }
+            validationData = json;
+        } catch (error) {
+            console.error("Validation error:", error);
+            await handleFailure(error.message || "Failed to update the ecobrick.");
+            submitButton.textContent = "✅ Confirm";
+            submitButton.disabled = false;
+            return;
+        }
+
+        await waitMinimum();
+        markStepComplete(steps.admin, { text: "Admin status confirmed..." });
+
+        await waitMinimum();
+        markStepComplete(steps.payload, { text: "Validation payload extracted..." });
+
+        await waitMinimum();
+        markStepComplete(steps.saved, { text: "Validation saved to GoBrik database..." });
+
+        const statusLabel = validationData.status_label || (statusField.value ? statusField.value.trim() : "");
+        await waitMinimum();
+        markStepComplete(steps.status, { text: "Ecobrick status updated to " + statusLabel + "..." });
+
+        await waitMinimum();
+        if ((validationData.status || "").toLowerCase() === "authenticated") {
+            const formatted = formatBrikValue(validationData.brk_value);
+            markStepComplete(steps.brikcoins, { text: formatted + " Brikcoins generated on the Brikchain...", icon: "✅" });
+        } else {
+            markStepComplete(steps.brikcoins, { text: "Unauthenticated ecobrick, no brikcoins generated.", icon: "🚫" });
+        }
+
+        const notifyPayload = {
+            status: validationData.status_label || (statusField.value ? statusField.value.trim() : ""),
+            serial_no: validationData.serial_no || "<?php echo htmlspecialchars($serial_no ?? '', ENT_QUOTES, 'UTF-8'); ?>",
+            ecobricker_id: validationData.maker_ecobricker_id,
+            validator_comments: feedbackField ? feedbackField.value.trim() : '',
+            validation_note: validationData.validation_note || "",
+            authenticator_version: validationData.authenticator_version || "",
+            validator_name: validationData.validator_name || "",
+            maker_id: validationData.maker_id || "",
+            brk_value: validationData.brk_value || 0,
+            brk_tran_id: validationData.brk_legacy_tran_id,
+            ecobrick_brk_amt: validationData.ecobrick_brk_amt || 0,
+            ecobrick_full_photo_url: ecobrickFullPhotoUrl
+        };
+
+        let notificationSuccess = false;
+        let notificationError = "";
+
+        try {
+            const notifyResponse = await fetch("../api/notify_ecobricker.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(notifyPayload)
+            });
+            const notifyJson = await notifyResponse.json();
+            if (!notifyResponse.ok || !notifyJson.success) {
+                throw new Error(notifyJson.error || "Unable to notify ecobricker.");
+            }
+            notificationSuccess = true;
+        } catch (error) {
+            console.error("Notification error:", error);
+            notificationError = error.message || "Unable to notify ecobricker.";
+        }
+
+        if (notificationSuccess) {
+            await waitMinimum();
+            markStepComplete(steps.email, { text: "Heads up email sent to ecobrick owner " + ownerNameDisplay, icon: "✅" });
+        } else {
+            await waitMinimum();
+            markStepError(steps.email, "Heads up email failed: " + notificationError);
+        }
+
+        await waitMinimum();
+        markStepComplete(steps.thanks, { text: "Thank you for your validation.", icon: "🙏" });
+
+        submitButton.textContent = "Confirmed!";
+
+        if (modalMessageContainer) {
+            const actions = document.createElement("div");
+            actions.className = "modal-progress-actions";
+            actions.innerHTML = `
+                <a class="modal-progress-button" href="admin-review.php">Continue Validating</a>
+                <a class="modal-progress-button secondary" href="dashboard.php">Dashboard</a>
+            `;
+            modalMessageContainer.appendChild(actions);
+        }
     });
 </script>
 

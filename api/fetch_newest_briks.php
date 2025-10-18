@@ -81,7 +81,12 @@ if (isset($_POST['order'][0]['column'])) {
 }
 
 // Prepare the statement for the main query
-$sql .= " ORDER BY {$orderColumn} {$orderDirection} LIMIT ?, ?";
+if ($orderColumn === 'status') {
+    $statusCase = "CASE\n        WHEN status LIKE '⏱️%' OR LOWER(status) LIKE 'awaiting validation%' THEN 1\n        WHEN status LIKE '✅%' OR LOWER(status) LIKE 'authenticated%' THEN 2\n        WHEN status LIKE '2️⃣%' OR LOWER(status) LIKE 'step 2 complete%' OR LOWER(status) LIKE 'step two complete%' THEN 3\n        ELSE 4\n    END";
+    $sql .= " ORDER BY {$statusCase}, status ASC LIMIT ?, ?";
+} else {
+    $sql .= " ORDER BY {$orderColumn} {$orderDirection} LIMIT ?, ?";
+}
 $bindTypes .= "ii";
 $bindValues[] = $start;
 $bindValues[] = $length;

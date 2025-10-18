@@ -149,8 +149,9 @@ echo '<!DOCTYPE html>
             ["awaiting validation", 0],
             ["authenticated", 1],
             ["step 2", 2],
-            ["step 2 complete", 2],
-            ["rejected", 3]
+            ["step 2 complete", 3],
+            ["step two complete", 3],
+            ["rejected", 4]
         ]);
 
         const normalizeStatusLabel = (statusLabel) => {
@@ -172,7 +173,8 @@ echo '<!DOCTYPE html>
                 case "step 2":
                     return "2️⃣";
                 case "step 2 complete":
-                    return "";
+                case "step two complete":
+                    return "2️⃣";
                 default:
                     return "ℹ️";
             }
