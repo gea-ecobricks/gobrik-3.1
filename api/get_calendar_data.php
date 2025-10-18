@@ -71,7 +71,7 @@ if (empty($calendar_name) && (empty($buwana_id) || !is_numeric($buwana_id))) {
 try {
     if (!empty($calendar_name) && !empty($buwana_id)) {
         // Fetch personal calendar data for a specific calendar
-        $sql = "SELECT events_json_blob, last_updated
+        $sql = "SELECT events_json_blob, last_updated, COALESCE(calendar_active, 1) AS calendar_active
                 FROM calendars_tb
                 WHERE buwana_id = ? AND calendar_name = ?";
         $stmt = $cal_conn->prepare($sql);
@@ -94,11 +94,12 @@ try {
         $response['success'] = true;
         $response['data'] = [
             'events_json_blob' => $calendar_data['events_json_blob'] ? json_decode($calendar_data['events_json_blob'], true) : [],
-            'last_updated' => $calendar_data['last_updated']
+            'last_updated' => $calendar_data['last_updated'],
+            'calendar_active' => isset($calendar_data['calendar_active']) ? (int) $calendar_data['calendar_active'] : 1
         ];
     } elseif (!empty($calendar_name)) {
         // Fetch public calendar data
-        $sql = "SELECT events_json_blob, last_updated
+        $sql = "SELECT events_json_blob, last_updated, COALESCE(calendar_active, 1) AS calendar_active
                 FROM calendars_tb
                 WHERE calendar_name = ? AND calendar_public = 1";
         $stmt = $cal_conn->prepare($sql);
@@ -121,11 +122,12 @@ try {
         $response['success'] = true;
         $response['data'] = [
             'events_json_blob' => $calendar_data['events_json_blob'] ? json_decode($calendar_data['events_json_blob'], true) : [],
-            'last_updated' => $calendar_data['last_updated']
+            'last_updated' => $calendar_data['last_updated'],
+            'calendar_active' => isset($calendar_data['calendar_active']) ? (int) $calendar_data['calendar_active'] : 1
         ];
     } elseif (!empty($buwana_id)) {
         // Fetch all personal calendars for the user
-        $sql = "SELECT calendar_name, last_updated, calendar_color, calendar_public
+        $sql = "SELECT calendar_name, last_updated, calendar_color, calendar_public, COALESCE(calendar_active, 1) AS calendar_active
                 FROM calendars_tb
                 WHERE buwana_id = ?";
         $stmt = $cal_conn->prepare($sql);
