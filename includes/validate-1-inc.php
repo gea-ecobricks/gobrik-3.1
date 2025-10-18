@@ -103,6 +103,10 @@
         max-width: 100%;
         padding: 0 0.75rem;
     }
+
+    .ecobrick-data-chart {
+        max-width: 100%;
+    }
 }
 
 @media screen and (min-width: 770px) and (max-width: 1200px) {
@@ -213,6 +217,7 @@
 }
 
 .ecobrick-data-chart {
+    width: 100%;
     max-width: 500px;
     margin: 20px auto 12px;
     padding: 15px;
@@ -220,6 +225,7 @@
     background: var(--lighter);
     text-align: left;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
 }
 
 .ecobrick-data-chart #basic-ecobrick-photo {

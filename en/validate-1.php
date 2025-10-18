@@ -4,7 +4,7 @@ require_once '../auth/session_start.php';
 
 // Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
-$version = '0.448';
+$version = '1.0';
 $page = 'validate-1';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 

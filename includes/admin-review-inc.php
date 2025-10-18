@@ -51,24 +51,25 @@ td.metric-column {
     }
 
 
+.modal-message {
+    margin: auto;
+    width: 100%;
+}
+
 .ecobrick-action-button {
     width: 100%;           /* Ensures the button takes the full width */
     display: block;        /* Ensures the button behaves as a block element */
     text-align: center;    /* Centers the text inside the button */
-    padding: 10px;         /* Add some padding for better button appearance */
-    margin-bottom: 10px;   /* Margin to create space between buttons */
+    padding: 10px 20px;    /* Add padding for better button appearance */
+    margin: 0 auto 10px;   /* Margin to create space between buttons and center them */
     border: none;          /* Remove default borders */
+    border-radius: 10px;
     cursor: pointer;       /* Show pointer on hover */
-    font-size: 1em;        /* Consistent font size */
-    padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  background: #00800094;
-  font-size: 1.3em;
-  text-align: center;
-  text-decoration: none;
-  color:white;
+    background: #00800094;
+    font-size: 1.3em;      /* Consistent font size */
+    text-decoration: none;
+    color: white;
+    box-sizing: border-box;
 }
 
 
@@ -107,6 +108,16 @@ td.metric-column {
 }
 
 @media screen and (max-width: 768px) {
+    .modal-message {
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+
+    .ecobrick-action-button {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
     .status-cell {
         justify-content: center;
         gap: 0;
