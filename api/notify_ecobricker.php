@@ -164,13 +164,25 @@ $infoHtml .= '</div>';
 $infoTextBlock = implode("\n", $infoTextLines) . "\n\n";
 
 $imageHtml = '';
+
 if ($ecobrickFullPhotoUrl !== '' && $ecobrickFullPhotoUrl !== 'url missing') {
-    $normalizedPhotoUrl = $ecobrickFullPhotoUrl;
-    if (stripos($ecobrickFullPhotoUrl, 'https://gobrik.com') !== 0) {
-        $normalizedPhotoUrl = 'https://gobrik.com' . (strpos($ecobrickFullPhotoUrl, '/') === 0 ? '' : '/') . $ecobrickFullPhotoUrl;
+
+    // Remove any '../' or './' segments from the stored relative path
+    $normalizedPhotoUrl = preg_replace('#(\.\./|\.\/)#', '', $ecobrickFullPhotoUrl);
+
+    // Ensure the URL starts with a single forward slash
+    if (strpos($normalizedPhotoUrl, '/') !== 0) {
+        $normalizedPhotoUrl = '/' . $normalizedPhotoUrl;
     }
+
+    // Prepend domain if it’s not already absolute
+    if (stripos($normalizedPhotoUrl, 'https://gobrik.com') !== 0) {
+        $normalizedPhotoUrl = 'https://gobrik.com' . $normalizedPhotoUrl;
+    }
+
     $imageHtml = '<p><img src="' . htmlspecialchars($normalizedPhotoUrl, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick photo" style="max-width:555px;width:100%;height:auto;"></p>';
 }
+
 
 $textIntro = "Hi there {$makerFirstName},\n\n" .
     "Heads up!  Your ecobrick has just been validated by a GEA admin.  While we implement our new v{$authenticatorVersion} Authentication system, ecobricks are being manually reviewed.\n\n";
