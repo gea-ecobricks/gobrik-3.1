@@ -492,6 +492,7 @@ echo '<!DOCTYPE html>
 </style>
 
 <script src="../translations/validate-1-en.js?v=<?php echo $version; ?>"></script>
+<script src="../translations/validate-1-id.js?v=<?php echo $version; ?>"></script>
 
 <script>
     const feedbackField = document.getElementById("validator-feedback");
@@ -499,6 +500,9 @@ echo '<!DOCTYPE html>
     const englishSelectElement = document.getElementById("preset-answers-en");
     const englishPresetData = Array.isArray(window.validatePresetCommentsEn) ? window.validatePresetCommentsEn : [];
     const englishPresetResponses = {};
+    const indonesianSelectElement = document.getElementById("preset-answers-id");
+    const indonesianPresetData = Array.isArray(window.validatePresetCommentsId) ? window.validatePresetCommentsId : [];
+    const indonesianPresetResponses = {};
 
     if (englishSelectElement && englishPresetData.length) {
         englishPresetData.forEach((preset) => {
@@ -522,18 +526,36 @@ echo '<!DOCTYPE html>
         });
     }
 
+    if (indonesianSelectElement && indonesianPresetData.length) {
+        indonesianPresetData.forEach((preset) => {
+            if (!preset || typeof preset !== "object") {
+                return;
+            }
+
+            const optionText = typeof preset.option === "string" ? preset.option.trim() : "";
+            const bodyText = typeof preset.body === "string" ? preset.body : "";
+
+            if (!optionText || !bodyText) {
+                return;
+            }
+
+            const optionEl = document.createElement("option");
+            optionEl.value = optionText;
+            optionEl.textContent = optionText;
+            indonesianSelectElement.appendChild(optionEl);
+
+            indonesianPresetResponses[optionText] = bodyText;
+        });
+    }
+
     const presetSelectConfigs = [
         {
             element: englishSelectElement,
             responses: englishPresetResponses
         },
         {
-            element: document.getElementById("preset-answers-id"),
-            responses: {
-                "Maaf, tidak boleh kertas.": "Waduh!  Sepertinya kamu memasukkan kertas ke dalam ecobrick.  Ecobrick itu hanya untuk plastik.  Kertas bisa berjamur dan membusuk di dalam ecobrick (dan tidak seperti plastik longgar, kertas bukan racun lingkungan).  Plastiklah yang membuat ecobrick padat dan kokoh (dan menjaga plastik agar tidak lepas ke biosfer).  Untuk info lebih lanjut silakan kunjungi https://ecobricks.org/how",
-                "Maaf, plastik tidak boleh kotor.": "Waduh!  Sepertinya sebagian plastikmu masih ada kotoran atau sisa makanan.  Ecobrick terbaik dibuat dari plastik yang bersih dan kering.  Sisa organik akan membusuk, berbau, dan melemahkan hasil kerjamu (dan kotoran membuat plastik sulit tetap tersekuester).  Tolong cuci, keringkan, dan potong plastik sebelum dipadatkan agar ecobrickmu awet!  Untuk inspirasi lihat https://ecobricks.org/how",
-                "Ecobrick kamu perlu dipadatkan rapat.": "Wah!  Masih ada ruang kosong di dalam ecobrickmu.  Ecobrick bekerja maksimal ketika dipenuhi plastik padat dari atas sampai bawah.  Bagian yang longgar membuatnya mudah bengkok dan bisa pecah (membuat plastik lepas kembali ke biosfer).  Terus tekan dengan tongkat dan tambahkan potongan kecil sampai ecobrick terasa sekeras batu!  Untuk tips pengepakan kunjungi https://ecobricks.org/how"
-            }
+            element: indonesianSelectElement,
+            responses: indonesianPresetResponses
         }
     ];
 
