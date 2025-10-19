@@ -123,9 +123,9 @@ If you would like to arrange a training session or have further questions please
 
 We look forward to seeing your improved ecobricks.`
   },
-  {
-    option: "11. The ecobrick looks squishy",
-    body: `Thank you for your interest in ecobricking and for wanting to sequester your plastic waste. Unfortunately your brick has been rejected because we are concerned about the contents of your bottle.
+    {
+        option: "11. The ecobrick looks squishy",
+        body: `Thank you for your interest in ecobricking and for wanting to sequester your plastic waste. Unfortunately your brick has been rejected because we are concerned about the contents of your bottle.
 
 When you log your brick it undergoes a density check based on the information you have provided. If you have made an error in the volume or weight of your brick this can result in a false density calculation.
 
@@ -138,5 +138,19 @@ So that you can successfully ecobrick in the future, please visit our website an
 If you would like to arrange a training session or have further questions please contact our Helpdesk via franoflanagan@ecobricks.org.
 
 We look forward to seeing your improved ecobricks.`
-  }
+    },
+
+    {
+        option: "12. Authenticated",
+        body: 'Congratulations! Your ecobrick has been authenticated and is now ready to build with.
+
+        For ideas on using your Ecobricks in a project or advice on building methods please visit our website www.ecobricks.org
+
+        Thank you for your amazing effort and care for our biosphere. Each ecobrick is given a star rating so you might find that yours has been included in our monthly top ten gallery as featured on our website and on Gobrik.
+
+            We look forward to authenticating your next brick.',
+
+    }
+
+
 ];

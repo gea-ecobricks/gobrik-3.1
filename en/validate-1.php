@@ -258,8 +258,6 @@ echo '<!DOCTYPE html>
     <div class="form-container" style="padding-top:5px;">
         <div id="validation-content" class="new-form-styling">
 
-
-
             <div id="ecobrick-data-chart" class="ecobrick-data-chart">
             <?php if (!empty($ecobrick_full_photo_url) && $ecobrick_full_photo_url !== 'url missing'): ?>
                 <div class="photo-container" id="basic-ecobrick-photo">
