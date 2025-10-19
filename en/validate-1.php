@@ -352,6 +352,7 @@ echo '<!DOCTYPE html>
         <label for="star-rating">Star Rating:</label>
         <select id="star-rating" name="star_rating" required>
             <option value="" disabled selected>Select a rating...</option>
+            <option value="0">No ⭐ (0)</option>
             <option value="5">⭐⭐⭐⭐⭐ (5)</option>
             <option value="4">⭐⭐⭐⭐ (4)</option>
             <option value="3">⭐⭐⭐ (3)</option>
@@ -370,9 +371,6 @@ echo '<!DOCTYPE html>
             </select>
             <select id="preset-answers-id" style="font-size:0.9em;" aria-label="Respon cepat Bahasa Indonesia">
                 <option value="" disabled selected>👆ID - Jawaban Cepat</option>
-                <option value="Maaf, tidak boleh kertas.">Maaf, tidak boleh kertas.</option>
-                <option value="Maaf, plastik tidak boleh kotor.">Maaf, plastik tidak boleh kotor.</option>
-                <option value="Ecobrick kamu perlu dipadatkan rapat.">Ecobrick kamu perlu dipadatkan rapat.</option>
             </select>
         </div>
     </div>
@@ -625,7 +623,7 @@ echo '<!DOCTYPE html>
         textSpan.textContent = text;
 
         stepEl.append(spinner, statusIcon, textSpan);
-        const step = { stepEl, spinner, statusIcon, textSpan, revealed: false };
+        const step = { stepEl, spinner, statusIcon, textSpan, revealed: false, startTimestamp: null };
         progressSteps.push(step);
 
         return step;
@@ -648,39 +646,84 @@ echo '<!DOCTYPE html>
         }
     };
 
-    const markStepComplete = (step, options = {}) => {
+    const MIN_SPINNER_DURATION = 220;
+
+    const wait = (duration = MIN_SPINNER_DURATION) => new Promise(resolve => setTimeout(resolve, duration));
+
+    const ensureStepVisible = (step) => {
         if (!step) {
             return;
         }
-        if (step.spinner && step.spinner.parentElement) {
-            step.spinner.remove();
+        revealStep(step);
+        step.stepEl.classList.remove("complete", "error");
+        if (step.spinner) {
+            step.spinner.style.display = "inline-flex";
         }
+        if (step.statusIcon) {
+            step.statusIcon.style.display = "none";
+        }
+    };
+
+    const startStep = (step) => {
+        if (!step) {
+            return;
+        }
+        ensureStepVisible(step);
+        if (typeof step.startTimestamp !== "number") {
+            step.startTimestamp = performance.now();
+        }
+    };
+
+    const ensureMinimumSpinnerTime = async (step) => {
+        if (!step) {
+            return;
+        }
+        const start = typeof step.startTimestamp === "number" ? step.startTimestamp : performance.now();
+        const elapsed = performance.now() - start;
+        if (elapsed < MIN_SPINNER_DURATION) {
+            await wait(MIN_SPINNER_DURATION - elapsed);
+        }
+    };
+
+    const markStepComplete = async (step, options = {}) => {
+        if (!step) {
+            return;
+        }
+        ensureStepVisible(step);
+        await ensureMinimumSpinnerTime(step);
         step.stepEl.classList.add("complete");
+        if (step.spinner) {
+            step.spinner.style.display = "none";
+        }
         if (options.text !== undefined) {
             step.textSpan.textContent = options.text;
         }
-        step.statusIcon.style.display = "inline-flex";
-        step.statusIcon.textContent = options.icon !== undefined ? options.icon : "✅";
-        revealStep(step);
+        if (step.statusIcon) {
+            step.statusIcon.style.display = "inline-flex";
+            step.statusIcon.textContent = options.icon !== undefined ? options.icon : "✅";
+        }
     };
 
-    const markStepError = (step, text) => {
+    const markStepError = async (step, text) => {
         if (!step) {
             return;
         }
-        if (step.spinner && step.spinner.parentElement) {
-            step.spinner.remove();
-        }
+        ensureStepVisible(step);
+        await ensureMinimumSpinnerTime(step);
         step.stepEl.classList.add("error");
-        step.statusIcon.style.display = "inline-flex";
-        step.statusIcon.textContent = "❌";
+        if (step.spinner) {
+            step.spinner.style.display = "none";
+        }
+        if (step.statusIcon) {
+            step.statusIcon.style.display = "inline-flex";
+            step.statusIcon.textContent = "❌";
+        }
         if (text !== undefined) {
             step.textSpan.textContent = text;
         }
-        revealStep(step);
     };
 
-    const waitMinimum = () => new Promise(resolve => setTimeout(resolve, 220));
+    const waitMinimum = (duration = MIN_SPINNER_DURATION) => wait(duration);
 
     const formatBrikValue = (value) => {
         const num = Number.parseFloat(value);
@@ -752,13 +795,16 @@ echo '<!DOCTYPE html>
             thanks: createProgressStep("Thank you for your validation.")
         };
 
+        startStep(steps.admin);
+
         const orderedSteps = [steps.admin, steps.payload, steps.saved, steps.status, steps.brikcoins, steps.email, steps.thanks];
         const findPendingStep = () => orderedSteps.find(step => step && !step.stepEl.classList.contains("complete") && !step.stepEl.classList.contains("error"));
 
         const handleFailure = async (message) => {
             const pending = findPendingStep() || steps.admin;
+            startStep(pending);
             await waitMinimum();
-            markStepError(pending, message);
+            await markStepError(pending, message);
         };
 
         let validationData;
@@ -781,24 +827,28 @@ echo '<!DOCTYPE html>
         }
 
         await waitMinimum();
-        markStepComplete(steps.admin, { text: "Admin status confirmed..." });
+        await markStepComplete(steps.admin, { text: "Admin status confirmed..." });
 
+        startStep(steps.payload);
         await waitMinimum();
-        markStepComplete(steps.payload, { text: "Validation payload extracted..." });
+        await markStepComplete(steps.payload, { text: "Validation payload extracted..." });
 
+        startStep(steps.saved);
         await waitMinimum();
-        markStepComplete(steps.saved, { text: "Validation saved to GoBrik database..." });
+        await markStepComplete(steps.saved, { text: "Validation saved to GoBrik database..." });
 
         const statusLabel = validationData.status_label || (statusField.value ? statusField.value.trim() : "");
+        startStep(steps.status);
         await waitMinimum();
-        markStepComplete(steps.status, { text: "Ecobrick status updated to " + statusLabel + "..." });
+        await markStepComplete(steps.status, { text: "Ecobrick status updated to " + statusLabel + "..." });
 
+        startStep(steps.brikcoins);
         await waitMinimum();
         if ((validationData.status || "").toLowerCase() === "authenticated") {
             const formatted = formatBrikValue(validationData.brk_value);
-            markStepComplete(steps.brikcoins, { text: formatted + " Brikcoins generated on the Brikchain...", icon: "✅" });
+            await markStepComplete(steps.brikcoins, { text: formatted + " Brikcoins generated on the Brikchain...", icon: "✅" });
         } else {
-            markStepComplete(steps.brikcoins, { text: "Unauthenticated ecobrick, no brikcoins generated.", icon: "🚫" });
+            await markStepComplete(steps.brikcoins, { text: "Unauthenticated ecobrick, no brikcoins generated.", icon: "🚫" });
         }
 
         const notifyPayload = {
@@ -820,6 +870,7 @@ echo '<!DOCTYPE html>
         let notificationSuccess = false;
         let notificationError = "";
 
+        startStep(steps.email);
         try {
             const notifyResponse = await fetch("../api/notify_ecobricker.php", {
                 method: "POST",
@@ -840,14 +891,15 @@ echo '<!DOCTYPE html>
 
         if (notificationSuccess) {
             await waitMinimum();
-            markStepComplete(steps.email, { text: "Heads up email sent to ecobrick owner " + ownerNameDisplay, icon: "✅" });
+            await markStepComplete(steps.email, { text: "Heads up email sent to ecobrick owner " + ownerNameDisplay, icon: "✅" });
         } else {
             await waitMinimum();
-            markStepError(steps.email, "Heads up email failed: " + notificationError);
+            await markStepError(steps.email, "Heads up email failed: " + notificationError);
         }
 
+        startStep(steps.thanks);
         await waitMinimum();
-        markStepComplete(steps.thanks, { text: "Thank you for your validation.", icon: "🙏" });
+        await markStepComplete(steps.thanks, { text: "Thank you for your validation.", icon: "🙏" });
 
         submitButton.textContent = "Confirmed!";
 
