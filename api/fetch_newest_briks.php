@@ -24,7 +24,8 @@ function safe_html($string) {
 $sql = "SELECT ecobrick_thumb_photo_url, ecobrick_full_photo_url, weight_g, volume_ml, density, date_logged_ts,
         location_full, location_watershed, ecobricker_maker, community_name, serial_no, status, feature, photo_version
         FROM tb_ecobricks
-        WHERE status != 'not ready'";
+        WHERE status != 'not ready'
+          AND LOWER(TRIM(status)) NOT IN ('rejected', 'authenticated')";
 
 $bindTypes = "";
 $bindValues = [];
@@ -45,7 +46,7 @@ if (!empty($searchValue)) {
 }
 
 // Count total records before filtering
-$totalRecordsQuery = "SELECT COUNT(*) as total FROM tb_ecobricks WHERE status != 'not ready'";
+$totalRecordsQuery = "SELECT COUNT(*) as total FROM tb_ecobricks WHERE status != 'not ready' AND LOWER(TRIM(status)) NOT IN ('rejected', 'authenticated')";
 if (!empty($ecobricker_id)) {
     $totalRecordsQuery .= " AND maker_id = ?";
     $stmtTotal = $gobrik_conn->prepare($totalRecordsQuery);
@@ -82,8 +83,9 @@ if (isset($_POST['order'][0]['column'])) {
 
 // Prepare the statement for the main query
 if ($orderColumn === 'status') {
-    $statusCase = "CASE\n        WHEN status LIKE '⏱️%' OR LOWER(status) LIKE 'awaiting validation%' THEN 1\n        WHEN status LIKE '✅%' OR LOWER(status) LIKE 'authenticated%' THEN 2\n        WHEN status LIKE '2️⃣%' OR LOWER(status) LIKE 'step 2 complete%' OR LOWER(status) LIKE 'step two complete%' THEN 3\n        ELSE 4\n    END";
-    $sql .= " ORDER BY {$statusCase}, status ASC LIMIT ?, ?";
+    $statusCase = "CASE\n        WHEN LOWER(TRIM(status)) = 'awaiting validation' THEN 0\n        WHEN LOWER(TRIM(status)) LIKE 'step 2%' THEN 1\n        ELSE 2\n    END";
+    $serialOrder = "CASE WHEN serial_no REGEXP '^[0-9]+$' THEN CAST(serial_no AS UNSIGNED) ELSE 999999999 END";
+    $sql .= " ORDER BY {$statusCase}, {$serialOrder} ASC, status ASC LIMIT ?, ?";
 } else {
     $sql .= " ORDER BY {$orderColumn} {$orderDirection} LIMIT ?, ?";
 }
@@ -139,7 +141,7 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Get total filtered records
-$totalFilteredQuery = "SELECT COUNT(*) as total FROM tb_ecobricks WHERE status != 'not ready'";
+$totalFilteredQuery = "SELECT COUNT(*) as total FROM tb_ecobricks WHERE status != 'not ready' AND LOWER(TRIM(status)) NOT IN ('rejected', 'authenticated')";
 if (!empty($ecobricker_id)) {
     $totalFilteredQuery .= " AND maker_id = ?";
 }
