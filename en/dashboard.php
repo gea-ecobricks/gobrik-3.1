@@ -27,16 +27,55 @@ $user_roles = getUser_Role($buwana_id);
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 
 // 👤 Look up user's GoBrik account info
-$sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt FROM tb_ecobrickers WHERE buwana_id = ?";
+$sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
 $stmt_lookup_user = $gobrik_conn->prepare($sql_lookup_user);
 if ($stmt_lookup_user) {
     $stmt_lookup_user->bind_param("i", $buwana_id);
     $stmt_lookup_user->execute();
-    $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt);
+    $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt, $user_capabilities_raw);
     $stmt_lookup_user->fetch();
     $stmt_lookup_user->close();
 } else {
     die("Error preparing statement for tb_ecobrickers: " . $gobrik_conn->error);
+}
+
+$user_capabilities_raw = $user_capabilities_raw ?? '';
+$user_capabilities_list = array_filter(array_map('trim', explode(',', $user_capabilities_raw)));
+$normalized_capabilities = array_map('strtolower', $user_capabilities_list);
+$has_review_capability = in_array('review ecobricks', $normalized_capabilities, true);
+$has_validation_access = (strpos(strtolower($user_roles ?? ''), 'admin') !== false) || $has_review_capability;
+
+$awaiting_validation_count = 0;
+$authenticated_today_count = 0;
+$rejected_today_count = 0;
+
+if ($has_validation_access) {
+    $sql_awaiting_validation = "SELECT COUNT(*) FROM tb_ecobricks WHERE status = 'Awaiting validation'";
+    $stmt_awaiting_validation = $gobrik_conn->prepare($sql_awaiting_validation);
+    if ($stmt_awaiting_validation) {
+        $stmt_awaiting_validation->execute();
+        $stmt_awaiting_validation->bind_result($awaiting_validation_count);
+        $stmt_awaiting_validation->fetch();
+        $stmt_awaiting_validation->close();
+    }
+
+    $validation_window_start = date('Y-m-d H:i:s', time() - 86400);
+    $sql_recent_validations = "SELECT status, COUNT(*) AS record_count FROM tb_ecobricks WHERE status IN ('Authenticated', 'Rejected') AND last_validation_ts >= ? GROUP BY status";
+    $stmt_recent_validations = $gobrik_conn->prepare($sql_recent_validations);
+    if ($stmt_recent_validations) {
+        $stmt_recent_validations->bind_param("s", $validation_window_start);
+        if ($stmt_recent_validations->execute()) {
+            $stmt_recent_validations->bind_result($status_value, $status_count);
+            while ($stmt_recent_validations->fetch()) {
+                if (strcasecmp($status_value, 'Authenticated') === 0) {
+                    $authenticated_today_count = (int) $status_count;
+                } elseif (strcasecmp($status_value, 'Rejected') === 0) {
+                    $rejected_today_count = (int) $status_count;
+                }
+            }
+        }
+        $stmt_recent_validations->close();
+    }
 }
 
 // 🪪 Set maker_id for further lookups
@@ -318,6 +357,33 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </tbody>
             </table>
         </div>
+<?php endif; ?>
+
+<?php if ($has_validation_access): ?>
+    <div id="validation-panel" class="dashboard-panel" style="text-align:center;">
+        <h4 class="panel-title">Validation Overview</h4>
+        <div style="margin: 20px 0;">
+            <div style="font-size:3em;font-weight:700;line-height:1;">
+                <?php echo number_format((int) $awaiting_validation_count); ?>
+            </div>
+            <div style="font-size:1.1em;">Awaiting Validation</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin-bottom:25px;">
+            <div>
+                <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
+                    <?php echo number_format((int) $authenticated_today_count); ?>
+                </div>
+                <div style="font-size:1em;">Authenticated Today</div>
+            </div>
+            <div>
+                <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
+                    <?php echo number_format((int) $rejected_today_count); ?>
+                </div>
+                <div style="font-size:1em;">Rejected Today</div>
+            </div>
+        </div>
+        <a href="admin-review.php" class="page-button">Admin Validation</a>
+    </div>
 <?php endif; ?>
 
 
