@@ -20,17 +20,23 @@ if (!isLoggedIn()) {
 $buwana_id = $_SESSION['buwana_id'];
 require_once '../gobrikconn_env.php';
 
-$query = "SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?";
+$query = "SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
 if ($stmt = $gobrik_conn->prepare($query)) {
     $stmt->bind_param("i", $buwana_id);
     $stmt->execute();
-    $stmt->bind_result($user_roles);
+    $stmt->bind_result($user_roles, $user_capabilities);
 
     if ($stmt->fetch()) {
-        // Check if the user has an admin role
-        if (stripos($user_roles, 'admin') === false) {
+        $user_roles = $user_roles ?? '';
+        $user_capabilities = $user_capabilities ?? '';
+
+        $has_admin_role = stripos($user_roles, 'admin') !== false;
+        $has_review_capability = stripos($user_capabilities, 'review ecobricks') !== false;
+
+        // Check if the user has an admin role or review capability
+        if (!$has_admin_role && !$has_review_capability) {
             echo "<script>
-                alert('Sorry, only admins can see this page.');
+                alert('Sorry, only admins or reviewers can see this page.');
                 window.location.href = 'dashboard.php';
             </script>";
             exit();
