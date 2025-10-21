@@ -148,5 +148,25 @@ Agar Anda bisa ecobricking dengan sukses ke depannya, kunjungi situs kami dan ba
 Jika Anda ingin pelatihan atau punya pertanyaan, hubungi Helpdesk via franoflanagan@ecobricks.org
 
 Kami menantikan ecobrick Anda yang lebih baik.`
+  },
+  {
+    option: "13. Berat atau volume salah",
+    body: `Terima kasih telah membuat ecobrick ini, kami dapat melihat bahwa ecobrick-nya dibuat dengan baik, sehingga dengan menyesal kami menulis untuk menjelaskan bahwa entri Anda telah ditolak. Hal ini karena Anda membuat kesalahan pada data di formulir pencatatan. Bisa jadi Anda memasukkan volume botol yang salah (yaitu berapa banyak cairan yang dapat ditampung) atau berat yang Anda catat tidak cocok dengan berat yang kami lihat pada timbangan atau yang tertulis di botol.
+
+Saat Anda mencatat ecobrick, sistem melakukan pemeriksaan kepadatan berdasarkan informasi yang Anda berikan. Jika Anda melakukan kesalahan dalam volume atau berat ecobrick, hal ini dapat menghasilkan perhitungan kepadatan yang keliru.
+
+Jika Anda ingin ecobrick Anda diverifikasi, silakan catat kembali dengan nomor seri baru dan pastikan informasi yang Anda berikan kali ini benar.
+
+Kami menantikan ecobrick Anda yang lebih baik.`
+  },
+  {
+    option: "14. Celah di bagian atas terlalu besar.",
+    body: `Terima kasih atas ketertarikan Anda pada ecobricking dan keinginan Anda untuk mensekuestrasi limbah plastik. Sayangnya ecobrick Anda ditolak karena terdapat celah yang terlalu besar di bagian atas botol yang membuat bagian ini tidak stabil.
+
+Walaupun kami menyarankan untuk menyisakan celah 1 atau 2 cm di bagian atas botol guna memberi ruang bagi pemuaian isi, ukuran ini diukur dari bibir botol. Dalam praktiknya biasanya ini adalah bagian tebal tempat ulir berada dan sering kali seluruhnya tertutup oleh tutup. Bisakah Anda menambahkan sedikit plastik lagi ke ecobrick Anda?
+
+Jika Anda ingin ecobrick Anda diverifikasi, silakan catat kembali dengan nomor seri baru dan pastikan berat yang baru dimasukkan.
+
+Kami menantikan ecobrick Anda yang lebih baik.`
   }
 ];

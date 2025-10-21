@@ -148,5 +148,25 @@ So that you can successfully ecobrick in the future, please visit our website an
 If you would like to arrange a training session or have further questions please contact our Helpdesk via franoflanagan@ecobricks.org.
 
 We look forward to seeing your improved ecobricks.`
+  },
+  {
+    option: "13. Wrong weight or volume",
+    body: `Thank you for making this ecobrick we can see that it is well made so it is with regret that I’m writing to you to explain that your entry has been rejected. This is because you have made errors in the data on your logging form. Either you have entered the incorrect volume for your bottle ( ie how much liquid it held) or the weight you have logged does not match the weight we can see on the scales or written on the bottle.
+
+When you log your brick it undergoes a density check based on the information you have provided. If you have made an error in the volume or weight of your brick this can result in a false density calculation.
+
+If you would like your ecobrick to be authenticated, please log it again under a new serial number ensuring that the information you provide this time is correct
+
+We look forward to seeing your improved ecobricks.`
+  },
+  {
+    option: "14. Too big a gap at the top.",
+    body: `Thank you for your interest in ecobricking and for wanting to sequester your plastic waste. Unfortunately your brick has been rejected because there is too big a gap at the top of your bottle which will make this part of the brick unstable.
+
+Whilst we do recommend leaving a gap of 1 or 2 cm at the top of your bottle to allow for expansion of the contents, this measurement is from the rim of the bottle. In practice this is usually the thick part where the screw thread is located and often totally covered by the cap. Please can you add a little more plastic to your brick?
+
+If you would like your ecobrick to be authenticated, please log it again under a new serial number ensuring that the new weight is entered.
+
+We look forward to seeing your improved ecobricks.`
   }
 ];
