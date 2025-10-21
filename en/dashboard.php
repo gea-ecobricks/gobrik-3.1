@@ -362,22 +362,22 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <h4 class="panel-title">Validation Overview</h4>
         <div style="margin: 20px 0;">
             <div style="font-size:3em;font-weight:700;line-height:1;">
-                <?php echo number_format((int) $awaiting_validation_count); ?>⏱️
+                <?php echo number_format((int) $awaiting_validation_count); ?>
             </div>
-            <div style="font-size:1.1em;">Awaiting Validation</div>
+            <div style="font-size:1.1em;margin-top: 6px;">⏱ Awaiting Validation</div>
         </div>
         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin-bottom:25px;">
             <div>
                 <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
-                    <?php echo number_format((int) $authenticated_today_count); ?>✅
+                    ✅<?php echo number_format((int) $authenticated_today_count); ?>
                 </div>
-                <div style="font-size:1em;">Authenticated Today</div>
+                <div style="font-size:1em;margin-top: 6px;">Authenticated Today</div>
             </div>
             <div>
                 <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
-                     <?php echo number_format((int) $rejected_today_count); ?>⛔
+                     ⛔<?php echo number_format((int) $rejected_today_count); ?>
                 </div>
-                <div style="font-size:1em;">Rejected Today</div>
+                <div style="font-size:1em;margin-top: 6px;">Rejected Today</div>
             </div>
         </div>
         <a href="admin-review.php" class="page-button">Admin Validation</a>
