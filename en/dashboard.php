@@ -251,7 +251,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
                 </a>
             </span>
-        <?php endif; ?>
+
         <button class="notice-close" aria-label="Close">&times;</button>
     </div>
     <div id="ecobrick-slider">
