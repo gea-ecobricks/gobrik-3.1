@@ -127,6 +127,57 @@ if ($stmt_featured) {
     die("Error preparing statement for featured ecobricks: " . $gobrik_conn->error);
 }
 
+// 📣 Fetch the latest dashboard notice for display and admin controls
+function fetchLatestDashNotice($conn) {
+    $latest_notice = null;
+    $sql_notice = "SELECT notice_id, message_body, message_emoji, featured_url, featured_text, status
+                   FROM dash_notices_tb
+                   ORDER BY date_created DESC, notice_id DESC
+                   LIMIT 1";
+
+    $stmt_notice = $conn->prepare($sql_notice);
+    if ($stmt_notice) {
+        if ($stmt_notice->execute()) {
+            $stmt_notice->bind_result($notice_id, $message_body, $message_emoji, $featured_url, $featured_text, $status);
+            if ($stmt_notice->fetch()) {
+                $latest_notice = [
+                    'notice_id' => $notice_id,
+                    'message_body' => $message_body,
+                    'message_emoji' => $message_emoji,
+                    'featured_url' => $featured_url,
+                    'featured_text' => $featured_text,
+                    'status' => $status
+                ];
+            }
+        }
+        $stmt_notice->close();
+    }
+
+    return $latest_notice;
+}
+
+$latest_notice = fetchLatestDashNotice($gobrik_conn);
+$active_notice = null;
+if ($latest_notice && (!isset($latest_notice['status']) || strtolower($latest_notice['status']) === 'active')) {
+    $active_notice = $latest_notice;
+}
+
+$default_notice_text = 'Updated: Free October 20th Ecobrick Intro course.';
+$default_featured_text = 'Register';
+$default_featured_url = 'https://gobrik.com/en/courses.php';
+
+if ($active_notice) {
+    $notice_icon = $active_notice['message_emoji'] ?? '👉';
+    $notice_text = $active_notice['message_body'] ?? $default_notice_text;
+    $notice_featured_text = $active_notice['featured_text'] ?? '';
+    $notice_featured_url = $active_notice['featured_url'] ?? '';
+} else {
+    $notice_icon = '👉';
+    $notice_text = $default_notice_text;
+    $notice_featured_text = $default_featured_text;
+    $notice_featured_url = $default_featured_url;
+}
+
 // 🔒 Clean exit: close DB connections
 $buwana_conn->close();
 $gobrik_conn->close();
@@ -153,10 +204,19 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div id="slider-box">
     <div id="registered-notice" class="top-container-notice">
-                <span id="notice-icon" style="margin-right:10px;">👉</span>
-                <span id="notice-text" data-lang-id="course-notice">Updated: Free October 20th Ecobrick Intro course.   <a href="https://gobrik.com/en/courses.php">Register</a></span>
-                <button class="notice-close" aria-label="Close">&times;</button>
+        <span id="notice-icon" style="margin-right:10px;">
+            <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
+        </span>
+        <span id="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?></span>
+        <?php if (!empty($notice_featured_text) && !empty($notice_featured_url)): ?>
+            <div class="notice-featured" style="display:inline;margin-left:10px;">
+                <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
+                </a>
             </div>
+        <?php endif; ?>
+        <button class="notice-close" aria-label="Close">&times;</button>
+    </div>
     <div id="ecobrick-slider">
         <?php foreach ($featured_ecobricks as $index => $brick): ?>
             <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
@@ -265,6 +325,33 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <!--ADMIN-->
 
 <?php if (strpos(strtolower($user_roles), 'admin') !== false): ?>
+    <div id="dash-notice-control" class="dashboard-panel">
+        <h4 class="panel-title">Update Dashboard Notice</h4>
+        <p>Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
+        <form action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form">
+            <div class="form-field" style="margin-bottom:15px;">
+                <label for="notice-message-body" style="display:block;margin-bottom:5px;">Message</label>
+                <textarea id="notice-message-body" name="message_body" rows="3" required style="width:100%;padding:10px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+            </div>
+            <div class="form-field" style="margin-bottom:15px;">
+                <label for="notice-featured-text" style="display:block;margin-bottom:5px;">Featured Text</label>
+                <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:10px;"
+                       value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+            </div>
+            <div class="form-field" style="margin-bottom:15px;">
+                <label for="notice-featured-url" style="display:block;margin-bottom:5px;">Featured URL</label>
+                <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:10px;"
+                       value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+            </div>
+            <div class="form-field" style="margin-bottom:15px;">
+                <label for="notice-message-emoji" style="display:block;margin-bottom:5px;">Message Emoji</label>
+                <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:10px;"
+                       value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+            </div>
+            <button type="submit" class="confirm-button enabled" style="width:100%;">Save Notice</button>
+        </form>
+    </div>
+
     <div id="admin-menu" class="dashboard-panel">
         <h4 class="panel-title">Admin Menu</h4>
         <div class="menu-buttons-row">
