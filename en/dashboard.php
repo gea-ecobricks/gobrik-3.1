@@ -246,9 +246,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <span id="notice-icon" style="margin-right:10px;">
             <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
         </span>
-        <span id="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?></span>
-        <?php if (!empty($notice_featured_text) && !empty($notice_featured_url)): ?>
-            <span>
+        <span id="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
                 <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
                     <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
                 </a>
@@ -364,20 +362,20 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <h4 class="panel-title">Validation Overview</h4>
         <div style="margin: 20px 0;">
             <div style="font-size:3em;font-weight:700;line-height:1;">
-                ⏱️ <?php echo number_format((int) $awaiting_validation_count); ?>
+                <?php echo number_format((int) $awaiting_validation_count); ?>⏱️
             </div>
             <div style="font-size:1.1em;">Awaiting Validation</div>
         </div>
         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin-bottom:25px;">
             <div>
                 <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
-                    ✅ <?php echo number_format((int) $authenticated_today_count); ?>
+                    <?php echo number_format((int) $authenticated_today_count); ?>✅
                 </div>
                 <div style="font-size:1em;">Authenticated Today</div>
             </div>
             <div>
                 <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
-                    ⛔ <?php echo number_format((int) $rejected_today_count); ?>
+                     <?php echo number_format((int) $rejected_today_count); ?>⛔
                 </div>
                 <div style="font-size:1em;">Rejected Today</div>
             </div>
