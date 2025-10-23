@@ -62,7 +62,7 @@ if (!isset($_SESSION['buwana_id'])) {
     exit;
 }
 
-$adminCheck = $gobrik_conn->prepare('SELECT user_roles FROM tb_ecobrickers WHERE buwana_id = ?');
+$adminCheck = $gobrik_conn->prepare('SELECT user_roles, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?');
 if (!$adminCheck) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Unable to verify permissions.']);
@@ -70,13 +70,13 @@ if (!$adminCheck) {
 }
 $adminCheck->bind_param('i', $_SESSION['buwana_id']);
 $adminCheck->execute();
-$adminCheck->bind_result($adminRoles);
+$adminCheck->bind_result($adminRoles, $reviewerCapabilities);
 $adminCheck->fetch();
 $adminCheck->close();
 
-if (stripos($adminRoles ?? '', 'admin') === false) {
+if (stripos($adminRoles ?? '', 'admin') === false && stripos($reviewerCapabilities ?? '', 'review ecobricks') === false) {
     http_response_code(403);
-    echo json_encode(['success' => false, 'error' => 'Admin privileges are required.']);
+    echo json_encode(['success' => false, 'error' => 'Reviewer privileges are required.']);
     exit;
 }
 
@@ -217,10 +217,10 @@ if ($ecobrickFullPhotoUrl !== '' && $ecobrickFullPhotoUrl !== 'url missing') {
 
 
 $textIntro = "Hi there {$makerFirstName},\n\n" .
-    "Heads up!  Your ecobrick has just been validated by a GEA admin.  While we implement our new v{$authenticatorVersion} Authentication system, ecobricks are being manually reviewed.\n\n";
+    "Heads up!  Your ecobrick has just been validated by a member of the GEA review team.  While we implement our new v{$authenticatorVersion} Authentication system, ecobricks are being manually reviewed.\n\n";
 
 $htmlIntro = '<p>Hi there ' . htmlspecialchars($makerFirstName, ENT_QUOTES, 'UTF-8') . ',</p>' .
-    '<p>Heads up!  Your ecobrick has just been validated by a GEA admin.  While we implement our new v' .
+    '<p>Heads up!  Your ecobrick has just been validated by a member of the GEA review team.  While we implement our new v' .
     htmlspecialchars($authenticatorVersion, ENT_QUOTES, 'UTF-8') . ' Authentication system, ecobricks are being manually reviewed.</p>' .
     $commentsHtmlBlock .
     $infoHtml;
@@ -270,7 +270,6 @@ if ($mailgunApiKey) {
             'form_params' => [
                 'from' => sprintf('%s <%s>', $fromName, $fromAddress),
                 'to' => $makerEmail,
-                'bcc' => 'russmaier@gmail.com, franoflanagan@ecobricks.org',
                 'subject' => $subject,
                 'text' => $textBody,
                 'html' => $htmlBody
@@ -296,8 +295,6 @@ if (!$mailgunSent) {
         $mailer->SMTPSecure = false;
         $mailer->SMTPAutoTLS = false;
         $mailer->setFrom($fromAddress, $fromName);
-        $mailer->addBCC('russmaier@gmail.com');
-        $mailer->addBCC('franoflanagan@ecobricks.org');
         $mailer->addAddress($makerEmail, $makerFirstName);
         $mailer->isHTML(true);
         $mailer->Subject = $subject;

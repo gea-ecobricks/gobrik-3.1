@@ -1,6 +1,6 @@
 <?php
 // forced_validation.php
-// Purpose: Handle admin-forced validations initiated from en/validate-1.php.
+// Purpose: Handle manual validations initiated from en/validate-1.php by admins or reviewers.
 
 session_start();
 header('Content-Type: application/json');
@@ -25,28 +25,28 @@ if (!isset($_SESSION['buwana_id'])) {
 $buwana_id = intval($_SESSION['buwana_id']);
 
 // -----------------------------------------------------------------------------
-// 2. Admin Verification & Context
+// 2. Permission Verification & Context
 // -----------------------------------------------------------------------------
-$admin_query = $gobrik_conn->prepare('SELECT ecobricker_id, full_name, user_roles FROM tb_ecobrickers WHERE buwana_id = ?');
+$admin_query = $gobrik_conn->prepare('SELECT ecobricker_id, full_name, user_roles, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?');
 if (!$admin_query) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Unable to prepare admin lookup.'], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['success' => false, 'error' => 'Unable to prepare reviewer lookup.'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 $admin_query->bind_param('i', $buwana_id);
 $admin_query->execute();
-$admin_query->bind_result($admin_ecobricker_id, $admin_name, $admin_roles);
+$admin_query->bind_result($validator_ecobricker_id, $validator_name, $user_roles, $user_capabilities);
 if (!$admin_query->fetch()) {
     http_response_code(403);
-    echo json_encode(['success' => false, 'error' => 'Admin account not found.'], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['success' => false, 'error' => 'Reviewer account not found.'], JSON_UNESCAPED_UNICODE);
     $admin_query->close();
     exit;
 }
 $admin_query->close();
 
-if (stripos($admin_roles ?? '', 'admin') === false) {
+if (stripos($user_roles ?? '', 'admin') === false && stripos($user_capabilities ?? '', 'review ecobricks') === false) {
     http_response_code(403);
-    echo json_encode(['success' => false, 'error' => 'Admin privileges are required.'], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['success' => false, 'error' => 'Reviewer privileges are required.'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -155,7 +155,7 @@ $count_stmt->close();
 
 $authenticator_version = '2.0';
 $validation_status = 'forced';
-$validation_note = 'Manual admin validation';
+$validation_note = 'Manual reviewer validation';
 
 $status_label = ucfirst($status_normalized);
 
@@ -173,7 +173,7 @@ $insert_stmt->bind_param(
     'ssiddiissss',
     $authenticator_version,
     $serial_no,
-    $admin_ecobricker_id,
+    $validator_ecobricker_id,
     $recorded_weight,
     $preset_brk_value,
     $star_rating,
@@ -207,7 +207,7 @@ if ($status_normalized === 'authenticated') {
         echo json_encode(['success' => false, 'error' => 'Failed to prepare ecobrick update.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $update_stmt->bind_param('sssddi', $admin_name, $now_ts, $status_label, $weight_kg, $weight_kg, $ecobrick_id);
+    $update_stmt->bind_param('sssddi', $validator_name, $now_ts, $status_label, $weight_kg, $weight_kg, $ecobrick_id);
 } else {
     $update_sql = 'UPDATE tb_ecobricks SET validator_1 = ?, last_validation_ts = ?, status = ?, final_validation_score = NULL, weight_authenticated_kg = NULL, ecobrick_brk_amt = 0 WHERE ecobrick_unique_id = ?';
     $update_stmt = $gobrik_conn->prepare($update_sql);
@@ -216,7 +216,7 @@ if ($status_normalized === 'authenticated') {
         echo json_encode(['success' => false, 'error' => 'Failed to prepare ecobrick update.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $update_stmt->bind_param('sssi', $admin_name, $now_ts, $status_label, $ecobrick_id);
+    $update_stmt->bind_param('sssi', $validator_name, $now_ts, $status_label, $ecobrick_id);
 }
 if (!$update_stmt->execute()) {
     http_response_code(500);
@@ -249,7 +249,7 @@ if ($status_normalized === 'authenticated') {
         echo json_encode(['success' => false, 'error' => 'Failed to prepare brikcoin transaction.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $tran_name = 'BRK from admin validation';
+    $tran_name = 'BRK from reviewer validation';
     $status_text = 'Completed';
     $block_type = 'Coins issued for authentication';
     $sender_ecobricker = null;
@@ -313,7 +313,7 @@ echo json_encode([
     'serial_no' => $serial_no,
     'maker_id' => $maker_id,
     'maker_ecobricker_id' => $maker_ecobricker_id,
-    'validator_name' => $admin_name,
+    'validator_name' => $validator_name,
     'authenticator_version' => $authenticator_version,
     'validator_comments' => $feedback,
     'validation_note' => $validation_note,
