@@ -202,7 +202,7 @@ echo '<!DOCTYPE html>
             "pageLength": 25, // Set default number of rows per page to 10
             "order": [[2, "asc"]],
             "language": {
-                "emptyTable": "It looks like no ecobricks have been logged yet!",
+                "emptyTable": "All ecobricks have been validated. Stay posted, there's lots more plastic to pack!",
                 "info": "Showing _START_ to _END_ of _TOTAL_ ecobricks",
                 "infoEmpty": "No ecobricks available",
                 "loadingRecords": "Loading ecobricks...",

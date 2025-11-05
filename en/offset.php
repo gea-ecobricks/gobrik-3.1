@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function() {
             },
             "pageLength": 10, // Set default number of rows per page to 10
             "language": {
-                "emptyTable": "It looks like no ecobricks have been logged yet!",
+                "emptyTable": "It looks like no ecobricks have been logged recently!",
                 "info": "Showing _START_ to _END_ of _TOTAL_ ecobricks",
                 "infoEmpty": "No ecobricks available",
                 "loadingRecords": "Loading ecobricks...",
