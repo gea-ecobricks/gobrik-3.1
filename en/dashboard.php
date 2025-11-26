@@ -117,16 +117,16 @@ if ($has_validation_access) {
     }
 }
 
-// 🪪 Set maker_id for further lookups
-$maker_id = $ecobricker_id;
+// 🪪 Set maaker_id for further lookups
+// $maaker_id = $ecobricker_id;
 
 // 📦 Fetch summary of ecobricks logged by user
 $sql_summary = "SELECT COUNT(*) as total_ecobricks, SUM(weight_g) / 1000 as total_weight_kg, SUM(volume_ml) as total_volume_ml
                 FROM tb_ecobricks
-                WHERE maker_id = ? AND status != 'not ready'";
+                WHERE ecobricker_id = ? AND status != 'not ready'";
 $stmt_summary = $gobrik_conn->prepare($sql_summary);
 if ($stmt_summary) {
-    $stmt_summary->bind_param("s", $maker_id);
+    $stmt_summary->bind_param("s", $ecobricker_id);
     $stmt_summary->execute();
     $stmt_summary->bind_result($total_ecobricks, $total_weight_kg, $total_volume_ml);
     $stmt_summary->fetch();
