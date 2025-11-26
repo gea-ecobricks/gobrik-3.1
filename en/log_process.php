@@ -48,6 +48,7 @@ try {
     // STEP 3: Derived values
     $user_ecobricker_id = getEcobrickerID($buwana_id);
     $maker_id = $user_ecobricker_id;
+    $ecobricker_id = $user_ecobricker_id;
     $owner = $ecobricker_maker;
     $status = "not ready";
     $density = $weight_g / $volume_ml;
@@ -113,16 +114,16 @@ try {
                     ecobrick_unique_id, serial_no, ecobricker_maker, volume_ml, weight_g, sequestration_type,
                     plastic_from, location_full, bottom_colour, location_lat, location_long, brand_name, owner, status,
                     universal_volume_ml, density, date_logged_ts, CO2_kg, last_ownership_change,
-                    actual_maker_name, brik_notes, date_published_ts, location_watershed, community_id, country_id, maker_id, community_name
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    actual_maker_name, brik_notes, date_published_ts, location_watershed, community_id, country_id, maker_id, ecobricker_id, community_name
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $gobrik_conn->prepare($sql);
         $stmt->bind_param(
-            "issiissssddsssidsdsssssiiss",
+            "issiissssddsssidsdsssssiisis",
             $ecobrick_unique_id, $serial_no, $ecobricker_maker, $volume_ml, $weight_g,
             $sequestration_type, $plastic_from, $location_full, $bottom_colour, $location_lat, $location_long,
             $brand_name, $owner, $status, $universal_volume_ml, $density, $date_logged_ts,
             $CO2_kg, $last_ownership_change, $actual_maker_name, $brik_notes, $date_published_ts,
-            $location_watershed, $community_id, $country_id, $maker_id, $community_name
+            $location_watershed, $community_id, $country_id, $maker_id, $ecobricker_id, $community_name
         );
     }
 
