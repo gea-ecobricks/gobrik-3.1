@@ -69,7 +69,7 @@ require_once '../buwanaconn_env.php';
 
 // Default newsletter headers
 $email_from = 'Earthen <earthen@ecobricks.org>';
-$email_subject = 'Solstice, Ayyew & Earthen';
+$email_subject = 'Writing Earth Right';
 
 // 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
 $has_alerts = false;
