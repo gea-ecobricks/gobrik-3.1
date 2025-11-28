@@ -22,6 +22,7 @@ if ($is_logged_in) {
     // Include database connections
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
+    require_once '../emailing/ghoststats_env.php';
 
     // Fetch the user's location data
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
@@ -72,6 +73,40 @@ require_once '../emailing/earthen_helpers.php';
 $email_from = 'Earthen <earthen@ecobricks.org>';
 $email_subject = 'Writing Earth Right';
 
+function fetchEarthenStats($ghoststats_conn): array
+{
+    $stats = [
+        'total' => 0,
+        'sent' => 0,
+        'percentage' => 0,
+    ];
+
+    if (!$ghoststats_conn || $ghoststats_conn->connect_error) {
+        error_log('[GHOST STATS] Connection unavailable.');
+        return $stats;
+    }
+
+    $totalResult = $ghoststats_conn->query("SELECT COUNT(*) AS total FROM members");
+    if ($totalResult && ($row = $totalResult->fetch_assoc())) {
+        $stats['total'] = (int) ($row['total'] ?? 0);
+    }
+
+    $sentQuery = "SELECT COUNT(*) AS sent
+                  FROM members_labels ml
+                  INNER JOIN labels l ON ml.label_id = l.id
+                  WHERE l.name = 'sent-001'";
+    $sentResult = $ghoststats_conn->query($sentQuery);
+    if ($sentResult && ($row = $sentResult->fetch_assoc())) {
+        $stats['sent'] = (int) ($row['sent'] ?? 0);
+    }
+
+    $stats['percentage'] = $stats['total'] > 0
+        ? round(($stats['sent'] / $stats['total']) * 100, 2)
+        : 0;
+
+    return $stats;
+}
+
 // 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
 $has_alerts = false;
 $alerts = [];
@@ -90,9 +125,11 @@ try {
     $ghost_members = fetchGhostMembers();
     $summary = summarizeGhostMembers($ghost_members, 'sent-001');
 
-    $total_members = $summary['total'];
-    $sent_count = $summary['sent_count'];
-    $sent_percentage = $summary['sent_percentage'];
+    $earthen_stats = fetchEarthenStats($ghoststats_conn);
+
+    $total_members = $earthen_stats['total'] ?? $summary['total'];
+    $sent_count = $earthen_stats['sent'] ?? $summary['sent_count'];
+    $sent_percentage = $earthen_stats['percentage'] ?? $summary['sent_percentage'];
 
     $status_limit = 20; // total rows to display in the status table
     $sent_limit = 4;    // number of most recent sent entries
