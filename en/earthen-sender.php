@@ -66,6 +66,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 }
 
 require_once '../buwanaconn_env.php';
+require_once 'ghost_admin_helpers.php';
 
 // Default newsletter headers
 $email_from = 'Earthen <earthen@ecobricks.org>';
@@ -85,70 +86,49 @@ if ($result->num_rows > 0) {
     }
 }
 
-// Fetch email stats
-$query = "SELECT COUNT(*) AS total_members, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count FROM earthen_members_tb";
-$result = $buwana_conn->query($query);
-$row = $result->fetch_assoc();
+try {
+    $ghost_members = fetchGhostMembers();
+    $summary = summarizeGhostMembers($ghost_members, 'sent-001');
 
-$total_members = intval($row['total_members'] ?? 0);
-$sent_count = intval($row['sent_count'] ?? 0);
-$sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
+    $total_members = $summary['total'];
+    $sent_count = $summary['sent_count'];
+    $sent_percentage = $summary['sent_percentage'];
 
-// Fetch the last four sent members and the remaining pending ones
-$status_limit = 20; // total rows to display in the status table
-$sent_limit = 4;    // number of most recent sent entries
+    $status_limit = 20; // total rows to display in the status table
+    $sent_limit = 4;    // number of most recent sent entries
 
-$query_sent = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
-               FROM earthen_members_tb
-               WHERE test_sent = 1
-               ORDER BY test_sent_date_time DESC
-               LIMIT {$sent_limit}";
-$sent_result = $buwana_conn->query($query_sent);
-$sent_members = $sent_result ? $sent_result->fetch_all(MYSQLI_ASSOC) : [];
-$sent_count = count($sent_members);
+    usort($summary['sent'], function ($a, $b) {
+        return strcmp($b['updated_at'] ?? '', $a['updated_at'] ?? '');
+    });
 
-$pending_limit = $status_limit - $sent_count;
+    usort($summary['pending'], function ($a, $b) {
+        return strcmp($a['created_at'] ?? '', $b['created_at'] ?? '');
+    });
 
-$query_pending = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
-                  FROM earthen_members_tb
-                  WHERE test_sent = 0 AND processing IS NULL
-                  ORDER BY created_at ASC
-                  LIMIT {$pending_limit}";
-$pending_result = $buwana_conn->query($query_pending);
-$pending_members = $pending_result ? $pending_result->fetch_all(MYSQLI_ASSOC) : [];
+    $sent_members = array_slice($summary['sent'], 0, $sent_limit);
+    $pending_limit = $status_limit - count($sent_members);
+    $pending_members = array_slice($summary['pending'], 0, $pending_limit);
 
-$all_members = array_merge($sent_members, $pending_members);
-
-// Processing stats for Chart.js
-$processing_query = "SELECT
-    SUM(CASE WHEN processing IS NULL THEN 1 ELSE 0 END) AS null_count,
-    SUM(CASE WHEN processing = 0 THEN 1 ELSE 0 END) AS delivered_count,
-    SUM(CASE WHEN processing = 1 THEN 1 ELSE 0 END) AS sending_count,
-    SUM(CASE WHEN processing = 2 THEN 1 ELSE 0 END) AS failed_immediate_count,
-    SUM(CASE WHEN processing = 3 THEN 1 ELSE 0 END) AS failed_later_count
-    FROM earthen_members_tb";
-$proc_result = $buwana_conn->query($processing_query);
-$proc_row = $proc_result->fetch_assoc();
-$processing_counts = [
-    'unsent' => intval($proc_row['null_count'] ?? 0),
-    'delivered' => intval($proc_row['delivered_count'] ?? 0),
-    'sending' => intval($proc_row['sending_count'] ?? 0),
-    'failed_immediate' => intval($proc_row['failed_immediate_count'] ?? 0),
-    'failed_later' => intval($proc_row['failed_later_count'] ?? 0)
-];
-
-$processing_percentages = [];
-foreach ($processing_counts as $key => $count) {
-    $processing_percentages[$key] = ($total_members > 0) ? round(($count / $total_members) * 100, 2) : 0;
+    $all_members = array_map(function ($member) {
+        $member['email_open_rate'] = calculateOpenRate($member);
+        $member['test_sent'] = memberHasLabel($member, 'sent-001');
+        $member['test_sent_date_time'] = $member['updated_at'] ?? 'N/A';
+        return $member;
+    }, array_merge($sent_members, $pending_members));
+} catch (Exception $e) {
+    error_log('[EARTHEN] Ghost sync failed: ' . $e->getMessage());
+    $total_members = 0;
+    $sent_count = 0;
+    $sent_percentage = 0;
+    $all_members = [];
 }
-$unsent_percentage = $processing_percentages['unsent'];
 
 require_once 'live-newsletter.php';  //the newsletter html
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
-    $subscriber_id = isset($_POST['subscriber_id']) ? intval($_POST['subscriber_id']) : null;
+    $subscriber_id = $_POST['subscriber_id'] ?? null;
     $is_test_mode = isset($_POST['test_mode']) && $_POST['test_mode'] == '1';
 
     if (!empty($email_html) && !empty($recipient_email) && ($subscriber_id || $is_test_mode)) {
@@ -158,23 +138,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             error_log("[EARTHEN] → Sending " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
             $send_ok = sendEmail($recipient_email, $email_html);
 
-            if ($subscriber_id && !$is_test_mode) {
-                if ($send_ok) {
-                    // Mark as sent and processing (sending)
-                    $stmt = $buwana_conn->prepare(
-                        "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 1 WHERE id = ?"
-                    );
-                } else {
-                    // Mark attempt but leave processing NULL
-                    $stmt = $buwana_conn->prepare(
-                        "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?"
-                    );
-                }
-
-                if ($stmt) {
-                    $stmt->bind_param('i', $subscriber_id);
-                    $stmt->execute();
-                    $stmt->close();
+            if ($subscriber_id && !$is_test_mode && $send_ok) {
+                try {
+                    ensureMemberHasLabel($subscriber_id, 'sent-001');
+                } catch (Exception $labelException) {
+                    error_log('[EARTHEN] ❌ Failed to add sent label: ' . $labelException->getMessage());
                 }
             }
 
@@ -190,14 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             exit();
         } catch (Exception $e) {
             if (!$is_test_mode && $subscriber_id) {
-                $stmt = $buwana_conn->prepare(
-                    "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?"
-                );
-                if ($stmt) {
-                    $stmt->bind_param('i', $subscriber_id);
-                    $stmt->execute();
-                    $stmt->close();
-                }
+                error_log('[EARTHEN] ❌ Failed send for ' . $subscriber_id . ': ' . $e->getMessage());
             }
             error_log("[EARTHEN] ❌ Exception: " . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Server error']);
@@ -255,12 +216,14 @@ echo '<!DOCTYPE html>
 <!-- SENDER FORM CONTENT -->
     <div class="form-container" style="padding-top:10px; margin-top: 100px;">
 
+        <!-- Processing chart temporarily disabled
         <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
             <div style="position:relative;">
                 <canvas id="processingChart" width="300" height="300"></canvas>
                 <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;color:grey;"></div>
             </div>
         </div>
+        -->
 
         <?php if ($has_alerts): ?>
         <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
@@ -404,11 +367,7 @@ echo '<!DOCTYPE html>
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-var processingData = <?php echo json_encode($processing_percentages); ?>;
-var unsentPercentage = <?php echo json_encode($unsent_percentage); ?>;
-</script>
+<!-- Processing chart temporarily disabled -->
 <script>
 $(document).ready(function () {
     let recipientEmail = '';
@@ -422,33 +381,7 @@ $(document).ready(function () {
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
-    // Initialize doughnut chart
-    const chartCtx = document.getElementById('processingChart').getContext('2d');
-    new Chart(chartCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Unsent', 'Delivered', 'Sending', 'Failed Immediately', 'Failed Later'],
-            datasets: [{
-                data: [
-                    processingData.unsent,
-                    processingData.delivered,
-                    processingData.sending,
-                    processingData.failed_immediate,
-                    processingData.failed_later
-                ],
-                backgroundColor: ['yellow', 'limegreen', '#90ee90', 'red', '#8b0000'],
-                borderColor: 'transparent',
-                borderWidth: 0
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { position: 'bottom', labels: { color: 'grey' } },
-                tooltip: { bodyColor: 'grey', titleColor: 'grey' }
-            }
-        }
-    });
-    $('#unsent-percentage-label').text(unsentPercentage + '% Unsent');
+    // Processing chart temporarily disabled
 
     // Initialize DataTable for status overview
     const statusTable = $('#email-status-table').DataTable({
