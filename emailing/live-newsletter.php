@@ -1,8 +1,10 @@
 <?php
 
-// Build the unsubscribe link using the recipient's UUID when available.
+// Build the unsubscribe link using the recipient's email when available.
 $recipient_uuid = !empty($recipient_uuid) ? $recipient_uuid : '{{RECIPIENT_UUID}}';
-$unsubscribe_link = "https://earthen.io/unsubscribe/?uuid={$recipient_uuid}&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f";
+$unsubscribe_link = isset($recipient_email)
+    ? "https://gobrik.com/emailing/unsubscribe.php?email=" . urlencode($recipient_email)
+    : "https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f";
 
 $email_template = <<<HTML
 <!doctype html>
@@ -782,7 +784,7 @@ Today, as we become more and more aware of the ecological crises that beset our 
 </html>
 HTML;
 
-$unsubscribe_href = $unsubscribe_link ?: 'https://earthen.io/unsubscribe/?uuid={$recipient_uuid}&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f';
+$unsubscribe_href = $unsubscribe_link ?: 'https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f';
 $email_template = str_replace('{{unsubscribe_link}}', htmlspecialchars($unsubscribe_href, ENT_QUOTES, 'UTF-8'), $email_template);
 
 ?>
