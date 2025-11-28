@@ -348,8 +348,8 @@ echo '<!DOCTYPE html>
         <tbody>
             <?php foreach ($all_members as $member): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($member['name']); ?></td>
-                    <td><?php echo htmlspecialchars($member['email']); ?></td>
+                    <td><?php echo htmlspecialchars($member['name'] ?? ''); ?></td>
+                    <td><?php echo htmlspecialchars($member['email'] ?? ''); ?></td>
                     <td><?php echo $member['email_open_rate'] ?? '0%'; ?></td>
                     <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
                     <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
