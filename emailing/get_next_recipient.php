@@ -49,6 +49,7 @@ try {
                 'id' => $subscriber['id'] ?? null,
                 'email' => $subscriber['email'] ?? '',
                 'name' => $subscriber['name'] ?? '',
+                'uuid' => $subscriber['uuid'] ?? '',
             ],
             'stats' => [
                 'total' => $summary['total'],

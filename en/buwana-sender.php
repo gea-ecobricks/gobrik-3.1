@@ -143,7 +143,7 @@ foreach ($processing_counts as $key => $count) {
 }
 $unsent_percentage = $processing_percentages['unsent'];
 
-require_once 'live-newsletter.php';  //the newsletter html
+require_once '../emailing/live-newsletter.php';  //the newsletter html
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';

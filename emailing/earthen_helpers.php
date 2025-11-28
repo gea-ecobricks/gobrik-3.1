@@ -185,7 +185,7 @@ function fetchGhostMembers(array $params = []): array
         }
     }
 
-    $sql = "SELECT m.id, m.email, m.name, m.created_at, m.updated_at, m.email_count, m.email_opened_count, " .
+    $sql = "SELECT m.id, m.uuid, m.email, m.name, m.created_at, m.updated_at, m.email_count, m.email_opened_count, " .
            "GROUP_CONCAT(DISTINCT l.name) AS label_names, " .
            "GROUP_CONCAT(DISTINCT n.name) AS newsletter_names " .
            "FROM members m " .
@@ -226,6 +226,7 @@ function fetchGhostMembers(array $params = []): array
 
         $members[] = [
             'id'                 => $row['id'] ?? null,
+            'uuid'               => $row['uuid'] ?? null,
             'email'              => $row['email'] ?? null,
             'name'               => $row['name'] ?? null,
             'created_at'         => $row['created_at'] ?? null,

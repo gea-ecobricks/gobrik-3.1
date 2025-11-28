@@ -104,12 +104,14 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 $all_members = array_merge($sent_members, $pending_members);
 
 
-require_once 'live-newsletter.php';  //the newsletter html
+require_once '../emailing/live-newsletter.php';  //the newsletter html
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
     $subscriber_id = isset($_POST['subscriber_id']) ? intval($_POST['subscriber_id']) : null;
+
+    $email_html = personalizeEmailHtml($email_html, $recipient_email);
 
     if (!empty($email_html) && !empty($recipient_email) && $subscriber_id) {
         // The webhook updates members once Mailgun confirms delivery
@@ -134,6 +136,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
         echo json_encode(['success' => false, 'message' => 'Missing recipient or content']);
         exit();
     }
+}
+
+
+function personalizeEmailHtml(string $html, string $recipient_email): string
+{
+    $uuid_placeholder = '{{RECIPIENT_UUID}}';
+    $fallback_uuid = '4dbbb711-73e9-4fd0-9056-a7cc1af6a905';
+
+    $html = str_replace($uuid_placeholder, $fallback_uuid, $html);
+
+    $unsubscribe_url = "https://earthen.io/unsubscribe/?uuid={$fallback_uuid}&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f";
+    $html = preg_replace(
+        '/https:\/\/earthen\.io\/unsubscribe\/\?uuid=[^&\"]+(&key=[^&\"]+)?(&newsletter=[^&\"]+)?/i',
+        $unsubscribe_url,
+        $html
+    );
+
+    if (!empty($recipient_email)) {
+        $gobrik_unsubscribe = 'https://gobrik.com/emailing/unsubscribe.php?email=' . urlencode($recipient_email);
+        $html = preg_replace(
+            '/https:\/\/gobrik\.com\/emailing\/unsubscribe\.php\?email=[^\s"\']+/i',
+            $gobrik_unsubscribe,
+            $html
+        );
+    }
+
+    return $html;
 }
 
 
