@@ -6,6 +6,43 @@
  * - Throws Exceptions on error so caller can log nicely
  */
 
+/**
+ * Load the Ghost stats database connection from the external credential file.
+ *
+ * @return mysqli|null
+ */
+function loadGhostStatsConnection(): ?mysqli
+{
+    $credentialPaths = [
+        dirname(__DIR__) . '/ghostconn_env.php',
+    ];
+
+    if (!empty($_SERVER['DOCUMENT_ROOT'])) {
+        $credentialPaths[] = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/ghostconn_env.php';
+    }
+
+    $ghoststats_conn = null;
+
+    foreach ($credentialPaths as $path) {
+        if (is_readable($path)) {
+            require $path;
+            break;
+        }
+    }
+
+    if (!$ghoststats_conn instanceof mysqli) {
+        error_log('[GHOST STATS] Credential file not found or did not create a mysqli connection.');
+        return null;
+    }
+
+    if ($ghoststats_conn->connect_error) {
+        error_log('[GHOST STATS] DB connection failed: ' . $ghoststats_conn->connect_error);
+        return null;
+    }
+
+    return $ghoststats_conn;
+}
+
 // URL-safe base64 encoder
 function base64UrlEncode($data) {
     return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
