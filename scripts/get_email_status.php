@@ -1,31 +1,33 @@
 <?php
-require_once '../buwanaconn_env.php';
 header('Content-Type: application/json');
+
+require_once '../en/ghost_admin_helpers.php';
 
 try {
     $status_limit = 20;
     $sent_limit = 4;
 
-    $sent_sql = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
-                  FROM earthen_members_tb
-                  WHERE test_sent = 1
-                  ORDER BY test_sent_date_time DESC
-                  LIMIT {$sent_limit}";
-    $sent_res = $buwana_conn->query($sent_sql);
-    $sent_members = $sent_res ? $sent_res->fetch_all(MYSQLI_ASSOC) : [];
-    $sent_count = count($sent_members);
+    $members = fetchGhostMembers();
+    $summary = summarizeGhostMembers($members, 'sent-001');
 
-    $pending_limit = $status_limit - $sent_count;
+    usort($summary['sent'], function ($a, $b) {
+        return strcmp($b['updated_at'] ?? '', $a['updated_at'] ?? '');
+    });
 
-    $pending_sql = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
-                     FROM earthen_members_tb
-                     WHERE test_sent = 0 AND processing IS NULL
-                     ORDER BY created_at ASC
-                     LIMIT {$pending_limit}";
-    $pending_res = $buwana_conn->query($pending_sql);
-    $pending_members = $pending_res ? $pending_res->fetch_all(MYSQLI_ASSOC) : [];
+    usort($summary['pending'], function ($a, $b) {
+        return strcmp($a['created_at'] ?? '', $b['created_at'] ?? '');
+    });
 
-    $all_members = array_merge($sent_members, $pending_members);
+    $sent_members = array_slice($summary['sent'], 0, $sent_limit);
+    $pending_limit = $status_limit - count($sent_members);
+    $pending_members = array_slice($summary['pending'], 0, $pending_limit);
+
+    $all_members = array_map(function ($member) {
+        $member['email_open_rate'] = calculateOpenRate($member);
+        $member['test_sent'] = memberHasLabel($member, 'sent-001');
+        $member['test_sent_date_time'] = $member['updated_at'] ?? 'N/A';
+        return $member;
+    }, array_merge($sent_members, $pending_members));
 
     echo json_encode(['success' => true, 'members' => $all_members]);
 } catch (Exception $e) {
