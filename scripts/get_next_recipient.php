@@ -1,5 +1,6 @@
 <?php
 require_once '../buwanaconn_env.php';
+require_once '../ghostconn_env.php';
 header('Content-Type: application/json');
 session_start();
 
@@ -10,6 +11,7 @@ $response = [
 ];
 
 try {
+    $sent_label_slug = 'sent-001';
     // 🚨 Check for unaddressed alerts first
     $alerts = [];
     $has_alerts = false;
@@ -31,42 +33,48 @@ try {
     }
 
     // 🔒 Begin transaction for safe locking
-    $buwana_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
+    $ghost_conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 
     $sql = "
-        SELECT id, email, name
-        FROM earthen_members_tb
-        WHERE test_sent = 0
-          AND (processing IS NULL OR processing = 0)
-          AND email IS NOT NULL
-          AND email <> ''
-        ORDER BY created_at DESC
+        SELECT m.id, m.email, m.name
+        FROM members m
+        INNER JOIN members_newsletters mn ON mn.member_id = m.id AND mn.subscribed = 1
+        WHERE NOT EXISTS (
+            SELECT 1 FROM members_labels ml
+            INNER JOIN labels l ON l.id = ml.label_id
+            WHERE ml.member_id = m.id AND (l.slug = ? OR l.name = ?)
+        )
+        ORDER BY m.created_at ASC
         LIMIT 1
         FOR UPDATE
     ";
 
-    $result = $buwana_conn->query($sql);
+    $stmt = $ghost_conn->prepare($sql);
+    $stmt->bind_param('ss', $sent_label_slug, $sent_label_slug);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result && $result->num_rows > 0) {
         $subscriber = $result->fetch_assoc();
+        $stmt->close();
+        $ghost_conn->commit();
 
-        // Mark the record as being processed to avoid duplicate fetches
-        $update = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET processing = 1 WHERE id = ?"
-        );
-        if ($update) {
-            $update->bind_param('i', $subscriber['id']);
-            $update->execute();
-            $update->close();
-        }
+        $stats_sql = "SELECT COUNT(DISTINCT m.id) AS total, COUNT(DISTINCT sent.member_id) AS sent
+                      FROM members m
+                      INNER JOIN members_newsletters mn ON mn.member_id = m.id AND mn.subscribed = 1
+                      LEFT JOIN (
+                          SELECT ml.member_id
+                          FROM members_labels ml
+                          INNER JOIN labels l ON l.id = ml.label_id
+                          WHERE l.slug = ? OR l.name = ?
+                      ) AS sent ON sent.member_id = m.id";
+        $stats_stmt = $ghost_conn->prepare($stats_sql);
+        $stats_stmt->bind_param('ss', $sent_label_slug, $sent_label_slug);
+        $stats_stmt->execute();
+        $stats_result = $stats_stmt->get_result();
+        $stats = $stats_result ? $stats_result->fetch_assoc() : ['total' => 0, 'sent' => 0];
+        $stats_stmt->close();
 
-        $buwana_conn->commit();
-
-        // Fetch updated stats
-        $stats_result = $buwana_conn->query(
-            "SELECT COUNT(*) AS total, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent FROM earthen_members_tb"
-        );
-        $stats = $stats_result->fetch_assoc();
         $percentage = ($stats['total'] > 0) ? round(($stats['sent'] / $stats['total']) * 100, 2) : 0;
 
         error_log("[EARTHEN] ✅ LOCKED: {$subscriber['email']}");
@@ -81,7 +89,8 @@ try {
             ]
         ]);
     } else {
-        $buwana_conn->commit();
+        $ghost_conn->commit();
+        $stmt->close();
         echo json_encode([
             'success' => false,
             'message' => 'No more recipients'
@@ -89,7 +98,7 @@ try {
     }
 
 } catch (Exception $e) {
-    $buwana_conn->rollback();
+    $ghost_conn->rollback();
     error_log("[EARTHEN] ❌ ERROR in get-next-recipient: " . $e->getMessage());
 
     echo json_encode([

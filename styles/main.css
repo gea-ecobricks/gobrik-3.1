@@ -795,7 +795,7 @@ Overlay Curtain */
 
 .menu-page-item {
   font-family: 'Mulish';
-  font-size: 1.4em;
+  font-size: 1em;
   color: var(--text-color);
   border-bottom: 1px solid var(--divider-line);
   cursor: pointer;
@@ -2914,7 +2914,7 @@ padding: 10px;
 }
 
 /* Material Design theme for DataTables */
-@import url('https://cdn.datatables.net/plug-ins/1.13.5/integration/material/dataTables.material.min.css');
+@import url('https://cdn.datatables.net/1.13.5/css/dataTables.material.min.css');
 
 /* Dashboard trainer table mobile adjustments */
 @media screen and (max-width: 769px) {

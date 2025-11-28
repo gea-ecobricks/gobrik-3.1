@@ -514,8 +514,8 @@ display: none;
 -->
 
 <div class="menu-page-item">
-  <a href="bug-report.php" data-lang-id="1000-bug-report">
-    Report a Bug
+  <a href="feedback.php" data-lang-id="1000-bug-report">
+    Support Chats
   </a>
   <span class="status-circle" style="background-color: RED;" title="Working."></span>
 </div>

@@ -22,6 +22,7 @@ if ($is_logged_in) {
     // Include database connections
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
+    require_once '../ghostconn_env.php';
 
     // Fetch the user's location data
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
@@ -85,70 +86,162 @@ if ($result->num_rows > 0) {
     }
 }
 
-// Fetch email stats
-$query = "SELECT COUNT(*) AS total_members, SUM(CASE WHEN test_sent = 1 THEN 1 ELSE 0 END) AS sent_count FROM earthen_members_tb";
-$result = $buwana_conn->query($query);
-$row = $result->fetch_assoc();
+// Ghost helpers
+$sent_label_slug = 'sent-001';
 
-$total_members = intval($row['total_members'] ?? 0);
-$sent_count = intval($row['sent_count'] ?? 0);
+function getGhostSubscriberCount($ghost_conn) {
+    $sql = "SELECT COUNT(DISTINCT m.id) AS total_members
+            FROM members m
+            INNER JOIN members_newsletters mn ON mn.member_id = m.id AND mn.subscribed = 1";
+
+    $result = $ghost_conn->query($sql);
+    $row = $result ? $result->fetch_assoc() : ['total_members' => 0];
+
+    return intval($row['total_members'] ?? 0);
+}
+
+function getGhostSentCount($ghost_conn, $label_slug) {
+    $sql = "SELECT COUNT(DISTINCT m.id) AS sent_members
+            FROM members m
+            INNER JOIN members_newsletters mn ON mn.member_id = m.id AND mn.subscribed = 1
+            INNER JOIN members_labels ml ON ml.member_id = m.id
+            INNER JOIN labels l ON l.id = ml.label_id
+            WHERE l.slug = ? OR l.name = ?";
+
+    $stmt = $ghost_conn->prepare($sql);
+    $stmt->bind_param('ss', $label_slug, $label_slug);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result ? $result->fetch_assoc() : ['sent_members' => 0];
+    $stmt->close();
+
+    return intval($row['sent_members'] ?? 0);
+}
+
+function fetchSentMembers($ghost_conn, $label_slug, $limit) {
+    $sql = "SELECT m.id, m.email, m.name, ml.created_at AS test_sent_date_time, 1 AS test_sent
+            FROM members m
+            INNER JOIN members_newsletters mn ON mn.member_id = m.id AND mn.subscribed = 1
+            INNER JOIN members_labels ml ON ml.member_id = m.id
+            INNER JOIN labels l ON l.id = ml.label_id AND (l.slug = ? OR l.name = ?)
+            ORDER BY ml.created_at DESC
+            LIMIT ?";
+
+    $stmt = $ghost_conn->prepare($sql);
+    $stmt->bind_param('ssi', $label_slug, $label_slug, $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $members = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    $stmt->close();
+
+    return $members;
+}
+
+function fetchPendingMembers($ghost_conn, $label_slug, $limit) {
+    $sql = "SELECT m.id, m.email, m.name, NULL AS test_sent_date_time, 0 AS test_sent
+            FROM members m
+            INNER JOIN members_newsletters mn ON mn.member_id = m.id AND mn.subscribed = 1
+            WHERE NOT EXISTS (
+                SELECT 1 FROM members_labels ml
+                INNER JOIN labels l ON l.id = ml.label_id
+                WHERE ml.member_id = m.id AND (l.slug = ? OR l.name = ?)
+            )
+            ORDER BY m.created_at ASC
+            LIMIT ?";
+
+    $stmt = $ghost_conn->prepare($sql);
+    $stmt->bind_param('ssi', $label_slug, $label_slug, $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $members = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    $stmt->close();
+
+    return $members;
+}
+
+function ensureSentLabelId($ghost_conn, $label_slug) {
+    $sql = "SELECT id FROM labels WHERE slug = ? OR name = ? LIMIT 1";
+    $stmt = $ghost_conn->prepare($sql);
+    $stmt->bind_param('ss', $label_slug, $label_slug);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result ? $result->fetch_assoc() : null;
+    $stmt->close();
+
+    if ($row && isset($row['id'])) {
+        return $row['id'];
+    }
+
+    $label_id = bin2hex(random_bytes(12));
+    $insert = $ghost_conn->prepare(
+        "INSERT INTO labels (id, name, slug, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())"
+    );
+    $insert->bind_param('sss', $label_id, $label_slug, $label_slug);
+    $insert->execute();
+    $insert->close();
+
+    return $label_id;
+}
+
+function addSentLabelToMember($ghost_conn, $member_id, $label_slug) {
+    $label_id = ensureSentLabelId($ghost_conn, $label_slug);
+
+    $check_sql = "SELECT 1 FROM members_labels ml
+                  INNER JOIN labels l ON l.id = ml.label_id
+                  WHERE ml.member_id = ? AND (l.slug = ? OR l.name = ?)";
+    $check = $ghost_conn->prepare($check_sql);
+    $check->bind_param('sss', $member_id, $label_slug, $label_slug);
+    $check->execute();
+    $check_result = $check->get_result();
+    $exists = $check_result && $check_result->num_rows > 0;
+    $check->close();
+
+    if ($exists) {
+        return;
+    }
+
+    $members_label_id = bin2hex(random_bytes(12));
+    $insert_sql = "INSERT INTO members_labels (id, member_id, label_id, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
+    $insert = $ghost_conn->prepare($insert_sql);
+    $insert->bind_param('sss', $members_label_id, $member_id, $label_id);
+    $insert->execute();
+    $insert->close();
+}
+
+// Fetch email stats and member lists from Ghost
+$total_members = 0;
+$sent_count = 0;
+
+try {
+    $total_members = getGhostSubscriberCount($ghost_conn);
+    $sent_count = getGhostSentCount($ghost_conn, $sent_label_slug);
+} catch (Exception $e) {
+    error_log('Error fetching Ghost stats: ' . $e->getMessage());
+}
+
 $sent_percentage = ($total_members > 0) ? round(($sent_count / $total_members) * 100, 2) : 0;
 
 // Fetch the last four sent members and the remaining pending ones
 $status_limit = 20; // total rows to display in the status table
 $sent_limit = 4;    // number of most recent sent entries
 
-$query_sent = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
-               FROM earthen_members_tb
-               WHERE test_sent = 1
-               ORDER BY test_sent_date_time DESC
-               LIMIT {$sent_limit}";
-$sent_result = $buwana_conn->query($query_sent);
-$sent_members = $sent_result ? $sent_result->fetch_all(MYSQLI_ASSOC) : [];
+$sent_members = fetchSentMembers($ghost_conn, $sent_label_slug, $sent_limit);
 $sent_count = count($sent_members);
 
 $pending_limit = $status_limit - $sent_count;
-
-$query_pending = "SELECT id, email, name, email_open_rate, test_sent, test_sent_date_time
-                  FROM earthen_members_tb
-                  WHERE test_sent = 0 AND processing IS NULL
-                  ORDER BY created_at ASC
-                  LIMIT {$pending_limit}";
-$pending_result = $buwana_conn->query($query_pending);
-$pending_members = $pending_result ? $pending_result->fetch_all(MYSQLI_ASSOC) : [];
+$pending_members = fetchPendingMembers($ghost_conn, $sent_label_slug, $pending_limit);
 
 $all_members = array_merge($sent_members, $pending_members);
 
-// Processing stats for Chart.js
-$processing_query = "SELECT
-    SUM(CASE WHEN processing IS NULL THEN 1 ELSE 0 END) AS null_count,
-    SUM(CASE WHEN processing = 0 THEN 1 ELSE 0 END) AS delivered_count,
-    SUM(CASE WHEN processing = 1 THEN 1 ELSE 0 END) AS sending_count,
-    SUM(CASE WHEN processing = 2 THEN 1 ELSE 0 END) AS failed_immediate_count,
-    SUM(CASE WHEN processing = 3 THEN 1 ELSE 0 END) AS failed_later_count
-    FROM earthen_members_tb";
-$proc_result = $buwana_conn->query($processing_query);
-$proc_row = $proc_result->fetch_assoc();
-$processing_counts = [
-    'unsent' => intval($proc_row['null_count'] ?? 0),
-    'delivered' => intval($proc_row['delivered_count'] ?? 0),
-    'sending' => intval($proc_row['sending_count'] ?? 0),
-    'failed_immediate' => intval($proc_row['failed_immediate_count'] ?? 0),
-    'failed_later' => intval($proc_row['failed_later_count'] ?? 0)
-];
-
 $processing_percentages = [];
-foreach ($processing_counts as $key => $count) {
-    $processing_percentages[$key] = ($total_members > 0) ? round(($count / $total_members) * 100, 2) : 0;
-}
-$unsent_percentage = $processing_percentages['unsent'];
+$unsent_percentage = 0;
 
 require_once 'live-newsletter.php';  //the newsletter html
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
-    $subscriber_id = isset($_POST['subscriber_id']) ? intval($_POST['subscriber_id']) : null;
+    $subscriber_id = $_POST['subscriber_id'] ?? null;
     $is_test_mode = isset($_POST['test_mode']) && $_POST['test_mode'] == '1';
 
     if (!empty($email_html) && !empty($recipient_email) && ($subscriber_id || $is_test_mode)) {
@@ -158,24 +251,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             error_log("[EARTHEN] → Sending " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
             $send_ok = sendEmail($recipient_email, $email_html);
 
-            if ($subscriber_id && !$is_test_mode) {
-                if ($send_ok) {
-                    // Mark as sent and processing (sending)
-                    $stmt = $buwana_conn->prepare(
-                        "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 1 WHERE id = ?"
-                    );
-                } else {
-                    // Mark attempt but leave processing NULL
-                    $stmt = $buwana_conn->prepare(
-                        "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?"
-                    );
-                }
-
-                if ($stmt) {
-                    $stmt->bind_param('i', $subscriber_id);
-                    $stmt->execute();
-                    $stmt->close();
-                }
+            if ($subscriber_id && !$is_test_mode && $send_ok) {
+                addSentLabelToMember($ghost_conn, $subscriber_id, $sent_label_slug);
             }
 
             if ($send_ok) {
@@ -189,16 +266,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             echo json_encode(['success' => $send_ok, 'message' => $send_ok ? '' : 'Sending failed']);
             exit();
         } catch (Exception $e) {
-            if (!$is_test_mode && $subscriber_id) {
-                $stmt = $buwana_conn->prepare(
-                    "UPDATE earthen_members_tb SET test_sent = 1, test_sent_date_time = NOW() WHERE id = ?"
-                );
-                if ($stmt) {
-                    $stmt->bind_param('i', $subscriber_id);
-                    $stmt->execute();
-                    $stmt->close();
-                }
-            }
             error_log("[EARTHEN] ❌ Exception: " . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Server error']);
             exit();
@@ -255,12 +322,12 @@ echo '<!DOCTYPE html>
 <!-- SENDER FORM CONTENT -->
     <div class="form-container" style="padding-top:10px; margin-top: 100px;">
 
-        <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
+<!--        <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
             <div style="position:relative;">
                 <canvas id="processingChart" width="300" height="300"></canvas>
                 <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;color:grey;"></div>
             </div>
-        </div>
+        </div>-->
 
         <?php if ($has_alerts): ?>
         <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
@@ -404,11 +471,11 @@ echo '<!DOCTYPE html>
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-var processingData = <?php echo json_encode($processing_percentages); ?>;
-var unsentPercentage = <?php echo json_encode($unsent_percentage); ?>;
-</script>
+var processingData = <?php echo json_encode($processing_percentages ?? []); ?>;
+var unsentPercentage = <?php echo json_encode($unsent_percentage ?? 0); ?>;
+</script> -->
 <script>
 $(document).ready(function () {
     let recipientEmail = '';
@@ -422,33 +489,33 @@ $(document).ready(function () {
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
-    // Initialize doughnut chart
-    const chartCtx = document.getElementById('processingChart').getContext('2d');
-    new Chart(chartCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Unsent', 'Delivered', 'Sending', 'Failed Immediately', 'Failed Later'],
-            datasets: [{
-                data: [
-                    processingData.unsent,
-                    processingData.delivered,
-                    processingData.sending,
-                    processingData.failed_immediate,
-                    processingData.failed_later
-                ],
-                backgroundColor: ['yellow', 'limegreen', '#90ee90', 'red', '#8b0000'],
-                borderColor: 'transparent',
-                borderWidth: 0
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { position: 'bottom', labels: { color: 'grey' } },
-                tooltip: { bodyColor: 'grey', titleColor: 'grey' }
-            }
-        }
-    });
-    $('#unsent-percentage-label').text(unsentPercentage + '% Unsent');
+    // Chart temporarily disabled
+    // const chartCtx = document.getElementById('processingChart').getContext('2d');
+    // new Chart(chartCtx, {
+    //     type: 'doughnut',
+    //     data: {
+    //         labels: ['Unsent', 'Delivered', 'Sending', 'Failed Immediately', 'Failed Later'],
+    //         datasets: [{
+    //             data: [
+    //                 processingData.unsent,
+    //                 processingData.delivered,
+    //                 processingData.sending,
+    //                 processingData.failed_immediate,
+    //                 processingData.failed_later
+    //             ],
+    //             backgroundColor: ['yellow', 'limegreen', '#90ee90', 'red', '#8b0000'],
+    //             borderColor: 'transparent',
+    //             borderWidth: 0
+    //         }]
+    //     },
+    //     options: {
+    //         plugins: {
+    //             legend: { position: 'bottom', labels: { color: 'grey' } },
+    //             tooltip: { bodyColor: 'grey', titleColor: 'grey' }
+    //         }
+    //     }
+    // });
+    // $('#unsent-percentage-label').text(unsentPercentage + '% Unsent');
 
     // Initialize DataTable for status overview
     const statusTable = $('#email-status-table').DataTable({
