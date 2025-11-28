@@ -258,16 +258,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 
 function resolveMemberIdByEmail(string $email): ?int
 {
-    global $buwana_conn;
+    global $gobrik_conn;
 
-    if (!isset($buwana_conn)) {
+    if (!isset($gobrik_conn)) {
         return null;
     }
 
-    $stmt = $buwana_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
+    $stmt = $gobrik_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
 
     if (!$stmt) {
-        error_log('[EARTHEN] Failed to prepare member lookup: ' . $buwana_conn->error);
+        error_log('[EARTHEN] Failed to prepare member lookup: ' . $gobrik_conn->error);
         return null;
     }
 
@@ -282,9 +282,9 @@ function resolveMemberIdByEmail(string $email): ?int
 
 function logFailedEmail(string $email, string $reason): void
 {
-    global $buwana_conn;
+    global $gobrik_conn;
 
-    if (!isset($buwana_conn)) {
+    if (!isset($gobrik_conn)) {
         error_log('[EARTHEN] No DB connection available to log failed email.');
         return;
     }
@@ -292,7 +292,7 @@ function logFailedEmail(string $email, string $reason): void
     $member_id = resolveMemberIdByEmail($email);
     $event_timestamp = date('Y-m-d H:i:s');
 
-    $stmt = $buwana_conn->prepare(
+    $stmt = $gobrik_conn->prepare(
         "INSERT INTO earthen_mailgun_events_tb (
             member_id,
             recipient_email,
@@ -305,7 +305,7 @@ function logFailedEmail(string $email, string $reason): void
     );
 
     if (!$stmt) {
-        error_log('[EARTHEN] Failed to prepare earthen_mailgun_events_tb insert: ' . $buwana_conn->error);
+        error_log('[EARTHEN] Failed to prepare earthen_mailgun_events_tb insert: ' . $gobrik_conn->error);
         return;
     }
 

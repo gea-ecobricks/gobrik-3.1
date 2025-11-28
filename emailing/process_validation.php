@@ -1,5 +1,6 @@
 <?php
-require_once '../buwanaconn_env.php'; // Load database credentials
+require_once '../gobrikconn_env.php'; // Gobrik database (for Mailgun logging)
+require_once '../buwanaconn_env.php'; // Buwana database
 require_once 'validate_functions.php'; // Include validation functions
 
 function logValidationFailure(mysqli $conn, string $email, string $reason): void
@@ -29,8 +30,8 @@ function logValidationFailure(mysqli $conn, string $email, string $reason): void
     $stmt->close();
 }
 
-// Ensure database connection exists
-if (!isset($buwana_conn)) {
+// Ensure database connections exist
+if (!isset($gobrik_conn) || !isset($buwana_conn)) {
     die(json_encode(["error" => "Database connection not established"]));
 }
 
@@ -58,7 +59,7 @@ if (!$validation['valid']) {
 
 // Insert failed email into earthen_mailgun_events_tb (if invalid)
 if ($failed_reason) {
-    logValidationFailure($buwana_conn, $email, $failed_reason);
+    logValidationFailure($gobrik_conn, $email, $failed_reason);
 
     // Delete invalid email from ghost_test_email_tb
     $delete_sql = "DELETE FROM ghost_test_email_tb WHERE id = ?";

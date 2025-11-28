@@ -3,8 +3,8 @@ header('Content-Type: application/json');
 require_once '../scripts/earthen_subscribe_functions.php';
 
 // Include database connection setups
-require_once '../gobrikconn_env.php';  // Gobrik DB (for tb_ecobrickers)
-require_once '../buwanaconn_env.php';  // Buwana DB (for mailgun logging, admin_alerts)
+require_once '../gobrikconn_env.php';  // Gobrik DB (for tb_ecobrickers, mailgun logging)
+require_once '../buwanaconn_env.php';  // Buwana DB (for admin_alerts)
 
 function resolveMemberIdByEmail(mysqli $conn, string $email): ?int
 {
@@ -184,13 +184,13 @@ try {
     $basic_mailgun_status = $data['event-data']['event'] ?? 'unknown';
     $email_subject = $data['event-data']['message']['headers']['subject'] ?? 'No Subject';
     $response_message = $data['event-data']['delivery-status']['message'] ?? 'No response message';
-    $member_id = resolveMemberIdByEmail($buwana_conn, $email_addr);
+    $member_id = resolveMemberIdByEmail($gobrik_conn, $email_addr);
 
     // Log a concise summary of the event
     $log_message = "📬 Mailgun Event: '$email_subject' to $email_addr was sent on $timestamp and returned: \"$response_message\"";
     error_log($log_message);
 
-    logMailgunEvent($buwana_conn, $member_id, $email_addr, $data['event-data'] ?? []);
+    logMailgunEvent($gobrik_conn, $member_id, $email_addr, $data['event-data'] ?? []);
 
     // 🚨 Detect and log rate limiting issues 🚨
 if (stripos($response_message, "rate limited") !== false || stripos($response_message, "throttled") !== false) {
