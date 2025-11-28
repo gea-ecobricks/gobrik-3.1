@@ -1,6 +1,6 @@
 <?php
 require_once '../buwanaconn_env.php';
-require_once '../en/ghost_admin_helpers.php';
+require_once __DIR__ . '/earthen_helpers.php';
 header('Content-Type: application/json');
 session_start();
 

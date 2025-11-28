@@ -66,7 +66,7 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 }
 
 require_once '../buwanaconn_env.php';
-require_once 'ghost_admin_helpers.php';
+require_once '../emailing/earthen_helpers.php';
 
 // Default newsletter headers
 $email_from = 'Earthen <earthen@ecobricks.org>';
@@ -393,7 +393,7 @@ $(document).ready(function () {
     $("div.dataTables_filter input").attr('placeholder', 'Search emails...');
 
     function refreshStatusTable() {
-        $.getJSON('../scripts/get_email_status.php', function(resp) {
+        $.getJSON('../emailing/get_email_status.php', function(resp) {
             if (resp.success) {
                 const rows = resp.members.map(m => [
                     m.name,
@@ -472,7 +472,7 @@ $(document).ready(function () {
     // 🟢 Fetch next recipient via AJAX
 function fetchNextRecipient() {
     $.ajax({
-        url: '../scripts/get_next_recipient.php',
+        url: '../emailing/get_next_recipient.php',
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -521,7 +521,7 @@ function fetchNextRecipient() {
 
     function logError(message) {
         console.error(message);
-        $.post('../scripts/log_sender_error.php', {message});
+        $.post('../emailing/log_sender_error.php', {message});
     }
 
     function handleSendError(msg) {
@@ -641,7 +641,7 @@ function sendEmail() {
             return;
         }
         $.ajax({
-            url: '../scripts/reset_admin_alerts.php',
+            url: '../emailing/reset_admin_alerts.php',
             type: 'POST',
             dataType: 'json',
             success: function (resp) {

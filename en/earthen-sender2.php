@@ -321,7 +321,7 @@ $(document).ready(function () {
     // 🟢 Fetch next recipient via AJAX
     function fetchNextRecipient(thenAutoSend = false) {
         $.ajax({
-            url: 'get_next_recipient.php',
+            url: '../emailing/get_next_recipient.php',
             type: 'GET',
             dataType: 'json',
             success: function (response) {

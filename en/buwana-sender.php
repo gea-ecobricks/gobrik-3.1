@@ -593,7 +593,7 @@ function fetchNextRecipient() {
 
     function logError(message) {
         console.error(message);
-        $.post('../scripts/log_sender_error.php', {message});
+        $.post('../emailing/log_sender_error.php', {message});
     }
 
     function handleSendError(msg) {
@@ -718,7 +718,7 @@ function sendEmail() {
             return;
         }
         $.ajax({
-            url: '../scripts/reset_admin_alerts.php',
+            url: '../emailing/reset_admin_alerts.php',
             type: 'POST',
             dataType: 'json',
             success: function (resp) {

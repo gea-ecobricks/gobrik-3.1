@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-require_once '../en/ghost_admin_helpers.php';
+require_once __DIR__ . '/earthen_helpers.php';
 
 try {
     $status_limit = 20;
