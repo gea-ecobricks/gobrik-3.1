@@ -145,76 +145,103 @@ function createGhostJWT() {
 }
 
 /**
- * Fetch Ghost members using the Admin API.
+ * Fetch Ghost members directly from the stats database instead of the Admin API.
  *
- * @param array $params Additional query params (limit, filter, etc.)
- * @return array Decoded members array (may be empty)
- * @throws Exception on HTTP or curl error
+ * Supported params (minimal, to satisfy existing callers):
+ * - limit: maximum rows to return (defaults to 1000)
+ * - filter: only supports "id:<value>" or "email:<value>" filters
+ *
+ * @param array $params
+ * @return array Member rows with labels/newsletters expanded
+ * @throws Exception when the database connection or query fails
  */
 function fetchGhostMembers(array $params = []): array
 {
-    $jwt     = createGhostJWT();
-    $baseUrl = 'https://earthen.io/ghost/api/v4/admin/members/';
+    $conn = loadGhostStatsConnection();
 
-    $defaultParams = [
-        // Ghost enforces pagination limits; stay at or below 100 per request.
-        'limit'   => 100,
-        'include' => 'newsletters,labels',
-    ];
-
-    if (isset($params['limit'])) {
-        $params['limit'] = min(100, (int) $params['limit']);
+    if (!$conn) {
+        throw new Exception('Ghost stats database connection unavailable.');
     }
 
-    // If a specific page was requested, respect it and avoid pagination.
-    $respectPage = array_key_exists('page', $params);
-    $page        = $respectPage ? (int) $params['page'] : 1;
-    unset($params['page']);
+    $limit = isset($params['limit']) ? max(1, (int) $params['limit']) : 1000;
 
+    $filters   = [];
+    $bindTypes = '';
+    $bindVars  = [];
+
+    if (!empty($params['filter'])) {
+        $filter = $params['filter'];
+
+        if (preg_match('/^id:(.+)$/', $filter, $matches)) {
+            $filters[]  = 'm.id = ?';
+            $bindTypes .= 's';
+            $bindVars[] = $matches[1];
+        } elseif (preg_match('/^email:(.+)$/', $filter, $matches)) {
+            $filters[]  = 'm.email = ?';
+            $bindTypes .= 's';
+            $bindVars[] = $matches[1];
+        } else {
+            throw new Exception('Unsupported filter format for fetchGhostMembers.');
+        }
+    }
+
+    $sql = "SELECT m.id, m.email, m.name, m.created_at, m.updated_at, m.email_count, m.email_opened_count, " .
+           "GROUP_CONCAT(DISTINCT l.name) AS label_names, " .
+           "GROUP_CONCAT(DISTINCT n.name) AS newsletter_names " .
+           "FROM members m " .
+           "LEFT JOIN members_labels ml ON m.id = ml.member_id " .
+           "LEFT JOIN labels l ON ml.label_id = l.id " .
+           "LEFT JOIN members_newsletters mn ON m.id = mn.member_id " .
+           "LEFT JOIN newsletters n ON mn.newsletter_id = n.id";
+
+    if (!empty($filters)) {
+        $sql .= ' WHERE ' . implode(' AND ', $filters);
+    }
+
+    $sql .= ' GROUP BY m.id ORDER BY m.created_at ASC LIMIT ?';
+
+    $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        throw new Exception('Failed to prepare Ghost member query: ' . $conn->error);
+    }
+
+    $bindTypes .= 'i';
+    $bindVars[] = $limit;
+
+    $stmt->bind_param($bindTypes, ...$bindVars);
+
+    if (!$stmt->execute()) {
+        $error = $stmt->error ?: 'Unknown execution error';
+        $stmt->close();
+        throw new Exception('Failed to execute Ghost member query: ' . $error);
+    }
+
+    $result = $stmt->get_result();
     $members = [];
 
-    do {
-        $query = http_build_query(array_merge($defaultParams, $params, ['page' => $page]));
-        $url   = $baseUrl . '?' . $query;
+    while ($row = $result->fetch_assoc()) {
+        $labelNames = array_filter(array_map('trim', explode(',', $row['label_names'] ?? '')));
+        $newsletterNames = array_filter(array_map('trim', explode(',', $row['newsletter_names'] ?? '')));
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: Ghost ' . $jwt,
-            'Content-Type: application/json',
-        ]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $members[] = [
+            'id'                 => $row['id'] ?? null,
+            'email'              => $row['email'] ?? null,
+            'name'               => $row['name'] ?? null,
+            'created_at'         => $row['created_at'] ?? null,
+            'updated_at'         => $row['updated_at'] ?? null,
+            'email_count'        => isset($row['email_count']) ? (int) $row['email_count'] : 0,
+            'email_opened_count' => isset($row['email_opened_count']) ? (int) $row['email_opened_count'] : 0,
+            'labels'             => array_map(function ($name) {
+                return ['name' => $name];
+            }, $labelNames),
+            'newsletters'        => array_map(function ($name) {
+                return ['name' => $name];
+            }, $newsletterNames),
+        ];
+    }
 
-        $response  = curl_exec($ch);
-        $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-
-        curl_close($ch);
-
-        if ($curlError) {
-            throw new Exception('Curl error: ' . $curlError);
-        }
-
-        if ($httpCode < 200 || $httpCode >= 300) {
-            throw new Exception('Ghost API request failed with status ' . $httpCode . ': ' . $response);
-        }
-
-        $data = json_decode($response, true);
-
-        if (!empty($data['members'])) {
-            $members = array_merge($members, $data['members']);
-        }
-
-        // Stop paginating if caller asked for a single page.
-        if ($respectPage) {
-            break;
-        }
-
-        $pagination = $data['meta']['pagination'] ?? [];
-        $nextPage   = $pagination['next'] ?? null;
-        $page       = $nextPage ?? null;
-
-    } while ($page);
+    $stmt->close();
 
     return $members;
 }
