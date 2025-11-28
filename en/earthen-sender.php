@@ -22,7 +22,6 @@ if ($is_logged_in) {
     // Include database connections
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
-    require_once '../emailing/ghoststats_env.php';
 
     // Fetch the user's location data
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
@@ -68,6 +67,8 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 
 require_once '../buwanaconn_env.php';
 require_once '../emailing/earthen_helpers.php';
+
+$ghoststats_conn = loadGhostStatsConnection();
 
 // Default newsletter headers
 $email_from = 'Earthen <earthen@ecobricks.org>';
