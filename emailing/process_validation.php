@@ -2,6 +2,33 @@
 require_once '../buwanaconn_env.php'; // Load database credentials
 require_once 'validate_functions.php'; // Include validation functions
 
+function logValidationFailure(mysqli $conn, string $email, string $reason): void
+{
+    $event_timestamp = date('Y-m-d H:i:s');
+    $stmt = $conn->prepare(
+        "INSERT INTO earthen_mailgun_events_tb (
+            recipient_email,
+            event_type,
+            event_timestamp,
+            severity,
+            reason,
+            error_message
+        ) VALUES (?, 'validation_failed', ?, 'temporary', 'validation_failed', ?)"
+    );
+
+    if (!$stmt) {
+        die(json_encode(["error" => "Insert failed: " . $conn->error]));
+    }
+
+    $stmt->bind_param("sss", $email, $event_timestamp, $reason);
+
+    if (!$stmt->execute()) {
+        die(json_encode(["error" => "Insert failed: " . $stmt->error]));
+    }
+
+    $stmt->close();
+}
+
 // Ensure database connection exists
 if (!isset($buwana_conn)) {
     die(json_encode(["error" => "Database connection not established"]));
@@ -29,14 +56,9 @@ if (!$validation['valid']) {
     $failed_reason = "Nonexistent domain";
 }
 
-// Insert failed email into failed_emails_tb (if invalid)
+// Insert failed email into earthen_mailgun_events_tb (if invalid)
 if ($failed_reason) {
-    $stmt = $buwana_conn->prepare("INSERT INTO failed_emails_tb (email_addr, fail_reason) VALUES (?, ?)");
-    $stmt->bind_param("ss", $email, $failed_reason);
-    if (!$stmt->execute()) {
-        die(json_encode(["error" => "Insert failed: " . $stmt->error]));
-    }
-    $stmt->close();
+    logValidationFailure($buwana_conn, $email, $failed_reason);
 
     // Delete invalid email from ghost_test_email_tb
     $delete_sql = "DELETE FROM ghost_test_email_tb WHERE id = ?";

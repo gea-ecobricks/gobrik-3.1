@@ -161,13 +161,33 @@ try {
     $all_members = [];
 }
 
-require_once 'live-newsletter.php';  //the newsletter html
+require_once '../emailing/live-newsletter.php';  //the newsletter html
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
     $recipient_email = $_POST['email_to'] ?? '';
     $subscriber_id = $_POST['subscriber_id'] ?? null;
     $is_test_mode = isset($_POST['test_mode']) && $_POST['test_mode'] == '1';
+
+    $recipient_uuid = null;
+
+    if ($subscriber_id) {
+        try {
+            $member_details = fetchGhostMembers([
+                'limit' => 1,
+                'filter' => "id:$subscriber_id",
+            ]);
+
+            if (!empty($member_details)) {
+                $recipient_uuid = $member_details[0]['uuid'] ?? null;
+                $recipient_email = $recipient_email ?: ($member_details[0]['email'] ?? '');
+            }
+        } catch (Exception $memberException) {
+            error_log('[EARTHEN] Unable to fetch member details: ' . $memberException->getMessage());
+        }
+    }
+
+    $email_html = personalizeEmailHtml($email_html, $recipient_uuid, $recipient_email);
 
     if (!empty($email_html) && !empty($recipient_email) && ($subscriber_id || $is_test_mode)) {
         // The webhook previously confirmed sends, now we update immediately
@@ -216,6 +236,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 }
 
 
+function resolveMemberIdByEmail(string $email): ?int
+{
+    global $buwana_conn;
+
+    if (!isset($buwana_conn)) {
+        return null;
+    }
+
+    $stmt = $buwana_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
+
+    if (!$stmt) {
+        error_log('[EARTHEN] Failed to prepare member lookup: ' . $buwana_conn->error);
+        return null;
+    }
+
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $stmt->bind_result($member_id);
+    $found = $stmt->fetch();
+    $stmt->close();
+
+    return $found ? (int) $member_id : null;
+}
+
 function logFailedEmail(string $email, string $reason): void
 {
     global $buwana_conn;
@@ -225,20 +269,60 @@ function logFailedEmail(string $email, string $reason): void
         return;
     }
 
-    $stmt = $buwana_conn->prepare("INSERT INTO failed_emails_tb (email_addr, fail_reason) VALUES (?, ?)");
+    $member_id = resolveMemberIdByEmail($email);
+    $event_timestamp = date('Y-m-d H:i:s');
+
+    $stmt = $buwana_conn->prepare(
+        "INSERT INTO earthen_mailgun_events_tb (
+            member_id,
+            recipient_email,
+            event_type,
+            event_timestamp,
+            severity,
+            reason,
+            error_message
+        ) VALUES (?, ?, 'send_error', ?, 'temporary', 'send_error', ?)"
+    );
 
     if (!$stmt) {
-        error_log('[EARTHEN] Failed to prepare failed_emails_tb insert: ' . $buwana_conn->error);
+        error_log('[EARTHEN] Failed to prepare earthen_mailgun_events_tb insert: ' . $buwana_conn->error);
         return;
     }
 
-    $stmt->bind_param('ss', $email, $reason);
+    $stmt->bind_param('isss', $member_id, $email, $event_timestamp, $reason);
 
     if (!$stmt->execute()) {
         error_log('[EARTHEN] Failed to log email failure: ' . $stmt->error);
     }
 
     $stmt->close();
+}
+
+function personalizeEmailHtml(string $html, ?string $recipient_uuid, string $recipient_email): string
+{
+    $uuid_placeholder = '{{RECIPIENT_UUID}}';
+    $fallback_uuid = '4dbbb711-73e9-4fd0-9056-a7cc1af6a905';
+    $uuid = $recipient_uuid ?: $fallback_uuid;
+
+    $html = str_replace($uuid_placeholder, $uuid, $html);
+
+    $unsubscribe_url = "https://earthen.io/unsubscribe/?uuid={$uuid}&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f";
+    $html = preg_replace(
+        '/https:\/\/earthen\.io\/unsubscribe\/\?uuid=[^&\"]+(&key=[^&\"]+)?(&newsletter=[^&\"]+)?/i',
+        $unsubscribe_url,
+        $html
+    );
+
+    if (!empty($recipient_email)) {
+        $gobrik_unsubscribe = 'https://gobrik.com/emailing/unsubscribe.php?email=' . urlencode($recipient_email);
+        $html = preg_replace(
+            '/https:\/\/gobrik\.com\/emailing\/unsubscribe\.php\?email=[^\s"\']+/i',
+            $gobrik_unsubscribe,
+            $html
+        );
+    }
+
+    return $html;
 }
 
 
