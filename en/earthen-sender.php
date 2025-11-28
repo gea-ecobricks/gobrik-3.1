@@ -161,6 +161,26 @@ try {
     $all_members = [];
 }
 
+// Mailgun event breakdown for processing chart
+$mailgun_status_counts = [];
+$mailgun_total_events = 0;
+$mailgun_status_query = "SELECT COALESCE(event_type, 'unknown') AS status, COUNT(*) AS count FROM earthen_mailgun_events_tb GROUP BY status ORDER BY status";
+$mailgun_status_result = $gobrik_conn->query($mailgun_status_query);
+
+if ($mailgun_status_result) {
+    while ($row = $mailgun_status_result->fetch_assoc()) {
+        $status = $row['status'] ?: 'unknown';
+        $count = (int) ($row['count'] ?? 0);
+        $mailgun_status_counts[$status] = $count;
+        $mailgun_total_events += $count;
+    }
+    $mailgun_status_result->free();
+}
+
+if (empty($mailgun_status_counts)) {
+    $mailgun_status_counts = ['no data' => 0];
+}
+
 require_once '../emailing/live-newsletter.php';  //the newsletter html
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
@@ -238,16 +258,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 
 function resolveMemberIdByEmail(string $email): ?int
 {
-    global $buwana_conn;
+    global $gobrik_conn;
 
-    if (!isset($buwana_conn)) {
+    if (!isset($gobrik_conn)) {
         return null;
     }
 
-    $stmt = $buwana_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
+    $stmt = $gobrik_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
 
     if (!$stmt) {
-        error_log('[EARTHEN] Failed to prepare member lookup: ' . $buwana_conn->error);
+        error_log('[EARTHEN] Failed to prepare member lookup: ' . $gobrik_conn->error);
         return null;
     }
 
@@ -262,9 +282,9 @@ function resolveMemberIdByEmail(string $email): ?int
 
 function logFailedEmail(string $email, string $reason): void
 {
-    global $buwana_conn;
+    global $gobrik_conn;
 
-    if (!isset($buwana_conn)) {
+    if (!isset($gobrik_conn)) {
         error_log('[EARTHEN] No DB connection available to log failed email.');
         return;
     }
@@ -272,7 +292,7 @@ function logFailedEmail(string $email, string $reason): void
     $member_id = resolveMemberIdByEmail($email);
     $event_timestamp = date('Y-m-d H:i:s');
 
-    $stmt = $buwana_conn->prepare(
+    $stmt = $gobrik_conn->prepare(
         "INSERT INTO earthen_mailgun_events_tb (
             member_id,
             recipient_email,
@@ -285,7 +305,7 @@ function logFailedEmail(string $email, string $reason): void
     );
 
     if (!$stmt) {
-        error_log('[EARTHEN] Failed to prepare earthen_mailgun_events_tb insert: ' . $buwana_conn->error);
+        error_log('[EARTHEN] Failed to prepare earthen_mailgun_events_tb insert: ' . $gobrik_conn->error);
         return;
     }
 
@@ -306,21 +326,22 @@ function personalizeEmailHtml(string $html, ?string $recipient_uuid, string $rec
 
     $html = str_replace($uuid_placeholder, $uuid, $html);
 
-    $unsubscribe_url = "https://earthen.io/unsubscribe/?uuid={$uuid}&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f";
+    $fallback_unsubscribe = 'https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f';
+    $unsubscribe_url = !empty($recipient_email)
+        ? 'https://gobrik.com/emailing/unsubscribe.php?email=' . urlencode($recipient_email)
+        : $fallback_unsubscribe;
+
+    $html = preg_replace(
+        '/https:\/\/gobrik\.com\/emailing\/unsubscribe\.php\?email=[^\s"\']+/i',
+        $unsubscribe_url,
+        $html
+    );
+
     $html = preg_replace(
         '/https:\/\/earthen\.io\/unsubscribe\/\?uuid=[^&\"]+(&key=[^&\"]+)?(&newsletter=[^&\"]+)?/i',
         $unsubscribe_url,
         $html
     );
-
-    if (!empty($recipient_email)) {
-        $gobrik_unsubscribe = 'https://gobrik.com/emailing/unsubscribe.php?email=' . urlencode($recipient_email);
-        $html = preg_replace(
-            '/https:\/\/gobrik\.com\/emailing\/unsubscribe\.php\?email=[^\s"\']+/i',
-            $gobrik_unsubscribe,
-            $html
-        );
-    }
 
     return $html;
 }
@@ -371,14 +392,12 @@ echo '<!DOCTYPE html>
 <!-- SENDER FORM CONTENT -->
     <div class="form-container" style="padding-top:10px; margin-top: 100px;">
 
-        <!-- Processing chart temporarily disabled
         <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
             <div style="position:relative;">
                 <canvas id="processingChart" width="300" height="300"></canvas>
                 <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;color:grey;"></div>
             </div>
         </div>
-        -->
 
         <?php if ($has_alerts): ?>
         <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
@@ -522,7 +541,7 @@ echo '<!DOCTYPE html>
 
 
 
-<!-- Processing chart temporarily disabled -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 $(document).ready(function () {
     let recipientEmail = '';
@@ -536,7 +555,36 @@ $(document).ready(function () {
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
 
-    // Processing chart temporarily disabled
+    const mailgunStatusLabels = <?php echo json_encode(array_keys($mailgun_status_counts)); ?>;
+    const mailgunStatusCounts = <?php echo json_encode(array_values($mailgun_status_counts)); ?>;
+    const mailgunTotalEvents = <?php echo json_encode($mailgun_total_events); ?>;
+
+    const chartCtx = document.getElementById('processingChart');
+    if (chartCtx && typeof Chart !== 'undefined') {
+        const palette = ['#4caf50', '#2196f3', '#ff9800', '#9c27b0', '#f44336', '#03a9f4', '#8bc34a', '#ffeb3b'];
+        const backgroundColors = mailgunStatusLabels.map((_, idx) => palette[idx % palette.length]);
+
+        new Chart(chartCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: mailgunStatusLabels,
+                datasets: [{
+                    data: mailgunStatusCounts,
+                    backgroundColor: backgroundColors,
+                    borderColor: 'transparent',
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: 'grey' } },
+                    tooltip: { bodyColor: 'grey', titleColor: 'grey' }
+                }
+            }
+        });
+
+        $('#unsent-percentage-label').text(`${mailgunTotalEvents} events`);
+    }
 
     // Initialize DataTable for status overview
     const statusTable = $('#email-status-table').DataTable({
