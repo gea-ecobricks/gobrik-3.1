@@ -187,6 +187,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             if ($send_ok) {
                 error_log("[EARTHEN] ✅ Mailgun accepted " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
             } else {
+                if (!$is_test_mode && !empty($recipient_email)) {
+                    logFailedEmail($recipient_email, 'Mailgun send failure');
+                }
                 error_log("[EARTHEN] ❌ Failed to send " . ($is_test_mode ? 'TEST ' : '') . "{$recipient_email} by " . session_id());
             }
 
@@ -198,6 +201,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
             if (!$is_test_mode && $subscriber_id) {
                 error_log('[EARTHEN] ❌ Failed send for ' . $subscriber_id . ': ' . $e->getMessage());
             }
+            if (!$is_test_mode && !empty($recipient_email)) {
+                logFailedEmail($recipient_email, $e->getMessage());
+            }
             error_log("[EARTHEN] ❌ Exception: " . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Server error']);
             exit();
@@ -207,6 +213,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
         echo json_encode(['success' => false, 'message' => 'Missing recipient or content']);
         exit();
     }
+}
+
+
+function logFailedEmail(string $email, string $reason): void
+{
+    global $buwana_conn;
+
+    if (!isset($buwana_conn)) {
+        error_log('[EARTHEN] No DB connection available to log failed email.');
+        return;
+    }
+
+    $stmt = $buwana_conn->prepare("INSERT INTO failed_emails_tb (email_addr, fail_reason) VALUES (?, ?)");
+
+    if (!$stmt) {
+        error_log('[EARTHEN] Failed to prepare failed_emails_tb insert: ' . $buwana_conn->error);
+        return;
+    }
+
+    $stmt->bind_param('ss', $email, $reason);
+
+    if (!$stmt->execute()) {
+        error_log('[EARTHEN] Failed to log email failure: ' . $stmt->error);
+    }
+
+    $stmt->close();
 }
 
 
@@ -223,6 +255,7 @@ function sendEmail($to, $htmlBody) {
         'form_params' => [
             'from' => $email_from,
             'to' => $to,
+            'bcc' => 'russmaier@gmail.com',
             'subject' => $email_subject,
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
