@@ -157,10 +157,14 @@ function fetchGhostMembers(array $params = []): array
     $baseUrl = 'https://earthen.io/ghost/api/v4/admin/members/';
 
     $defaultParams = [
-        // Ghost enforces pagination limits; pull the maximum we can and iterate pages.
-        'limit'   => 1000,
+        // Ghost enforces pagination limits; stay at or below 100 per request.
+        'limit'   => 100,
         'include' => 'newsletters,labels',
     ];
+
+    if (isset($params['limit'])) {
+        $params['limit'] = min(100, (int) $params['limit']);
+    }
 
     // If a specific page was requested, respect it and avoid pagination.
     $respectPage = array_key_exists('page', $params);
