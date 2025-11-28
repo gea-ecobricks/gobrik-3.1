@@ -116,41 +116,66 @@ function createGhostJWT() {
  */
 function fetchGhostMembers(array $params = []): array
 {
-    $jwt = createGhostJWT();
+    $jwt     = createGhostJWT();
     $baseUrl = 'https://earthen.io/ghost/api/v4/admin/members/';
 
     $defaultParams = [
-        'limit'   => 'all',
+        // Ghost enforces pagination limits; pull the maximum we can and iterate pages.
+        'limit'   => 1000,
         'include' => 'newsletters,labels',
     ];
 
-    $query = http_build_query(array_merge($defaultParams, $params));
-    $url   = $baseUrl . '?' . $query;
+    // If a specific page was requested, respect it and avoid pagination.
+    $respectPage = array_key_exists('page', $params);
+    $page        = $respectPage ? (int) $params['page'] : 1;
+    unset($params['page']);
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Ghost ' . $jwt,
-        'Content-Type: application/json',
-    ]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $members = [];
 
-    $response  = curl_exec($ch);
-    $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlError = curl_error($ch);
+    do {
+        $query = http_build_query(array_merge($defaultParams, $params, ['page' => $page]));
+        $url   = $baseUrl . '?' . $query;
 
-    curl_close($ch);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Ghost ' . $jwt,
+            'Content-Type: application/json',
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-    if ($curlError) {
-        throw new Exception('Curl error: ' . $curlError);
-    }
+        $response  = curl_exec($ch);
+        $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
 
-    if ($httpCode < 200 || $httpCode >= 300) {
-        throw new Exception('Ghost API request failed with status ' . $httpCode . ': ' . $response);
-    }
+        curl_close($ch);
 
-    $data = json_decode($response, true);
-    return $data['members'] ?? [];
+        if ($curlError) {
+            throw new Exception('Curl error: ' . $curlError);
+        }
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            throw new Exception('Ghost API request failed with status ' . $httpCode . ': ' . $response);
+        }
+
+        $data = json_decode($response, true);
+
+        if (!empty($data['members'])) {
+            $members = array_merge($members, $data['members']);
+        }
+
+        // Stop paginating if caller asked for a single page.
+        if ($respectPage) {
+            break;
+        }
+
+        $pagination = $data['meta']['pagination'] ?? [];
+        $nextPage   = $pagination['next'] ?? null;
+        $page       = $nextPage ?? null;
+
+    } while ($page);
+
+    return $members;
 }
 
 function memberHasLabel(array $member, string $labelName): bool
