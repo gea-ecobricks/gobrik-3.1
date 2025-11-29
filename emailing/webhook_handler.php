@@ -6,12 +6,19 @@ require_once '../scripts/earthen_subscribe_functions.php';
 require_once '../gobrikconn_env.php';  // Gobrik DB (for tb_ecobrickers, mailgun logging)
 require_once '../buwanaconn_env.php';  // Buwana DB (for admin_alerts)
 
-function resolveMemberIdByEmail(mysqli $conn, string $email): ?int
+function resolveMemberIdByEmail(string $email): ?int
 {
-    $stmt = $conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
+    global $gobrik_conn;
+
+    if (!isset($gobrik_conn)) {
+        error_log('[MAILGUN] Gobrik database connection not available for member lookup.');
+        return null;
+    }
+
+    $stmt = $gobrik_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
 
     if (!$stmt) {
-        error_log('[MAILGUN] Failed to prepare member lookup: ' . $conn->error);
+        error_log('[MAILGUN] Failed to prepare member lookup: ' . $gobrik_conn->error);
         return null;
     }
 
@@ -24,8 +31,15 @@ function resolveMemberIdByEmail(mysqli $conn, string $email): ?int
     return $found ? (int) $member_id : null;
 }
 
-function logMailgunEvent(mysqli $conn, ?int $member_id, string $recipient_email, array $eventData): void
+function logMailgunEvent(?int $member_id, string $recipient_email, array $eventData): void
 {
+    global $gobrik_conn;
+
+    if (!isset($gobrik_conn)) {
+        error_log('[MAILGUN] Gobrik database connection not available for logging.');
+        return;
+    }
+
     $campaign_name = null;
     if (!empty($eventData['tags'][0])) {
         $campaign_name = $eventData['tags'][0];
@@ -65,7 +79,7 @@ function logMailgunEvent(mysqli $conn, ?int $member_id, string $recipient_email,
     $user_variables_json = !empty($user_variables) ? json_encode($user_variables) : null;
     $raw_payload = !empty($eventData) ? json_encode($eventData) : null;
 
-    $stmt = $conn->prepare(
+    $stmt = $gobrik_conn->prepare(
         "INSERT INTO earthen_mailgun_events_tb (
             member_id,
             recipient_email,
@@ -92,7 +106,7 @@ function logMailgunEvent(mysqli $conn, ?int $member_id, string $recipient_email,
     );
 
     if (!$stmt) {
-        error_log('[MAILGUN] Failed to prepare mailgun event insert: ' . $conn->error);
+        error_log('[MAILGUN] Failed to prepare mailgun event insert: ' . $gobrik_conn->error);
         return;
     }
 
@@ -184,13 +198,13 @@ try {
     $basic_mailgun_status = $data['event-data']['event'] ?? 'unknown';
     $email_subject = $data['event-data']['message']['headers']['subject'] ?? 'No Subject';
     $response_message = $data['event-data']['delivery-status']['message'] ?? 'No response message';
-    $member_id = resolveMemberIdByEmail($gobrik_conn, $email_addr);
+    $member_id = resolveMemberIdByEmail($email_addr);
 
     // Log a concise summary of the event
     $log_message = "📬 Mailgun Event: '$email_subject' to $email_addr was sent on $timestamp and returned: \"$response_message\"";
     error_log($log_message);
 
-    logMailgunEvent($gobrik_conn, $member_id, $email_addr, $data['event-data'] ?? []);
+    logMailgunEvent($member_id, $email_addr, $data['event-data'] ?? []);
 
     // 🚨 Detect and log rate limiting issues 🚨
 if (stripos($response_message, "rate limited") !== false || stripos($response_message, "throttled") !== false) {
