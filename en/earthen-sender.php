@@ -165,7 +165,7 @@ try {
 $mailgun_status_counts = [];
 $mailgun_total_events = 0;
 $mailgun_status_query = "SELECT COALESCE(event_type, 'unknown') AS status, COUNT(*) AS count FROM earthen_mailgun_events_tb GROUP BY status ORDER BY status";
-$mailgun_status_result = $buwana_conn->query($mailgun_status_query);
+$mailgun_status_result = $gobrik_conn->query($mailgun_status_query);
 
 if ($mailgun_status_result) {
     while ($row = $mailgun_status_result->fetch_assoc()) {
