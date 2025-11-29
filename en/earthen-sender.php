@@ -456,13 +456,17 @@ echo '<!DOCTYPE html>
         <div id="test-email-container" class="form-row" style="display:none;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
             <div id="left-colum" style="width: 100%;">
                 <label for="test-email-toggle">📨 Send One Test Email</label>
-                <p class="form-caption" style="margin-top:10px;">Will send this email once to russmaier@gmail.com</p>
+                <p class="form-caption" style="margin-top:10px;">Will send this email once to <span id="test-email-display">russmaier@gmail.com</span></p>
             </div>
             <div id="right-column" style="width:100px;justify-content:center;">
                 <label class="toggle-switch">
                     <input type="checkbox" id="test-email-toggle" value="1">
                     <span class="slider"></span>
                 </label>
+            </div>
+            <div id="test-email-config" style="display:none;width:100%;margin-top:15px;">
+                <label for="test-email-input" style="display:block;margin-bottom:6px;">Test email address</label>
+                <input type="email" id="test-email-input" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;" value="russmaier@gmail.com" autocomplete="email">
             </div>
         </div>
 
@@ -490,9 +494,14 @@ echo '<!DOCTYPE html>
 
 
 <!-- Test Send Button (visible by default when auto-send is off) -->
-<button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
-    📨 Send to russmaier@gmail.com
-</button>
+<div id="test-send-actions" style="display:flex;gap:10px;align-items:center;">
+    <button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+        📨 Send to russmaier@gmail.com
+    </button>
+    <button type="button" id="test-email-settings" class="confirm-button enabled" style="min-width:45px;padding:10px 12px;">
+        ⚙️
+    </button>
+</div>
 
 
 </form>
@@ -551,6 +560,8 @@ $(document).ready(function () {
     let isSending = false; // prevent duplicate sends
     let sendDelay = 5;
     let sendFailCount = 0;
+    const testEmailDefault = 'russmaier@gmail.com';
+    let testEmail = localStorage.getItem('testEmail') || testEmailDefault;
 
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
@@ -615,11 +626,28 @@ $(document).ready(function () {
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
 
+    function updateTestEmailDisplay() {
+        $('#test-email-display').text(testEmail);
+        $('#test-email-input').val(testEmail);
+    }
+
+    function setTestEmail(email) {
+        const trimmed = (email || '').trim();
+        testEmail = trimmed || testEmailDefault;
+        localStorage.setItem('testEmail', testEmail);
+        updateTestEmailDisplay();
+        if (!autoSendEnabled() && testSendEnabled()) {
+            $('#test-send-button').html(`📨 Send to ${testEmail}`);
+        }
+    }
+
+    setTestEmail(testEmail);
+
     function updateVisibleButton() {
         if (!autoSendEnabled()) {
             $('#test-email-container').show();
             if (testSendEnabled()) {
-                $('#test-send-button').show().html("📨 Send to russmaier@gmail.com");
+                $('#test-send-button').show().html(`📨 Send to ${testEmail}`);
             } else {
                 $('#test-send-button').hide();
             }
@@ -749,7 +777,7 @@ function sendEmail() {
             return;
         }
 
-        const targetEmail = isTestMode ? "russmaier@gmail.com" : recipientEmail;
+        const targetEmail = isTestMode ? testEmail : recipientEmail;
 
         if (!targetEmail) {
             alert("❌ No recipient available.");
@@ -763,6 +791,7 @@ function sendEmail() {
 
         // Show sending state
         $('#auto-send-button, #test-send-button').text("⏳ Sending...").prop('disabled', true);
+        $('#email_to').val(targetEmail);
 
         $.ajax({
             url: "", // Same page
@@ -818,6 +847,14 @@ function sendEmail() {
     $('#test-email-toggle').on('change', function () {
         localStorage.setItem('testSend', $(this).is(':checked'));
         updateVisibleButton();
+    });
+
+    $('#test-email-settings').on('click', function () {
+        $('#test-email-config').toggle();
+    });
+
+    $('#test-email-input').on('input change', function () {
+        setTestEmail($(this).val());
     });
 
     $('#auto-send-toggle').on('change', function () {
