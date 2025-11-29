@@ -163,7 +163,7 @@ function fetchGhostMembers(array $params = []): array
         throw new Exception('Ghost stats database connection unavailable.');
     }
 
-    $limit = isset($params['limit']) ? max(1, (int) $params['limit']) : 1000;
+    $limit = isset($params['limit']) ? max(1, (int) $params['limit']) : 80000;
 
     $filters   = [];
     $bindTypes = '';
