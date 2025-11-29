@@ -537,7 +537,7 @@ $(document).ready(function () {
     function startCountdownAndSend() {
         clearInterval(countdownInterval);
         if (isSending) return; // don't queue another send while sending
-        sendDelay = parseInt($('#send-delay-slider').val()) || 5;
+        sendDelay = parseInt($('#send-delay-slider').val()) || 1;
         let remaining = sendDelay;
         $('#delay-display').text(sendDelay);
         console.log(`⏰ Countdown ${sendDelay}s for ${recipientEmail}`);
