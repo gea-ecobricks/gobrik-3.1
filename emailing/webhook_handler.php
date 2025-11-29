@@ -15,7 +15,6 @@ function resolveMemberIdByEmail(string $email): ?int
         return null;
     }
 
-    $stmt = $gobrik_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
 
     if (!$stmt) {
         error_log('[MAILGUN] Failed to prepare member lookup: ' . $gobrik_conn->error);
