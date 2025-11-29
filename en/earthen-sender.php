@@ -34,10 +34,12 @@ if ($is_logged_in) {
     $first_name = getFirstName($buwana_conn, $buwana_id);
 
 } else {
-    // Redirect to login page with the redirect parameter set to the current page
+    $redirect_target = 'earthen-sender.php';
+    $login_url = 'login.php?redirect=' . urlencode($redirect_target);
+
     echo '<script>
         alert("Please login before viewing this page.");
-        window.location.href = "login.php?redirect=' . urlencode('earthen-sender') . '.php";
+        window.location.href = "' . $login_url . '";
     </script>';
     exit();
 }
@@ -452,28 +454,28 @@ echo '<!DOCTYPE html>
 
 
         <!-- Send one test email (hidden unless auto-send is off) -->
-        <div id="test-email-container" class="form-row" style="display:none;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
-            <div id="left-colum" style="width: 100%;">
+        <div id="test-email-container" class="form-row" style="display:none;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+            <div id="left-colum" style="flex: 1 1 280px;">
                 <label for="test-email-toggle">📨 Send One Test Email</label>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
                     <button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
                         📨 Send to russmaier@gmail.com
                     </button>
                     <p class="form-caption" style="margin:0;">Will send this email once to <span id="test-email-display">russmaier@gmail.com</span></p>
-                    <button type="button" id="test-email-settings" class="confirm-button enabled" style="min-width:45px;padding:10px 12px;">
-                        ⚙️
-                    </button>
                 </div>
             </div>
-            <div id="right-column" style="width:100px;justify-content:center;">
-                <label class="toggle-switch">
+            <div id="right-column" style="width:180px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+                <label class="toggle-switch" style="margin-bottom:0;">
                     <input type="checkbox" id="test-email-toggle" value="1">
                     <span class="slider"></span>
                 </label>
-            </div>
-            <div id="test-email-config" style="display:none;width:100%;margin-top:15px;">
-                <label for="test-email-input" style="display:block;margin-bottom:6px;">Test email address</label>
-                <input type="email" id="test-email-input" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;" value="russmaier@gmail.com" autocomplete="email">
+                <button type="button" id="test-email-settings" aria-label="Configure test email address" style="background:none;border:none;font-size:24px;cursor:pointer;line-height:1;">
+                    ⚙️
+                </button>
+                <div id="test-email-config" style="display:none;width:100%;margin-top:5px;">
+                    <label for="test-email-input" style="display:block;margin-bottom:6px;text-align:center;">Test email address</label>
+                    <input type="email" id="test-email-input" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;" value="russmaier@gmail.com" autocomplete="email">
+                </div>
             </div>
         </div>
 
@@ -602,6 +604,12 @@ $(document).ready(function () {
     });
     $("div.dataTables_filter input").attr('placeholder', 'Search emails...');
 
+    const statusTableWrapper = $('#email-status-table_wrapper');
+    const mailgunLogsButton = $('<div id="mailgun-logs-action" style="margin-top:10px;text-align:right;"><a class="confirm-button enabled" href="../emailing/mailgun-logs.php" target="_blank" rel="noopener">View Mailgun Logs</a></div>');
+    if (statusTableWrapper.length) {
+        statusTableWrapper.after(mailgunLogsButton);
+    }
+
     function refreshStatusTable() {
         $.getJSON('../emailing/get_email_status.php', function(resp) {
             if (resp.success) {
@@ -641,7 +649,7 @@ $(document).ready(function () {
 
     function updateVisibleButton() {
         if (!autoSendEnabled()) {
-            $('#test-email-container').show();
+            $('#test-email-container').css('display', 'flex');
             if (testSendEnabled()) {
                 $('#test-send-button').show().html(`📨 Send to ${testEmail}`);
             } else {
