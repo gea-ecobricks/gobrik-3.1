@@ -6,6 +6,31 @@ require_once '../scripts/earthen_subscribe_functions.php';
 require_once '../gobrikconn_env.php';  // Gobrik DB (for tb_ecobrickers, mailgun logging)
 require_once '../buwanaconn_env.php';  // Buwana DB (for admin_alerts)
 
+function resolveMemberIdByEmail(string $email): ?int
+{
+    global $gobrik_conn;
+
+    if (!isset($gobrik_conn)) {
+        error_log('[MAILGUN] Gobrik database connection not available for member lookup.');
+        return null;
+    }
+
+    $stmt = $gobrik_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
+
+    if (!$stmt) {
+        error_log('[MAILGUN] Failed to prepare member lookup: ' . $gobrik_conn->error);
+        return null;
+    }
+
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $stmt->bind_result($member_id);
+    $found = $stmt->fetch();
+    $stmt->close();
+
+    return $found ? (int) $member_id : null;
+}
+
 function logMailgunEvent(?int $member_id, string $recipient_email, array $eventData): void
 {
     global $gobrik_conn;
@@ -170,7 +195,7 @@ try {
     $basic_mailgun_status = $data['event-data']['event'] ?? 'unknown';
     $email_subject = $data['event-data']['message']['headers']['subject'] ?? 'No Subject';
     $response_message = $data['event-data']['delivery-status']['message'] ?? 'No response message';
-    $member_id = null;
+    $member_id = resolveMemberIdByEmail($email_addr);
 
     // Log a concise summary of the event
     $log_message = "📬 Mailgun Event: '$email_subject' to $email_addr was sent on $timestamp and returned: \"$response_message\"";
