@@ -166,9 +166,6 @@ try {
         exit();
     }
 
-    // Define failure events
-    $failure_events = ['failed', 'bounced', 'complained'];
-
     // Validate the webhook signature
     $signature = $data['signature'] ?? null;
     if (!isset($signature['timestamp'], $signature['token'], $signature['signature'])) {
@@ -237,82 +234,7 @@ if (stripos($response_message, "rate limited") !== false || stripos($response_me
 }
 
 
-    // 🚨 Fetch current emailing_status before updating 🚨
-    $sql_check_status = "SELECT emailing_status FROM tb_ecobrickers WHERE email_addr = ?";
-    $stmt_check_status = $gobrik_conn->prepare($sql_check_status);
-    $stmt_check_status->bind_param('s', $email_addr);
-    $stmt_check_status->execute();
-    $stmt_check_status->bind_result($current_status);
-    $stmt_check_status->fetch();
-    $stmt_check_status->close();
-
-    // ✅ Log what we found in the database
-    if ($current_status !== null) {
-        error_log("🔎 Found $email_addr in tb_ecobrickers. Current emailing_status: '$current_status'");
-
-        // 🚨 Prioritize status updates to avoid downgrades 🚨
-        $priority = [
-            'failed' => 3,
-            'bounced' => 3,
-            'complained' => 3,
-            'delivered' => 2,
-            'accepted' => 1
-        ];
-
-        $current_level = $priority[strtolower($current_status)] ?? 0;
-        $new_level = $priority[strtolower($basic_mailgun_status)] ?? 0;
-
-        if ($new_level >= $current_level) {
-            $sql_update_status = "UPDATE tb_ecobrickers SET emailing_status = ? WHERE email_addr = ?";
-            $stmt_update_status = $gobrik_conn->prepare($sql_update_status);
-            if (!$stmt_update_status) {
-                throw new Exception('❌ Error preparing update statement: ' . $gobrik_conn->error);
-            }
-            $stmt_update_status->bind_param('ss', $basic_mailgun_status, $email_addr);
-            $stmt_update_status->execute();
-
-            if ($stmt_update_status->affected_rows > 0) {
-                error_log("✅ Delivered! Emailing_status set to '$basic_mailgun_status' for $email_addr.");
-            } else {
-                error_log("👌️ No update needed for $email_addr. Emailing_status was already '$basic_mailgun_status'.");
-            }
-
-            $stmt_update_status->close();
-        } else {
-            error_log("👌️ Ignored lower priority status '$basic_mailgun_status' for $email_addr.");
-        }
-    } else {
-        // 🚫 No record to update
-        error_log("❌ No record found for $email_addr in tb_ecobrickers! Skipping status update.");
-    }
-
-    // Update earthen_members_tb processing column based on the event result
-    if ($basic_mailgun_status === 'delivered') {
-        $stmt_update_member = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET processing = 0 WHERE email = ?"
-        );
-    } elseif ($basic_mailgun_status === 'accepted' || $basic_mailgun_status === 'sending') {
-        $stmt_update_member = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET processing = 1 WHERE email = ?"
-        );
-    } elseif (in_array($basic_mailgun_status, $failure_events)) {
-        $stmt_update_member = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET processing = 2 WHERE email = ?"
-        );
-    } elseif ($basic_mailgun_status === 'rejected') {
-        $stmt_update_member = $buwana_conn->prepare(
-            "UPDATE earthen_members_tb SET processing = 3 WHERE email = ?"
-        );
-    } else {
-        $stmt_update_member = null;
-    }
-
-    if ($stmt_update_member) {
-        $stmt_update_member->bind_param('s', $email_addr);
-        $stmt_update_member->execute();
-        $stmt_update_member->close();
-        error_log("✅ Updated processing for $email_addr to $basic_mailgun_status.");
-    }
+    // Member-specific updates have been removed to keep webhook focused on event logging.
 
     // Respond with HTTP 200 to acknowledge the webhook
     http_response_code(200);
