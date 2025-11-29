@@ -360,7 +360,6 @@ function sendEmail($to, $htmlBody) {
         'form_params' => [
             'from' => $email_from,
             'to' => $to,
-            'bcc' => 'russmaier@gmail.com',
             'subject' => $email_subject,
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
@@ -456,7 +455,15 @@ echo '<!DOCTYPE html>
         <div id="test-email-container" class="form-row" style="display:none;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
             <div id="left-colum" style="width: 100%;">
                 <label for="test-email-toggle">📨 Send One Test Email</label>
-                <p class="form-caption" style="margin-top:10px;">Will send this email once to <span id="test-email-display">russmaier@gmail.com</span></p>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                    <button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+                        📨 Send to russmaier@gmail.com
+                    </button>
+                    <p class="form-caption" style="margin:0;">Will send this email once to <span id="test-email-display">russmaier@gmail.com</span></p>
+                    <button type="button" id="test-email-settings" class="confirm-button enabled" style="min-width:45px;padding:10px 12px;">
+                        ⚙️
+                    </button>
+                </div>
             </div>
             <div id="right-column" style="width:100px;justify-content:center;">
                 <label class="toggle-switch">
@@ -491,17 +498,6 @@ echo '<!DOCTYPE html>
 <button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
     📨 Send
 </button>
-
-
-<!-- Test Send Button (visible by default when auto-send is off) -->
-<div id="test-send-actions" style="display:flex;gap:10px;align-items:center;">
-    <button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
-        📨 Send to russmaier@gmail.com
-    </button>
-    <button type="button" id="test-email-settings" class="confirm-button enabled" style="min-width:45px;padding:10px 12px;">
-        ⚙️
-    </button>
-</div>
 
 
 </form>
