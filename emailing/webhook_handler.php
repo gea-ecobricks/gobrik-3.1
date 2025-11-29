@@ -110,7 +110,7 @@ function logMailgunEvent(?int $member_id, string $recipient_email, array $eventD
     }
 
     $stmt->bind_param(
-        'isssssssssssssssssss',
+        'i' . str_repeat('s', 20),
         $member_id,
         $recipient_email,
         $campaign_name,
