@@ -133,6 +133,7 @@ try {
     $total_members = $earthen_stats['total'] ?? $summary['total'];
     $sent_count = $earthen_stats['sent'] ?? $summary['sent_count'];
     $sent_percentage = $earthen_stats['percentage'] ?? $summary['sent_percentage'];
+    $pending_count = max(0, $total_members - $sent_count);
 
     $status_limit = 20; // total rows to display in the status table
     $sent_limit = 4;    // number of most recent sent entries
@@ -160,6 +161,7 @@ try {
     $total_members = 0;
     $sent_count = 0;
     $sent_percentage = 0;
+    $pending_count = 0;
     $all_members = [];
 }
 
@@ -725,9 +727,66 @@ $(document).ready(function () {
         updateStatsDisplay(queueStats);
     }
 
-    function logError(message) {
-        console.error(message);
-        $.post('../emailing/log_sender_error.php', {message});
+        return true;
+    }
+
+    function markCurrentRecipient(status) {
+        const current = recipientQueue[queueIndex];
+        if (!current) return;
+
+        current.status = status;
+        if (status === 'sent') {
+            current.sent_at = new Date().toISOString();
+        }
+
+        renderStatusTable();
+    }
+
+    function handleBatchCompletion() {
+        queueIndex = 0;
+        recipientQueue = [];
+        renderStatusTable();
+        setActiveRecipientFromQueue(-1);
+
+        const remaining = Math.max(0, (queueStats.total || 0) - (queueStats.sent || 0));
+        if (remaining > 0) {
+            $('#auto-send-button').text("⏳ No recipients available").prop('disabled', true);
+            logError(`No recipients returned but ${remaining} pending according to stats.`);
+        } else {
+            $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
+        }
+    }
+
+    function fetchRecipientBatch() {
+        $.ajax({
+            url: '../emailing/get_recipient_batch.php',
+            type: 'GET',
+            dataType: 'json',
+            data: { limit: batchSize },
+            success: function (response) {
+                if (response.has_alerts) {
+                    alert('⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.');
+                    $('#auto-send-button, #test-send-button').prop('disabled', true);
+                    return;
+                }
+
+                if (response.stats) {
+                    updateStatsDisplay(response.stats);
+                }
+
+                if (response.success && response.batch && response.batch.length) {
+                    recipientQueue = response.batch;
+                    queueIndex = 0;
+                    renderStatusTable();
+                    setActiveRecipientFromQueue(queueIndex);
+                } else {
+                    handleBatchCompletion();
+                }
+            },
+            error: function () {
+                logError('Failed to fetch recipient batch.');
+            }
+        });
     }
 
     function setActiveRecipientFromQueue(index) {
