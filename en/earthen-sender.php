@@ -537,7 +537,6 @@ $(document).ready(function () {
     let queueStats = {
         total: <?php echo (int) ($total_members ?? 0); ?>,
         sent: <?php echo (int) ($sent_count ?? 0); ?>,
-        pending: <?php echo (int) ($pending_count ?? 0); ?>,
         percentage: <?php echo (float) ($sent_percentage ?? 0); ?>
     };
     const testEmailDefault = 'russmaier@gmail.com';
@@ -711,7 +710,6 @@ $(document).ready(function () {
         queueStats = {
             total: stats.total ?? 0,
             sent: stats.sent ?? 0,
-            pending: stats.pending ?? Math.max(0, (stats.total ?? 0) - (stats.sent ?? 0)),
             percentage: stats.percentage ?? 0,
         };
 
@@ -722,46 +720,12 @@ $(document).ready(function () {
 
     function incrementSentStats() {
         queueStats.sent = (queueStats.sent || 0) + 1;
-        queueStats.pending = Math.max(0, (queueStats.pending || Math.max(0, queueStats.total - queueStats.sent)) - 1);
         queueStats.percentage = queueStats.total > 0
             ? Math.min(100, (queueStats.sent / queueStats.total) * 100)
             : 0;
 
         updateStatsDisplay(queueStats);
     }
-
-    function logError(message) {
-        console.error(message);
-        $.post('../emailing/log_sender_error.php', {message});
-    }
-
-    function setActiveRecipientFromQueue(index) {
-        const sub = recipientQueue[index];
-
-        if (!sub) {
-            recipientEmail = '';
-            recipientId = null;
-            $('#email_to').val('');
-            $('#subscriber_id').val('');
-            updateVisibleButton();
-            return false;
-        }
-
-        recipientEmail = sub.email || '';
-        recipientName = sub.name || '';
-        recipientId = sub.id || null;
-
-        $('#subscriber_id').val(recipientId);
-        $('#email_to').val(recipientEmail);
-
-        console.log('📋 Next recipient:', recipientEmail);
-
-        updateVisibleButton();
-        renderStatusTable();
-
-        if (autoSendEnabled()) {
-            startCountdownAndSend();
-        }
 
         return true;
     }
@@ -813,6 +777,85 @@ $(document).ready(function () {
                 if (response.success && response.batch && response.batch.length) {
                     recipientQueue = response.batch;
                     queueIndex = 0;
+                    renderStatusTable();
+                    setActiveRecipientFromQueue(queueIndex);
+                } else {
+                    handleBatchCompletion();
+                }
+            },
+            error: function () {
+                logError('Failed to fetch recipient batch.');
+            }
+        });
+    }
+
+    function setActiveRecipientFromQueue(index) {
+        const sub = recipientQueue[index];
+
+        if (!sub) {
+            recipientEmail = '';
+            recipientId = null;
+            $('#email_to').val('');
+            $('#subscriber_id').val('');
+            updateVisibleButton();
+            return false;
+        }
+
+        recipientEmail = sub.email || '';
+        recipientName = sub.name || '';
+        recipientId = sub.id || null;
+
+        $('#subscriber_id').val(recipientId);
+        $('#email_to').val(recipientEmail);
+
+        console.log('📋 Next recipient:', recipientEmail);
+
+        updateVisibleButton();
+        renderStatusTable();
+
+        if (autoSendEnabled()) {
+            startCountdownAndSend();
+        }
+
+        return true;
+    }
+
+    function markCurrentRecipient(status) {
+        const current = recipientQueue[queueIndex];
+        if (!current) return;
+
+        current.status = status;
+        if (status === 'sent') {
+            current.sent_at = new Date().toISOString();
+        }
+
+        renderStatusTable();
+    }
+
+    function handleBatchCompletion() {
+        queueIndex = 0;
+        recipientQueue = [];
+        renderStatusTable();
+        $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
+    }
+
+    function fetchRecipientBatch() {
+        $.ajax({
+            url: '../emailing/get_recipient_batch.php',
+            type: 'GET',
+            dataType: 'json',
+            data: { limit: batchSize },
+            success: function (response) {
+                if (response.has_alerts) {
+                    alert('⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.');
+                    $('#auto-send-button, #test-send-button').prop('disabled', true);
+                    return;
+                }
+
+                if (response.success && response.batch && response.batch.length) {
+                    recipientQueue = response.batch;
+                    queueIndex = 0;
+                    updateStatsDisplay(response.stats);
                     renderStatusTable();
                     setActiveRecipientFromQueue(queueIndex);
                 } else {
