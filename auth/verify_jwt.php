@@ -5,7 +5,7 @@ use Firebase\JWT\Key;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-function verify_id_token($id_token, $expected_aud) {
+function verify_id_token($id_token, $expected_aud, $timestampOverride = null) {
     // Decode token header to get 'kid'
     $header = json_decode(base64_decode(explode('.', $id_token)[0]), true);
     $kid = $header['kid'] ?? null;
@@ -33,6 +33,12 @@ function verify_id_token($id_token, $expected_aud) {
     // Convert to key set
     $keySet = JWK::parseKeySet($jwks);
 
+    // Optionally override the timestamp used for validating time-based claims
+    $previousTimestamp = JWT::$timestamp;
+    if ($timestampOverride !== null) {
+        JWT::$timestamp = $timestampOverride;
+    }
+
     try {
         $decoded = JWT::decode($id_token, $keySet);
         $claims = (array)$decoded;
@@ -46,5 +52,8 @@ function verify_id_token($id_token, $expected_aud) {
     } catch (Exception $e) {
         error_log("JWT validation failed: " . $e->getMessage());
         return false;
+    } finally {
+        // Restore the original timestamp to avoid side effects elsewhere
+        JWT::$timestamp = $previousTimestamp;
     }
 }
