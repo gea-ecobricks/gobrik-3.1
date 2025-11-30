@@ -9,6 +9,9 @@ use GuzzleHttp\Exception\RequestException;
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.54';
+if (!defined('EARTHEN_TOTAL_MEMBERS')) {
+    define('EARTHEN_TOTAL_MEMBERS', 70000);
+}
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -35,7 +38,11 @@ if ($is_logged_in) {
 
 } else {
     $redirect_target = 'earthen-sender.php';
-    $login_url = 'login.php?redirect=' . urlencode($redirect_target);
+    $buwana_id = $_SESSION['buwana_id'] ?? '';
+    $login_url = 'https://buwana.ecobricks.org/en/login.php?redirect=' . urlencode($redirect_target) . '&app=gbrk_f2c61a85a4cd4b8b89a7';
+    if (!empty($buwana_id)) {
+        $login_url .= '&id=' . urlencode($buwana_id);
+    }
 
     echo '<script>
         alert("Please login before viewing this page.");
@@ -89,10 +96,7 @@ function fetchEarthenStats($ghoststats_conn): array
         return $stats;
     }
 
-    $totalResult = $ghoststats_conn->query("SELECT COUNT(*) AS total FROM members");
-    if ($totalResult && ($row = $totalResult->fetch_assoc())) {
-        $stats['total'] = (int) ($row['total'] ?? 0);
-    }
+    $stats['total'] = defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0;
 
     $sentQuery = "SELECT COUNT(*) AS sent
                   FROM members_labels ml
@@ -130,9 +134,9 @@ try {
 
     $earthen_stats = fetchEarthenStats($ghoststats_conn);
 
-    $total_members = $earthen_stats['total'] ?? $summary['total'];
+    $total_members = defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0;
     $sent_count = $earthen_stats['sent'] ?? $summary['sent_count'];
-    $sent_percentage = $earthen_stats['percentage'] ?? $summary['sent_percentage'];
+    $sent_percentage = $total_members > 0 ? round(($sent_count / $total_members) * 100, 3) : 0;
     $pending_count = max(0, $total_members - $sent_count);
 
     $status_limit = 20; // total rows to display in the status table
@@ -158,7 +162,7 @@ try {
     }, array_merge($sent_members, $pending_members));
 } catch (Exception $e) {
     error_log('[EARTHEN] Ghost sync failed: ' . $e->getMessage());
-    $total_members = 0;
+    $total_members = defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0;
     $sent_count = 0;
     $sent_percentage = 0;
     $pending_count = 0;
@@ -168,7 +172,7 @@ try {
 // Mailgun event breakdown for processing chart
 $mailgun_status_counts = [];
 $mailgun_total_events = 0;
-$mailgun_status_query = "SELECT COALESCE(event_type, 'unknown') AS status, COUNT(*) AS count FROM earthen_mailgun_events_tb GROUP BY status ORDER BY status";
+$mailgun_status_query = "SELECT COALESCE(event_type, 'unknown') AS status, COUNT(*) AS count FROM earthen_mailgun_events_tb WHERE LOWER(COALESCE(event_type, '')) <> 'accepted' GROUP BY status ORDER BY status";
 $mailgun_status_result = $gobrik_conn->query($mailgun_status_query);
 
 if ($mailgun_status_result) {
@@ -387,15 +391,14 @@ echo '<!DOCTYPE html>
     <?php endif; ?>
 
         <div id="greeting" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-            <h2 id="greeting">Newsletter Sender</h2>
+            <h2 id="greeting">Earthen Manual Sender</h2>
             <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
         </div>
 
 
 
-<p>Total Members: <strong id="total-members"><?php echo $total_members; ?></strong></p>
-<p>Emails Sent: <strong id="sent-count"><?php echo $sent_count; ?></strong> (
-    <span id="sent-percentage"><?php echo number_format($sent_percentage, 2); ?></span>%)</p>
+<p id="overall-stats">Total Members: <strong id="total-members"><?php echo number_format($total_members); ?></strong>  |  Total Sent <strong id="sent-count"><?php echo $sent_count; ?></strong> (<span id="sent-percentage"><?php echo number_format($sent_percentage, 3); ?></span>%)</p>
+<p id="batch-stats">Current Batch: <strong id="batch-size">0</strong>  |  Batch Sent: <strong id="batch-sent">0</strong> (<span id="batch-percentage">0.00</span>%)</p>
 
 
 
@@ -533,7 +536,10 @@ $(document).ready(function () {
     let sendFailCount = 0;
     let recipientQueue = [];
     let queueIndex = 0;
-    const batchSize = 20;
+    const batchSize = 100;
+    let batchSent = 0;
+    let currentBatchSize = 0;
+    let batchOffset = 0;
     let queueStats = {
         total: <?php echo (int) ($total_members ?? 0); ?>,
         sent: <?php echo (int) ($sent_count ?? 0); ?>,
@@ -709,6 +715,13 @@ $(document).ready(function () {
         updateVisibleButton();
     });
 
+    function updateBatchDisplay() {
+        const percent = currentBatchSize > 0 ? Math.min(100, (batchSent / currentBatchSize) * 100) : 0;
+        $('#batch-size').text(currentBatchSize);
+        $('#batch-sent').text(batchSent);
+        $('#batch-percentage').text(percent.toFixed(2));
+    }
+
     function updateStatsDisplay(stats) {
         if (!stats) return;
         queueStats = {
@@ -717,9 +730,9 @@ $(document).ready(function () {
             percentage: stats.percentage ?? 0,
         };
 
-        $('#total-members').text(queueStats.total);
+        $('#total-members').text(Number(queueStats.total).toLocaleString());
         $('#sent-count').text(queueStats.sent);
-        $('#sent-percentage').text(Number(queueStats.percentage).toFixed(2));
+        $('#sent-percentage').text(Number(queueStats.percentage).toFixed(3));
     }
 
     function incrementSentStats() {
@@ -729,29 +742,35 @@ $(document).ready(function () {
             : 0;
 
         updateStatsDisplay(queueStats);
+        batchSent += 1;
+        updateBatchDisplay();
     }
 
     function handleBatchCompletion() {
         queueIndex = 0;
         recipientQueue = [];
+        currentBatchSize = 0;
+        batchSent = 0;
         renderStatusTable();
         setActiveRecipientFromQueue(-1);
+        updateBatchDisplay();
 
         const remaining = Math.max(0, (queueStats.total || 0) - (queueStats.sent || 0));
         if (remaining > 0) {
-            $('#auto-send-button').text("⏳ No recipients available").prop('disabled', true);
-            logError(`No recipients returned but ${remaining} pending according to stats.`);
+            $('#auto-send-button').text("⏳ Loading next batch...").prop('disabled', false);
+            fetchRecipientBatch();
         } else {
             $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
         }
     }
 
     function fetchRecipientBatch() {
+        const requestOffset = batchOffset;
         $.ajax({
             url: '../emailing/get_recipient_batch.php',
             type: 'GET',
             dataType: 'json',
-            data: { limit: batchSize },
+            data: { limit: batchSize, offset: requestOffset },
             success: function (response) {
                 if (response.has_alerts) {
                     alert('⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.');
@@ -766,9 +785,14 @@ $(document).ready(function () {
                 if (response.success && response.batch && response.batch.length) {
                     recipientQueue = response.batch;
                     queueIndex = 0;
+                    batchSent = 0;
+                    currentBatchSize = recipientQueue.length;
+                    batchOffset = requestOffset + currentBatchSize;
+                    updateBatchDisplay();
                     renderStatusTable();
                     setActiveRecipientFromQueue(queueIndex);
                 } else {
+                    batchOffset = requestOffset + batchSize;
                     handleBatchCompletion();
                 }
             },
@@ -984,6 +1008,7 @@ function sendEmail() {
     $('#auto-send-toggle').prop('checked', savedAutoSend);
     $('#test-email-toggle').prop('checked', savedTestSend);
 
+    updateBatchDisplay();
     updateVisibleButton();
 
     if (hasAlerts) {
