@@ -1,4 +1,7 @@
 <?php
+if (!defined('EARTHEN_TOTAL_MEMBERS')) {
+    define('EARTHEN_TOTAL_MEMBERS', 70000);
+}
 /**
  * Cron-safe Earthen / Ghost helpers.
  * - No HTML/JS output
@@ -164,6 +167,7 @@ function fetchGhostMembers(array $params = []): array
     }
 
     $limit = isset($params['limit']) ? max(1, (int) $params['limit']) : 1000;
+    $offset = isset($params['offset']) ? max(0, (int) $params['offset']) : 0;
 
     $filters   = [];
     $bindTypes = '';
@@ -198,7 +202,7 @@ function fetchGhostMembers(array $params = []): array
         $sql .= ' WHERE ' . implode(' AND ', $filters);
     }
 
-    $sql .= ' GROUP BY m.id ORDER BY m.created_at ASC LIMIT ?';
+    $sql .= ' GROUP BY m.id ORDER BY m.created_at ASC LIMIT ? OFFSET ?';
 
     $stmt = $conn->prepare($sql);
 
@@ -206,8 +210,9 @@ function fetchGhostMembers(array $params = []): array
         throw new Exception('Failed to prepare Ghost member query: ' . $conn->error);
     }
 
-    $bindTypes .= 'i';
+    $bindTypes .= 'ii';
     $bindVars[] = $limit;
+    $bindVars[] = $offset;
 
     $stmt->bind_param($bindTypes, ...$bindVars);
 

@@ -13,7 +13,8 @@ $response = [
 ];
 
 try {
-    $batchSize = isset($_GET['limit']) ? max(1, min((int) $_GET['limit'], 50)) : 20;
+    $batchSize = isset($_GET['limit']) ? max(1, min((int) $_GET['limit'], 100)) : 100;
+    $offset = isset($_GET['offset']) ? max(0, (int) $_GET['offset']) : 0;
 
     $alert_query = "SELECT alert_title, alert_message FROM admin_alerts WHERE addressed = 0 ORDER BY date_posted DESC LIMIT 3";
     $result = $buwana_conn->query($alert_query);
@@ -29,7 +30,8 @@ try {
     }
 
     $members = fetchGhostMembers([
-        'limit' => max($batchSize * 5, 100),
+        'limit' => $batchSize,
+        'offset' => $offset,
     ]);
 
     $summary = summarizeGhostMembers($members, 'sent-001');
@@ -51,10 +53,13 @@ try {
         ];
     }, $batchMembers);
 
+    $totalMembers = defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : ($summary['total'] ?? 0);
+    $sentCount = $summary['sent_count'];
+
     $response['stats'] = [
-        'total' => $summary['total'],
-        'sent' => $summary['sent_count'],
-        'percentage' => $summary['sent_percentage'],
+        'total' => $totalMembers,
+        'sent' => $sentCount,
+        'percentage' => $totalMembers > 0 ? round(($sentCount / $totalMembers) * 100, 3) : 0,
     ];
 
     $response['success'] = true;
