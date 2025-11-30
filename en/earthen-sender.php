@@ -591,6 +591,10 @@ $(document).ready(function () {
         statusTableWrapper.after(mailgunLogsButton);
     }
 
+    function logError(message) {
+        console.error(message);
+    }
+
     function renderStatusTable() {
         if (recipientQueue.length) {
             const rows = recipientQueue.map((m) => {
@@ -727,21 +731,6 @@ $(document).ready(function () {
         updateStatsDisplay(queueStats);
     }
 
-        return true;
-    }
-
-    function markCurrentRecipient(status) {
-        const current = recipientQueue[queueIndex];
-        if (!current) return;
-
-        current.status = status;
-        if (status === 'sent') {
-            current.sent_at = new Date().toISOString();
-        }
-
-        renderStatusTable();
-    }
-
     function handleBatchCompletion() {
         queueIndex = 0;
         recipientQueue = [];
@@ -830,42 +819,6 @@ $(document).ready(function () {
         }
 
         renderStatusTable();
-    }
-
-    function handleBatchCompletion() {
-        queueIndex = 0;
-        recipientQueue = [];
-        renderStatusTable();
-        $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
-    }
-
-    function fetchRecipientBatch() {
-        $.ajax({
-            url: '../emailing/get_recipient_batch.php',
-            type: 'GET',
-            dataType: 'json',
-            data: { limit: batchSize },
-            success: function (response) {
-                if (response.has_alerts) {
-                    alert('⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.');
-                    $('#auto-send-button, #test-send-button').prop('disabled', true);
-                    return;
-                }
-
-                if (response.success && response.batch && response.batch.length) {
-                    recipientQueue = response.batch;
-                    queueIndex = 0;
-                    updateStatsDisplay(response.stats);
-                    renderStatusTable();
-                    setActiveRecipientFromQueue(queueIndex);
-                } else {
-                    handleBatchCompletion();
-                }
-            },
-            error: function () {
-                logError('Failed to fetch recipient batch.');
-            }
-        });
     }
 
     function handleSendError(msg) {
