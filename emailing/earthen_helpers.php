@@ -301,6 +301,34 @@ function summarizeGhostMembers(array $members, string $sentLabel = 'sent-001'): 
     ];
 }
 
+function personalizeEmailHtml(string $html, ?string $recipient_uuid, string $recipient_email): string
+{
+    $uuid_placeholder = '{{RECIPIENT_UUID}}';
+    $fallback_uuid = '4dbbb711-73e9-4fd0-9056-a7cc1af6a905';
+    $uuid = $recipient_uuid ?: $fallback_uuid;
+
+    $html = str_replace($uuid_placeholder, $uuid, $html);
+
+    $fallback_unsubscribe = 'https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f';
+    $unsubscribe_url = !empty($recipient_email)
+        ? 'https://gobrik.com/emailing/unsubscribe.php?email=' . urlencode($recipient_email)
+        : $fallback_unsubscribe;
+
+    $html = preg_replace(
+        '/https:\/\/gobrik\.com\/emailing\/unsubscribe\.php\?email=[^\s"\']+/i',
+        $unsubscribe_url,
+        $html
+    );
+
+    $html = preg_replace(
+        '/https:\/\/earthen\.io\/unsubscribe\/\?uuid=[^&\"]+(&key=[^&\"]+)?(&newsletter=[^&\"]+)?/i',
+        $unsubscribe_url,
+        $html
+    );
+
+    return $html;
+}
+
 function ensureMemberHasLabel(string $memberId, string $labelName): bool
 {
     $members = fetchGhostMembers([
