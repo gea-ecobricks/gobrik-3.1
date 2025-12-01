@@ -252,6 +252,89 @@ function fetchGhostMembers(array $params = []): array
     return $members;
 }
 
+/**
+ * Fetch Earthen member stats using the Earthen MySQL database connection.
+ *
+ * Caches the total member count in the current session while keeping the
+ * sent count live so that progress updates remain accurate.
+ */
+function getEarthenMemberStats(mysqli $conn): array
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['earthen_member_total'])) {
+        $totalQuery = "SELECT COUNT(*) AS total_members FROM earthen_members_tb";
+        $totalResult = $conn->query($totalQuery);
+        $_SESSION['earthen_member_total'] = (int) ($totalResult && ($row = $totalResult->fetch_assoc()) ? ($row['total_members'] ?? 0) : 0);
+
+        if ($totalResult instanceof mysqli_result) {
+            $totalResult->free();
+        }
+    }
+
+    $sentQuery = "SELECT COUNT(*) AS sent_count FROM earthen_members_tb WHERE test_sent = 1";
+    $sentResult = $conn->query($sentQuery);
+    $sentCount = (int) ($sentResult && ($row = $sentResult->fetch_assoc()) ? ($row['sent_count'] ?? 0) : 0);
+
+    if ($sentResult instanceof mysqli_result) {
+        $sentResult->free();
+    }
+
+    $totalMembers = (int) ($_SESSION['earthen_member_total'] ?? 0);
+
+    return [
+        'total' => $totalMembers,
+        'sent' => $sentCount,
+        'percentage' => $totalMembers > 0 ? round(($sentCount / $totalMembers) * 100, 3) : 0,
+    ];
+}
+
+/**
+ * Retrieve a batch of pending Earthen members from the MySQL database.
+ */
+function fetchEarthenPendingBatch(mysqli $conn, int $limit = 100, int $offset = 0): array
+{
+    $limit = max(1, min($limit, 500));
+    $offset = max(0, $offset);
+
+    $sql = "SELECT id, email, name, test_sent, test_sent_date_time
+            FROM earthen_members_tb
+            WHERE test_sent = 0
+              AND (processing IS NULL OR processing = 0)
+              AND email IS NOT NULL
+              AND email <> ''
+            ORDER BY id ASC
+            LIMIT ? OFFSET ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        error_log('[EARTHEN] Failed to prepare pending batch query: ' . $conn->error);
+        return [];
+    }
+
+    $stmt->bind_param('ii', $limit, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $batch = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+
+    $stmt->close();
+
+    return array_map(function ($member) {
+        return [
+            'id' => $member['id'] ?? null,
+            'email' => $member['email'] ?? '',
+            'name' => $member['name'] ?? '',
+            'email_open_rate' => 0,
+            'status' => 'pending',
+            'test_sent' => (int) ($member['test_sent'] ?? 0),
+            'test_sent_date_time' => $member['test_sent_date_time'] ?? 'N/A',
+        ];
+    }, $batch);
+}
+
 function memberHasLabel(array $member, string $labelName): bool
 {
     if (empty($member['labels'])) {

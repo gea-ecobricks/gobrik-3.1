@@ -9,9 +9,6 @@ use GuzzleHttp\Exception\RequestException;
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.54';
-if (!defined('EARTHEN_TOTAL_MEMBERS')) {
-    define('EARTHEN_TOTAL_MEMBERS', 70000);
-}
 $page = 'admin-panel';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -44,10 +41,7 @@ if ($is_logged_in) {
         $login_url .= '&id=' . urlencode($buwana_id);
     }
 
-    echo '<script>
-        alert("Please login before viewing this page.");
-        window.location.href = "' . $login_url . '";
-    </script>';
+    header('Location: ' . $login_url);
     exit();
 }
 
@@ -78,41 +72,15 @@ require_once '../buwanaconn_env.php';
 require_once '../emailing/earthen_helpers.php';
 
 $ghoststats_conn = loadGhostStatsConnection();
+$earthen_stats = getEarthenMemberStats($buwana_conn);
+
+if (!defined('EARTHEN_TOTAL_MEMBERS')) {
+    define('EARTHEN_TOTAL_MEMBERS', $earthen_stats['total'] ?? 0);
+}
 
 // Default newsletter headers
 $email_from = 'Earthen <earthen@ecobricks.org>';
 $email_subject = 'Writing Earth Right';
-
-function fetchEarthenStats($ghoststats_conn): array
-{
-    $stats = [
-        'total' => 0,
-        'sent' => 0,
-        'percentage' => 0,
-    ];
-
-    if (!$ghoststats_conn || $ghoststats_conn->connect_error) {
-        error_log('[GHOST STATS] Connection unavailable.');
-        return $stats;
-    }
-
-    $stats['total'] = defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0;
-
-    $sentQuery = "SELECT COUNT(*) AS sent
-                  FROM members_labels ml
-                  INNER JOIN labels l ON ml.label_id = l.id
-                  WHERE l.name = 'sent-001'";
-    $sentResult = $ghoststats_conn->query($sentQuery);
-    if ($sentResult && ($row = $sentResult->fetch_assoc())) {
-        $stats['sent'] = (int) ($row['sent'] ?? 0);
-    }
-
-    $stats['percentage'] = $stats['total'] > 0
-        ? round(($stats['sent'] / $stats['total']) * 100, 2)
-        : 0;
-
-    return $stats;
-}
 
 // 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
 $has_alerts = false;
@@ -128,46 +96,13 @@ if ($result->num_rows > 0) {
     }
 }
 
-try {
-    $ghost_members = fetchGhostMembers();
-    $summary = summarizeGhostMembers($ghost_members, 'sent-001');
+$initial_member_batch = fetchEarthenPendingBatch($buwana_conn, 100, 0);
 
-    $earthen_stats = fetchEarthenStats($ghoststats_conn);
-
-    $total_members = defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0;
-    $sent_count = $earthen_stats['sent'] ?? $summary['sent_count'];
-    $sent_percentage = $total_members > 0 ? round(($sent_count / $total_members) * 100, 3) : 0;
-    $pending_count = max(0, $total_members - $sent_count);
-
-    $status_limit = 20; // total rows to display in the status table
-    $sent_limit = 4;    // number of most recent sent entries
-
-    usort($summary['sent'], function ($a, $b) {
-        return strcmp($b['updated_at'] ?? '', $a['updated_at'] ?? '');
-    });
-
-    usort($summary['pending'], function ($a, $b) {
-        return strcmp($a['created_at'] ?? '', $b['created_at'] ?? '');
-    });
-
-    $sent_members = array_slice($summary['sent'], 0, $sent_limit);
-    $pending_limit = $status_limit - count($sent_members);
-    $pending_members = array_slice($summary['pending'], 0, $pending_limit);
-
-    $all_members = array_map(function ($member) {
-        $member['email_open_rate'] = calculateOpenRate($member);
-        $member['test_sent'] = memberHasLabel($member, 'sent-001');
-        $member['test_sent_date_time'] = $member['updated_at'] ?? 'N/A';
-        return $member;
-    }, array_merge($sent_members, $pending_members));
-} catch (Exception $e) {
-    error_log('[EARTHEN] Ghost sync failed: ' . $e->getMessage());
-    $total_members = defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0;
-    $sent_count = 0;
-    $sent_percentage = 0;
-    $pending_count = 0;
-    $all_members = [];
-}
+$total_members = $earthen_stats['total'] ?? (defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0);
+$sent_count = $earthen_stats['sent'] ?? 0;
+$sent_percentage = $earthen_stats['percentage'] ?? 0;
+$pending_count = max(0, $total_members - $sent_count);
+$all_members = $initial_member_batch;
 
 // Mailgun event breakdown for processing chart
 $mailgun_status_counts = [];
@@ -540,6 +475,8 @@ $(document).ready(function () {
     let batchSent = 0;
     let currentBatchSize = 0;
     let batchOffset = 0;
+    const initialBatch = <?php echo json_encode($initial_member_batch); ?>;
+    const initialStats = <?php echo json_encode($earthen_stats); ?>;
     let queueStats = {
         total: <?php echo (int) ($total_members ?? 0); ?>,
         sent: <?php echo (int) ($sent_count ?? 0); ?>,
@@ -733,6 +670,21 @@ $(document).ready(function () {
         $('#total-members').text(Number(queueStats.total).toLocaleString());
         $('#sent-count').text(queueStats.sent);
         $('#sent-percentage').text(Number(queueStats.percentage).toFixed(3));
+    }
+
+    function loadInitialBatch() {
+        updateStatsDisplay(initialStats);
+
+        if (Array.isArray(initialBatch) && initialBatch.length) {
+            recipientQueue = initialBatch;
+            queueIndex = 0;
+            currentBatchSize = recipientQueue.length;
+            batchOffset = currentBatchSize;
+            renderStatusTable();
+            setActiveRecipientFromQueue(queueIndex);
+        }
+
+        updateBatchDisplay();
     }
 
     function incrementSentStats() {
@@ -1008,15 +960,18 @@ function sendEmail() {
     $('#auto-send-toggle').prop('checked', savedAutoSend);
     $('#test-email-toggle').prop('checked', savedTestSend);
 
-    updateBatchDisplay();
+    loadInitialBatch();
     updateVisibleButton();
 
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#auto-send-button, #test-send-button').prop('disabled', true);
     } else {
-        console.log("🚚 Fetching first recipient...");
-        fetchRecipientBatch(); // Fetch on page load, and auto-send if toggled
+        if (!recipientQueue.length) {
+            fetchRecipientBatch();
+        } else if (autoSendEnabled() && recipientEmail) {
+            startCountdownAndSend();
+        }
     }
 });
 
