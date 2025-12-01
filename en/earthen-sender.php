@@ -471,6 +471,7 @@ $(document).ready(function () {
     let sendFailCount = 0;
     let recipientQueue = [];
     let queueIndex = 0;
+    let autoSendStarted = false;
     const batchSize = 100;
     let batchSent = 0;
     let currentBatchSize = 0;
@@ -623,6 +624,10 @@ $(document).ready(function () {
     }
 
     function startCountdownAndSend() {
+        if (!autoSendEnabled() || !autoSendStarted || !recipientEmail) {
+            return;
+        }
+
         clearInterval(countdownInterval);
         if (isSending) return; // don't queue another send while sending
         sendDelay = parseInt($('#send-delay-slider').val()) || 1;
@@ -886,12 +891,22 @@ function sendEmail() {
     // 🔹 Form submission (manual trigger)
     $('#email-form').on('submit', function (e) {
         e.preventDefault();
+
+        if (autoSendEnabled()) {
+            autoSendStarted = true;
+            startCountdownAndSend();
+            return;
+        }
+
         sendEmail();
     });
 
     // 🔹 Manual click trigger
     $('#test-send-button, #auto-send-button').on('click', function (e) {
         e.preventDefault();
+        if (autoSendEnabled()) {
+            autoSendStarted = true;
+        }
         $('#email-form').trigger('submit');
     });
 
@@ -912,6 +927,13 @@ function sendEmail() {
     $('#auto-send-toggle').on('change', function () {
         localStorage.setItem('autoSend', $(this).is(':checked'));
         updateVisibleButton();
+
+        if (!$(this).is(':checked')) {
+            autoSendStarted = false;
+            clearInterval(countdownInterval);
+            $('#countdown-timer').hide();
+            return;
+        }
 
         // If switched ON and a recipient is already loaded, auto-trigger
         if (autoSendEnabled() && recipientEmail) {

@@ -322,7 +322,7 @@ function fetchEarthenPendingBatch(mysqli $conn, int $limit = 100, int $offset = 
 
     $stmt->close();
 
-    return array_map(function ($member) {
+    $mappedBatch = array_map(function ($member) {
         return [
             'id' => $member['id'] ?? null,
             'email' => $member['email'] ?? '',
@@ -333,6 +333,75 @@ function fetchEarthenPendingBatch(mysqli $conn, int $limit = 100, int $offset = 
             'test_sent_date_time' => $member['test_sent_date_time'] ?? 'N/A',
         ];
     }, $batch);
+
+    return filterMembersWithoutGhostLabel($mappedBatch, 'sent-001');
+}
+
+/**
+ * Remove members that already have a specific Ghost label.
+ */
+function filterMembersWithoutGhostLabel(array $members, string $labelName = 'sent-001'): array
+{
+    if (empty($members)) {
+        return [];
+    }
+
+    $emails = array_values(array_unique(array_filter(array_column($members, 'email'))));
+
+    if (empty($emails)) {
+        return $members;
+    }
+
+    $ghost_conn = loadGhostStatsConnection();
+
+    if (!$ghost_conn) {
+        return $members;
+    }
+
+    $placeholders = implode(',', array_fill(0, count($emails), '?'));
+    $sql = "SELECT DISTINCT m.email
+            FROM members m
+            INNER JOIN members_labels ml ON m.id = ml.member_id
+            INNER JOIN labels l ON ml.label_id = l.id
+            WHERE l.name = ? AND m.email IN ($placeholders)";
+
+    $stmt = $ghost_conn->prepare($sql);
+
+    if (!$stmt) {
+        error_log('[EARTHEN] Failed to prepare Ghost label filter query: ' . $ghost_conn->error);
+        return $members;
+    }
+
+    $params = array_merge([$labelName], $emails);
+    $types = str_repeat('s', count($params));
+
+    $bindValues = [$types];
+    foreach ($params as $key => $value) {
+        $bindValues[] = &$params[$key];
+    }
+
+    call_user_func_array([$stmt, 'bind_param'], $bindValues);
+
+    if (!$stmt->execute()) {
+        error_log('[EARTHEN] Failed executing Ghost label filter query: ' . $stmt->error);
+        $stmt->close();
+        return $members;
+    }
+
+    $result = $stmt->get_result();
+    $labelledEmails = $result ? array_column($result->fetch_all(MYSQLI_ASSOC), 'email') : [];
+    $stmt->close();
+
+    if (empty($labelledEmails)) {
+        return $members;
+    }
+
+    $labelledSet = array_flip(array_map('strtolower', $labelledEmails));
+
+    return array_values(array_filter($members, function ($member) use ($labelledSet) {
+        $email = strtolower($member['email'] ?? '');
+        return $email === '' || !isset($labelledSet[$email]);
+    }));
 }
 
 function memberHasLabel(array $member, string $labelName): bool
