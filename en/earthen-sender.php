@@ -881,6 +881,11 @@ function sendEmail() {
                     return;
                 }
                 isSending = false;
+
+                // Continue auto sending on the configured timer after a successful send
+                if (!isTestMode && autoSendEnabled() && autoSendStarted) {
+                    startCountdownAndSend();
+                }
             },
             error: function () {
                 handleSendError('Failed to send the email.');
@@ -943,6 +948,7 @@ function sendEmail() {
 
     $('#send-delay-slider').on('input change', function () {
         sendDelay = parseInt($(this).val());
+        localStorage.setItem('sendDelay', sendDelay);
         $('#delay-display').text(sendDelay);
         console.log(`⏲️ Delay set to ${sendDelay}s`);
 
