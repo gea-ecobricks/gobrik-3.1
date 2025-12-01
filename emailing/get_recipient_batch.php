@@ -29,37 +29,14 @@ try {
         exit();
     }
 
-    $members = fetchGhostMembers([
-        'limit' => $batchSize,
-        'offset' => $offset,
-    ]);
+    $response['batch'] = fetchEarthenPendingBatch($buwana_conn, $batchSize, $offset);
 
-    $summary = summarizeGhostMembers($members, 'sent-001');
-
-    usort($summary['pending'], function ($a, $b) {
-        return strcmp($a['created_at'] ?? '', $b['created_at'] ?? '');
-    });
-
-    $batchMembers = array_slice($summary['pending'], 0, $batchSize);
-
-    $response['batch'] = array_map(function ($member) {
-        return [
-            'id' => $member['id'] ?? null,
-            'email' => $member['email'] ?? '',
-            'name' => $member['name'] ?? '',
-            'uuid' => $member['uuid'] ?? '',
-            'email_open_rate' => calculateOpenRate($member),
-            'status' => 'pending',
-        ];
-    }, $batchMembers);
-
-    $totalMembers = defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : ($summary['total'] ?? 0);
-    $sentCount = $summary['sent_count'];
+    $earthenStats = getEarthenMemberStats($buwana_conn);
 
     $response['stats'] = [
-        'total' => $totalMembers,
-        'sent' => $sentCount,
-        'percentage' => $totalMembers > 0 ? round(($sentCount / $totalMembers) * 100, 3) : 0,
+        'total' => $earthenStats['total'] ?? 0,
+        'sent' => $earthenStats['sent'] ?? 0,
+        'percentage' => $earthenStats['percentage'] ?? 0,
     ];
 
     $response['success'] = true;
