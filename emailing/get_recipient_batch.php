@@ -29,9 +29,11 @@ try {
         exit();
     }
 
-    $response['batch'] = fetchEarthenPendingBatch($buwana_conn, $batchSize, $offset);
+    $ghost_conn = loadGhostStatsConnection();
 
-    $earthenStats = getEarthenMemberStats($buwana_conn);
+    $response['batch'] = fetchGhostPendingBatch($ghost_conn, $batchSize, $offset);
+
+    $earthenStats = getGhostMemberStats($ghost_conn);
 
     $response['stats'] = [
         'total' => $earthenStats['total'] ?? 0,

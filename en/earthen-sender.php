@@ -72,7 +72,7 @@ require_once '../buwanaconn_env.php';
 require_once '../emailing/earthen_helpers.php';
 
 $ghoststats_conn = loadGhostStatsConnection();
-$earthen_stats = getEarthenMemberStats($buwana_conn);
+$earthen_stats = getGhostMemberStats($ghoststats_conn);
 
 if (!defined('EARTHEN_TOTAL_MEMBERS')) {
     define('EARTHEN_TOTAL_MEMBERS', $earthen_stats['total'] ?? 0);
@@ -96,7 +96,7 @@ if ($result->num_rows > 0) {
     }
 }
 
-$initial_member_batch = fetchEarthenPendingBatch($buwana_conn, 100, 0);
+$initial_member_batch = fetchGhostPendingBatch($ghoststats_conn, 100, 0);
 
 $total_members = $earthen_stats['total'] ?? (defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0);
 $sent_count = $earthen_stats['sent'] ?? 0;
@@ -199,30 +199,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 }
 
 
-function resolveMemberIdByEmail(string $email): ?int
-{
-    global $gobrik_conn;
-
-    if (!isset($gobrik_conn)) {
-        return null;
-    }
-
-    $stmt = $gobrik_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
-
-    if (!$stmt) {
-        error_log('[EARTHEN] Failed to prepare member lookup: ' . $gobrik_conn->error);
-        return null;
-    }
-
-    $stmt->bind_param('s', $email);
-    $stmt->execute();
-    $stmt->bind_result($member_id);
-    $found = $stmt->fetch();
-    $stmt->close();
-
-    return $found ? (int) $member_id : null;
-}
-
 function logFailedEmail(string $email, string $reason): void
 {
     global $gobrik_conn;
@@ -232,7 +208,14 @@ function logFailedEmail(string $email, string $reason): void
         return;
     }
 
-    $member_id = resolveMemberIdByEmail($email);
+    $member_id = null;
+
+    try {
+        $member_id = getMemberIdByEmail($email);
+    } catch (Exception $e) {
+        error_log('[EARTHEN] Failed to look up Ghost member ID: ' . $e->getMessage());
+    }
+
     $event_timestamp = date('Y-m-d H:i:s');
 
     $stmt = $gobrik_conn->prepare(
@@ -881,6 +864,11 @@ function sendEmail() {
                     return;
                 }
                 isSending = false;
+
+                // Continue auto sending on the configured timer after a successful send
+                if (!isTestMode && autoSendEnabled() && autoSendStarted) {
+                    startCountdownAndSend();
+                }
             },
             error: function () {
                 handleSendError('Failed to send the email.');
@@ -943,6 +931,7 @@ function sendEmail() {
 
     $('#send-delay-slider').on('input change', function () {
         sendDelay = parseInt($(this).val());
+        localStorage.setItem('sendDelay', sendDelay);
         $('#delay-display').text(sendDelay);
         console.log(`⏲️ Delay set to ${sendDelay}s`);
 
