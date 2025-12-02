@@ -78,9 +78,23 @@ if (!defined('EARTHEN_TOTAL_MEMBERS')) {
     define('EARTHEN_TOTAL_MEMBERS', $earthen_stats['total'] ?? 0);
 }
 
-// Default newsletter headers
-$email_from = 'Earthen <earthen@ecobricks.org>';
-$email_subject = 'Writing Earth Right';
+$requested_newsletter = $_POST['newsletter_choice'] ?? null;
+
+function buildSentLabel(?string $newsletterId): string
+{
+    $safeId = preg_replace('/[^0-9A-Za-z_-]/', '', (string) $newsletterId);
+
+    if ($safeId === '') {
+        return 'sent-unknown';
+    }
+
+    return 'sent-' . $safeId;
+}
+
+// Newsletter headers are defined inside each newsletter template
+$email_from = '';
+$email_reply_to = '';
+$email_subject = '';
 
 // 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
 $has_alerts = false;
@@ -134,7 +148,7 @@ try {
                 $insert_stmt->execute();
 
                 try {
-                    ensureMemberHasLabel($ghost_id, 'sent-001');
+                    ensureMemberHasLabel($ghost_id, buildSentLabel($requested_newsletter ?? '001'));
                 } catch (Exception $labelException) {
                     error_log('[EARTHEN] ❌ Failed to apply sent label: ' . $labelException->getMessage());
                 }
@@ -208,18 +222,34 @@ $newsletter_files = [
 ];
 
 $newsletter_templates = [];
+$newsletter_headers = [];
 
 foreach ($newsletter_files as $newsletter_id => $path) {
     if (file_exists($path)) {
         $email_template = '';
         $recipient_uuid = null;
         $recipient_email = null;
+        $email_from = '';
+        $email_reply_to = '';
+        $email_subject = '';
         include $path;
         $newsletter_templates[$newsletter_id] = $email_template;
+        $newsletter_headers[$newsletter_id] = [
+            'from' => $email_from,
+            'reply_to' => $email_reply_to ?: $email_from,
+            'subject' => $email_subject,
+        ];
     }
 }
 
 $selected_newsletter = $_POST['newsletter_choice'] ?? array_key_first($newsletter_templates);
+$selected_headers = $newsletter_headers[$selected_newsletter] ?? ['from' => '', 'reply_to' => '', 'subject' => ''];
+$email_from = $selected_headers['from'] ?? '';
+$email_reply_to = $selected_headers['reply_to'] ?? ($email_from ?? '');
+$email_subject = $selected_headers['subject'] ?? '';
+
+$sent_label = buildSentLabel($selected_newsletter);
+
 $email_template = $newsletter_templates[$selected_newsletter] ?? reset($newsletter_templates);
 if ($email_template === false) {
     $email_template = '';
@@ -260,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 
             if ($subscriber_id && !$is_test_mode && $send_ok) {
                 try {
-                    ensureMemberHasLabel($subscriber_id, 'sent-001');
+                    ensureMemberHasLabel($subscriber_id, $sent_label);
                 } catch (Exception $labelException) {
                     error_log('[EARTHEN] ❌ Failed to add sent label: ' . $labelException->getMessage());
                 }
@@ -345,7 +375,7 @@ function logFailedEmail(string $email, string $reason): void
 
 // Email sending function
 function sendEmail($to, $htmlBody) {
-    global $email_from, $email_subject;
+    global $email_from, $email_reply_to, $email_subject;
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
     $mailgunApiKey = getenv('EARTHEN_MAILGUN_SENDING_KEY');
     $mailgunDomain = 'earthen.ecobricks.org';
@@ -356,6 +386,7 @@ function sendEmail($to, $htmlBody) {
         'form_params' => [
             'from' => $email_from,
             'to' => $to,
+            'h:Reply-To' => $email_reply_to ?: $email_from,
             'subject' => $email_subject,
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
@@ -518,8 +549,9 @@ echo '<!DOCTYPE html>
 
 <div id="send-controls" style="height:500px;">
 <form id="email-form" method="POST" style="margin-top: 50px;">
-    <p><strong>From:</strong> <?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></p>
-    <p><strong>Subject:</strong> <?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></p>
+    <p><strong>From:</strong> <span id="email-from-display"><?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></span></p>
+    <p><strong>Reply:</strong> <span id="email-reply-display"><?php echo htmlspecialchars($email_reply_to, ENT_QUOTES, 'UTF-8'); ?></span></p>
+    <p><strong>Subject:</strong> <span id="email-subject-display"><?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></span></p>
     <label for="email_html">Newsletter HTML:</label>
     <div style="margin:8px 0 12px;">
         <select id="newsletter-selector" name="newsletter_choice" style="padding:8px;border-radius:8px;min-width:200px;">
@@ -620,11 +652,20 @@ $(document).ready(function () {
     let testEmail = localStorage.getItem('testEmail') || testEmailDefault;
 
     const newsletterTemplates = <?php echo json_encode($newsletter_templates, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+    const newsletterHeaders = <?php echo json_encode($newsletter_headers, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
     const newsletterSelector = $('#newsletter-selector');
+
+    function updateNewsletterMeta(templateId) {
+        const meta = newsletterHeaders[templateId] || {};
+        $('#email-from-display').text(meta.from || '');
+        $('#email-reply-display').text(meta.reply_to || meta.from || '');
+        $('#email-subject-display').text(meta.subject || '');
+    }
 
     function loadNewsletterTemplate(templateId) {
         const template = newsletterTemplates[templateId] || '';
         $('#email_html').val(template);
+        updateNewsletterMeta(templateId);
     }
 
     newsletterSelector.on('change', function () {
@@ -1087,6 +1128,7 @@ function sendEmail() {
                 email_html: emailBody,
                 test_mode: isTestMode ? 1 : 0,
                 subscriber_id: recipientId,
+                newsletter_choice: newsletterSelector.val(),
                 batch_row_id: recipientQueue[queueIndex] ? recipientQueue[queueIndex].batch_row_id : null
             },
             success: function (resp) {

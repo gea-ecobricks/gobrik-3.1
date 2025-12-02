@@ -1,5 +1,9 @@
 <?php
 
+$email_from = 'Russell Maier <russ@ecobricks.org>';
+$email_reply_to = 'russ@ecobricks.org';
+$email_subject = 'Plastic, the Biosphere & Ecobricks + latest Earthen posts';
+
 // Build the unsubscribe link using the recipient's email when available.
 $recipient_uuid = !empty($recipient_uuid) ? $recipient_uuid : '{{RECIPIENT_UUID}}';
 $default_unsubscribe = 'https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=18bce2af-ca5b-4a10-bff3-f79d32479f09';
