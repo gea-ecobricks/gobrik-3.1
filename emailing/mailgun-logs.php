@@ -2,6 +2,7 @@
 require_once '../earthenAuth_helper.php';
 require_once '../auth/session_start.php';
 require_once '../gobrikconn_env.php';
+require_once 'earthen_helpers.php';
 
 if (!$is_logged_in) {
     header('Location: ../login.php?redirect=emailing/mailgun-logs.php');
@@ -29,6 +30,26 @@ if ($stmt = $gobrik_conn->prepare($roles_query)) {
         window.location.href = '../en/dashboard.php';
     </script>";
     exit();
+}
+
+$action_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unsubscribe_email'])) {
+    $email = trim($_POST['unsubscribe_email']);
+
+    if ($email !== '') {
+        try {
+            $unsubscribe_result = earthenUnsubscribe($email);
+
+            if ($unsubscribe_result) {
+                $action_message = "Successfully removed $email from Ghost.";
+            } else {
+                $action_message = "No Ghost member found for $email.";
+            }
+        } catch (Exception $e) {
+            $action_message = 'Unable to process unsubscribe: ' . $e->getMessage();
+        }
+    }
 }
 
 $mailgun_events = [];
@@ -93,6 +114,18 @@ if ($result = $gobrik_conn->query($events_query)) {
             align-items: center;
         }
 
+        .count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            background: #f0f4ff;
+            color: #0d6efd;
+            border: 1px solid #d0d7de;
+            font-weight: 600;
+        }
+
         .button {
             display: inline-flex;
             align-items: center;
@@ -125,12 +158,52 @@ if ($result = $gobrik_conn->query($events_query)) {
         table.dataTable thead th {
             background: #f0f0f0;
         }
+
+        .danger-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #d62c2c;
+            background: #e55353;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+            width: 100%;
+        }
+
+        .danger-button:hover {
+            background: #d62c2c;
+            box-shadow: 0 3px 8px rgba(214, 44, 44, 0.3);
+        }
+
+        .process-cell {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .notice {
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #f0f9ff;
+            border: 1px solid #9ec5fe;
+            color: #0c63e4;
+            margin-top: 14px;
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header-bar">
             <h1>Mailgun Logs</h1>
+            <span class="count-badge">
+                <?php echo count($mailgun_events); ?> events retrieved
+            </span>
             <div class="actions">
                 <?php if ($show_failed_only): ?>
                     <a class="button secondary" href="mailgun-logs.php">View All Events</a>
@@ -146,6 +219,9 @@ if ($result = $gobrik_conn->query($events_query)) {
                 Latest Mailgun events for the Earthen sender (most recent 200 entries).
             <?php endif; ?>
         </p>
+        <?php if ($action_message): ?>
+            <p class="notice"><?php echo htmlspecialchars($action_message); ?></p>
+        <?php endif; ?>
         <table id="mailgun-log-table" class="display" style="width:100%">
             <thead>
                 <tr>
@@ -154,6 +230,7 @@ if ($result = $gobrik_conn->query($events_query)) {
                     <th>Event</th>
                     <th>Severity</th>
                     <th>Details</th>
+                    <th>Process</th>
                 </tr>
             </thead>
             <tbody>
@@ -164,6 +241,22 @@ if ($result = $gobrik_conn->query($events_query)) {
                         <td><?php echo htmlspecialchars($event['event_type'] ?? '—'); ?></td>
                         <td><?php echo htmlspecialchars($event['severity'] ?? '—'); ?></td>
                         <td><?php echo htmlspecialchars($event['details'] ?? '—'); ?></td>
+                        <td class="process-cell">
+                            <?php
+                                $event_type   = strtolower($event['event_type'] ?? '');
+                                $event_sev    = strtolower($event['severity'] ?? '');
+                                $is_failure   = ($event_type === 'failed') || (strpos($event_sev, 'failure') !== false);
+                                $recipient    = $event['recipient_email'] ?? '';
+                            ?>
+                            <?php if ($is_failure && $recipient): ?>
+                                <form method="POST" onsubmit="return confirm('Remove <?php echo htmlspecialchars($recipient); ?> from Ghost?');">
+                                    <input type="hidden" name="unsubscribe_email" value="<?php echo htmlspecialchars($recipient); ?>">
+                                    <button type="submit" class="danger-button">Remove</button>
+                                </form>
+                            <?php else: ?>
+                                —
+                            <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
