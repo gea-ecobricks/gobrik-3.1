@@ -359,6 +359,16 @@ echo '<!DOCTYPE html>
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
+<style>
+    .toggle-switch .slider.order-oldest {
+        background-color: #4caf50;
+    }
+
+    .toggle-switch .slider.order-newest {
+        background-color: #ff9800;
+    }
+</style>
+
 
 
 
