@@ -1,0 +1,1707 @@
+Return-Path: <bounce+43e761.2266b-russ=earthen.io@earthen.ecobricks.org>
+Received: from m204-229.eu.mailgun.net (m204-229.eu.mailgun.net [161.38.204.229])
+by work-mx.app.hey.com (Postfix) with ESMTP id B541882405
+for <russ@earthen.io>; Tue,  2 Dec 2025 09:58:14 +0000 (UTC)
+Received: by 65e302691be9ef985de94db3a12389e3f4030bd0c4aa9ccad3847b9f90b713dc with HTTP
+id 692eb835d1f9c7e12860cbad; Tue, 02 Dec 2025 09:58:12 GMT
+Date: Tue, 02 Dec 2025 09:58:12 +0000
+From: Russell Maier <russ@ecobricks.org>
+Sender: Russell Maier <russ@ecobricks.org>
+Reply-To: russ@ecobricks.org
+To: russ@earthen.io
+Message-ID: <20251202095812.04fa13c2a7ad0681@earthen.ecobricks.org>
+Subject: Plastic, the Biosphere & Ecobricks + latest Earthen posts
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+boundary="8fdca3192ec32357b28c6caea7d4e8b32ea52111dae7d8231e4bf84a179f"
+Content-Transfer-Encoding: 7bit
+X-Original-To: russ@earthen.io
+Delivered-To: russ@earthen.io
+Authentication-Results: work-mx.app.hey.com;
+dkim=pass header.d=earthen.ecobricks.org header.s=pdk1 header.b=RMeKPToQ;
+spf=pass (work-mx.app.hey.com: domain of "bounce+43e761.2266b-russ=earthen.io@earthen.ecobricks.org" designates 161.38.204.229 as permitted sender) smtp.mailfrom="bounce+43e761.2266b-russ=earthen.io@earthen.ecobricks.org";
+dmarc=pass (policy=none) header.from=ecobricks.org
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=earthen.io;
+s=heymail; t=1764669495;
+h=from:from:sender:sender:reply-to:reply-to:subject:subject:date:date:
+message-id:message-id:to:to:cc:mime-version:mime-version:
+content-type:content-type:list-unsubscribe:list-unsubscribe-post;
+bh=eeeJA2UOuny+E+90BQGrJt49/c58HbD+jxibzndem+s=;
+b=AgY6iMsAZejchn4fy5ve/XeBwrE0MLPN7gzJL3ArMgeLGmY+M7szud/vlMFsaN5LSxTApB
+tGn280gcdictC0dQ/94ZGiISMN7HJkwpYtaYAHdYA3nY460XNnwWWkZ30ZWjtBI7LoExYh
+VEQKfHHAFlyggR5udO+/pOI9ffjyI6EPv2lePGK4Rjq90SyB4tQXapCqauJ5p0QYS+F/H3
+YBkHk0PJRMLknrFFZvOX0aLpqgbFBDqjuui4iuRMOKNKy7DN5E2rzs0QlcMGwz8gketms6
+9s4y5shLQZbCaOa/P0qkVnY8oB/H2CwkxsdagIyHFikoYIhi2nT4JXZKvnwgWA==
+ARC-Authentication-Results: i=1;
+work-mx.app.hey.com;
+dkim=pass header.d=earthen.ecobricks.org header.s=pdk1 header.b=RMeKPToQ;
+spf=pass (work-mx.app.hey.com: domain of "bounce+43e761.2266b-russ=earthen.io@earthen.ecobricks.org" designates 161.38.204.229 as permitted sender) smtp.mailfrom="bounce+43e761.2266b-russ=earthen.io@earthen.ecobricks.org";
+dmarc=pass (policy=none) header.from=ecobricks.org
+ARC-Seal: i=1; s=heymail; d=earthen.io; t=1764669495; a=rsa-sha256;
+cv=none;
+b=AAfemagfA/9uB0SNq83FwnbVz4lLJDRmvFvXDqFH/iZBcE1igCEpFhF9Y7YeWrcq2PFRPv
+Pwu1lgCFLHWsJZ9VxUIX1NI/pyFpLaBcnW+rNrWYo2EFnhEQDDTKt1y+FL34i1IpKpN/ib
+D2uoXbzdhGeJzje7alH+xgN8ktB+9GzjIFC0iJiwoe7N1yPSsKdmgKknMrdcOGQkqPuv+h
+Z212ZhjnALatEnHl5kgcaOVVWp0IYlHP1ftTLnr9gPimNBWHAX+Ki/ccokrO/UjcB5lc+W
+1wqZ3/F5V1Mbrv5qfmEkTxFO5wPlGF/hiH7+ontife8HxJyHOKj5DNUiUw304g==
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=earthen.ecobricks.org; q=dns/txt; s=pdk1; t=1764669493; x=1764676693;
+h=Message-Id: List-Unsubscribe-Post: List-Unsubscribe: Sender: Sender: Reply-To: To: To: From: From: Subject: Subject: Content-Type: Mime-Version: Date;
+bh=eeeJA2UOuny+E+90BQGrJt49/c58HbD+jxibzndem+s=;
+b=RMeKPToQX/SOySLjjPnyxAad13tzUg/mA3agftskvjYwv+HySFfEnWjB2q2ERtM5LmhauOAGSR5QsQDVfo6JweLGLUWYPmanbgI58x8RO0q94C7G+vEp3NGg3yI4xcDU1P5mUQTUdXobFoPTGUoIMKYdrHOsOrzyMiHEejV6FAhfqSF5gKUuEmyBr9EW2uJt4/16YCzCCU+wta75saDePrJAdfph+S93k61JZguilfeXYA5q8NY10rfIxE7I4E0SnamMTQg+awegDNKDZEmvXaj6ZuyweffVuNwJMqQiOFmeONg6jKxo+F7aAzLHKTinURQ1kUp+L3bz8yaTgPf7eA==
+X-Mailgun-Sid: WyI2MzA0ZCIsInJ1c3NAZWFydGhlbi5pbyIsIjIyNjZiIl0=
+X-Mailgun-Sending-Ip: 161.38.204.229
+X-Mailgun-Batch-Id: 692eb8347189073a41370261
+X-Mailgun-Tag: ghost-email
+X-Mailgun-Tag: bulk-email
+X-Mailgun-Track-Opens: true
+Auto-Submitted: auto-generated
+X-Auto-Response-Suppress: OOF, AutoReply
+List-Unsubscribe: <https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=18bce2af-ca5b-4a10-bff3-f79d32479f09>,
+<mailto:u+mq6temrwgzrcmzlnmfuwylljmq6tmojsmvrdqmzqgmygenjzhe3dazjzgm3deylfhetgqpldmu2gczjvmm4dkyrxgvqwgzbygrtdamrumm2tintbgvrdiztegutgspjsgazdkmjsgazdaojvhaytelrqgrtgcmjtmmzgcn3bmqydmobreu2dazlboj2gqzlofzswg33cojuwg23tfzxxezzgoi6xe5ltomstimdfmfzhi2dfnyxgs3zgoq6wo2dpon2c2zlnmfuwyjtuhvrhk3dlfvsw2yljnqthmpjs@earthen.ecobricks.org>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+X-Mailgun-Variables: {"email-id": "692eb83030b59960e9362ae9"}
+
+--8fdca3192ec32357b28c6caea7d4e8b32ea52111dae7d8231e4bf84a179f
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+
+
+
+
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=
+=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=
+=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =
+=E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=
+=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =E2=
+=80=87=CD=8F =E2=80=87=CD=8F =E2=80=87=CD=8F =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=
+=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =
+=C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=AD =C2=A0
+
+
+
+
+
+
+
+
+
+=C2=A0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+https://earthen.io/r/905f4b81?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905
+
+
+
+
+
+
+
+
+
+GEA Trainer Newsletter [https://earthen.io/r/952be789?m=3D4dbbb711-73e9-4fd=
+0-9056-a7cc1af6a905]
+
+
+
+
+
+
+
+
+
+
+
+
+
+Plastic, the Biosphere & Ecobricks + latest Earthen posts [https://earthen.=
+io/r/a740e14c?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905]
+
+
+
+
+
+
+
+
+
+
+
+
+By GEA Center Circle =E2=80=A2 2 Dec 2025
+
+
+View in browser [https://earthen.io/r/b482a7e6?m=3D4dbbb711-73e9-4fd0-9056-=
+a7cc1af6a905]
+
+
+
+
+View in browser [https://earthen.io/r/2c9cb531?m=3D4dbbb711-73e9-4fd0-9056-=
+a7cc1af6a905]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=C2=A0
+
+
+
+
+
+
+
+
+
+
+
+=C2=A0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This coming Sunday, we're excited to run our last intro to ecobricks course=
+for 2025!
+
+This will also be the last free course that we run. Our courses have been f=
+ree this past year while we've set up the Global Ecobrick Alliance's offici=
+al Indonesian organization (and its bank account)=E2=80=93 and our own paym=
+ent processing system. Don't worry, the cost will be reasonable! But this w=
+ill be the last one...
+
+Paula and Russell will be leading the 90 minute overview of the principles,=
+theory and best practices behind ecobricking and plastic sequestration. Us=
+e your Buwana GoBrik account to register =F0=9F=91=87
+
+
+
+
+
+
+Plastic, the Biosphere and Ecobricks
+Register for our Online Starter Workshop led by Paula Apollonia and Russell=
+Maier on December 7, 2025=E2=80=A6
+
+
+GoBrik.com
+
+
+
+
+
+[https://earthen.io/r/e643f8de?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905]
+
+
+
+
+
+Meanwhile, be sure to check out the latest posts on Earthen that you might =
+have missed any. The last two essays Russell has been slow and steady worki=
+ng on for the last two years!
+
+
+
+
+
+
+Writing Earth Right
+How we write the name of our home planet unconsciously encodes the relation=
+ship we have with it.=E2=80=A6
+
+
+Earthen
+=E2=80=A2Russell Maier
+
+
+
+
+[https://earthen.io/r/9f8ce9c4?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905]
+
+
+
+
+
+
+
+
+The Problem with Google Calendar
+As we hit the limits of the Roman Empire=E2=80=99s 2,000-year-old Calendar,=
+now is the time for transition from linear and huma=E2=80=A6
+
+
+Earthen
+=E2=80=A2Russell Maier
+
+
+
+
+[https://earthen.io/r/30e80ec0?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+More like this
+
+
+[https://earthen.io/plastic-the-biosphere-ecobricks-latest-earthen-posts/#/=
+feedback/69146a7b1b74ba04b3f2a339/1/?uuid=3D4dbbb711-73e9-4fd0-9056-a7cc1af=
+6a905&key=3D6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087d=
+c]
+
+
+
+
+
+Less like this
+
+
+[https://earthen.io/plastic-the-biosphere-ecobricks-latest-earthen-posts/#/=
+feedback/69146a7b1b74ba04b3f2a339/0/?uuid=3D4dbbb711-73e9-4fd0-9056-a7cc1af=
+6a905&key=3D6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087d=
+c]
+
+
+
+
+
+Comment
+
+
+[https://earthen.io/r/766788b6?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905]
+
+
+
+
+
+
+
+
+
+
+
+
+
+Earthen =C2=A9 2025 =E2=80=93 Unsubscribe [https://earthen.io/unsubscribe/?=
+uuid=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=3D6c3ffe5e66725cd21a19a3f06=
+a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=3D18bce2af-ca5b-4a10-bff=
+3-f79d32479f09]
+
+
+
+
+
+
+
+
+
+
+
+
+=C2=A0
+
+
+
+
+
+--8fdca3192ec32357b28c6caea7d4e8b32ea52111dae7d8231e4bf84a179f
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<!doctype html>
+<html>
+<head>
+    <meta name=3D"viewport" content=3D"width=3Ddevice-width">
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DU=
+          TF-8">
+    <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:=
+    PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]-->
+    <title>Plastic, the Biosphere &amp; Ecobricks + latest Earthen post=
+        s</title>
+    <style>
+        =2Epost-title-link {
+            display: block;
+            margin-top: 32px;
+            color: #15212A;
+            text-align: center;
+            line-height: 1.1em;
+        }
+        =2Epost-title-link-left {
+              text-align: left;
+          }
+        =2Eview-online-link {
+              word-wrap: none;
+              white-space: nowrap;
+              color: #15212a;
+              color: rgba(0, 0, 0, 0.6);
+              text-decoration: underline !important;
+          }
+        =2Ekg-nft-link {
+              display: block;
+              text-decoration: none !important;
+              color: #15212A !important;
+              font-family: inherit !important;
+              font-size: 14px;
+              line-height: 1.3em;
+              padding-top: 4px;
+              padding-right: 20px;
+              padding-left: 20px;
+              padding-bottom: 4px;
+          }
+        =2Ekg-twitter-link {
+              display: block;
+              text-decoration: none !important;
+              color: #15212A !important;
+              font-family: inherit !important;
+              font-size: 15px;
+              padding: 8px;
+              line-height: 1.3em;
+          }
+        =2Ekg-cta-link-accent .kg-cta-sponsor-label a {
+              color: #4B8501 !important;
+          }
+        =2Ekg-cta-text a:not(.kg-cta-link-accent .kg-cta-text a) {
+              color: #15212A;
+              text-decoration: underline;
+          }
+        =2Ekg-cta-link-accent .kg-cta-text a {
+              color: #4B8501 !important;
+          }
+        =2Ekg-audio-link {
+              color: #15212a !important;
+              color: rgba(0, 0, 0, 0.6) !important;
+          }
+        @media only screen and (max-width: 620px) {
+            table.body {
+                width: 100%;
+                min-width: 100%;
+            }
+
+            .hide-mobile {
+                display: none;
+            }
+
+            .mobile-only {
+                display: initial !important;
+            }
+
+            .hide-desktop {
+                display: initial !important;
+            }
+
+            .desktop-only {
+                display: none !important;
+            }
+
+            table.body p,
+            table.body ul,
+            table.body ol,
+            table.body td {
+                font-size: 16px;
+            }
+
+            table.header .post-excerpt {
+                font-size: 16px !important;
+            }
+
+            table.body .kg-callout-card {
+                padding: 16px 24px !important;
+            }
+
+            table.body .kg-callout-text {
+                font-size: 16px !important;
+                line-height: 1.5em !important;
+            }
+
+            table.body pre {
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
+            }
+
+            table.body .content {
+                padding: 0 !important;
+            }
+
+            table.body .container {
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            table.body .main,
+            table.header .header-main {
+                border-spacing: 10px 0 !important;
+                border-left-width: 0 !important;
+                border-radius: 0 !important;
+                border-right-width: 0 !important;
+            }
+
+            table.body .img-responsive {
+                height: auto !important;
+                max-width: 100% !important;
+                width: auto !important;
+            }
+
+            table.header .site-icon {
+                padding-top: 0 !important;
+            }
+
+            table.header .site-info {
+                padding-top: 24px !important;
+            }
+
+            table.header .post-title-link {
+                margin-top: 24px !important;
+            }
+
+            table.header .post-meta-wrapper {
+                padding-bottom: 24px !important;
+            }
+
+            table.header .site-icon img {
+                width: 36px !important;
+                height: 36px !important;
+            }
+
+            table.header .site-url a {
+                font-size: 13px !important;
+                padding-bottom: 16px !important;
+            }
+
+            table.header .post-meta,
+            table.header .post-meta-date {
+                white-space: normal !important;
+                font-size: 13px !important;
+                line-height: 1.2em;
+            }
+
+            table.header .post-meta,
+            table.header .view-online {
+                width: 100% !important;
+            }
+
+            table.header .post-meta-left,
+            table.header .post-meta-left.view-online {
+                width: 100% !important;
+                text-align: left !important;
+            }
+
+            table.header .post-meta.view-online-mobile {
+                display: table-row !important;
+            }
+
+            table.header .post-meta-left.view-online-mobile,
+            table.header .post-meta-left.view-online-mobile .view-online {
+                text-align: left !important;
+            }
+
+            table.header .post-meta.view-online.desktop {
+                display: none !important;
+            }
+
+            table.header .view-online {
+                text-decoration: underline;
+            }
+
+            table.body .footer p,
+            table.body .footer p span {
+                font-size: 13px !important;
+            }
+
+            table.header .view-online-link,
+            table.body .footer,
+            table.body .footer a {
+                font-size: 13px !important;
+            }
+
+            table.header .post-title a {
+                font-size: 26px !important;
+                line-height: 1.1em !important;
+            }
+
+            table.feedback-buttons {
+                display: table !important;
+                width: 100% !important;
+                max-width: 390px;
+            }
+
+            table.feedback-buttons img {
+                display: inherit !important;
+            }
+
+            table.body .feedback-button-text {
+                display: none!important;
+            }
+
+            table.body .latest-posts-header {
+                font-size: 12px !important;
+            }
+
+            table.body .latest-post-title {
+                padding-right: 8px !important;
+            }
+
+            table.body .latest-post h4,
+            table.body .latest-post h4 span {
+                padding: 4px 0 6px !important;
+                font-size: 15px !important;
+            }
+
+            table.body .latest-post-excerpt,
+            table.body .latest-post-excerpt a,
+            table.body .latest-post-excerpt span {
+                font-size: 13px !important;
+                line-height: 1.2 !important;
+            }
+
+            table.body .subscription-box h3 {
+                font-size: 14px !important;
+            }
+
+            table.body .subscription-box p,
+            table.body .subscription-box p span {
+                font-size: 13px !important;
+            }
+
+            table.body .subscription-details,
+            table.body .manage-subscription {
+                display: inline-block;
+                width: 100%;
+                text-align: left !important;
+                font-size: 13px !important;
+            }
+
+            table.body .subscription-details {
+                padding-bottom: 12px;
+            }
+
+            table.body .kg-bookmark-card {
+                width: 90vw;
+            }
+
+            table.body .kg-bookmark-thumbnail {
+                display: none !important;
+            }
+
+            table.body .kg-bookmark-metadata span {
+                font-size: 13px !important;
+            }
+
+            table.body .kg-embed-card {
+                max-width: 90vw !important;
+            }
+
+            table.body h1 {
+                font-size: 32px !important;
+                line-height: 1.3em !important;
+            }
+
+            table.body h2,
+            table.body h2 span {
+                font-size: 26px !important;
+                line-height: 1.22em !important;
+            }
+
+            table.body h3 {
+                font-size: 21px !important;
+                line-height: 1.25em !important;
+            }
+
+            table.body h4 {
+                font-size: 19px !important;
+                line-height: 1.3em !important;
+            }
+
+            table.body h5 {
+                font-size: 16px !important;
+                line-height: 1.4em !important;
+            }
+
+            table.body h6 {
+                font-size: 16px !important;
+                line-height: 1.4em !important;
+            }
+
+            table.body blockquote {
+                font-size: 16px !important;
+                line-height: 1.6em;
+                margin-bottom: 0;
+            }
+
+            table.body blockquote p {
+                margin-right: 15px !important;
+                margin-left: 15px !important;
+            }
+
+            table.body blockquote.kg-blockquote-alt {
+                border-left: 0 none !important;
+                margin: 0 !important;
+                font-size: 18px !important;
+                line-height: 1.4em !important;
+            }
+
+            table.body blockquote.kg-blockquote-alt p {
+                margin-right: 20px !important;
+                margin-left: 20px !important;
+            }
+
+            table.body hr {
+                margin: 2em 0 !important;
+            }
+
+            .feature-image-caption {
+                font-size: 13px!important;
+            }
+
+            .kg-card-figcaption {
+                font-size: 13px!important;
+            }
+
+            .kg-card-figcaption p,
+        =2Ekg-card-figcaption p span {
+            font-size: 13px!important;
+        }
+
+            table.body .kg-cta-card {
+                padding: 0 20px;
+            }
+
+            table.body .kg-cta-card.kg-cta-bg-none {
+                padding: 0;
+            }
+
+            table.body .kg-cta-sponsor-label {
+                padding: 10px 0;
+            }
+
+            table.body table.kg-cta-content-wrapper:not(.kg-cta-bg-none.kg-cta-no-div=
+iders table.kg-cta-content-wrapper) {
+                padding: 20px 0;
+            }
+
+            table.body .kg-cta-immersive.kg-cta-has-img:not(.kg-cta-bg-none):not(.kg-=
+cta-no-label) table.kg-cta-content-wrapper {
+                padding-top: 0;
+            }
+
+            table.body .kg-cta-minimal .kg-cta-image-container {
+                padding-right: 20px;
+            }
+
+            table.body .kg-cta-immersive .kg-cta-image-container {
+                padding-bottom: 20px;
+            }
+
+            table.body .kg-cta-immersive.kg-cta-no-text .kg-cta-image-container {
+                padding-bottom: 0;
+            }
+
+            table.body .kg-cta-button-container {
+                padding-top: 16px;
+            }
+
+            table.body .kg-cta-minimal .kg-cta-image-container {
+                display: inline-block !important;
+                width: 100% !important;
+                padding: 0 !important;
+                padding-bottom: 16px !important;
+                padding-right: 0 !important;
+            }
+
+            table.body .kg-cta-minimal .kg-cta-content-inner {
+                display: inline-block !important;
+                width: 100% !important;
+                padding: 0 !important;
+            }
+
+            table.body .kg-cta-minimal img.kg-cta-image {
+                width: 52px !important;
+                height: 52px !important;
+            }
+        }
+        @media all {
+            .subscription-details p.hidden {
+                display: none !important;
+            }
+
+            .ExternalClass {
+                width: 100%;
+            }
+
+            .ExternalClass,
+        =2EExternalClass p,
+        =2EExternalClass span,
+        =2EExternalClass font,
+        =2EExternalClass td,
+        =2EExternalClass div {
+            line-height: 100%;
+        }
+
+            .apple-link a {
+                color: inherit !important;
+                font-family: inherit !important;
+                font-size: inherit !important;
+                font-weight: inherit !important;
+                line-height: inherit !important;
+                text-decoration: none !important;
+            }
+
+            #MessageViewBody a {
+                color: inherit;
+                text-decoration: none;
+                font-size: inherit;
+                font-family: inherit;
+                font-weight: inherit;
+                line-height: inherit;
+            }
+        }
+    </style>
+    <!--[if mso]>
+    <style type=3D"text/css">
+        ul, ol { margin-left: 1.5em !important; }=20
+    </style>
+    <![endif]-->
+</head>
+<body data-testid=3D"email-preview-body" style=3D"background-color: #ff=
+        f; font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial=
+              , sans-serif; -webkit-font-smoothing: antialiased; font-size: 18px; line-he=
+              ight: 0; margin: 0; padding: 0; -ms-text-size-adjust: 100%; -webkit-text-si=
+              ze-adjust: 100%; color: #15212A;">
+<span class=3D"preheader" style=3D"color: transparent; display: non=
+        e; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; ms=
+              o-hide: all; visibility: hidden; width: 0;">This coming Sunday, we&#39;re e=
+xcited to run our last intro to ecobricks course for 2025!
+
+This will also be the last free course that we run. Our courses have been f=
+ree this past year while we&#39;ve set up the Global Ecobrick Alliance&#39;=
+s official Indonesian organization (and its bank account)&#x2013; and our o=
+wn payment processing system. Don&#39;t worry, the cost will be reasonable!=
+But this will be the last one...
+
+Paula and Russell will be leading the 90 minute overview of the principles,=
+theory and best pract</span>
+<!-- SPACING TO AVOID BODY TEXT BEING DUPLICATED IN PREVIEW TEXT --=
+>
+<div style=3D"display:none; max-height:0; overflow:hidden; mso-hide=
+: all;" aria-hidden=3D"true" role=3D"presentation">
+    &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F;=
+&#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#=
+x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x20=
+07;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; =
+&#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x=
+34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x200=
+7;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &=
+#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x3=
+4F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007=
+;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#=
+x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34=
+F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;=
+&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x=
+2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F=
+; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&=
+#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2=
+007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F;=
+&#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#=
+x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x20=
+07;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; =
+&#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x=
+34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x200=
+7;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &=
+#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x3=
+4F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007=
+;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#=
+x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34=
+F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;=
+&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x=
+2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F=
+; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&=
+#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2=
+007;&#x34F; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; =
+&#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD=
+; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#x=
+AD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &=
+#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD;=
+&#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xA=
+D; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#=
+xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; =
+&#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD=
+; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#x=
+AD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &=
+#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD;=
+&#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xA=
+D; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#=
+xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; =
+&#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD=
+; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#x=
+AD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &=
+#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD;  &#xA0;
+</div>
+
+<!-- HEADER WITH FULL-WIDTH BACKGROUND -->
+<table role=3D"presentation" border=3D"0" cellpadding=3D"0" cel=
+        lspacing=3D"0" class=3D"header" width=3D"100%" style=3D"mso-table-lspace: 0=
+               pt; mso-table-rspace: 0pt; line-height: 1.4; background-color: #ffffff; wid=
+               th: 100%; border-spacing: 0; border-collapse: collapse;" bgcolor=3D"#ffffff=
+">
+<!-- Outlook doesn't respect max-width so we need an extra =
+centered table -->
+<!--[if mso]>
+<tr>
+    <td>
+        <center>
+            <table border=3D"0" cellpadding=3D"0" cellspaci=
+                    ng=3D"0" width=3D"600">
+<![endif]-->
+<tr>
+    <td style=3D"font-family: -apple-system, BlinkMacSystem=
+            Font, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align=
+                : top; color: #15212A;" valign=3D"top">&#xA0;</td>
+    <td class=3D"container" align=3D"center" style=3D"font-=
+        family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-s=
+                erif; font-size: 18px; vertical-align: top; color: #15212A;" valign=3D"top"=
+    >
+    <div class=3D"content" style=3D"box-sizing: border-=
+            box; display: block; margin: 0 auto; max-width: 600px;">
+    <!-- Header content constrained to 600px -->
+    <table role=3D"presentation" border=3D"0" cellpaddi=
+            ng=3D"0" cellspacing=3D"0" class=3D"header-main" style=3D"border-collapse: =
+    separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 20p=
+    x 0; width: 100%; max-width: 600px; background: #ffffff; background-color: =
+    transparent;" width=3D"100%" bgcolor=3D"transparent">
+<tr>
+    <td class=3D"header-content" style=3D"font-=
+        family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-s=
+                erif; font-size: 18px; vertical-align: top; color: #15212A; padding: 0; mar=
+                gin: 0 auto;" valign=3D"top">
+    <table role=3D"presentation" border=3D"=
+           0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" style=3D"border-colla=
+    pse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+<tr class=3D"header-image-row">
+    <td class=3D"header-image" =
+    width=3D"100%" align=3D"center" style=3D"font-family: -apple-system, BlinkM=
+    acSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertic=
+    al-align: top; color: #15212A; padding-top: 24px; padding-bottom: 16px;" va=
+    lign=3D"top">
+    <a href=3D"https://eart=
+       hen.io/r/905f4b81?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style=3D"color:=
+    #4B8501; text-decoration: none; overflow-wrap: anywhere;" target=3D"_blank=
+    ">
+    <img src=3D"https:/=
+    /earthen.io/content/images/size/w1200/2024/04/gea-trainer-newsletter-top-ba=
+    nner.png" width=3D"600" style=3D"border: none; -ms-interpolation-mode: bicu=
+    bic; max-width: 100%;">
+    </a>
+    </td>
+</tr>
+
+<tr class=3D"site-info-row">
+    <td class=3D"site-info" wid=
+            th=3D"100%" align=3D"center" style=3D"font-family: -apple-system, BlinkMacS=
+                ystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-=
+                align: top; color: #15212A; padding-top: 32px;" valign=3D"top">
+    <table role=3D"presenta=
+           tion" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"border-coll=
+    apse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;"=
+    width=3D"100%">
+<tr>
+    <td class=
+                =3D"site-url site-url-bottom-padding" style=3D"font-family: -apple-system, =
+    BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: t=
+    op; color: #15212A; font-size: 16px; letter-spacing: -0.1px; font-weight: 7=
+    00; text-transform: uppercase; text-align: center; padding-bottom: 12px;" v=
+    align=3D"top" align=3D"center"><div style=3D"width: 100% !important;"><a hr=
+                                                                                     ef=3D"https://earthen.io/r/952be789?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a90=
+                                                                             5" class=3D"site-title" style=3D"text-decoration: none; color: #15212A; ove=
+    rflow-wrap: anywhere;" target=3D"_blank">GEA Trainer Newsletter</a></div></=
+td>
+</tr>
+
+</table>
+</td>
+</tr>
+
+<tr>
+    <td class=3D"post-title pos=
+            t-title-no-excerpt" style=3D"font-family: -apple-system, BlinkMacSystemFont=
+                , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to=
+                p; text-align: center; color: #000000; padding-bottom: 16px;" valign=3D"top=
+    " align=3D"center">
+    <table role=3D"presenta=
+           tion" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"border-coll=
+    apse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;"=
+    width=3D"100%">
+<tr>
+    <td style=3D"fo=
+        nt-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, san=
+                s-serif; vertical-align: top; font-size: 36px; line-height: 1.1; font-weigh=
+                t: 700; text-align: center; color: #000000;" valign=3D"top" align=3D"center=
+    ">
+    <a href=3D"=
+       https://earthen.io/r/a740e14c?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905" cla=
+    ss=3D"post-title-link" style=3D"text-decoration: none; display: block; marg=
+    in-top: 32px; text-align: center; line-height: 1.1em; overflow-wrap: anywhe=
+    re; color: #000000;" target=3D"_blank">Plastic, the Biosphere &amp; Ecobric=
+    ks + latest Earthen posts</a>
+    </td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+    <td width=3D"100%" style=3D=
+    "font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, =
+    sans-serif; font-size: 18px; vertical-align: top; color: #15212A; width: 10=
+    0%;" align=3D"center" valign=3D"top">
+    <table class=3D"post-me=
+           ta-wrapper" role=3D"presentation" border=3D"0" cellpadding=3D"0" cellspacin=
+    g=3D"0" width=3D"100%" style=3D"border-collapse: separate; mso-table-lspace=
+    : 0pt; mso-table-rspace: 0pt; width: 100%; padding-bottom: 32px;">
+<tr>
+    <td height=3D"2=
+        0" class=3D"post-meta post-meta-center" style=3D"font-family: -apple-system=
+    , BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align:=
+    top; color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weig=
+    ht: 400; text-align: center; padding: 0;" valign=3D"top" align=3D"center">
+    By GEA Cent=
+    er Circle &#x2022; <span class=3D"post-meta-date" style=3D"white-space: now=
+        rap;">2 Dec 2025 </span>
+    </td>
+    <td class=3D"po=
+        st-meta post-meta-center view-online desktop" style=3D"font-family: -apple-=
+    system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-=
+    align: top; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; t=
+    ext-align: center; display: none;" valign=3D"top" align=3D"center">
+    <a href=3D"=
+       https://earthen.io/r/b482a7e6?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905" cla=
+    ss=3D"view-online-link" style=3D"word-wrap: none; white-space: nowrap; colo=
+    r: #15212a; color: rgba(0, 0, 0, 0.6); overflow-wrap: anywhere; text-decora=
+    tion: underline;" target=3D"_blank">View in browser</a>
+    </td>
+</tr>
+<tr class=3D"post-m=
+    eta post-meta-center view-online-mobile" style=3D"color: #15212a; color: rg=
+ba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; text-align: center;" a=
+lign=3D"center">
+<td height=3D"2=
+    0" class=3D"view-online" style=3D"font-family: -apple-system, BlinkMacSyste=
+mFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: top; color: #1=
+5212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; text-a=
+lign: center; text-decoration: underline;" valign=3D"top" align=3D"center">
+<a href=3D"=
+   https://earthen.io/r/2c9cb531?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905" cla=
+ss=3D"view-online-link" style=3D"word-wrap: none; white-space: nowrap; colo=
+r: #15212a; color: rgba(0, 0, 0, 0.6); overflow-wrap: anywhere; text-decora=
+tion: underline;" target=3D"_blank">View in browser</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr class=3D"feature-image-row"=
+>
+    <td class=3D"feature-image
+    " align=3D"center" style=3D=
+    "font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, =
+    sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding-b=
+    ottom: 30px; width: 100%; text-align: center;" width=3D"100%" valign=3D"top=
+    "><img src=3D"https://earthen.io/content/images/size/w1200/2025/12/ecobrick=
+           -course.webp" width=3D"600" style=3D"border: none; -ms-interpolation-mode: =
+    bicubic; max-width: 100%;"></td>
+</tr>
+
+</table>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td style=3D"font-family: -apple-system, BlinkMacSystem=
+        Font, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align=
+            : top; color: #15212A;" valign=3D"top">&#xA0;</td>
+</tr>
+<!--[if mso]>
+</table>
+</center>
+</td>
+</tr>
+<![endif]-->
+</table>
+
+<!-- MAIN CONTENT AREA -->
+<table role=3D"presentation" border=3D"0" cellpadding=3D"0" cellspa=
+        cing=3D"0" class=3D"body" width=3D"100%" style=3D"border-collapse: separate=
+               ; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; line-height: 1=
+               =2E4; background-color: #ffffff;" bgcolor=3D"#ffffff">
+<!-- Outlook doesn't respect max-width so we need an extra cent=
+ered table -->
+<!--[if mso]>
+<tr>
+    <td>
+        <center>
+            <table border=3D"0" cellpadding=3D"0" cellspacing=
+                    =3D"0" width=3D"600">
+<![endif]-->
+<tr>
+    <td style=3D"font-family: -apple-system, BlinkMacSystemFont=
+            , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to=
+                p; color: #15212A;" valign=3D"top">&#xA0;</td>
+    <td class=3D"container" style=3D"font-family: -apple-system=
+            , BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px=
+                ; vertical-align: top; color: #15212A; display: block; max-width: 600px; ma=
+                rgin: 0 auto;" valign=3D"top">
+    <div class=3D"content" style=3D"box-sizing: border-box;=
+            display: block; margin: 0 auto; max-width: 600px;">
+    <table role=3D"presentation" border=3D"0" cellpaddi=
+            ng=3D"0" cellspacing=3D"0" class=3D"main" width=3D"100%" style=3D"border-co=
+           llapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spac=
+                   ing: 20px 0; width: 100%; max-width: 600px; background: #ffffff; background=
+                   -color: #ffffff;" bgcolor=3D"#ffffff">
+<tr>
+    <td class=3D"wrapper" style=3D"font-family:=
+        -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; f=
+                ont-size: 18px; vertical-align: top; color: #15212A; box-sizing: border-box=
+                ;" valign=3D"top">
+        <table role=3D"presentation" border=3D"=
+               0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" data-testid=3D"email-=
+        preview-content" style=3D"border-collapse: separate; mso-table-lspace: 0pt;=
+        mso-table-rspace: 0pt; width: 100%;">
+<tr class=3D"post-content-row">
+    <td class=3D"post-content-sans-=
+        serif" style=3D"font-family: -apple-system, BlinkMacSystemFont, Roboto, Hel=
+    vetica, Arial, sans-serif; vertical-align: top; font-size: 17px; line-heigh=
+    t: 1.5em; color: #15212A; padding-bottom: 20px; border-bottom: 1px solid #e=
+    0e7eb; max-width: 600px;" valign=3D"top">
+    <!-- POST CONTENT START -->
+    <p style=3D"margin: 0 0 1.5=
+            em 0; line-height: 1.6em; color: #15212A;">This coming Sunday, we&#39;re ex=
+    cited to run our last intro to ecobricks course for 2025!  </p><p style=3D"=
+                                                                      margin: 0 0 1.5em 0; line-height: 1.6em; color: #15212A;">This will also be=
+    the last free course that we run.  Our courses have been free this past ye=
+    ar while we&#39;ve set up the Global Ecobrick Alliance&#39;s official Indon=
+    esian organization (and its bank account)&#x2013; and our own payment proce=
+    ssing system.  Don&#39;t worry, the cost will be reasonable!  But this will=
+    be the last one...</p><p style=3D"margin: 0 0 1.5em 0; line-height: 1.6em;=
+        color: #15212A;">Paula and Russell will be leading the 90 minute overview =
+    of the principles, theory and best practices behind ecobricking and plastic=
+    sequestration.  Use your Buwana GoBrik account to register &#x1F447;</p><d=
+    iv>
+    <!--[if !mso !vml]-->
+    <div class=3D"kg-card kg-bookmark-card " style=3D"margin: 0 0 1=
+    =2E5em; padding: 0; width: 100%;">
+    <a class=3D"kg-bookmark-container" href=3D"https://earthen.=
+       io/r/e643f8de?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style=3D"display: f=
+    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob=
+    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f=
+    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7=
+    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color: =
+    #4B8501; text-decoration: none;" target=3D"_blank">
+    <div class=3D"kg-bookmark-content" style=3D"display: in=
+            line-block; width: 100%; padding: 20px;">
+    <div class=3D"kg-bookmark-title" style=3D"color: #1=
+            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">Plastic, the=
+    Biosphere and Ecobricks</div>
+    <div class=3D"kg-bookmark-description" style=3D"dis=
+         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px; =
+                 color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.=
+                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;=
+                 ">Register for our Online Starter Workshop led by Paula Apollonia and Russe=
+ll Maier on Dece<span class=3D"desktop-only">mber 7, 2025</span><span class=
+                                                                                                =3D"hide-desktop" style=3D"display: none;">&#x2026;</span></div>
+    <div class=3D"kg-bookmark-metadata" style=3D"displa=
+         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15=
+                 212A; font-size: 13px; font-weight: 400;">
+    <img class=3D"kg-bookmark-icon" src=3D"https://=
+         earthen.io/content/images/icon/apple-icon-180x180-22.png" alt style=3D"bord=
+    er: none; -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8=
+    px; width: 22px; height: 22px;" width=3D"22" height=3D"22">
+    <span class=3D"kg-bookmark-author" src=3D"GoBri=
+          k.com" style=3D"line-height: 1.5em;">GoBrik.com</span>
+    =20
+    </div>
+    </div>
+    <div class=3D"kg-bookmark-thumbnail" style=3D"min-width=
+         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c=
+                 over; background-position: center; border-radius: 0 2px 2px 0; background-i=
+                 mage: url(&#39;https://earthen.io/content/images/thumbnail/starter-workshop=
+    -feature-1-en-4.webp&#39;);">
+    <img src=3D"https://earthen.io/content/images/thumb=
+         nail/starter-workshop-feature-1-en-4.webp" alt onerror=3D"this.style.displa=
+    y=3D&#39;none&#39;" style=3D"border: none; -ms-interpolation-mode: bicubic;=
+    max-width: 100%; display: none;"></div>
+    </a>
+    =20
+    </div>
+    <!--[endif]-->
+    <!--[if vml]>
+        <table class=3D"kg-card kg-bookmark-card--outlook" style=3D"mar=
+gin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ff=
+ffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, O=
+xygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border=
+-collapse: collapse; border-spacing: 0;" width=3D"100%">
+            <tr>
+                <td width=3D"100%" style=3D"padding: 20px;">
+                    <table style=3D"margin: 0; padding: 0; border-colla=
+pse: collapse; border-spacing: 0;">
+                        <tr>
+                            <td class=3D"kg-bookmark-title--outlook">
+                                <a href=3D"https://gobrik.com/en/regist=
+er.php?id=3D954" style=3D"text-decoration: none; color: #15212A; font-size:=
+15px; line-height: 1.5em; font-weight: 600;">
+                                    Plastic, the Biosphere and Ecobrick=
+s
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class=3D"kg-bookmark-description--=
+outlook">
+                                    <a href=3D"https://gobrik.com/en/re=
+gister.php?id=3D954" style=3D"text-decoration: none; margin-top: 12px; colo=
+r: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
+                                        Register for our Online Starter=
+Workshop led by Paula Apollonia and Russell Maier on Dece<span class=3D"de=
+sktop-only">mber 7, 2025</span><span class=3D"hide-desktop">=E2=80=A6</span=
+>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class=3D"kg-bookmark-metadata--outlook"=
+style=3D"padding-top: 14px; color: #15212A; font-size: 13px; font-weight: =
+400; line-height: 1.5em;">
+                                <table style=3D"margin: 0; padding: 0; =
+border-collapse: collapse; border-spacing: 0;">
+                                    <tr>
+                                       =20
+                                            <td valign=3D"middle" class=
+=3D"kg-bookmark-icon--outlook" style=3D"padding-right: 8px; font-size: 0; l=
+ine-height: 1.5em;">
+                                                <a href=3D"https://gobr=
+ik.com/en/register.php?id=3D954" style=3D"text-decoration: none; color: #15=
+212A;">
+                                                    <img src=3D"https:/=
+/earthen.io/content/images/icon/apple-icon-180x180-22.png" width=3D"22" hei=
+ght=3D"22" alt=3D" ">
+                                                </a>
+                                            </td>
+                                       =20
+                                        <td valign=3D"middle" class=3D"=
+kg-bookmark-byline--outlook">
+                                            <a href=3D"https://gobrik.c=
+om/en/register.php?id=3D954" style=3D"text-decoration: none; color: #15212A=
+;">
+                                                GoBrik.com
+                                               =20
+                                               =20
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div class=3D"kg-bookmark-spacer--outlook" style=3D"height: 1.5=
+em;">&nbsp;</div>
+    <![endif]--></div><p style=3D"margin: 0 0 1.5em 0; line-height: 1.6=
+        em; color: #15212A;">Meanwhile, be sure to check out the latest posts on Ea=
+    rthen that you might have missed any. The last two essays Russell has been =
+    slow and steady working on for the last two years!</p><div>
+    <!--[if !mso !vml]-->
+    <div class=3D"kg-card kg-bookmark-card " style=3D"margin: 0 0 1=
+    =2E5em; padding: 0; width: 100%;">
+    <a class=3D"kg-bookmark-container" href=3D"https://earthen.=
+       io/r/9f8ce9c4?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style=3D"display: f=
+    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob=
+    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f=
+    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7=
+    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color: =
+    #4B8501; text-decoration: none;" target=3D"_blank">
+    <div class=3D"kg-bookmark-content" style=3D"display: in=
+            line-block; width: 100%; padding: 20px;">
+    <div class=3D"kg-bookmark-title" style=3D"color: #1=
+            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">Writing Eart=
+    h Right</div>
+    <div class=3D"kg-bookmark-description" style=3D"dis=
+         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px; =
+                 color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.=
+                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;=
+                 ">How we write the name of our home planet unconsciously encodes the relati=
+onship we have w<span class=3D"desktop-only">ith it.</span><span class=3D"h=
+                                                                 ide-desktop" style=3D"display: none;">&#x2026;</span></div>
+    <div class=3D"kg-bookmark-metadata" style=3D"displa=
+         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15=
+                 212A; font-size: 13px; font-weight: 400;">
+    <img class=3D"kg-bookmark-icon" src=3D"https://=
+         earthen.io/content/images/icon/page-logo-11.png" alt style=3D"border: none;=
+    -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8px; width=
+    : 22px; height: 22px;" width=3D"22" height=3D"22">
+    <span class=3D"kg-bookmark-author" src=3D"Earth=
+          en" style=3D"line-height: 1.5em;">Earthen</span>
+    <span class=3D"kg-bookmark-publisher" src=3D"Ru=
+          ssell Maier" style=3D"overflow: hidden; max-width: 240px; line-height: 1.5e=
+    m; text-overflow: ellipsis; white-space: nowrap;"><span style=3D"margin: 0 =
+        6px;">&#x2022;</span>Russell Maier</span>
+    </div>
+    </div>
+    <div class=3D"kg-bookmark-thumbnail" style=3D"min-width=
+         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c=
+                 over; background-position: center; border-radius: 0 2px 2px 0; background-i=
+                 mage: url(&#39;https://earthen.io/content/images/thumbnail/earthrise-croppe=
+    d-1.webp&#39;);">
+    <img src=3D"https://earthen.io/content/images/thumb=
+         nail/earthrise-cropped-1.webp" alt onerror=3D"this.style.display=3D&#39;non=
+    e&#39;" style=3D"border: none; -ms-interpolation-mode: bicubic; max-width: =
+    100%; display: none;"></div>
+    </a>
+    =20
+    </div>
+    <!--[endif]-->
+    <!--[if vml]>
+        <table class=3D"kg-card kg-bookmark-card--outlook" style=3D"mar=
+gin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ff=
+ffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, O=
+xygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border=
+-collapse: collapse; border-spacing: 0;" width=3D"100%">
+            <tr>
+                <td width=3D"100%" style=3D"padding: 20px;">
+                    <table style=3D"margin: 0; padding: 0; border-colla=
+pse: collapse; border-spacing: 0;">
+                        <tr>
+                            <td class=3D"kg-bookmark-title--outlook">
+                                <a href=3D"https://earthen.io/writing-e=
+arth-right/" style=3D"text-decoration: none; color: #15212A; font-size: 15p=
+x; line-height: 1.5em; font-weight: 600;">
+                                    Writing Earth Right
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class=3D"kg-bookmark-description--=
+outlook">
+                                    <a href=3D"https://earthen.io/writi=
+ng-earth-right/" style=3D"text-decoration: none; margin-top: 12px; color: #=
+738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
+                                        How we write the name of our ho=
+me planet unconsciously encodes the relationship we have w<span class=3D"de=
+sktop-only">ith it.</span><span class=3D"hide-desktop">=E2=80=A6</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class=3D"kg-bookmark-metadata--outlook"=
+style=3D"padding-top: 14px; color: #15212A; font-size: 13px; font-weight: =
+400; line-height: 1.5em;">
+                                <table style=3D"margin: 0; padding: 0; =
+border-collapse: collapse; border-spacing: 0;">
+                                    <tr>
+                                       =20
+                                            <td valign=3D"middle" class=
+=3D"kg-bookmark-icon--outlook" style=3D"padding-right: 8px; font-size: 0; l=
+ine-height: 1.5em;">
+                                                <a href=3D"https://eart=
+hen.io/writing-earth-right/" style=3D"text-decoration: none; color: #15212A=
+;">
+                                                    <img src=3D"https:/=
+/earthen.io/content/images/icon/page-logo-11.png" width=3D"22" height=3D"22=
+" alt=3D" ">
+                                                </a>
+                                            </td>
+                                       =20
+                                        <td valign=3D"middle" class=3D"=
+kg-bookmark-byline--outlook">
+                                            <a href=3D"https://earthen.=
+io/writing-earth-right/" style=3D"text-decoration: none; color: #15212A;">
+                                                Earthen
+                                                &nbsp;&#x2022;&nbsp;
+                                                Russell Maier
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div class=3D"kg-bookmark-spacer--outlook" style=3D"height: 1.5=
+em;">&nbsp;</div>
+    <![endif]--></div><div>
+    <!--[if !mso !vml]-->
+    <div class=3D"kg-card kg-bookmark-card " style=3D"margin: 0 0 1=
+    =2E5em; padding: 0; width: 100%;">
+    <a class=3D"kg-bookmark-container" href=3D"https://earthen.=
+       io/r/30e80ec0?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style=3D"display: f=
+    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob=
+    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f=
+    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7=
+    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color: =
+    #4B8501; text-decoration: none;" target=3D"_blank">
+    <div class=3D"kg-bookmark-content" style=3D"display: in=
+            line-block; width: 100%; padding: 20px;">
+    <div class=3D"kg-bookmark-title" style=3D"color: #1=
+            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">The Problem =
+    with Google Calendar</div>
+    <div class=3D"kg-bookmark-description" style=3D"dis=
+         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px; =
+                 color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.=
+                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;=
+                 ">As we hit the limits of the Roman Empire&#x2019;s 2,000-year-old Calendar=
+, now is the time for t<span class=3D"desktop-only">ransition from linear a=
+    nd huma</span>&#x2026;</div>
+    <div class=3D"kg-bookmark-metadata" style=3D"displa=
+         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15=
+                 212A; font-size: 13px; font-weight: 400;">
+    <img class=3D"kg-bookmark-icon" src=3D"https://=
+         earthen.io/content/images/icon/page-logo-12.png" alt style=3D"border: none;=
+    -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8px; width=
+    : 22px; height: 22px;" width=3D"22" height=3D"22">
+    <span class=3D"kg-bookmark-author" src=3D"Earth=
+          en" style=3D"line-height: 1.5em;">Earthen</span>
+    <span class=3D"kg-bookmark-publisher" src=3D"Ru=
+          ssell Maier" style=3D"overflow: hidden; max-width: 240px; line-height: 1.5e=
+    m; text-overflow: ellipsis; white-space: nowrap;"><span style=3D"margin: 0 =
+        6px;">&#x2022;</span>Russell Maier</span>
+    </div>
+    </div>
+    <div class=3D"kg-bookmark-thumbnail" style=3D"min-width=
+         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c=
+                 over; background-position: center; border-radius: 0 2px 2px 0; background-i=
+                 mage: url(&#39;https://earthen.io/content/images/thumbnail/colleuseum-engra=
+    ving2-1-1.webp&#39;);">
+    <img src=3D"https://earthen.io/content/images/thumb=
+         nail/colleuseum-engraving2-1-1.webp" alt onerror=3D"this.style.display=3D&#=
+    39;none&#39;" style=3D"border: none; -ms-interpolation-mode: bicubic; max-w=
+    idth: 100%; display: none;"></div>
+    </a>
+    =20
+    </div>
+    <!--[endif]-->
+    <!--[if vml]>
+        <table class=3D"kg-card kg-bookmark-card--outlook" style=3D"mar=
+gin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ff=
+ffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, O=
+xygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border=
+-collapse: collapse; border-spacing: 0;" width=3D"100%">
+            <tr>
+                <td width=3D"100%" style=3D"padding: 20px;">
+                    <table style=3D"margin: 0; padding: 0; border-colla=
+pse: collapse; border-spacing: 0;">
+                        <tr>
+                            <td class=3D"kg-bookmark-title--outlook">
+                                <a href=3D"https://earthen.io/the-probl=
+em-with-google-calendar/" style=3D"text-decoration: none; color: #15212A; f=
+ont-size: 15px; line-height: 1.5em; font-weight: 600;">
+                                    The Problem with Google Calendar
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class=3D"kg-bookmark-description--=
+outlook">
+                                    <a href=3D"https://earthen.io/the-p=
+roblem-with-google-calendar/" style=3D"text-decoration: none; margin-top: 1=
+2px; color: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;=
+">
+                                        As we hit the limits of the Rom=
+an Empire=E2=80=99s 2,000-year-old Calendar, now is the time for t<span cla=
+ss=3D"desktop-only">ransition from linear and huma</span>=E2=80=A6
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class=3D"kg-bookmark-metadata--outlook"=
+style=3D"padding-top: 14px; color: #15212A; font-size: 13px; font-weight: =
+400; line-height: 1.5em;">
+                                <table style=3D"margin: 0; padding: 0; =
+border-collapse: collapse; border-spacing: 0;">
+                                    <tr>
+                                       =20
+                                            <td valign=3D"middle" class=
+=3D"kg-bookmark-icon--outlook" style=3D"padding-right: 8px; font-size: 0; l=
+ine-height: 1.5em;">
+                                                <a href=3D"https://eart=
+hen.io/the-problem-with-google-calendar/" style=3D"text-decoration: none; c=
+olor: #15212A;">
+                                                    <img src=3D"https:/=
+/earthen.io/content/images/icon/page-logo-12.png" width=3D"22" height=3D"22=
+" alt=3D" ">
+                                                </a>
+                                            </td>
+                                       =20
+                                        <td valign=3D"middle" class=3D"=
+kg-bookmark-byline--outlook">
+                                            <a href=3D"https://earthen.=
+io/the-problem-with-google-calendar/" style=3D"text-decoration: none; color=
+: #15212A;">
+                                                Earthen
+                                                &nbsp;&#x2022;&nbsp;
+                                                Russell Maier
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div class=3D"kg-bookmark-spacer--outlook" style=3D"height: 1.5=
+em;">&nbsp;</div>
+    <![endif]--></div>
+    <!-- POST CONTENT END -->
+
+    </td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- END MAIN CONTENT AREA -->
+
+<tr>
+    <td class=3D"feedback-buttons-container=
+    " dir=3D"ltr" width=3D"100%" align=3D"center" style=3D"font-family: -apple-=
+    system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size=
+    : 18px; vertical-align: top; color: #15212A; padding: 32px 0 24px; border-b=
+    ottom: 1px solid #e0e7eb; text-align: center; background-color: #ffffff;" v=
+    align=3D"top" bgcolor=3D"#ffffff">
+    <table class=3D"feedback-buttons" r=
+            ole=3D"presentation" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=
+                   =3D"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt=
+                   ; margin: auto; width: 100%;" width=3D"100%">
+<tr>
+    <td dir=3D"ltr" valign=
+            =3D"top" align=3D"center" style=3D"font-size: 18px; color: #15212A; display=
+                : inline-block; vertical-align: top; font-family: inherit; text-align: cent=
+                er; padding: 0 4px 4px; cursor: pointer; width: 30%;" width=3D"30%">
+    <a href=3D"https://=
+       earthen.io/plastic-the-biosphere-ecobricks-latest-earthen-posts/#/feedback/=
+    69146a7b1b74ba04b3f2a339/1/?uuid=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905&amp=
+    ;key=3D6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc" ta=
+    rget=3D"_blank" style=3D"color: #4B8501; text-decoration: none; overflow-wr=
+    ap: anywhere;">
+    <img src=3D"htt=
+         ps://static.ghost.org/v5.0.0/images/more-like-this-mobile.png" border=3D"0"=
+    width=3D"42" height=3D"42" alt=3D"More like this" style=3D"border: none; -=
+    ms-interpolation-mode: bicubic; max-width: 100%; display: block; margin: 0 =
+    auto; vertical-align: middle;">
+    <p class=3D"fee=
+       dback-button-text" style=3D"display: inline-block; font-family: -apple-syst=
+    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212=
+    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre=
+    ak-word; font-size: 13px;">More like this</p>
+    </a>
+    </td>                  =
+    <td dir=3D"ltr" valign=3D"top" align=3D"c=
+        enter" style=3D"font-size: 18px; color: #15212A; display: inline-block; ver=
+    tical-align: top; font-family: inherit; text-align: center; padding: 0 4px =
+    4px; cursor: pointer; width: 30%;" width=3D"30%">
+    <a href=3D"https://=
+       earthen.io/plastic-the-biosphere-ecobricks-latest-earthen-posts/#/feedback/=
+    69146a7b1b74ba04b3f2a339/0/?uuid=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905&amp=
+    ;key=3D6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc" ta=
+    rget=3D"_blank" style=3D"color: #4B8501; text-decoration: none; overflow-wr=
+    ap: anywhere;">
+    <img src=3D"htt=
+         ps://static.ghost.org/v5.0.0/images/less-like-this-mobile.png" border=3D"0"=
+    width=3D"42" height=3D"42" alt=3D"Less like this" style=3D"border: none; -=
+    ms-interpolation-mode: bicubic; max-width: 100%; display: block; margin: 0 =
+    auto; vertical-align: middle;">
+    <p class=3D"fee=
+       dback-button-text" style=3D"display: inline-block; font-family: -apple-syst=
+    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212=
+    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre=
+    ak-word; font-size: 13px;">Less like this</p>
+    </a>
+    </td>                  =
+    <td dir=3D"ltr" valign=3D"top" align=3D"c=
+        enter" style=3D"font-size: 18px; color: #15212A; display: inline-block; ver=
+    tical-align: top; font-family: inherit; text-align: center; padding: 0 4px =
+    4px; cursor: pointer; width: 30%;" width=3D"30%">
+    <a href=3D"https://=
+       earthen.io/r/766788b6?m=3D4dbbb711-73e9-4fd0-9056-a7cc1af6a905" target=3D"_=
+    blank" style=3D"color: #4B8501; text-decoration: none; overflow-wrap: anywh=
+    ere;">
+    <img src=3D"htt=
+         ps://static.ghost.org/v5.0.0/images/comment-mobile.png" border=3D"0" width=
+    =3D"42" height=3D"42" alt=3D"Comment" style=3D"border: none; -ms-interpolat=
+    ion-mode: bicubic; max-width: 100%; display: block; margin: 0 auto; vertica=
+    l-align: middle;">
+    <p class=3D"fee=
+       dback-button-text" style=3D"display: inline-block; font-family: -apple-syst=
+    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212=
+    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre=
+    ak-word; font-size: 13px;">Comment</p>
+    </a>
+    </td>                  =
+</tr>
+</table>
+</td>
+</tr>
+
+
+
+<tr>
+    <td class=3D"wrapper" align=3D"center" styl=
+            e=3D"font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Ari=
+                al, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; box-s=
+                izing: border-box;" valign=3D"top">
+    <table role=3D"presentation" border=3D"=
+           0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" style=3D"border-colla=
+    pse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; p=
+    adding-top: 40px; padding-bottom: 30px;">
+<tr>
+    <td class=3D"footer" style=3D"f=
+        ont-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sa=
+                ns-serif; vertical-align: top; color: #15212a; color: rgba(0, 0, 0, 0.6); m=
+                argin-top: 20px; text-align: center; padding-bottom: 10px; padding-top: 10p=
+                x; padding-left: 30px; padding-right: 30px; line-height: 1.5em; font-size: =
+                13px;" valign=3D"top" align=3D"center">Earthen &#xA9; 2025 &#x2013; <a href=
+                                                                                               =3D"https://earthen.io/unsubscribe/?uuid=3D4dbbb711-73e9-4fd0-9056-a7cc1af6=
+                                                                                       a905&key=3D6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc=
+                                                                                       &newsletter=3D18bce2af-ca5b-4a10-bff3-f79d32479f09" style=3D"overflow-wrap:=
+                                                                                       anywhere; color: #15212a; color: rgba(0, 0, 0, 0.6); text-decoration: unde=
+                                                                                               rline; font-size: 13px;" target=3D"_blank">Unsubscribe</a></td>
+</tr>
+
+</table>
+</td>
+</tr>
+
+</table>
+<!-- END CENTERED WHITE CONTAINER -->
+</div>
+</td>
+<td style=3D"font-family: -apple-system, BlinkMacSystemFont=
+        , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to=
+            p; color: #15212A;" valign=3D"top">&#xA0;</td>
+</tr>
+
+<!--[if mso]>
+</table>
+</center>
+</td>
+</tr>
+<![endif]-->
+</table>
+<img width=3D"1" height=3D"1" alt=3D"" src=3D"http://email.earthen.ecob=
+     ricks.org/o/eJxMzkFuxCAMQNHTlN1ExjhOvPBhTHAmaKZFAtLzV6q66PLrb15RROYcXOPGxCw=
+kKfin1fejFmVBz3uCBHkVYXBJjOYSLj0LAW1rPmkDs4jFczFCwyPCmZKHqgi4RgQEWfeIC9BpMR=
+1omxXgPX4QuPV5-dfiR8u9Hq-xtP4MXfs9xr9dW5j6vNqYj19amJrv9-svvhV_AgAA__9M4TsM"=
+></body>
+</html>
+
+--8fdca3192ec32357b28c6caea7d4e8b32ea52111dae7d8231e4bf84a179f--
