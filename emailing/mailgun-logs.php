@@ -34,6 +34,77 @@ if ($stmt = $gobrik_conn->prepare($roles_query)) {
 
 $action_message = '';
 
+function respondJson(array $data): void
+{
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $action = $_POST['action'];
+
+    if ($action === 'remove_event') {
+        $event_id = isset($_POST['event_id']) ? (int) $_POST['event_id'] : 0;
+        $email = trim($_POST['recipient_email'] ?? '');
+
+        if ($event_id <= 0 || $email === '') {
+            respondJson(['success' => false, 'message' => 'Missing event details.']);
+        }
+
+        try {
+            earthenUnsubscribe($email);
+        } catch (Exception $e) {
+            // Log unsubscribe issues but continue with deletion
+            error_log('[EARTHEN] Remove event unsubscribe failed: ' . $e->getMessage());
+        }
+
+        $delete_stmt = $gobrik_conn->prepare('DELETE FROM earthen_mailgun_events_tb WHERE id = ?');
+
+        if (!$delete_stmt) {
+            respondJson(['success' => false, 'message' => 'Unable to prepare deletion.']);
+        }
+
+        $delete_stmt->bind_param('i', $event_id);
+        $delete_stmt->execute();
+        $deleted_rows = $delete_stmt->affected_rows;
+        $delete_stmt->close();
+
+        if ($deleted_rows > 0) {
+            respondJson(['success' => true, 'message' => 'Record removed.']);
+        }
+
+        respondJson(['success' => false, 'message' => 'No record deleted.']);
+    }
+
+    if ($action === 'ignore_event') {
+        $event_id = isset($_POST['event_id']) ? (int) $_POST['event_id'] : 0;
+
+        if ($event_id <= 0) {
+            respondJson(['success' => false, 'message' => 'Missing event id.']);
+        }
+
+        $update_stmt = $gobrik_conn->prepare('UPDATE earthen_mailgun_events_tb SET event_type = "ignored", severity = "ignored" WHERE id = ?');
+
+        if (!$update_stmt) {
+            respondJson(['success' => false, 'message' => 'Unable to prepare ignore update.']);
+        }
+
+        $update_stmt->bind_param('i', $event_id);
+        $update_stmt->execute();
+        $updated_rows = $update_stmt->affected_rows;
+        $update_stmt->close();
+
+        if ($updated_rows > 0) {
+            respondJson(['success' => true, 'message' => 'Event ignored.']);
+        }
+
+        respondJson(['success' => false, 'message' => 'No changes made.']);
+    }
+
+    respondJson(['success' => false, 'message' => 'Unknown action.']);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unsubscribe_email'])) {
     $email = trim($_POST['unsubscribe_email']);
 
@@ -55,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unsubscribe_email']))
 $mailgun_events = [];
 $show_failed_only = isset($_GET['failed']) && $_GET['failed'] === '1';
 
-$events_query = "SELECT event_timestamp, recipient_email, COALESCE(event_type, 'unknown') AS event_type, COALESCE(severity, 'unknown') AS severity, COALESCE(NULLIF(error_message, ''), reason, '—') AS details FROM earthen_mailgun_events_tb";
+$events_query = "SELECT id, event_timestamp, recipient_email, COALESCE(event_type, 'unknown') AS event_type, COALESCE(severity, 'unknown') AS severity, COALESCE(NULLIF(error_message, ''), reason, '—') AS details FROM earthen_mailgun_events_tb";
 
 if ($show_failed_only) {
     $events_query .= " WHERE COALESCE(event_type, '') = 'failed' OR COALESCE(severity, '') LIKE '%failure%'";
@@ -108,6 +179,13 @@ if ($result = $gobrik_conn->query($events_query)) {
             margin: 0;
         }
 
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .actions {
             display: flex;
             gap: 8px;
@@ -146,6 +224,17 @@ if ($result = $gobrik_conn->query($events_query)) {
             color: #0d6efd;
         }
 
+        .button.danger {
+            background: #e55353;
+            border-color: #d62c2c;
+            box-shadow: 0 2px 4px rgba(214, 44, 44, 0.2);
+        }
+
+        .button.danger:hover {
+            background: #d62c2c;
+            box-shadow: 0 4px 10px rgba(214, 44, 44, 0.25);
+        }
+
         .button:hover {
             background: #0b5ed7;
             box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25);
@@ -173,7 +262,7 @@ if ($result = $gobrik_conn->query($events_query)) {
             cursor: pointer;
             text-decoration: none;
             transition: background 0.15s ease, box-shadow 0.15s ease;
-            width: 100%;
+            width: auto;
         }
 
         .danger-button:hover {
@@ -184,6 +273,74 @@ if ($result = $gobrik_conn->query($events_query)) {
         .process-cell {
             text-align: center;
             min-width: 120px;
+        }
+
+        .process-actions {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .skip-button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #d0d7de;
+            background: #fff;
+            color: #0d6efd;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .skip-button:hover {
+            background: #e9f2ff;
+            box-shadow: 0 3px 8px rgba(13, 110, 253, 0.2);
+        }
+
+        .skip-button.loading {
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .details-cell {
+            max-width: 300px;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        table.dataTable tbody td.details-cell {
+            white-space: normal;
+        }
+
+        .danger-button .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .danger-button.loading {
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .danger-button.loading .spinner {
+            display: inline-block;
+        }
+
+        .danger-button.loading .button-label {
+            display: none;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .notice {
@@ -201,15 +358,18 @@ if ($result = $gobrik_conn->query($events_query)) {
     <div class="container">
         <div class="header-bar">
             <h1>Mailgun Logs</h1>
-            <span class="count-badge">
-                <?php echo count($mailgun_events); ?> events retrieved
-            </span>
-            <div class="actions">
-                <?php if ($show_failed_only): ?>
-                    <a class="button secondary" href="mailgun-logs.php">View All Events</a>
-                <?php else: ?>
-                    <a class="button" href="mailgun-logs.php?failed=1">View Failed Events</a>
-                <?php endif; ?>
+            <div class="header-controls">
+                <span class="count-badge">
+                    <?php echo count($mailgun_events); ?> events retrieved
+                </span>
+                <div class="actions">
+                    <?php if ($show_failed_only): ?>
+                        <button type="button" class="button danger">Start purge</button>
+                        <a class="button secondary" href="mailgun-logs.php">View All Events</a>
+                    <?php else: ?>
+                        <a class="button" href="mailgun-logs.php?failed=1">View Failed Events</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
         <p>
@@ -235,24 +395,30 @@ if ($result = $gobrik_conn->query($events_query)) {
             </thead>
             <tbody>
                 <?php foreach ($mailgun_events as $event): ?>
+                    <?php
+                        $event_type   = strtolower($event['event_type'] ?? '');
+                        $event_sev    = strtolower($event['severity'] ?? '');
+                        $is_failure   = ($event_type === 'failed') || (strpos($event_sev, 'failure') !== false);
+                        $recipient    = $event['recipient_email'] ?? '';
+                        $event_id     = (int) ($event['id'] ?? 0);
+                    ?>
                     <tr>
                         <td><?php echo htmlspecialchars($event['event_timestamp'] ?? '—'); ?></td>
-                        <td><?php echo htmlspecialchars($event['recipient_email'] ?? '—'); ?></td>
+                        <td><?php echo htmlspecialchars($recipient ?: '—'); ?></td>
                         <td><?php echo htmlspecialchars($event['event_type'] ?? '—'); ?></td>
                         <td><?php echo htmlspecialchars($event['severity'] ?? '—'); ?></td>
-                        <td><?php echo htmlspecialchars($event['details'] ?? '—'); ?></td>
+                        <td class="details-cell"><?php echo htmlspecialchars($event['details'] ?? '—'); ?></td>
                         <td class="process-cell">
-                            <?php
-                                $event_type   = strtolower($event['event_type'] ?? '');
-                                $event_sev    = strtolower($event['severity'] ?? '');
-                                $is_failure   = ($event_type === 'failed') || (strpos($event_sev, 'failure') !== false);
-                                $recipient    = $event['recipient_email'] ?? '';
-                            ?>
-                            <?php if ($is_failure && $recipient): ?>
-                                <form method="POST" onsubmit="return confirm('Remove <?php echo htmlspecialchars($recipient); ?> from Ghost?');">
-                                    <input type="hidden" name="unsubscribe_email" value="<?php echo htmlspecialchars($recipient); ?>">
-                                    <button type="submit" class="danger-button">Remove</button>
-                                </form>
+                            <?php if ($is_failure && $recipient && $event_id): ?>
+                                <div class="process-actions">
+                                    <button type="button" class="skip-button" data-event-id="<?php echo $event_id; ?>" data-recipient="<?php echo htmlspecialchars($recipient, ENT_QUOTES); ?>">
+                                        <span class="button-label">Skip</span>
+                                    </button>
+                                    <button type="button" class="danger-button remove-button" data-event-id="<?php echo $event_id; ?>" data-recipient="<?php echo htmlspecialchars($recipient, ENT_QUOTES); ?>">
+                                        <span class="button-label">Remove</span>
+                                        <span class="spinner" aria-hidden="true"></span>
+                                    </button>
+                                </div>
                             <?php else: ?>
                                 —
                             <?php endif; ?>
@@ -267,9 +433,65 @@ if ($result = $gobrik_conn->query($events_query)) {
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#mailgun-log-table').DataTable({
+            const table = $('#mailgun-log-table').DataTable({
                 order: [[0, 'desc']],
-                pageLength: 25
+                pageLength: 25,
+                columnDefs: [
+                    { targets: 4, width: '300px' }
+                ]
+            });
+
+            function handleAction(button, action) {
+                const $button = $(button);
+                const eventId = $button.data('event-id');
+                const recipient = $button.data('recipient');
+                const $row = $button.closest('tr');
+
+                if (!eventId) {
+                    alert('Missing event details.');
+                    return;
+                }
+
+                $button.addClass('loading');
+                const labelText = action === 'remove_event' ? 'Removing...' : 'Skipping...';
+                const $label = $button.find('.button-label');
+                if ($label.length) {
+                    $label.data('original-text', $label.text());
+                    $label.text(labelText);
+                }
+
+                $.ajax({
+                    method: 'POST',
+                    url: 'mailgun-logs.php',
+                    data: {
+                        action: action,
+                        event_id: eventId,
+                        recipient_email: recipient
+                    },
+                    dataType: 'json'
+                }).done(function(response) {
+                    if (response.success) {
+                        table.row($row).remove().draw();
+                    } else if (response.message) {
+                        alert(response.message);
+                    }
+                }).fail(function() {
+                    alert('Action could not be completed.');
+                }).always(function() {
+                    $button.removeClass('loading');
+                    if ($label && $label.length) {
+                        const originalText = $label.data('original-text') || (action === 'remove_event' ? 'Remove' : 'Skip');
+                        $label.text(originalText);
+                    }
+                });
+            }
+
+            $(document).on('click', '.remove-button', function() {
+                handleAction(this, 'remove_event');
+            });
+
+            $(document).on('click', '.skip-button', function() {
+                handleAction(this, 'ignore_event');
             });
         });
     </script>
