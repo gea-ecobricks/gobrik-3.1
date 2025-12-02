@@ -104,7 +104,28 @@ $pending_members = $pending_result->fetch_all(MYSQLI_ASSOC);
 $all_members = array_merge($sent_members, $pending_members);
 
 
-require_once '../emailing/live-newsletter.php';  //the newsletter html
+$newsletter_files = [
+    '001' => __DIR__ . '/../emailing/newsletters/001.php',
+    '002' => __DIR__ . '/../emailing/newsletters/002.php',
+];
+
+$newsletter_templates = [];
+
+foreach ($newsletter_files as $newsletter_id => $path) {
+    if (file_exists($path)) {
+        $email_template = '';
+        $recipient_uuid = null;
+        $recipient_email = null;
+        include $path;
+        $newsletter_templates[$newsletter_id] = $email_template;
+    }
+}
+
+$selected_newsletter = $_POST['newsletter_choice'] ?? array_key_first($newsletter_templates);
+$email_template = $newsletter_templates[$selected_newsletter] ?? reset($newsletter_templates);
+if ($email_template === false) {
+    $email_template = '';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$has_alerts) {
     $email_html = $_POST['email_html'] ?? '';
@@ -257,7 +278,16 @@ echo '<!DOCTYPE html>
 
 
    <form id="email-form" method="POST">
-    <label for="email_html">Newsletter HTML:</label>
+   <label for="email_html">Newsletter HTML:</label>
+    <div style="margin:8px 0 12px;">
+        <select id="newsletter-selector" name="newsletter_choice" style="padding:8px;border-radius:8px;min-width:200px;">
+            <?php foreach ($newsletter_templates as $newsletter_id => $template_html): ?>
+                <option value="<?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $newsletter_id === $selected_newsletter ? 'selected' : ''; ?>>
+                    Newsletter <?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
     <input type="hidden" id="subscriber_id" name="subscriber_id" value="">
 
@@ -320,6 +350,22 @@ $(document).ready(function () {
     let recipientId = null;
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
+
+    const newsletterTemplates = <?php echo json_encode($newsletter_templates, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+    const newsletterSelector = $('#newsletter-selector');
+
+    function loadNewsletterTemplate(templateId) {
+        const template = newsletterTemplates[templateId] || '';
+        $('#email_html').val(template);
+    }
+
+    newsletterSelector.on('change', function () {
+        loadNewsletterTemplate($(this).val());
+    });
+
+    if (newsletterSelector.length) {
+        loadNewsletterTemplate(newsletterSelector.val());
+    }
 
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
