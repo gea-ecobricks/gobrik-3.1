@@ -499,16 +499,22 @@ Paula and Russell will be leading the 90 minute overview of the principles, theo
                                                 </td>
                                             </tr>
 
-                                            <tr class="site-info-row">
-                                                <td class="site-info" width="100%" align="center" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding-top: 32px;" valign="top">
-                                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
-                                                            <tr>
-                                                                <td class="site-url site-url-bottom-padding" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: top; color: #15212A; font-size: 16px; letter-spacing: -0.1px; font-weight: 700; text-transform: uppercase; text-align: center; padding-bottom: 12px;" valign="top" align="center"><div style="width: 100% !important;"><a href="https://earthen.io/r/952be789?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" class="site-title" style="text-decoration: none; color: #15212A; overflow-wrap: anywhere;" target="_blank">GEA Trainer Newsletter</a></div></td>
-                                                            </tr>
+                                              <tr class="site-info-row">
+                                                                                            <td class="site-info" width="100%" align="center" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding-top: 32px;" valign="top">
+                                                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
+                                                                                                        <tr>
+                                                                                                            <td class="site-icon" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding-bottom: 8px; padding-top: 8px; text-align: center; border-radius: 3px;" valign="top" align="center"><a href="https://earthen.io/r/8521f669?m={$recipient_uuid}" style="color: #4B8501; text-decoration: none; overflow-wrap: anywhere;" target="_blank"><img src="https://earthen.io/content/images/2022/07/page-logo.png" alt="Earthen" border="0" width="44" height="44" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%; width: 44px; height: 44px; border-radius: 3px;"></a></td>
+                                                                                                        </tr>
+                                                                                                        <tr>
+                                                                                                            <td class="site-url " style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: top; color: #15212A; font-size: 16px; letter-spacing: -0.1px; font-weight: 700; text-transform: uppercase; text-align: center;" valign="top" align="center"><div style="width: 100% !important;"><a href="https://earthen.io/r/fb84f209?m={$recipient_uuid}" class="site-title" style="text-decoration: none; color: #15212A; overflow-wrap: anywhere;" target="_blank">Earthen</a></div></td>
+                                                                                                        </tr>
+                                                                                                        <tr>
+                                                                                                            <td class="site-url site-url-bottom-padding" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: top; color: #15212A; font-size: 16px; letter-spacing: -0.1px; font-weight: 700; text-transform: uppercase; text-align: center; padding-bottom: 12px;" valign="top" align="center"><div style="width: 100% !important;"><a href="https://earthen.io/r/0d112d8d?m={$recipient_uuid}" class="site-subtitle" style="text-decoration: none; color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; text-transform: none; overflow-wrap: anywhere;" target="_blank">Ayyew 452</a></div></td>
+                                                                                                        </tr>
 
-                                                    </table>
-                                                </td>
-                                            </tr>
+                                                                                                </table>
+                                                                                            </td>
+                                                                                        </tr>
 
                                             <tr>
                                                 <td class="post-title post-title-no-excerpt" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: top; text-align: center; color: #000000; padding-bottom: 16px;" valign="top" align="center">
