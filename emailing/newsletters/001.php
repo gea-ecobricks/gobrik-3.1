@@ -1,5 +1,9 @@
 <?php
 
+$email_from = 'Earthen <earthen@ecobricks.org>';
+$email_reply_to = 'Earthen <earthen@ecobricks.org>';
+$email_subject = 'Writing Earth Right';
+
 // Build the unsubscribe link using the recipient's email when available.
 $recipient_uuid = !empty($recipient_uuid) ? $recipient_uuid : '{{RECIPIENT_UUID}}';
 $unsubscribe_link = isset($recipient_email)

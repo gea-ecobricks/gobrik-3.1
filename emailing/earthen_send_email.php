@@ -13,8 +13,49 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$email_from = 'Earthen <earthen@ecobricks.org>';
-$email_subject = 'Writing Earth Right';
+function buildSentLabel(?string $newsletterId): string
+{
+    $safeId = preg_replace('/[^0-9A-Za-z_-]/', '', (string) $newsletterId);
+
+    if ($safeId === '') {
+        return 'sent-unknown';
+    }
+
+    return 'sent-' . $safeId;
+}
+
+function loadNewsletterMetadata(?string $newsletterId): array
+{
+    $safeId = preg_replace('/[^0-9A-Za-z_-]/', '', (string) $newsletterId);
+    $path = __DIR__ . "/newsletters/{$safeId}.php";
+
+    if (!is_file($path)) {
+        return ['from' => '', 'reply_to' => '', 'subject' => ''];
+    }
+
+    $email_from = '';
+    $email_reply_to = '';
+    $email_subject = '';
+    $email_template = '';
+    $recipient_uuid = null;
+    $recipient_email = null;
+
+    include $path;
+
+    return [
+        'from' => $email_from,
+        'reply_to' => $email_reply_to ?: $email_from,
+        'subject' => $email_subject,
+    ];
+}
+
+$selected_newsletter = $_POST['newsletter_choice'] ?? null;
+$newsletter_meta = loadNewsletterMetadata($selected_newsletter);
+
+$email_from = $newsletter_meta['from'] ?: 'Earthen <earthen@ecobricks.org>';
+$email_reply_to = $newsletter_meta['reply_to'] ?: $email_from;
+$email_subject = $newsletter_meta['subject'] ?: 'Writing Earth Right';
+$sent_label = buildSentLabel($selected_newsletter ?? '001');
 
 $email_html = $_POST['email_html'] ?? '';
 $recipient_email = $_POST['email_to'] ?? '';
@@ -48,11 +89,11 @@ if (empty($email_html) || empty($recipient_email) || (!$subscriber_id && !$is_te
 }
 
 try {
-    $send_ok = sendEarthenMailgun($recipient_email, $email_html, $email_from, $email_subject);
+    $send_ok = sendEarthenMailgun($recipient_email, $email_html, $email_from, $email_subject, $email_reply_to);
 
     if ($subscriber_id && !$is_test_mode && $send_ok) {
         try {
-            ensureMemberHasLabel($subscriber_id, 'sent-001');
+            ensureMemberHasLabel($subscriber_id, $sent_label);
         } catch (Exception $labelException) {
             error_log('[EARTHEN] ❌ Failed to add sent label: ' . $labelException->getMessage());
         }
@@ -97,7 +138,7 @@ try {
     echo json_encode(['success' => false, 'message' => 'Server error']);
 }
 
-function sendEarthenMailgun(string $to, string $htmlBody, string $email_from, string $email_subject): bool
+function sendEarthenMailgun(string $to, string $htmlBody, string $email_from, string $email_subject, string $email_reply_to): bool
 {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
     $mailgunApiKey = getenv('EARTHEN_MAILGUN_SENDING_KEY');
@@ -108,6 +149,7 @@ function sendEarthenMailgun(string $to, string $htmlBody, string $email_from, st
         'form_params' => [
             'from' => $email_from,
             'to' => $to,
+            'h:Reply-To' => $email_reply_to ?: $email_from,
             'subject' => $email_subject,
             'html' => $htmlBody,
             'text' => strip_tags($htmlBody),
