@@ -397,8 +397,11 @@ function fetchEarthenPendingBatch(mysqli $conn, int $limit = 100, int $offset = 
 
 /**
  * Retrieve a batch of pending Earthen members directly from the Ghost stats database.
+ *
+ * Results can be ordered by the Ghost member creation timestamp ascending (oldest first)
+ * or descending (newest first) to control newsletter send order.
  */
-function fetchGhostPendingBatch(?mysqli $conn, int $limit = 100, int $offset = 0, string $sentLabel = 'sent-001'): array
+function fetchGhostPendingBatch(?mysqli $conn, int $limit = 100, int $offset = 0, string $orderDirection = 'ASC', string $sentLabel = 'sent-001'): array
 {
     if (!$conn) {
         return [];
@@ -406,6 +409,7 @@ function fetchGhostPendingBatch(?mysqli $conn, int $limit = 100, int $offset = 0
 
     $limit = max(1, min($limit, 500));
     $offset = max(0, $offset);
+    $orderSql = strtoupper($orderDirection) === 'DESC' ? 'DESC' : 'ASC';
 
     $sql = "SELECT m.id, m.uuid, m.email, m.name, m.email_count, m.email_opened_count
             FROM members m
@@ -419,7 +423,7 @@ function fetchGhostPendingBatch(?mysqli $conn, int $limit = 100, int $offset = 0
                     AND l.name LIKE CONCAT('%', ?, '%')
               )
             GROUP BY m.id
-            ORDER BY m.created_at ASC
+            ORDER BY m.created_at $orderSql
             LIMIT ? OFFSET ?";
 
     $stmt = $conn->prepare($sql);

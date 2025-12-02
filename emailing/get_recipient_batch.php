@@ -15,6 +15,7 @@ $response = [
 try {
     $batchSize = isset($_GET['limit']) ? max(1, min((int) $_GET['limit'], 100)) : 100;
     $offset = isset($_GET['offset']) ? max(0, (int) $_GET['offset']) : 0;
+    $orderDirection = isset($_GET['order']) && strtolower($_GET['order']) === 'desc' ? 'DESC' : 'ASC';
 
     $alert_query = "SELECT alert_title, alert_message FROM admin_alerts WHERE addressed = 0 ORDER BY date_posted DESC LIMIT 3";
     $result = $buwana_conn->query($alert_query);
@@ -31,7 +32,7 @@ try {
 
     $ghost_conn = loadGhostStatsConnection();
 
-    $response['batch'] = fetchGhostPendingBatch($ghost_conn, $batchSize, $offset);
+    $response['batch'] = fetchGhostPendingBatch($ghost_conn, $batchSize, $offset, $orderDirection);
 
     $earthenStats = getGhostMemberStats($ghost_conn);
 

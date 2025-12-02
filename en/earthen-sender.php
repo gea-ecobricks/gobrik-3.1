@@ -359,6 +359,16 @@ echo '<!DOCTYPE html>
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
+<style>
+    .toggle-switch .slider.order-oldest {
+        background-color: #4caf50;
+    }
+
+    .toggle-switch .slider.order-newest {
+        background-color: #ff9800;
+    }
+</style>
+
 
 
 
@@ -403,6 +413,11 @@ echo '<!DOCTYPE html>
         <label>✉️ Auto Send Emails</label>
         <p class="form-caption" style="margin-top:10px;">Uncheck to prevent the email from sending automatically after countdown.</p>
 
+        <label style="display:block;margin-top:15px;">🔁 Auto-load batches</label>
+        <p class="form-caption" style="margin-top:10px;">When enabled, the next 100 members will load automatically after the current batch finishes and sending will continue.</p>
+
+        <p id="batch-order-caption" class="form-caption" style="margin-top:10px;">Start sending newsletters to the oldest members of Earthen first.</p>
+
         <label for="send-delay-slider" style="display:block;margin-top:20px;margin-bottom: 5px;">⏱️ Send Delay</label>
         <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:90%;accent-color:var(--emblem-green);">
                 <p class="form-caption" style="margin-top:5px;">Adjust sending delay from 1 to 10 seconds.</p>
@@ -415,6 +430,18 @@ echo '<!DOCTYPE html>
             <input type="checkbox" id="auto-send-toggle" value="1">
             <span class="slider"></span>
         </label>
+        <div style="margin-top:10px;">
+            <label class="toggle-switch">
+                <input type="checkbox" id="auto-load-toggle" value="1">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div style="margin-top:10px;">
+            <label class="toggle-switch">
+                <input type="checkbox" id="batch-order-toggle" value="1">
+                <span id="batch-order-slider" class="slider order-oldest"></span>
+            </label>
+        </div>
         <div style="margin-top:auto;margin-bottom:10px">
             <p style="text-align:center;margin:45px 30px 10px 0px;font-weight:bold;">⏱ <span id="delay-display">5</span>s</p>
         </div>
@@ -536,6 +563,7 @@ $(document).ready(function () {
     let batchSent = 0;
     let currentBatchSize = 0;
     let batchOffset = 0;
+    let isLoadingBatch = false;
     const initialBatch = <?php echo json_encode($all_members); ?>;
     const initialStats = <?php echo json_encode($earthen_stats); ?>;
     let queueStats = {
@@ -597,6 +625,28 @@ $(document).ready(function () {
 
     function logError(message) {
         console.error(message);
+    }
+
+    function autoLoadEnabled() {
+        return $('#auto-load-toggle').is(':checked');
+    }
+
+    function getBatchOrder() {
+        return $('#batch-order-toggle').is(':checked') ? 'desc' : 'asc';
+    }
+
+    function updateBatchOrderDisplay() {
+        const newestFirst = $('#batch-order-toggle').is(':checked');
+        const captionText = newestFirst
+            ? 'Start sending newsletters to the newest members of Earthen first.'
+            : 'Start sending newsletters to the oldest members of Earthen first.';
+
+        $('#batch-order-caption').text(captionText);
+        $('#batch-order-slider')
+            .toggleClass('order-newest', newestFirst)
+            .toggleClass('order-oldest', !newestFirst);
+
+        localStorage.setItem('batchOrder', getBatchOrder());
     }
 
     function renderStatusTable() {
@@ -738,23 +788,32 @@ $(document).ready(function () {
         $('#sent-percentage').text(Number(queueStats.percentage).toFixed(3));
     }
 
+    function setBatchFromData(batch) {
+        recipientQueue = batch;
+        currentBatchSize = recipientQueue.length;
+        batchOffset += currentBatchSize;
+        batchSent = recipientQueue.filter(m => m.test_sent === 1).length;
+
+        const firstPendingIndex = recipientQueue.findIndex(m => m.test_sent !== 1);
+        queueIndex = firstPendingIndex >= 0 ? firstPendingIndex : recipientQueue.length;
+
+        renderStatusTable();
+
+        if (!setActiveRecipientFromQueue(queueIndex)) {
+            handleBatchCompletion();
+        }
+    }
+
     function loadInitialBatch() {
         updateStatsDisplay(initialStats);
 
+        if (getBatchOrder() === 'desc') {
+            fetchNextBatch();
+            return;
+        }
+
         if (Array.isArray(initialBatch) && initialBatch.length) {
-            recipientQueue = initialBatch;
-            currentBatchSize = recipientQueue.length;
-            batchOffset = currentBatchSize;
-            batchSent = recipientQueue.filter(m => m.test_sent === 1).length;
-
-            const firstPendingIndex = recipientQueue.findIndex(m => m.test_sent !== 1);
-            queueIndex = firstPendingIndex >= 0 ? firstPendingIndex : recipientQueue.length;
-
-            renderStatusTable();
-
-            if (!setActiveRecipientFromQueue(queueIndex)) {
-                handleBatchCompletion();
-            }
+            setBatchFromData(initialBatch);
         } else {
             handleBatchCompletion();
         }
@@ -782,7 +841,69 @@ $(document).ready(function () {
         setActiveRecipientFromQueue(-1);
         updateBatchDisplay();
 
+        if (autoLoadEnabled()) {
+            fetchNextBatch();
+            return;
+        }
+
         $('#auto-send-button').text("✅ All batch emails sent!").prop('disabled', true);
+    }
+
+    function fetchNextBatch() {
+        if (isLoadingBatch) return;
+
+        isLoadingBatch = true;
+        $('#auto-send-button').text('⏳ Loading next batch...').prop('disabled', true);
+
+        $.ajax({
+            url: '../emailing/get_recipient_batch.php',
+            method: 'GET',
+            dataType: 'json',
+            data: { limit: batchSize, offset: batchOffset, order: getBatchOrder() },
+            success: function (resp) {
+                isLoadingBatch = false;
+
+                if (!resp || !resp.success) {
+                    $('#auto-send-button').text('❌ Failed to load batch').prop('disabled', false);
+                    return;
+                }
+
+                if (resp.stats) {
+                    updateStatsDisplay(resp.stats);
+                }
+
+                const batch = Array.isArray(resp.batch) ? resp.batch : [];
+
+                if (!batch.length) {
+                    $('#auto-send-button').text('✅ All batch emails sent!').prop('disabled', true);
+                    return;
+                }
+
+                const normalizedBatch = batch.map((m) => ({
+                    id: m.id ?? null,
+                    email: m.email ?? '',
+                    name: m.name ?? '',
+                    email_open_rate: m.email_open_rate ?? '0%',
+                    test_sent: parseInt(m.test_sent ?? 0),
+                    test_sent_date_time: m.test_sent_date_time ?? 'N/A',
+                    batch_row_id: m.batch_row_id ?? null,
+                    status: m.status ?? 'pending',
+                }));
+
+                setBatchFromData(normalizedBatch);
+                updateBatchDisplay();
+
+                $('#auto-send-button').text('📨 Send').prop('disabled', false);
+
+                if (autoSendEnabled() && autoSendStarted && recipientEmail) {
+                    startCountdownAndSend();
+                }
+            },
+            error: function () {
+                isLoadingBatch = false;
+                $('#auto-send-button').text('❌ Failed to load batch').prop('disabled', false);
+            }
+        });
     }
 
     function setActiveRecipientFromQueue(index) {
@@ -975,6 +1096,18 @@ function sendEmail() {
         }
     });
 
+    $('#auto-load-toggle').on('change', function () {
+        localStorage.setItem('autoLoad', $(this).is(':checked'));
+
+        if (!$(this).is(':checked')) {
+            $('#auto-send-button').text("✅ All batch emails sent!").prop('disabled', recipientQueue.length === 0);
+        }
+    });
+
+    $('#batch-order-toggle').on('change', function () {
+        updateBatchOrderDisplay();
+    });
+
     $('#send-delay-slider').on('input change', function () {
         sendDelay = parseInt($(this).val());
         localStorage.setItem('sendDelay', sendDelay);
@@ -1010,12 +1143,21 @@ function sendEmail() {
     // 🔹 Initial state from localStorage
     const savedAutoSend = localStorage.getItem('autoSend') === 'true';
     const savedTestSend = localStorage.getItem('testSend') === 'true';
+    const savedAutoLoad = localStorage.getItem('autoLoad') === 'true';
+    const savedBatchOrder = localStorage.getItem('batchOrder');
     sendDelay = parseInt(localStorage.getItem('sendDelay')) || 1;
     $('#send-delay-slider').val(sendDelay);
     $('#delay-display').text(sendDelay);
 
     $('#auto-send-toggle').prop('checked', savedAutoSend);
     $('#test-email-toggle').prop('checked', savedTestSend);
+    $('#auto-load-toggle').prop('checked', savedAutoLoad);
+
+    if (savedBatchOrder === 'desc') {
+        $('#batch-order-toggle').prop('checked', true);
+    }
+
+    updateBatchOrderDisplay();
 
     loadInitialBatch();
     updateVisibleButton();
