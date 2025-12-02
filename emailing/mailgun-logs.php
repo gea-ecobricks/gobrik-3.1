@@ -352,6 +352,43 @@ if ($result = $gobrik_conn->query($events_query)) {
             margin-top: 14px;
             margin-bottom: 0;
         }
+
+        .purge-status {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            margin-top: 8px;
+            border-radius: 8px;
+            background: #f0f4ff;
+            border: 1px solid #d0d7de;
+        }
+
+        .purge-status.visible {
+            display: inline-flex;
+        }
+
+        .status-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(13, 110, 253, 0.3);
+            border-top-color: #0d6efd;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .status-text {
+            font-weight: 600;
+            color: #0d6efd;
+        }
+
+        .status-text.success {
+            color: #2d9f49;
+        }
+
+        .status-text.error {
+            color: #d62c2c;
+        }
     </style>
 </head>
 <body>
@@ -364,12 +401,18 @@ if ($result = $gobrik_conn->query($events_query)) {
                 </span>
                 <div class="actions">
                     <?php if ($show_failed_only): ?>
-                        <button type="button" class="button danger">Start purge</button>
+                        <button type="button" class="button danger" id="start-purge">Start purge</button>
                         <a class="button secondary" href="mailgun-logs.php">View All Events</a>
                     <?php else: ?>
                         <a class="button" href="mailgun-logs.php?failed=1">View Failed Events</a>
                     <?php endif; ?>
                 </div>
+                <?php if ($show_failed_only): ?>
+                    <div class="purge-status" id="purge-status" aria-live="polite">
+                        <span class="status-spinner" aria-hidden="true"></span>
+                        <span class="status-text" id="purge-status-text">Waiting to start purge…</span>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
         <p>
@@ -492,6 +535,108 @@ if ($result = $gobrik_conn->query($events_query)) {
 
             $(document).on('click', '.skip-button', function() {
                 handleAction(this, 'ignore_event');
+            });
+
+            const $purgeStatus = $('#purge-status');
+            const $purgeStatusText = $('#purge-status-text');
+            const $startPurgeButton = $('#start-purge');
+
+            function updatePurgeStatus(message, state = 'info') {
+                if (!$purgeStatus.length || !$purgeStatusText.length) return;
+
+                $purgeStatus.addClass('visible');
+                $purgeStatusText.removeClass('success error');
+
+                if (state === 'success') {
+                    $purgeStatusText.addClass('success');
+                } else if (state === 'error') {
+                    $purgeStatusText.addClass('error');
+                }
+
+                $purgeStatusText.text(message);
+            }
+
+            function processPurgeQueue(queue, index, removedCount, failureCount) {
+                if (index >= queue.length) {
+                    const summaryParts = [];
+                    if (removedCount > 0) {
+                        summaryParts.push(`${removedCount} event${removedCount === 1 ? '' : 's'} removed`);
+                    }
+                    if (failureCount > 0) {
+                        summaryParts.push(`${failureCount} event${failureCount === 1 ? '' : 's'} failed`);
+                    }
+
+                    const summaryMessage = summaryParts.length ? summaryParts.join(', ') : 'No events processed.';
+
+                    updatePurgeStatus(`Purge completed: ${summaryMessage}.`, failureCount > 0 ? 'error' : 'success');
+                    $startPurgeButton.removeClass('loading').prop('disabled', false);
+                    return;
+                }
+
+                const $row = $(queue[index]);
+                const $button = $row.find('.remove-button');
+
+                if (!$button.length) {
+                    processPurgeQueue(queue, index + 1, removedCount, failureCount);
+                    return;
+                }
+
+                const eventId = $button.data('event-id');
+                const recipient = $button.data('recipient');
+
+                if (!eventId || !recipient) {
+                    processPurgeQueue(queue, index + 1, removedCount, failureCount + 1);
+                    return;
+                }
+
+                updatePurgeStatus(`Removing ${recipient}…`, 'info');
+                $button.addClass('loading');
+
+                $.ajax({
+                    method: 'POST',
+                    url: 'mailgun-logs.php',
+                    data: {
+                        action: 'remove_event',
+                        event_id: eventId,
+                        recipient_email: recipient
+                    },
+                    dataType: 'json'
+                }).done(function(response) {
+                    if (response.success) {
+                        table.row($row).remove().draw();
+                        updatePurgeStatus(`Removed ${recipient}.`, 'success');
+                        removedCount += 1;
+                    } else {
+                        updatePurgeStatus(response.message || `Unable to remove ${recipient}.`, 'error');
+                        failureCount += 1;
+                    }
+                }).fail(function() {
+                    updatePurgeStatus(`Request failed for ${recipient}.`, 'error');
+                    failureCount += 1;
+                }).always(function() {
+                    $button.removeClass('loading');
+                    setTimeout(function() {
+                        processPurgeQueue(queue, index + 1, removedCount, failureCount);
+                    }, 1000);
+                });
+            }
+
+            $startPurgeButton.on('click', function() {
+                if (!$startPurgeButton.length || $startPurgeButton.prop('disabled')) return;
+
+                const queue = table.rows({ order: 'applied' }).nodes().toArray();
+                const processableQueue = queue.filter(function(node) {
+                    return $(node).find('.remove-button').length > 0;
+                });
+
+                if (!processableQueue.length) {
+                    updatePurgeStatus('No failed events available to purge.', 'info');
+                    return;
+                }
+
+                $startPurgeButton.addClass('loading').prop('disabled', true);
+                updatePurgeStatus('Starting purge…', 'info');
+                processPurgeQueue(processableQueue, 0, 0, 0);
             });
         });
     </script>
