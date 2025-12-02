@@ -292,6 +292,64 @@ function getEarthenMemberStats(mysqli $conn): array
 }
 
 /**
+ * Get member stats directly from the Ghost stats database.
+ */
+function getGhostMemberStats(?mysqli $conn, string $sentLabel = 'sent-001'): array
+{
+    if (!$conn) {
+        return [
+            'total' => 0,
+            'sent' => 0,
+            'percentage' => 0,
+        ];
+    }
+
+    $totalSql = "SELECT COUNT(DISTINCT m.id) AS total_members
+                 FROM members m
+                 INNER JOIN members_newsletters mn ON m.id = mn.member_id
+                 WHERE m.email IS NOT NULL AND m.email <> ''";
+
+    $totalResult = $conn->query($totalSql);
+    $totalMembers = (int) ($totalResult && ($row = $totalResult->fetch_assoc()) ? ($row['total_members'] ?? 0) : 0);
+
+    if ($totalResult instanceof mysqli_result) {
+        $totalResult->free();
+    }
+
+    $sentSql = "SELECT COUNT(DISTINCT m.id) AS sent_members
+                FROM members m
+                INNER JOIN members_newsletters mn ON m.id = mn.member_id
+                INNER JOIN members_labels ml ON m.id = ml.member_id
+                INNER JOIN labels l ON ml.label_id = l.id AND l.name = ?
+                WHERE m.email IS NOT NULL AND m.email <> ''";
+
+    $sentStmt = $conn->prepare($sentSql);
+
+    if (!$sentStmt) {
+        error_log('[EARTHEN] Failed to prepare Ghost sent stats: ' . $conn->error);
+
+        return [
+            'total' => $totalMembers,
+            'sent' => 0,
+            'percentage' => $totalMembers > 0 ? 0 : 0,
+        ];
+    }
+
+    $sentStmt->bind_param('s', $sentLabel);
+    $sentStmt->execute();
+    $sentResult = $sentStmt->get_result();
+    $sentCount = (int) ($sentResult && ($row = $sentResult->fetch_assoc()) ? ($row['sent_members'] ?? 0) : 0);
+
+    $sentStmt->close();
+
+    return [
+        'total' => $totalMembers,
+        'sent' => $sentCount,
+        'percentage' => $totalMembers > 0 ? round(($sentCount / $totalMembers) * 100, 3) : 0,
+    ];
+}
+
+/**
  * Retrieve a batch of pending Earthen members from the MySQL database.
  */
 function fetchEarthenPendingBatch(mysqli $conn, int $limit = 100, int $offset = 0): array
@@ -335,6 +393,67 @@ function fetchEarthenPendingBatch(mysqli $conn, int $limit = 100, int $offset = 
     }, $batch);
 
     return filterMembersWithoutGhostLabel($mappedBatch, 'sent-001');
+}
+
+/**
+ * Retrieve a batch of pending Earthen members directly from the Ghost stats database.
+ */
+function fetchGhostPendingBatch(?mysqli $conn, int $limit = 100, int $offset = 0, string $sentLabel = 'sent-001'): array
+{
+    if (!$conn) {
+        return [];
+    }
+
+    $limit = max(1, min($limit, 500));
+    $offset = max(0, $offset);
+
+    $sql = "SELECT m.id, m.uuid, m.email, m.name, m.email_count, m.email_opened_count
+            FROM members m
+            INNER JOIN members_newsletters mn ON m.id = mn.member_id
+            LEFT JOIN members_labels ml ON m.id = ml.member_id
+            LEFT JOIN labels l ON ml.label_id = l.id AND l.name = ?
+            WHERE m.email IS NOT NULL AND m.email <> ''
+              AND l.id IS NULL
+            GROUP BY m.id
+            ORDER BY m.created_at ASC
+            LIMIT ? OFFSET ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        error_log('[EARTHEN] Failed to prepare Ghost pending batch query: ' . $conn->error);
+        return [];
+    }
+
+    $stmt->bind_param('sii', $sentLabel, $limit, $offset);
+
+    if (!$stmt->execute()) {
+        error_log('[EARTHEN] Failed executing Ghost pending batch query: ' . $stmt->error);
+        $stmt->close();
+        return [];
+    }
+
+    $result = $stmt->get_result();
+    $batch = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+
+    $stmt->close();
+
+    return array_map(function ($member) {
+        $opened = (int) ($member['email_opened_count'] ?? 0);
+        $sent = (int) ($member['email_count'] ?? 0);
+        $openRate = $sent > 0 ? round(($opened / $sent) * 100, 2) . '%' : '0%';
+
+        return [
+            'id' => $member['id'] ?? null,
+            'uuid' => $member['uuid'] ?? null,
+            'email' => $member['email'] ?? '',
+            'name' => $member['name'] ?? '',
+            'email_open_rate' => $openRate,
+            'status' => 'pending',
+            'test_sent' => 0,
+            'test_sent_date_time' => 'N/A',
+        ];
+    }, $batch);
 }
 
 /**
