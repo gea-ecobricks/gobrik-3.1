@@ -14,6 +14,12 @@ $extras = [];
 if (isset($_GET['firstname'])) $extras['firstname'] = $_GET['firstname'];
 if (isset($_GET['status'])) $extras['status'] = $_GET['status'];
 if (isset($_GET['id'])) $extras['id'] = $_GET['id']; // buwana_id
+$redirectTarget = $_GET['redirect'] ?? ($_SESSION['post_login_redirect'] ?? null);
+
+if ($redirectTarget && strpos($redirectTarget, '/') === 0) {
+    $_SESSION['post_login_redirect'] = $redirectTarget;
+    $extras['redirect'] = $redirectTarget;
+}
 
 // Base OpenID Connect params
 $params = array_merge([
