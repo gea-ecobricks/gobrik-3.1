@@ -1,4 +1,7 @@
 <?php
+if (!defined('EARTHEN_TOTAL_MEMBERS')) {
+    define('EARTHEN_TOTAL_MEMBERS', 70000);
+}
 /**
  * Cron-safe Earthen / Ghost helpers.
  * - No HTML/JS output
@@ -164,6 +167,7 @@ function fetchGhostMembers(array $params = []): array
     }
 
     $limit = isset($params['limit']) ? max(1, (int) $params['limit']) : 1000;
+    $offset = isset($params['offset']) ? max(0, (int) $params['offset']) : 0;
 
     $filters   = [];
     $bindTypes = '';
@@ -198,7 +202,7 @@ function fetchGhostMembers(array $params = []): array
         $sql .= ' WHERE ' . implode(' AND ', $filters);
     }
 
-    $sql .= ' GROUP BY m.id ORDER BY m.created_at ASC LIMIT ?';
+    $sql .= ' GROUP BY m.id ORDER BY m.created_at ASC LIMIT ? OFFSET ?';
 
     $stmt = $conn->prepare($sql);
 
@@ -206,8 +210,9 @@ function fetchGhostMembers(array $params = []): array
         throw new Exception('Failed to prepare Ghost member query: ' . $conn->error);
     }
 
-    $bindTypes .= 'i';
+    $bindTypes .= 'ii';
     $bindVars[] = $limit;
+    $bindVars[] = $offset;
 
     $stmt->bind_param($bindTypes, ...$bindVars);
 
@@ -245,6 +250,285 @@ function fetchGhostMembers(array $params = []): array
     $stmt->close();
 
     return $members;
+}
+
+/**
+ * Fetch Earthen member stats using the Earthen MySQL database connection.
+ *
+ * Caches the total member count in the current session while keeping the
+ * sent count live so that progress updates remain accurate.
+ */
+function getEarthenMemberStats(mysqli $conn): array
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['earthen_member_total'])) {
+        $totalQuery = "SELECT COUNT(*) AS total_members FROM earthen_members_tb";
+        $totalResult = $conn->query($totalQuery);
+        $_SESSION['earthen_member_total'] = (int) ($totalResult && ($row = $totalResult->fetch_assoc()) ? ($row['total_members'] ?? 0) : 0);
+
+        if ($totalResult instanceof mysqli_result) {
+            $totalResult->free();
+        }
+    }
+
+    $sentQuery = "SELECT COUNT(*) AS sent_count FROM earthen_members_tb WHERE test_sent = 1";
+    $sentResult = $conn->query($sentQuery);
+    $sentCount = (int) ($sentResult && ($row = $sentResult->fetch_assoc()) ? ($row['sent_count'] ?? 0) : 0);
+
+    if ($sentResult instanceof mysqli_result) {
+        $sentResult->free();
+    }
+
+    $totalMembers = (int) ($_SESSION['earthen_member_total'] ?? 0);
+
+    return [
+        'total' => $totalMembers,
+        'sent' => $sentCount,
+        'percentage' => $totalMembers > 0 ? round(($sentCount / $totalMembers) * 100, 3) : 0,
+    ];
+}
+
+/**
+ * Get member stats directly from the Ghost stats database.
+ */
+function getGhostMemberStats(?mysqli $conn, string $sentLabel = 'sent-001'): array
+{
+    if (!$conn) {
+        return [
+            'total' => 0,
+            'sent' => 0,
+            'percentage' => 0,
+        ];
+    }
+
+    $totalSql = "SELECT COUNT(DISTINCT m.id) AS total_members
+                 FROM members m
+                 INNER JOIN members_newsletters mn ON m.id = mn.member_id
+                 WHERE m.email IS NOT NULL AND m.email <> ''";
+
+    $totalResult = $conn->query($totalSql);
+    $totalMembers = (int) ($totalResult && ($row = $totalResult->fetch_assoc()) ? ($row['total_members'] ?? 0) : 0);
+
+    if ($totalResult instanceof mysqli_result) {
+        $totalResult->free();
+    }
+
+    $sentSql = "SELECT COUNT(DISTINCT m.id) AS sent_members
+                FROM members m
+                INNER JOIN members_newsletters mn ON m.id = mn.member_id
+                INNER JOIN members_labels ml ON m.id = ml.member_id
+                INNER JOIN labels l ON ml.label_id = l.id AND l.name = ?
+                WHERE m.email IS NOT NULL AND m.email <> ''";
+
+    $sentStmt = $conn->prepare($sentSql);
+
+    if (!$sentStmt) {
+        error_log('[EARTHEN] Failed to prepare Ghost sent stats: ' . $conn->error);
+
+        return [
+            'total' => $totalMembers,
+            'sent' => 0,
+            'percentage' => $totalMembers > 0 ? 0 : 0,
+        ];
+    }
+
+    $sentStmt->bind_param('s', $sentLabel);
+    $sentStmt->execute();
+    $sentResult = $sentStmt->get_result();
+    $sentCount = (int) ($sentResult && ($row = $sentResult->fetch_assoc()) ? ($row['sent_members'] ?? 0) : 0);
+
+    $sentStmt->close();
+
+    return [
+        'total' => $totalMembers,
+        'sent' => $sentCount,
+        'percentage' => $totalMembers > 0 ? round(($sentCount / $totalMembers) * 100, 3) : 0,
+    ];
+}
+
+/**
+ * Retrieve a batch of pending Earthen members from the MySQL database.
+ */
+function fetchEarthenPendingBatch(mysqli $conn, int $limit = 100, int $offset = 0): array
+{
+    $limit = max(1, min($limit, 500));
+    $offset = max(0, $offset);
+
+    $sql = "SELECT id, email, name, test_sent, test_sent_date_time
+            FROM earthen_members_tb
+            WHERE test_sent = 0
+              AND (processing IS NULL OR processing = 0)
+              AND email IS NOT NULL
+              AND email <> ''
+            ORDER BY id ASC
+            LIMIT ? OFFSET ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        error_log('[EARTHEN] Failed to prepare pending batch query: ' . $conn->error);
+        return [];
+    }
+
+    $stmt->bind_param('ii', $limit, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $batch = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+
+    $stmt->close();
+
+    $mappedBatch = array_map(function ($member) {
+        return [
+            'id' => $member['id'] ?? null,
+            'email' => $member['email'] ?? '',
+            'name' => $member['name'] ?? '',
+            'email_open_rate' => 0,
+            'status' => 'pending',
+            'test_sent' => (int) ($member['test_sent'] ?? 0),
+            'test_sent_date_time' => $member['test_sent_date_time'] ?? 'N/A',
+        ];
+    }, $batch);
+
+    return filterMembersWithoutGhostLabel($mappedBatch, 'sent-001');
+}
+
+/**
+ * Retrieve a batch of pending Earthen members directly from the Ghost stats database.
+ *
+ * Results can be ordered by the Ghost member creation timestamp ascending (oldest first)
+ * or descending (newest first) to control newsletter send order.
+ */
+function fetchGhostPendingBatch(?mysqli $conn, int $limit = 100, int $offset = 0, string $orderDirection = 'ASC', string $sentLabel = 'sent-001'): array
+{
+    if (!$conn) {
+        return [];
+    }
+
+    $limit = max(1, min($limit, 500));
+    $offset = max(0, $offset);
+    $orderSql = strtoupper($orderDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+    $sql = "SELECT m.id, m.uuid, m.email, m.name, m.email_count, m.email_opened_count
+            FROM members m
+            INNER JOIN members_newsletters mn ON m.id = mn.member_id
+            WHERE m.email IS NOT NULL AND m.email <> ''
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM members_labels ml
+                  INNER JOIN labels l ON ml.label_id = l.id
+                  WHERE ml.member_id = m.id
+                    AND l.name LIKE CONCAT('%', ?, '%')
+              )
+            GROUP BY m.id
+            ORDER BY m.created_at $orderSql
+            LIMIT ? OFFSET ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        error_log('[EARTHEN] Failed to prepare Ghost pending batch query: ' . $conn->error);
+        return [];
+    }
+
+    $stmt->bind_param('sii', $sentLabel, $limit, $offset);
+
+    if (!$stmt->execute()) {
+        error_log('[EARTHEN] Failed executing Ghost pending batch query: ' . $stmt->error);
+        $stmt->close();
+        return [];
+    }
+
+    $result = $stmt->get_result();
+    $batch = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+
+    $stmt->close();
+
+    return array_map(function ($member) {
+        $opened = (int) ($member['email_opened_count'] ?? 0);
+        $sent = (int) ($member['email_count'] ?? 0);
+        $openRate = $sent > 0 ? round(($opened / $sent) * 100, 2) . '%' : '0%';
+
+        return [
+            'id' => $member['id'] ?? null,
+            'uuid' => $member['uuid'] ?? null,
+            'email' => $member['email'] ?? '',
+            'name' => $member['name'] ?? '',
+            'email_open_rate' => $openRate,
+            'status' => 'pending',
+            'test_sent' => 0,
+            'test_sent_date_time' => 'N/A',
+        ];
+    }, $batch);
+}
+
+/**
+ * Remove members that already have a specific Ghost label.
+ */
+function filterMembersWithoutGhostLabel(array $members, string $labelName = 'sent-001'): array
+{
+    if (empty($members)) {
+        return [];
+    }
+
+    $emails = array_values(array_unique(array_filter(array_column($members, 'email'))));
+
+    if (empty($emails)) {
+        return $members;
+    }
+
+    $ghost_conn = loadGhostStatsConnection();
+
+    if (!$ghost_conn) {
+        return $members;
+    }
+
+    $placeholders = implode(',', array_fill(0, count($emails), '?'));
+    $sql = "SELECT DISTINCT m.email
+            FROM members m
+            INNER JOIN members_labels ml ON m.id = ml.member_id
+            INNER JOIN labels l ON ml.label_id = l.id
+            WHERE l.name = ? AND m.email IN ($placeholders)";
+
+    $stmt = $ghost_conn->prepare($sql);
+
+    if (!$stmt) {
+        error_log('[EARTHEN] Failed to prepare Ghost label filter query: ' . $ghost_conn->error);
+        return $members;
+    }
+
+    $params = array_merge([$labelName], $emails);
+    $types = str_repeat('s', count($params));
+
+    $bindValues = [$types];
+    foreach ($params as $key => $value) {
+        $bindValues[] = &$params[$key];
+    }
+
+    call_user_func_array([$stmt, 'bind_param'], $bindValues);
+
+    if (!$stmt->execute()) {
+        error_log('[EARTHEN] Failed executing Ghost label filter query: ' . $stmt->error);
+        $stmt->close();
+        return $members;
+    }
+
+    $result = $stmt->get_result();
+    $labelledEmails = $result ? array_column($result->fetch_all(MYSQLI_ASSOC), 'email') : [];
+    $stmt->close();
+
+    if (empty($labelledEmails)) {
+        return $members;
+    }
+
+    $labelledSet = array_flip(array_map('strtolower', $labelledEmails));
+
+    return array_values(array_filter($members, function ($member) use ($labelledSet) {
+        $email = strtolower($member['email'] ?? '');
+        return $email === '' || !isset($labelledSet[$email]);
+    }));
 }
 
 function memberHasLabel(array $member, string $labelName): bool
@@ -299,6 +583,34 @@ function summarizeGhostMembers(array $members, string $sentLabel = 'sent-001'): 
         'sent_count'      => $sentCount,
         'sent_percentage' => $total > 0 ? round(($sentCount / $total) * 100, 2) : 0,
     ];
+}
+
+function personalizeEmailHtml(string $html, ?string $recipient_uuid, string $recipient_email): string
+{
+    $uuid_placeholder = '{{RECIPIENT_UUID}}';
+    $fallback_uuid = '4dbbb711-73e9-4fd0-9056-a7cc1af6a905';
+    $uuid = $recipient_uuid ?: $fallback_uuid;
+
+    $html = str_replace($uuid_placeholder, $uuid, $html);
+
+    $fallback_unsubscribe = 'https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f';
+    $unsubscribe_url = !empty($recipient_email)
+        ? 'https://gobrik.com/emailing/unsubscribe.php?email=' . urlencode($recipient_email)
+        : $fallback_unsubscribe;
+
+    $html = preg_replace(
+        '/https:\/\/gobrik\.com\/emailing\/unsubscribe\.php\?email=[^\s"\']+/i',
+        $unsubscribe_url,
+        $html
+    );
+
+    $html = preg_replace(
+        '/https:\/\/earthen\.io\/unsubscribe\/\?uuid=[^&\"]+(&key=[^&\"]+)?(&newsletter=[^&\"]+)?/i',
+        $unsubscribe_url,
+        $html
+    );
+
+    return $html;
 }
 
 function ensureMemberHasLabel(string $memberId, string $labelName): bool

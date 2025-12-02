@@ -35,12 +35,13 @@ if ($is_logged_in) {
 
 } else {
     $redirect_target = 'earthen-sender.php';
-    $login_url = 'login.php?redirect=' . urlencode($redirect_target);
+    $buwana_id = $_SESSION['buwana_id'] ?? '';
+    $login_url = 'https://buwana.ecobricks.org/en/login.php?redirect=' . urlencode($redirect_target) . '&app=gbrk_f2c61a85a4cd4b8b89a7';
+    if (!empty($buwana_id)) {
+        $login_url .= '&id=' . urlencode($buwana_id);
+    }
 
-    echo '<script>
-        alert("Please login before viewing this page.");
-        window.location.href = "' . $login_url . '";
-    </script>';
+    header('Location: ' . $login_url);
     exit();
 }
 
@@ -71,44 +72,15 @@ require_once '../buwanaconn_env.php';
 require_once '../emailing/earthen_helpers.php';
 
 $ghoststats_conn = loadGhostStatsConnection();
+$earthen_stats = getGhostMemberStats($ghoststats_conn);
+
+if (!defined('EARTHEN_TOTAL_MEMBERS')) {
+    define('EARTHEN_TOTAL_MEMBERS', $earthen_stats['total'] ?? 0);
+}
 
 // Default newsletter headers
 $email_from = 'Earthen <earthen@ecobricks.org>';
 $email_subject = 'Writing Earth Right';
-
-function fetchEarthenStats($ghoststats_conn): array
-{
-    $stats = [
-        'total' => 0,
-        'sent' => 0,
-        'percentage' => 0,
-    ];
-
-    if (!$ghoststats_conn || $ghoststats_conn->connect_error) {
-        error_log('[GHOST STATS] Connection unavailable.');
-        return $stats;
-    }
-
-    $totalResult = $ghoststats_conn->query("SELECT COUNT(*) AS total FROM members");
-    if ($totalResult && ($row = $totalResult->fetch_assoc())) {
-        $stats['total'] = (int) ($row['total'] ?? 0);
-    }
-
-    $sentQuery = "SELECT COUNT(*) AS sent
-                  FROM members_labels ml
-                  INNER JOIN labels l ON ml.label_id = l.id
-                  WHERE l.name = 'sent-001'";
-    $sentResult = $ghoststats_conn->query($sentQuery);
-    if ($sentResult && ($row = $sentResult->fetch_assoc())) {
-        $stats['sent'] = (int) ($row['sent'] ?? 0);
-    }
-
-    $stats['percentage'] = $stats['total'] > 0
-        ? round(($stats['sent'] / $stats['total']) * 100, 2)
-        : 0;
-
-    return $stats;
-}
 
 // 🚨 CHECK FOR UNADDRESSED ADMIN ALERTS 🚨
 $has_alerts = false;
@@ -124,49 +96,96 @@ if ($result->num_rows > 0) {
     }
 }
 
+
+$batch_label = 'earthen-' . date('Ymd-His');
+$initial_member_batch = [];
+$initialOrderDirection = (isset($_COOKIE['ghostBatchOrder']) && strtolower($_COOKIE['ghostBatchOrder']) === 'desc') ? 'DESC' : 'ASC';
+
 try {
-    $ghost_members = fetchGhostMembers();
-    $summary = summarizeGhostMembers($ghost_members, 'sent-001');
+    $pending_members = fetchGhostPendingBatch($ghoststats_conn, 100, 0, $initialOrderDirection);
 
-    $earthen_stats = fetchEarthenStats($ghoststats_conn);
+    if (!empty($pending_members)) {
+        $insert_stmt = $gobrik_conn->prepare(
+            "INSERT IGNORE INTO earthen_send_batch_tb (
+                batch_label,
+                ghost_member_id,
+                ghost_email,
+                ghost_name,
+                ghost_newsletter_id,
+                ghost_newsletter_slug,
+                test_sent,
+                email_open_rate
+            ) VALUES (?, ?, ?, ?, NULL, NULL, 0, ?);"
+        );
 
-    $total_members = $earthen_stats['total'] ?? $summary['total'];
-    $sent_count = $earthen_stats['sent'] ?? $summary['sent_count'];
-    $sent_percentage = $earthen_stats['percentage'] ?? $summary['sent_percentage'];
+        if ($insert_stmt) {
+            foreach ($pending_members as $member) {
+                $ghost_id = $member['id'] ?? null;
+                $ghost_email = $member['email'] ?? '';
 
-    $status_limit = 20; // total rows to display in the status table
-    $sent_limit = 4;    // number of most recent sent entries
+                if (!$ghost_id || !$ghost_email) {
+                    continue;
+                }
 
-    usort($summary['sent'], function ($a, $b) {
-        return strcmp($b['updated_at'] ?? '', $a['updated_at'] ?? '');
-    });
+                $ghost_name = $member['name'] ?? null;
+                $open_rate = $member['email_open_rate'] ?? null;
 
-    usort($summary['pending'], function ($a, $b) {
-        return strcmp($a['created_at'] ?? '', $b['created_at'] ?? '');
-    });
+                $insert_stmt->bind_param('sssss', $batch_label, $ghost_id, $ghost_email, $ghost_name, $open_rate);
+                $insert_stmt->execute();
 
-    $sent_members = array_slice($summary['sent'], 0, $sent_limit);
-    $pending_limit = $status_limit - count($sent_members);
-    $pending_members = array_slice($summary['pending'], 0, $pending_limit);
+                try {
+                    ensureMemberHasLabel($ghost_id, 'sent-001');
+                } catch (Exception $labelException) {
+                    error_log('[EARTHEN] ❌ Failed to apply sent label: ' . $labelException->getMessage());
+                }
+            }
 
-    $all_members = array_map(function ($member) {
-        $member['email_open_rate'] = calculateOpenRate($member);
-        $member['test_sent'] = memberHasLabel($member, 'sent-001');
-        $member['test_sent_date_time'] = $member['updated_at'] ?? 'N/A';
-        return $member;
-    }, array_merge($sent_members, $pending_members));
-} catch (Exception $e) {
-    error_log('[EARTHEN] Ghost sync failed: ' . $e->getMessage());
-    $total_members = 0;
-    $sent_count = 0;
-    $sent_percentage = 0;
-    $all_members = [];
+            $insert_stmt->close();
+
+            $fetch_stmt = $gobrik_conn->prepare(
+                "SELECT id, ghost_member_id, ghost_email, ghost_name, email_open_rate, test_sent, test_sent_date_time
+                 FROM earthen_send_batch_tb
+                 WHERE batch_label = ?
+                 ORDER BY id ASC"
+            );
+
+            if ($fetch_stmt) {
+                $fetch_stmt->bind_param('s', $batch_label);
+                $fetch_stmt->execute();
+                $result = $fetch_stmt->get_result();
+                $initial_member_batch = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+                $fetch_stmt->close();
+            }
+        }
+    }
+} catch (Exception $batchException) {
+    error_log('[EARTHEN] ❌ Failed to prepare initial batch: ' . $batchException->getMessage());
 }
+
+$all_members = array_map(function ($member) {
+    return [
+        'id' => $member['ghost_member_id'] ?? null,
+        'email' => $member['ghost_email'] ?? '',
+        'name' => $member['ghost_name'] ?? '',
+        'email_open_rate' => $member['email_open_rate'] ?? '0%',
+        'test_sent' => (int) ($member['test_sent'] ?? 0),
+        'test_sent_date_time' => $member['test_sent_date_time'] ?? 'N/A',
+        'batch_row_id' => $member['id'] ?? null,
+    ];
+}, $initial_member_batch);
+
+$first_recipient_email = $all_members[0]['email'] ?? '';
+$first_recipient_id = $all_members[0]['id'] ?? '';
+
+$total_members = $earthen_stats['total'] ?? (defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0);
+$sent_count = $earthen_stats['sent'] ?? 0;
+$sent_percentage = $earthen_stats['percentage'] ?? 0;
+$pending_count = max(0, $total_members - $sent_count);
 
 // Mailgun event breakdown for processing chart
 $mailgun_status_counts = [];
 $mailgun_total_events = 0;
-$mailgun_status_query = "SELECT COALESCE(event_type, 'unknown') AS status, COUNT(*) AS count FROM earthen_mailgun_events_tb GROUP BY status ORDER BY status";
+$mailgun_status_query = "SELECT COALESCE(event_type, 'unknown') AS status, COUNT(*) AS count FROM earthen_mailgun_events_tb WHERE LOWER(COALESCE(event_type, '')) <> 'accepted' GROUP BY status ORDER BY status";
 $mailgun_status_result = $gobrik_conn->query($mailgun_status_query);
 
 if ($mailgun_status_result) {
@@ -258,30 +277,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_email']) && !$ha
 }
 
 
-function resolveMemberIdByEmail(string $email): ?int
-{
-    global $gobrik_conn;
-
-    if (!isset($gobrik_conn)) {
-        return null;
-    }
-
-    $stmt = $gobrik_conn->prepare('SELECT id FROM earthen_members_tb WHERE email = ? LIMIT 1');
-
-    if (!$stmt) {
-        error_log('[EARTHEN] Failed to prepare member lookup: ' . $gobrik_conn->error);
-        return null;
-    }
-
-    $stmt->bind_param('s', $email);
-    $stmt->execute();
-    $stmt->bind_result($member_id);
-    $found = $stmt->fetch();
-    $stmt->close();
-
-    return $found ? (int) $member_id : null;
-}
-
 function logFailedEmail(string $email, string $reason): void
 {
     global $gobrik_conn;
@@ -291,7 +286,14 @@ function logFailedEmail(string $email, string $reason): void
         return;
     }
 
-    $member_id = resolveMemberIdByEmail($email);
+    $member_id = null;
+
+    try {
+        $member_id = getMemberIdByEmail($email);
+    } catch (Exception $e) {
+        error_log('[EARTHEN] Failed to look up Ghost member ID: ' . $e->getMessage());
+    }
+
     $event_timestamp = date('Y-m-d H:i:s');
 
     $stmt = $gobrik_conn->prepare(
@@ -319,35 +321,6 @@ function logFailedEmail(string $email, string $reason): void
 
     $stmt->close();
 }
-
-function personalizeEmailHtml(string $html, ?string $recipient_uuid, string $recipient_email): string
-{
-    $uuid_placeholder = '{{RECIPIENT_UUID}}';
-    $fallback_uuid = '4dbbb711-73e9-4fd0-9056-a7cc1af6a905';
-    $uuid = $recipient_uuid ?: $fallback_uuid;
-
-    $html = str_replace($uuid_placeholder, $uuid, $html);
-
-    $fallback_unsubscribe = 'https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc&newsletter=1db69ae6-6504-48ba-9fd9-d78b3928071f';
-    $unsubscribe_url = !empty($recipient_email)
-        ? 'https://gobrik.com/emailing/unsubscribe.php?email=' . urlencode($recipient_email)
-        : $fallback_unsubscribe;
-
-    $html = preg_replace(
-        '/https:\/\/gobrik\.com\/emailing\/unsubscribe\.php\?email=[^\s"\']+/i',
-        $unsubscribe_url,
-        $html
-    );
-
-    $html = preg_replace(
-        '/https:\/\/earthen\.io\/unsubscribe\/\?uuid=[^&\"]+(&key=[^&\"]+)?(&newsletter=[^&\"]+)?/i',
-        $unsubscribe_url,
-        $html
-    );
-
-    return $html;
-}
-
 
 // Email sending function
 function sendEmail($to, $htmlBody) {
@@ -387,6 +360,28 @@ echo '<!DOCTYPE html>
 
 <?php require_once("../includes/admin-panel-inc.php"); ?>
 
+<style>
+    .toggle-switch .slider.order-oldest {
+        background-color: #4caf50;
+    }
+
+    .toggle-switch .slider.order-newest {
+        background-color: #ff9800;
+    }
+
+    #order-toggle-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    #order-toggle-wrapper strong {
+        min-width: 120px;
+        display: inline-block;
+    }
+</style>
+
 
 
 
@@ -414,15 +409,14 @@ echo '<!DOCTYPE html>
     <?php endif; ?>
 
         <div id="greeting" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-            <h2 id="greeting">Newsletter Sender</h2>
+            <h2 id="greeting">Earthen Manual Sender</h2>
             <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
         </div>
 
 
 
-<p>Total Members: <strong id="total-members"><?php echo $total_members; ?></strong></p>
-<p>Emails Sent: <strong id="sent-count"><?php echo $sent_count; ?></strong> (
-    <span id="sent-percentage"><?php echo number_format($sent_percentage, 2); ?></span>%)</p>
+<p id="overall-stats">Total Members: <strong id="total-members"><?php echo number_format($total_members); ?></strong>  |  Total Sent <strong id="sent-count"><?php echo $sent_count; ?></strong> (<span id="sent-percentage"><?php echo number_format($sent_percentage, 3); ?></span>%)</p>
+<p id="batch-stats">Current Batch: <strong id="batch-size">0</strong>  |  Batch Sent: <strong id="batch-sent">0</strong> (<span id="batch-percentage">0.00</span>%)</p>
 
 
 
@@ -431,6 +425,18 @@ echo '<!DOCTYPE html>
     <div id="left-colum" style="width: 100%;">
         <label>✉️ Auto Send Emails</label>
         <p class="form-caption" style="margin-top:10px;">Uncheck to prevent the email from sending automatically after countdown.</p>
+
+        <label style="display:block;margin-top:15px;">🔁 Auto-load batches</label>
+        <p class="form-caption" style="margin-top:10px;">When enabled, the next 100 members will load automatically after the current batch finishes and sending will continue.</p>
+
+        <div id="order-toggle-wrapper">
+            <strong>🧭 Member order</strong>
+            <label class="toggle-switch" style="margin:0;">
+                <input type="checkbox" id="order-toggle" value="1">
+                <span class="slider"></span>
+            </label>
+            <span id="order-label" class="form-caption">Oldest first</span>
+        </div>
 
         <label for="send-delay-slider" style="display:block;margin-top:20px;margin-bottom: 5px;">⏱️ Send Delay</label>
         <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:90%;accent-color:var(--emblem-green);">
@@ -444,6 +450,12 @@ echo '<!DOCTYPE html>
             <input type="checkbox" id="auto-send-toggle" value="1">
             <span class="slider"></span>
         </label>
+        <div style="margin-top:10px;">
+            <label class="toggle-switch">
+                <input type="checkbox" id="auto-load-toggle" value="1">
+                <span class="slider"></span>
+            </label>
+        </div>
         <div style="margin-top:auto;margin-bottom:10px">
             <p style="text-align:center;margin:45px 30px 10px 0px;font-weight:bold;">⏱ <span id="delay-display">5</span>s</p>
         </div>
@@ -489,12 +501,12 @@ echo '<!DOCTYPE html>
     <p><strong>Subject:</strong> <?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></p>
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
-    <input type="hidden" id="subscriber_id" name="subscriber_id" value="">
+    <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($first_recipient_id); ?>">
 
     <!-- Hidden field for recipient email
         <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
     -->
-<input type="hidden" id="email_to" name="email_to" value="">
+<input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($first_recipient_email); ?>">
     <br><br>
 <!-- Auto-send Button (hidden by default unless auto-send is enabled) -->
 <button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
@@ -558,6 +570,22 @@ $(document).ready(function () {
     let isSending = false; // prevent duplicate sends
     let sendDelay = 1;
     let sendFailCount = 0;
+    let recipientQueue = [];
+    let queueIndex = 0;
+    let autoSendStarted = false;
+    const batchSize = 100;
+    let batchSent = 0;
+    let currentBatchSize = 0;
+    let batchOffset = 0;
+    let batchOrder = 'ASC';
+    let isLoadingBatch = false;
+    const initialBatch = <?php echo json_encode($all_members); ?>;
+    const initialStats = <?php echo json_encode($earthen_stats); ?>;
+    let queueStats = {
+        total: <?php echo (int) ($total_members ?? 0); ?>,
+        sent: <?php echo (int) ($sent_count ?? 0); ?>,
+        percentage: <?php echo (float) ($sent_percentage ?? 0); ?>
+    };
     const testEmailDefault = 'russmaier@gmail.com';
     let testEmail = localStorage.getItem('testEmail') || testEmailDefault;
 
@@ -610,7 +638,69 @@ $(document).ready(function () {
         statusTableWrapper.after(mailgunLogsButton);
     }
 
-    function refreshStatusTable() {
+    function logError(message) {
+        console.error(message);
+    }
+
+    function autoLoadEnabled() {
+        return $('#auto-load-toggle').is(':checked');
+    }
+
+    function setBatchOrder(order, reload = true) {
+        batchOrder = order === 'DESC' ? 'DESC' : 'ASC';
+        localStorage.setItem('ghostBatchOrder', batchOrder);
+        document.cookie = `ghostBatchOrder=${batchOrder};path=/;max-age=${60 * 60 * 24 * 30}`;
+        updateOrderToggleLabel();
+
+        if (reload) {
+            resetBatchState();
+            fetchNextBatch(true);
+        }
+    }
+
+    function updateOrderToggleLabel() {
+        const isNewest = batchOrder === 'DESC';
+        const slider = $('#order-toggle').siblings('.slider');
+
+        $('#order-toggle').prop('checked', isNewest);
+        slider.toggleClass('order-newest', isNewest);
+        slider.toggleClass('order-oldest', !isNewest);
+        $('#order-label').text(isNewest ? 'Newest first' : 'Oldest first');
+    }
+
+    function resetBatchState() {
+        queueIndex = 0;
+        recipientQueue = [];
+        currentBatchSize = 0;
+        batchSent = 0;
+        batchOffset = 0;
+        renderStatusTable();
+        setActiveRecipientFromQueue(-1);
+        updateBatchDisplay();
+    }
+
+    function renderStatusTable() {
+        if (recipientQueue.length) {
+            const rows = recipientQueue.map((m) => {
+                const isSent = m.test_sent === 1 || m.status === 'sent';
+                const statusIcon = isSent ? '✅ Sent' : (m.status === 'failed' ? '⚠️ Failed' : '⏳ Pending');
+                const sentDate = m.test_sent_date_time && m.test_sent_date_time !== 'N/A'
+                    ? m.test_sent_date_time
+                    : (m.sent_at ? new Date(m.sent_at).toLocaleString() : 'Queued');
+
+                return [
+                    m.name || '',
+                    m.email || '',
+                    m.email_open_rate || '0%',
+                    sentDate,
+                    statusIcon,
+                ];
+            });
+
+            statusTable.clear().rows.add(rows).draw(false);
+            return;
+        }
+
         $.getJSON('../emailing/get_email_status.php', function(resp) {
             if (resp.success) {
                 const rows = resp.members.map(m => [
@@ -625,7 +715,7 @@ $(document).ready(function () {
         });
     }
 
-    refreshStatusTable();
+    renderStatusTable();
 
     const autoSendEnabled = () => $('#auto-send-toggle').is(':checked');
     const testSendEnabled = () => $('#test-email-toggle').is(':checked');
@@ -675,6 +765,10 @@ $(document).ready(function () {
     }
 
     function startCountdownAndSend() {
+        if (!autoSendEnabled() || !autoSendStarted || !recipientEmail) {
+            return;
+        }
+
         clearInterval(countdownInterval);
         if (isSending) return; // don't queue another send while sending
         sendDelay = parseInt($('#send-delay-slider').val()) || 1;
@@ -704,66 +798,207 @@ $(document).ready(function () {
         updateVisibleButton();
     });
 
-    // 🟢 Fetch next recipient via AJAX
-function fetchNextRecipient() {
-    $.ajax({
-        url: '../emailing/get_next_recipient.php',
-        type: 'GET',
-        dataType: 'json',
-        success: function (response) {
-            if (response.success) {
-                // 🎯 Set recipient
-                const sub = response.subscriber;
-                recipientEmail = sub?.email || '';
-                recipientName = sub?.name || '';
-                recipientId = sub?.id || null;
+    function updateBatchDisplay() {
+        const percent = currentBatchSize > 0 ? Math.min(100, (batchSent / currentBatchSize) * 100) : 0;
+        $('#batch-size').text(currentBatchSize);
+        $('#batch-sent').text(batchSent);
+        $('#batch-percentage').text(percent.toFixed(2));
+    }
 
-                $('#subscriber_id').val(recipientId);
+    function updateStatsDisplay(stats) {
+        if (!stats) return;
+        queueStats = {
+            total: stats.total ?? 0,
+            sent: stats.sent ?? 0,
+            percentage: stats.percentage ?? 0,
+        };
 
-                console.log("📋 Next recipient:", recipientEmail);
+        $('#total-members').text(Number(queueStats.total).toLocaleString());
+        $('#sent-count').text(queueStats.sent);
+        $('#sent-percentage').text(Number(queueStats.percentage).toFixed(3));
+    }
 
-                $('#email_to').val(recipientEmail);
+    function setBatchFromData(batch) {
+        recipientQueue = batch;
+        currentBatchSize = recipientQueue.length;
+        batchOffset += currentBatchSize;
+        batchSent = recipientQueue.filter(m => m.test_sent === 1).length;
 
-                // 📊 Update stats
-                if (response.stats) {
-                    $('#total-members').text(response.stats.total);
-                    $('#sent-count').text(response.stats.sent);
-                    $('#sent-percentage').text(response.stats.percentage.toFixed(2));
+        const firstPendingIndex = recipientQueue.findIndex(m => m.test_sent !== 1);
+        queueIndex = firstPendingIndex >= 0 ? firstPendingIndex : recipientQueue.length;
+
+        renderStatusTable();
+
+        if (!setActiveRecipientFromQueue(queueIndex)) {
+            handleBatchCompletion();
+        }
+    }
+
+    function loadInitialBatch() {
+        updateStatsDisplay(initialStats);
+
+        if (batchOrder === 'DESC') {
+            resetBatchState();
+            fetchNextBatch(true);
+            return;
+        }
+
+        if (Array.isArray(initialBatch) && initialBatch.length) {
+            setBatchFromData(initialBatch);
+        } else {
+            handleBatchCompletion();
+        }
+
+        updateBatchDisplay();
+    }
+
+    function incrementSentStats() {
+        queueStats.sent = (queueStats.sent || 0) + 1;
+        queueStats.percentage = queueStats.total > 0
+            ? Math.min(100, (queueStats.sent / queueStats.total) * 100)
+            : 0;
+
+        updateStatsDisplay(queueStats);
+        batchSent += 1;
+        updateBatchDisplay();
+    }
+
+    function handleBatchCompletion() {
+        queueIndex = 0;
+        recipientQueue = [];
+        currentBatchSize = 0;
+        batchSent = 0;
+        renderStatusTable();
+        setActiveRecipientFromQueue(-1);
+        updateBatchDisplay();
+
+        if (autoLoadEnabled()) {
+            fetchNextBatch();
+            return;
+        }
+
+        $('#auto-send-button').text("✅ All batch emails sent!").prop('disabled', true);
+    }
+
+    function fetchNextBatch(showLoadingText = false) {
+        if (isLoadingBatch) return;
+
+        isLoadingBatch = true;
+        if (showLoadingText) {
+            $('#auto-send-button').text('⏳ Loading batch...').prop('disabled', true);
+        } else {
+            $('#auto-send-button').text('⏳ Loading next batch...').prop('disabled', true);
+        }
+
+        $.ajax({
+            url: '../emailing/get_recipient_batch.php',
+            method: 'GET',
+            dataType: 'json',
+            data: { limit: batchSize, offset: batchOffset, order: batchOrder.toLowerCase() },
+            success: function (resp) {
+                isLoadingBatch = false;
+
+                if (!resp || !resp.success) {
+                    $('#auto-send-button').text('❌ Failed to load batch').prop('disabled', false);
+                    return;
                 }
 
-                updateVisibleButton();
-                refreshStatusTable();
+                if (resp.stats) {
+                    updateStatsDisplay(resp.stats);
+                }
 
-                // 🟢 Auto-send the next email if enabled
-                if ($('#auto-send-toggle').is(':checked')) {
+                const batch = Array.isArray(resp.batch) ? resp.batch : [];
+
+                if (!batch.length) {
+                    $('#auto-send-button').text('✅ All batch emails sent!').prop('disabled', true);
+                    return;
+                }
+
+                const normalizedBatch = batch.map((m) => ({
+                    id: m.id ?? null,
+                    email: m.email ?? '',
+                    name: m.name ?? '',
+                    email_open_rate: m.email_open_rate ?? '0%',
+                    test_sent: parseInt(m.test_sent ?? 0),
+                    test_sent_date_time: m.test_sent_date_time ?? 'N/A',
+                    batch_row_id: m.batch_row_id ?? null,
+                    status: m.status ?? 'pending',
+                }));
+
+                setBatchFromData(normalizedBatch);
+                updateBatchDisplay();
+
+                $('#auto-send-button').text('📨 Send').prop('disabled', false);
+
+                if (autoSendEnabled() && autoSendStarted && recipientEmail) {
                     startCountdownAndSend();
                 }
-
-            } else {
-                // ✅ All done
-                recipientEmail = '';
-                recipientId = null;
-                $('#email_to').val('');
-                $('#subscriber_id').val('');
-                $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
+            },
+            error: function () {
+                isLoadingBatch = false;
+                $('#auto-send-button').text('❌ Failed to load batch').prop('disabled', false);
             }
-        },
-        error: function () {
-            logError('Failed to fetch next recipient.');
-        }
-    });
-}
+        });
+    }
 
-    function logError(message) {
-        console.error(message);
-        $.post('../emailing/log_sender_error.php', {message});
+    function setActiveRecipientFromQueue(index) {
+        const sub = recipientQueue[index];
+
+        if (!sub) {
+            recipientEmail = '';
+            recipientId = null;
+            $('#email_to').val('');
+            $('#subscriber_id').val('');
+            updateVisibleButton();
+            return false;
+        }
+
+        recipientEmail = sub.email || '';
+        recipientName = sub.name || '';
+        recipientId = sub.id || null;
+
+        $('#subscriber_id').val(recipientId);
+        $('#email_to').val(recipientEmail);
+
+        console.log('📋 Next recipient:', recipientEmail);
+
+        updateVisibleButton();
+        renderStatusTable();
+
+        if (autoSendEnabled()) {
+            startCountdownAndSend();
+        }
+
+        return true;
+    }
+
+    function markCurrentRecipient(status) {
+        const current = recipientQueue[queueIndex];
+        if (!current) return;
+
+        current.status = status;
+        if (status === 'sent') {
+            current.sent_at = new Date().toISOString();
+            current.test_sent = 1;
+            current.test_sent_date_time = current.sent_at;
+        }
+
+        renderStatusTable();
     }
 
     function handleSendError(msg) {
         sendFailCount++;
         logError(`${msg} Attempt ${sendFailCount} for ${recipientEmail}`);
+        markCurrentRecipient('failed');
+        isSending = false;
         sendFailCount = 0;
-        fetchNextRecipient(true);
+
+        if (autoSendEnabled()) {
+            queueIndex++;
+            if (!setActiveRecipientFromQueue(queueIndex)) {
+                handleBatchCompletion();
+            }
+        }
     }
 
 
@@ -798,14 +1033,15 @@ function sendEmail() {
         $('#email_to').val(targetEmail);
 
         $.ajax({
-            url: "", // Same page
-            type: "POST",
+            url: '../emailing/earthen_send_email.php',
+            type: 'POST',
             data: {
-                send_email: "1",
+                send_email: '1',
                 email_to: targetEmail,
                 email_html: emailBody,
                 test_mode: isTestMode ? 1 : 0,
-                subscriber_id: recipientId
+                subscriber_id: recipientId,
+                batch_row_id: recipientQueue[queueIndex] ? recipientQueue[queueIndex].batch_row_id : null
             },
             success: function (resp) {
                 let data = {};
@@ -818,18 +1054,25 @@ function sendEmail() {
                     } else {
                         $('#auto-send-button').text(`✅ Sent to ${recipientEmail}`);
                         console.log("✅ Server confirmed send to:", targetEmail);
-                        // Chain to next
-                        fetchNextRecipient(true); // fetch + auto-send next
+                        markCurrentRecipient('sent');
+                        incrementSentStats();
+                        queueIndex++;
+                        if (!setActiveRecipientFromQueue(queueIndex)) {
+                            handleBatchCompletion();
+                        }
                     }
                 } else {
-                    isSending = false;
                     handleSendError(data.message || 'Failed to send the email.');
                     return;
                 }
                 isSending = false;
+
+                // Continue auto sending on the configured timer after a successful send
+                if (!isTestMode && autoSendEnabled() && autoSendStarted) {
+                    startCountdownAndSend();
+                }
             },
             error: function () {
-                isSending = false;
                 handleSendError('Failed to send the email.');
             }
         });
@@ -838,12 +1081,22 @@ function sendEmail() {
     // 🔹 Form submission (manual trigger)
     $('#email-form').on('submit', function (e) {
         e.preventDefault();
+
+        if (autoSendEnabled()) {
+            autoSendStarted = true;
+            startCountdownAndSend();
+            return;
+        }
+
         sendEmail();
     });
 
     // 🔹 Manual click trigger
     $('#test-send-button, #auto-send-button').on('click', function (e) {
         e.preventDefault();
+        if (autoSendEnabled()) {
+            autoSendStarted = true;
+        }
         $('#email-form').trigger('submit');
     });
 
@@ -865,14 +1118,35 @@ function sendEmail() {
         localStorage.setItem('autoSend', $(this).is(':checked'));
         updateVisibleButton();
 
+        if (!$(this).is(':checked')) {
+            autoSendStarted = false;
+            clearInterval(countdownInterval);
+            $('#countdown-timer').hide();
+            return;
+        }
+
         // If switched ON and a recipient is already loaded, auto-trigger
         if (autoSendEnabled() && recipientEmail) {
             startCountdownAndSend();
         }
     });
 
+    $('#auto-load-toggle').on('change', function () {
+        localStorage.setItem('autoLoad', $(this).is(':checked'));
+
+        if (!$(this).is(':checked')) {
+            $('#auto-send-button').text("✅ All batch emails sent!").prop('disabled', recipientQueue.length === 0);
+        }
+    });
+
+    $('#order-toggle').on('change', function () {
+        const isNewest = $(this).is(':checked');
+        setBatchOrder(isNewest ? 'DESC' : 'ASC');
+    });
+
     $('#send-delay-slider').on('input change', function () {
         sendDelay = parseInt($(this).val());
+        localStorage.setItem('sendDelay', sendDelay);
         $('#delay-display').text(sendDelay);
         console.log(`⏲️ Delay set to ${sendDelay}s`);
 
@@ -905,21 +1179,27 @@ function sendEmail() {
     // 🔹 Initial state from localStorage
     const savedAutoSend = localStorage.getItem('autoSend') === 'true';
     const savedTestSend = localStorage.getItem('testSend') === 'true';
+    const savedAutoLoad = localStorage.getItem('autoLoad') === 'true';
+    const savedOrder = localStorage.getItem('ghostBatchOrder') === 'DESC' ? 'DESC' : 'ASC';
     sendDelay = parseInt(localStorage.getItem('sendDelay')) || 1;
     $('#send-delay-slider').val(sendDelay);
     $('#delay-display').text(sendDelay);
 
+    setBatchOrder(savedOrder, false);
     $('#auto-send-toggle').prop('checked', savedAutoSend);
     $('#test-email-toggle').prop('checked', savedTestSend);
+    $('#auto-load-toggle').prop('checked', savedAutoLoad);
 
+    loadInitialBatch();
     updateVisibleButton();
 
     if (hasAlerts) {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#auto-send-button, #test-send-button').prop('disabled', true);
     } else {
-        console.log("🚚 Fetching first recipient...");
-        fetchNextRecipient(true); // Fetch on page load, and auto-send if toggled
+        if (autoSendEnabled() && recipientEmail) {
+            startCountdownAndSend();
+        }
     }
 });
 

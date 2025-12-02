@@ -67,9 +67,20 @@ $_SESSION['buwana_user'] = [
     'jwt' => $tokens['id_token']
 ];
 
+// Track when the session was authenticated so we can enforce a 3-hour lifetime
+$_SESSION['authenticated_at'] = time();
+
 // Save buwana_id from token claim explicitly
 $_SESSION['buwana_id'] = $claims['buwana_id'] ?? null;
 
-// 7. Redirect to dashboard
-header('Location: ../en/dashboard.php');
+// 7. Redirect to the original page if provided; otherwise, go to dashboard
+$postLoginRedirect = $_SESSION['post_login_redirect'] ?? null;
+
+if ($postLoginRedirect && strpos($postLoginRedirect, '/') === 0) {
+    unset($_SESSION['post_login_redirect']);
+    header('Location: ' . $postLoginRedirect);
+    exit;
+}
+
+header('Location: /en/dashboard.php');
 exit;
