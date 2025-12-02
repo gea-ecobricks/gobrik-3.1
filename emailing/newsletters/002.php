@@ -1,7 +1,7 @@
 <?php
 
-$email_from = 'Russell Maier <russ@ecobricks.org>';
-$email_reply_to = 'russ@ecobricks.org';
+$email_from = 'Earthen <earthen@ecobricks.org>';
+$email_reply_to = 'Earthen <earthen@ecobricks.org>';
 $email_subject = 'Plastic, the Biosphere & Ecobricks + latest Earthen posts';
 
 // Build the unsubscribe link using the recipient's email when available.
@@ -13,13 +13,29 @@ $unsubscribe_link = isset($recipient_email)
 
 $email_template = <<<HTML
 <!doctype html>
+
 <html>
+
 <head>
-    <meta name="viewport" content="width=device-width">
-    <meta http-equiv="Content-Type" content="text/html; charset=U          TF-8">
-    <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:    PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]-->
-    <title>Plastic, the Biosphere &amp; Ecobricks + latest Earthen post        s</title>
-    <style>
+    
+<meta name="viewport" content="width=device-width">
+    
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+<!--[if mso]>
+<xml>
+<o:OfficeDocumentSettings>
+<o:PixelsPerInch>96
+</o:    PixelsPerInch>
+<o:AllowPNG/>
+</o:OfficeDocumentSettings>
+</xml>
+<![endif]-->
+    
+<title>Plastic, the Biosphere &amp; Ecobricks + latest Earthen post        s
+</title>
+    
+<style>
         .post-title-link {
             display: block;
             margin-top: 32px;
@@ -453,403 +469,827 @@ $email_template = <<<HTML
                 line-height: inherit;
             }
         }
-    </style>
-    <!--[if mso]>
-    <style type="text/css">
+    
+</style>
+    
+<!--[if mso]>
+    
+<style type="text/css">
         ul, ol { margin-left: 1.5em !important; } 
-    </style>
-    <![endif]-->
+    
+</style>
+    
+<![endif]-->
+
 </head>
+
 <body data-testid="email-preview-body" style="background-color: #ff        f; font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial              , sans-serif; -webkit-font-smoothing: antialiased; font-size: 18px; line-he              ight: 0; margin: 0; padding: 0; -ms-text-size-adjust: 100%; -webkit-text-si              ze-adjust: 100%; color: #15212A;">
+
 <span class="preheader" style="color: transparent; display: non        e; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; ms              o-hide: all; visibility: hidden; width: 0;">This coming Sunday, we&#39;re excited to run our last intro to ecobricks course for 2025!
 
 This will also be the last free course that we run. Our courses have been free this past year while we&#39;ve set up the Global Ecobrick Alliance&#39;s official Indonesian organization (and its bank account)&#x2013; and our own payment processing system. Don&#39;t worry, the cost will be reasonable!But this will be the last one...
 
-Paula and Russell will be leading the 90 minute overview of the principles,theory and best pract</span>
+Paula and Russell will be leading the 90 minute overview of the principles,theory and best pract
+</span>
+
 <!-- SPACING TO AVOID BODY TEXT BEING DUPLICATED IN PREVIEW TEXT -->
+
 <div style="display:none; max-height:0; overflow:hidden; mso-hide: all;" aria-hidden="true" role="presentation">
     &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F;&#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F;&#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#x2007;&#x34F; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD;&#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD;&#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD; &#xAD;  &#xA0;
+
 </div>
+
 
 <!-- HEADER WITH FULL-WIDTH BACKGROUND -->
+
 <table role="presentation" border="0" cellpadding="0" cel        lspacing="0" class="header" width="100%" style="mso-table-lspace: 0               pt; mso-table-rspace: 0pt; line-height: 1.4; background-color: #ffffff; wid               th: 100%; border-spacing: 0; border-collapse: collapse;" bgcolor="#ffffff">
+
 <!-- Outlook doesn't respect max-width so we need an extra centered table -->
+
 <!--[if mso]>
+
 <tr>
-    <td>
-        <center>
-            <table border="0" cellpadding="0" cellspaci                    ng="0" width="600">
+    
+<td>
+        
+<center>
+            
+<table border="0" cellpadding="0" cellspaci                    ng="0" width="600">
+
 <![endif]-->
+
 <tr>
-    <td style="font-family: -apple-system, BlinkMacSystem            Font, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align                : top; color: #15212A;" valign="top">&#xA0;</td>
-    <td class="container" align="center" style="font-        family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-s                erif; font-size: 18px; vertical-align: top; color: #15212A;" valign="top"    >
-    <div class="content" style="box-sizing: border-            box; display: block; margin: 0 auto; max-width: 600px;">
-    <!-- Header content constrained to 600px -->
-    <table role="presentation" border="0" cellpaddi            ng="0" cellspacing="0" class="header-main" style="border-collapse:     separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 20p    x 0; width: 100%; max-width: 600px; background: #ffffff; background-color:     transparent;" width="100%" bgcolor="transparent">
+    
+<td style="font-family: -apple-system, BlinkMacSystem            Font, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align                : top; color: #15212A;" valign="top">&#xA0;
+</td>
+    
+<td class="container" align="center" style="font-        family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-s                erif; font-size: 18px; vertical-align: top; color: #15212A;" valign="top"    >
+    
+<div class="content" style="box-sizing: border-            box; display: block; margin: 0 auto; max-width: 600px;">
+    
+<!-- Header content constrained to 600px -->
+    
+<table role="presentation" border="0" cellpaddi            ng="0" cellspacing="0" class="header-main" style="border-collapse:     separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 20p    x 0; width: 100%; max-width: 600px; background: #ffffff; background-color:     transparent;" width="100%" bgcolor="transparent">
+
 <tr>
-    <td class="header-content" style="font-        family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-s                erif; font-size: 18px; vertical-align: top; color: #15212A; padding: 0; mar                gin: 0 auto;" valign="top">
-    <table role="presentation" border="           0" cellpadding="0" cellspacing="0" width="100%" style="border-colla    pse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+    
+<td class="header-content" style="font-        family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-s                erif; font-size: 18px; vertical-align: top; color: #15212A; padding: 0; mar                gin: 0 auto;" valign="top">
+    
+<table role="presentation" border="           0" cellpadding="0" cellspacing="0" width="100%" style="border-colla    pse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+
 <tr class="header-image-row">
-    <td class="header-image"     width="100%" align="center" style="font-family: -apple-system, BlinkM    acSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertic    al-align: top; color: #15212A; padding-top: 24px; padding-bottom: 16px;" va    lign="top">
-    <a href="https://eart       hen.io/r/905f4b81?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style="color:    #4B8501; text-decoration: none; overflow-wrap: anywhere;" target="_blank    ">
-    <img src="https:/    /earthen.io/content/images/size/w1200/2024/04/gea-trainer-newsletter-top-ba    nner.png" width="600" style="border: none; -ms-interpolation-mode: bicu    bic; max-width: 100%;">
-    </a>
-    </td>
+    
+<td class="header-image"     width="100%" align="center" style="font-family: -apple-system, BlinkM    acSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertic    al-align: top; color: #15212A; padding-top: 24px; padding-bottom: 16px;" va    lign="top">
+    
+<a href="https://earthen.io/r/905f4b81?m={$recipient_uuid}" style="color:    #4B8501; text-decoration: none; overflow-wrap: anywhere;" target="_blank    ">
+    
+<img src="https:/    /earthen.io/content/images/size/w1200/2024/04/gea-trainer-newsletter-top-ba    nner.png" width="600" style="border: none; -ms-interpolation-mode: bicu    bic; max-width: 100%;">
+    
+</a>
+    
+</td>
+
 </tr>
+
 
 <tr class="site-info-row">
-    <td class="site-info" wid            th="100%" align="center" style="font-family: -apple-system, BlinkMacS                ystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-                align: top; color: #15212A; padding-top: 32px;" valign="top">
-    <table role="presenta           tion" border="0" cellpadding="0" cellspacing="0" style="border-coll    apse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;"    width="100%">
-<tr>
-    <td class                ="site-url site-url-bottom-padding" style="font-family: -apple-system,     BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: t    op; color: #15212A; font-size: 16px; letter-spacing: -0.1px; font-weight: 7    00; text-transform: uppercase; text-align: center; padding-bottom: 12px;" v    align="top" align="center"><div style="width: 100% !important;"><a hr                                                                                     ef="https://earthen.io/r/952be789?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a90                                                                             5" class="site-title" style="text-decoration: none; color: #15212A; ove    rflow-wrap: anywhere;" target="_blank">GEA Trainer Newsletter</a></div></td>
-</tr>
-
-</table>
-</td>
-</tr>
+    
+<td class="site-info" wid            th="100%" align="center" style="font-family: -apple-system, BlinkMacS                ystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-                align: top; color: #15212A; padding-top: 32px;" valign="top">
+    
+<table role="presenta           tion" border="0" cellpadding="0" cellspacing="0" style="border-coll    apse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;"    width="100%">
 
 <tr>
-    <td class="post-title pos            t-title-no-excerpt" style="font-family: -apple-system, BlinkMacSystemFont                , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to                p; text-align: center; color: #000000; padding-bottom: 16px;" valign="top    " align="center">
-    <table role="presenta           tion" border="0" cellpadding="0" cellspacing="0" style="border-coll    apse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;"    width="100%">
-<tr>
-    <td style="fo        nt-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, san                s-serif; vertical-align: top; font-size: 36px; line-height: 1.1; font-weigh                t: 700; text-align: center; color: #000000;" valign="top" align="center    ">
-    <a href="       https://earthen.io/r/a740e14c?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" cla    ss="post-title-link" style="text-decoration: none; display: block; marg    in-top: 32px; text-align: center; line-height: 1.1em; overflow-wrap: anywhe    re; color: #000000;" target="_blank">Plastic, the Biosphere &amp; Ecobric    ks + latest Earthen posts</a>
-    </td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-    <td width="100%" style=    "font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial,     sans-serif; font-size: 18px; vertical-align: top; color: #15212A; width: 10    0%;" align="center" valign="top">
-    <table class="post-me           ta-wrapper" role="presentation" border="0" cellpadding="0" cellspacin    g="0" width="100%" style="border-collapse: separate; mso-table-lspace    : 0pt; mso-table-rspace: 0pt; width: 100%; padding-bottom: 32px;">
-<tr>
-    <td height="2        0" class="post-meta post-meta-center" style="font-family: -apple-system    , BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align:    top; color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weig    ht: 400; text-align: center; padding: 0;" valign="top" align="center">
-    By GEA Cent    er Circle &#x2022; <span class="post-meta-date" style="white-space: now        rap;">2 Dec 2025 </span>
-    </td>
-    <td class="po        st-meta post-meta-center view-online desktop" style="font-family: -apple-    system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-    align: top; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; t    ext-align: center; display: none;" valign="top" align="center">
-    <a href="       https://earthen.io/r/b482a7e6?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" cla    ss="view-online-link" style="word-wrap: none; white-space: nowrap; colo    r: #15212a; color: rgba(0, 0, 0, 0.6); overflow-wrap: anywhere; text-decora    tion: underline;" target="_blank">View in browser</a>
-    </td>
-</tr>
-<tr class="post-m    eta post-meta-center view-online-mobile" style="color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; text-align: center;" align="center">
-<td height="2    0" class="view-online" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: top; color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; text-align: center; text-decoration: underline;" valign="top" align="center">
-<a href="   https://earthen.io/r/2c9cb531?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" class="view-online-link" style="word-wrap: none; white-space: nowrap; color: #15212a; color: rgba(0, 0, 0, 0.6); overflow-wrap: anywhere; text-decoration: underline;" target="_blank">View in browser</a>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-
-<tr class="feature-image-row">
-    <td class="feature-image
-    " align="center" style=    "font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial,     sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding-b    ottom: 30px; width: 100%; text-align: center;" width="100%" valign="top    "><img src="https://earthen.io/content/images/size/w1200/2025/12/ecobrick           -course.webp" width="600" style="border: none; -ms-interpolation-mode:     bicubic; max-width: 100%;"></td>
-</tr>
-
-</table>
-</td>
-</tr>
-</table>
+    
+<td class                ="site-url site-url-bottom-padding" style="font-family: -apple-system,     BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: t    op; color: #15212A; font-size: 16px; letter-spacing: -0.1px; font-weight: 7    00; text-transform: uppercase; text-align: center; padding-bottom: 12px;" v    align="top" align="center">
+<div style="width: 100% !important;">
+<a hr                                                                                     ef="https://earthen.io/r/952be789?m={$recipient_uuid}" class="site-title" style="text-decoration: none; color: #15212A; ove    rflow-wrap: anywhere;" target="_blank">GEA Trainer Newsletter
+</a>
 </div>
 </td>
-<td style="font-family: -apple-system, BlinkMacSystem        Font, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align            : top; color: #15212A;" valign="top">&#xA0;</td>
+
 </tr>
-<!--[if mso]>
-</table>
-</center>
-</td>
-</tr>
-<![endif]-->
+
+
 </table>
 
-<!-- MAIN CONTENT AREA -->
-<table role="presentation" border="0" cellpadding="0" cellspa        cing="0" class="body" width="100%" style="border-collapse: separate               ; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; line-height: 1               .4; background-color: #ffffff;" bgcolor="#ffffff">
-<!-- Outlook doesn't respect max-width so we need an extra centered table -->
+</td>
+
+</tr>
+
+
+<tr>
+    
+<td class="post-title pos            t-title-no-excerpt" style="font-family: -apple-system, BlinkMacSystemFont                , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to                p; text-align: center; color: #000000; padding-bottom: 16px;" valign="top    " align="center">
+    
+<table role="presenta           tion" border="0" cellpadding="0" cellspacing="0" style="border-coll    apse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;"    width="100%">
+
+<tr>
+    
+<td style="fo        nt-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, san                s-serif; vertical-align: top; font-size: 36px; line-height: 1.1; font-weigh                t: 700; text-align: center; color: #000000;" valign="top" align="center    ">
+    
+<a href="       https://earthen.io/r/a740e14c?m={$recipient_uuid}" cla    ss="post-title-link" style="text-decoration: none; display: block; marg    in-top: 32px; text-align: center; line-height: 1.1em; overflow-wrap: anywhe    re; color: #000000;" target="_blank">Plastic, the Biosphere &amp; Ecobric    ks + latest Earthen posts
+</a>
+    
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+<tr>
+    
+<td width="100%" style=    "font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial,     sans-serif; font-size: 18px; vertical-align: top; color: #15212A; width: 10    0%;" align="center" valign="top">
+    
+<table class="post-me           ta-wrapper" role="presentation" border="0" cellpadding="0" cellspacin    g="0" width="100%" style="border-collapse: separate; mso-table-lspace    : 0pt; mso-table-rspace: 0pt; width: 100%; padding-bottom: 32px;">
+
+<tr>
+    
+<td height="2        0" class="post-meta post-meta-center" style="font-family: -apple-system    , BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align:    top; color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weig    ht: 400; text-align: center; padding: 0;" valign="top" align="center">
+    By GEA Cent    er Circle &#x2022; 
+<span class="post-meta-date" style="white-space: now        rap;">2 Dec 2025 
+</span>
+    
+</td>
+    
+<td class="po        st-meta post-meta-center view-online desktop" style="font-family: -apple-    system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-    align: top; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; t    ext-align: center; display: none;" valign="top" align="center">
+    
+<a href="       https://earthen.io/r/b482a7e6?m={$recipient_uuid}" cla    ss="view-online-link" style="word-wrap: none; white-space: nowrap; colo    r: #15212a; color: rgba(0, 0, 0, 0.6); overflow-wrap: anywhere; text-decora    tion: underline;" target="_blank">View in browser
+</a>
+    
+</td>
+
+</tr>
+
+<tr class="post-m    eta post-meta-center view-online-mobile" style="color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; text-align: center;" align="center">
+
+<td height="2    0" class="view-online" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; vertical-align: top; color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 400; text-align: center; text-decoration: underline;" valign="top" align="center">
+
+<a href="   https://earthen.io/r/2c9cb531?m={$recipient_uuid}" class="view-online-link" style="word-wrap: none; white-space: nowrap; color: #15212a; color: rgba(0, 0, 0, 0.6); overflow-wrap: anywhere; text-decoration: underline;" target="_blank">View in browser
+</a>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+
+<tr class="feature-image-row">
+    
+<td class="feature-image
+    " align="center" style=    "font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial,     sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding-b    ottom: 30px; width: 100%; text-align: center;" width="100%" valign="top    ">
+<img src="https://earthen.io/content/images/size/w1200/2025/12/ecobrick-course.webp" width="600" style="border: none; -ms-interpolation-mode:     bicubic; max-width: 100%;">
+</td>
+
+</tr>
+
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+</div>
+
+</td>
+
+<td style="font-family: -apple-system, BlinkMacSystem        Font, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align            : top; color: #15212A;" valign="top">&#xA0;
+</td>
+
+</tr>
+
 <!--[if mso]>
-<tr>
-    <td>
-        <center>
-            <table border="0" cellpadding="0" cellspacing                    ="0" width="600">
+
+</table>
+
+</center>
+
+</td>
+
+</tr>
+
 <![endif]-->
+
+</table>
+
+
+<!-- MAIN CONTENT AREA -->
+
+<table role="presentation" border="0" cellpadding="0" cellspa        cing="0" class="body" width="100%" style="border-collapse: separate               ; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; line-height: 1               .4; background-color: #ffffff;" bgcolor="#ffffff">
+
+<!-- Outlook doesn't respect max-width so we need an extra centered table -->
+
+<!--[if mso]>
+
 <tr>
-    <td style="font-family: -apple-system, BlinkMacSystemFont            , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to                p; color: #15212A;" valign="top">&#xA0;</td>
-    <td class="container" style="font-family: -apple-system            , BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px                ; vertical-align: top; color: #15212A; display: block; max-width: 600px; ma                rgin: 0 auto;" valign="top">
-    <div class="content" style="box-sizing: border-box;            display: block; margin: 0 auto; max-width: 600px;">
-    <table role="presentation" border="0" cellpaddi            ng="0" cellspacing="0" class="main" width="100%" style="border-co           llapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spac                   ing: 20px 0; width: 100%; max-width: 600px; background: #ffffff; background                   -color: #ffffff;" bgcolor="#ffffff">
+    
+<td>
+        
+<center>
+            
+<table border="0" cellpadding="0" cellspacing                    ="0" width="600">
+
+<![endif]-->
+
 <tr>
-    <td class="wrapper" style="font-family:        -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; f                ont-size: 18px; vertical-align: top; color: #15212A; box-sizing: border-box                ;" valign="top">
-        <table role="presentation" border="               0" cellpadding="0" cellspacing="0" width="100%" data-testid="email-        preview-content" style="border-collapse: separate; mso-table-lspace: 0pt;        mso-table-rspace: 0pt; width: 100%;">
+    
+<td style="font-family: -apple-system, BlinkMacSystemFont            , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to                p; color: #15212A;" valign="top">&#xA0;
+</td>
+    
+<td class="container" style="font-family: -apple-system            , BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px                ; vertical-align: top; color: #15212A; display: block; max-width: 600px; ma                rgin: 0 auto;" valign="top">
+    
+<div class="content" style="box-sizing: border-box;            display: block; margin: 0 auto; max-width: 600px;">
+    
+<table role="presentation" border="0" cellpaddi            ng="0" cellspacing="0" class="main" width="100%" style="border-co           llapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spac                   ing: 20px 0; width: 100%; max-width: 600px; background: #ffffff; background                   -color: #ffffff;" bgcolor="#ffffff">
+
+<tr>
+    
+<td class="wrapper" style="font-family:        -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; f                ont-size: 18px; vertical-align: top; color: #15212A; box-sizing: border-box                ;" valign="top">
+        
+<table role="presentation" border="               0" cellpadding="0" cellspacing="0" width="100%" data-testid="email-        preview-content" style="border-collapse: separate; mso-table-lspace: 0pt;        mso-table-rspace: 0pt; width: 100%;">
+
 <tr class="post-content-row">
-    <td class="post-content-sans-        serif" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Hel    vetica, Arial, sans-serif; vertical-align: top; font-size: 17px; line-heigh    t: 1.5em; color: #15212A; padding-bottom: 20px; border-bottom: 1px solid #e    0e7eb; max-width: 600px;" valign="top">
-    <!-- POST CONTENT START -->
-    <p style="margin: 0 0 1.5            em 0; line-height: 1.6em; color: #15212A;">This coming Sunday, we&#39;re ex    cited to run our last intro to ecobricks course for 2025!  </p><p style="                                                                      margin: 0 0 1.5em 0; line-height: 1.6em; color: #15212A;">This will also be    the last free course that we run.  Our courses have been free this past ye    ar while we&#39;ve set up the Global Ecobrick Alliance&#39;s official Indon    esian organization (and its bank account)&#x2013; and our own payment proce    ssing system.  Don&#39;t worry, the cost will be reasonable!  But this will    be the last one...</p><p style="margin: 0 0 1.5em 0; line-height: 1.6em;        color: #15212A;">Paula and Russell will be leading the 90 minute overview     of the principles, theory and best practices behind ecobricking and plastic    sequestration.  Use your Buwana GoBrik account to register &#x1F447;</p><d    iv>
-    <!--[if !mso !vml]-->
-    <div class="kg-card kg-bookmark-card " style="margin: 0 0 1    .5em; padding: 0; width: 100%;">
-    <a class="kg-bookmark-container" href="https://earthen.       io/r/e643f8de?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style="display: f    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color:     #4B8501; text-decoration: none;" target="_blank">
-    <div class="kg-bookmark-content" style="display: in            line-block; width: 100%; padding: 20px;">
-    <div class="kg-bookmark-title" style="color: #1            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">Plastic, the    Biosphere and Ecobricks</div>
-    <div class="kg-bookmark-description" style="dis         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px;                  color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;                 ">Register for our Online Starter Workshop led by Paula Apollonia and Russell Maier on Dece<span class="desktop-only">mber 7, 2025</span><span class                                                                                                ="hide-desktop" style="display: none;">&#x2026;</span></div>
-    <div class="kg-bookmark-metadata" style="displa         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15                 212A; font-size: 13px; font-weight: 400;">
-    <img class="kg-bookmark-icon" src="https://         earthen.io/content/images/icon/apple-icon-180x180-22.png" alt style="bord    er: none; -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8    px; width: 22px; height: 22px;" width="22" height="22">
-    <span class="kg-bookmark-author" src="GoBri          k.com" style="line-height: 1.5em;">GoBrik.com</span>
+    
+<td class="post-content-sans-        serif" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Hel    vetica, Arial, sans-serif; vertical-align: top; font-size: 17px; line-heigh    t: 1.5em; color: #15212A; padding-bottom: 20px; border-bottom: 1px solid #e    0e7eb; max-width: 600px;" valign="top">
+    
+<!-- POST CONTENT START -->
+    
+<p style="margin: 0 0 1.5            em 0; line-height: 1.6em; color: #15212A;">This coming Sunday, we&#39;re ex    cited to run our last intro to ecobricks course for 2025!  
+</p>
+<p style="                                                                      margin: 0 0 1.5em 0; line-height: 1.6em; color: #15212A;">This will also be    the last free course that we run.  Our courses have been free this past ye    ar while we&#39;ve set up the Global Ecobrick Alliance&#39;s official Indon    esian organization (and its bank account)&#x2013; and our own payment proce    ssing system.  Don&#39;t worry, the cost will be reasonable!  But this will    be the last one...
+</p>
+<p style="margin: 0 0 1.5em 0; line-height: 1.6em;        color: #15212A;">Paula and Russell will be leading the 90 minute overview     of the principles, theory and best practices behind ecobricking and plastic    sequestration.  Use your Buwana GoBrik account to register &#x1F447;
+</p>
+<d    iv>
+    
+<!--[if !mso !vml]-->
+    
+<div class="kg-card kg-bookmark-card " style="margin: 0 0 1    .5em; padding: 0; width: 100%;">
+    
+<a class="kg-bookmark-container" href="https://earthen.io/r/e643f8de?m={$recipient_uuid}" style="display: f    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color:     #4B8501; text-decoration: none;" target="_blank">
+    
+<div class="kg-bookmark-content" style="display: in            line-block; width: 100%; padding: 20px;">
+    
+<div class="kg-bookmark-title" style="color: #1            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">Plastic, the    Biosphere and Ecobricks
+</div>
+    
+<div class="kg-bookmark-description" style="dis         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px;                  color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;                 ">Register for our Online Starter Workshop led by Paula Apollonia and Russell Maier on Dece
+<span class="desktop-only">mber 7, 2025
+</span>
+<span class                                                                                                ="hide-desktop" style="display: none;">&#x2026;
+</span>
+</div>
+    
+<div class="kg-bookmark-metadata" style="displa         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15                 212A; font-size: 13px; font-weight: 400;">
+    
+<img class="kg-bookmark-icon" src="https://earthen.io/content/images/icon/apple-icon-180x180-22.png" alt style="bord    er: none; -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8    px; width: 22px; height: 22px;" width="22" height="22">
+    
+<span class="kg-bookmark-author" src="GoBri          k.com" style="line-height: 1.5em;">GoBrik.com
+</span>
      
-    </div>
-    </div>
-    <div class="kg-bookmark-thumbnail" style="min-width         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c                 over; background-position: center; border-radius: 0 2px 2px 0; background-i                 mage: url(&#39;https://earthen.io/content/images/thumbnail/starter-workshop    -feature-1-en-4.webp&#39;);">
-    <img src="https://earthen.io/content/images/thumb         nail/starter-workshop-feature-1-en-4.webp" alt onerror="this.style.displa    y=&#39;none&#39;" style="border: none; -ms-interpolation-mode: bicubic;    max-width: 100%; display: none;"></div>
-    </a>
+    
+</div>
+    
+</div>
+    
+<div class="kg-bookmark-thumbnail" style="min-width         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c                 over; background-position: center; border-radius: 0 2px 2px 0; background-i                 mage: url(&#39;https://earthen.io/content/images/thumbnail/starter-workshop-feature-1-en-4.webp&#39;);">
+    
+<img src="https://earthen.io/content/images/thumbnail/starter-workshop-feature-1-en-4.webp" alt onerror="this.style.displa    y=&#39;none&#39;" style="border: none; -ms-interpolation-mode: bicubic;    max-width: 100%; display: none;">
+</div>
+    
+</a>
      
-    </div>
-    <!--[endif]-->
-    <!--[if vml]>
-        <table class="kg-card kg-bookmark-card--outlook" style="margin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-collapse: collapse; border-spacing: 0;" width="100%">
-            <tr>
-                <td width="100%" style="padding: 20px;">
-                    <table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
-                        <tr>
-                            <td class="kg-bookmark-title--outlook">
-                                <a href="https://gobrik.com/en/register.php?id=954" style="text-decoration: none; color: #15212A; font-size:15px; line-height: 1.5em; font-weight: 600;">
+    
+</div>
+    
+<!--[endif]-->
+    
+<!--[if vml]>
+        
+<table class="kg-card kg-bookmark-card--outlook" style="margin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-collapse: collapse; border-spacing: 0;" width="100%">
+            
+<tr>
+                
+<td width="100%" style="padding: 20px;">
+                    
+<table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
+                        
+<tr>
+                            
+<td class="kg-bookmark-title--outlook">
+                                
+<a href="https://gobrik.com/en/register.php?id=954" style="text-decoration: none; color: #15212A; font-size:15px; line-height: 1.5em; font-weight: 600;">
                                     Plastic, the Biosphere and Ecobricks
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="kg-bookmark-description--outlook">
-                                    <a href="https://gobrik.com/en/register.php?id=954" style="text-decoration: none; margin-top: 12px; color: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
-                                        Register for our Online StarterWorkshop led by Paula Apollonia and Russell Maier on Dece<span class="desktop-only">mber 7, 2025</span><span class="hide-desktop">…</span>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="kg-bookmark-metadata--outlook"style="padding-top: 14px; color: #15212A; font-size: 13px; font-weight: 400; line-height: 1.5em;">
-                                <table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
-                                    <tr>
+                                
+</a>
+                            
+</td>
+                        
+</tr>
+                        
+<tr>
+                            
+<td>
+                                
+<div class="kg-bookmark-description--outlook">
+                                    
+<a href="https://gobrik.com/en/register.php?id=954" style="text-decoration: none; margin-top: 12px; color: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
+                                        Register for our Online StarterWorkshop led by Paula Apollonia and Russell Maier on Dece
+<span class="desktop-only">mber 7, 2025
+</span>
+<span class="hide-desktop">…
+</span>
+                                    
+</a>
+                                
+</div>
+                            
+</td>
+                        
+</tr>
+                        
+<tr>
+                            
+<td class="kg-bookmark-metadata--outlook"style="padding-top: 14px; color: #15212A; font-size: 13px; font-weight: 400; line-height: 1.5em;">
+                                
+<table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
+                                    
+<tr>
                                         
-                                            <td valign="middle" class="kg-bookmark-icon--outlook" style="padding-right: 8px; font-size: 0; line-height: 1.5em;">
-                                                <a href="https://gobrik.com/en/register.php?id=954" style="text-decoration: none; color: #15212A;">
-                                                    <img src="https://earthen.io/content/images/icon/apple-icon-180x180-22.png" width="22" height="22" alt=" ">
-                                                </a>
-                                            </td>
+                                            
+<td valign="middle" class="kg-bookmark-icon--outlook" style="padding-right: 8px; font-size: 0; line-height: 1.5em;">
+                                                
+<a href="https://gobrik.com/en/register.php?id=954" style="text-decoration: none; color: #15212A;">
+                                                    
+<img src="https://earthen.io/content/images/icon/apple-icon-180x180-22.png" width="22" height="22" alt=" ">
+                                                
+</a>
+                                            
+</td>
                                         
-                                        <td valign="middle" class="kg-bookmark-byline--outlook">
-                                            <a href="https://gobrik.com/en/register.php?id=954" style="text-decoration: none; color: #15212A;">
+                                        
+<td valign="middle" class="kg-bookmark-byline--outlook">
+                                            
+<a href="https://gobrik.com/en/register.php?id=954" style="text-decoration: none; color: #15212A;">
                                                 GoBrik.com
                                                 
                                                 
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-        <div class="kg-bookmark-spacer--outlook" style="height: 1.5em;">&nbsp;</div>
-    <![endif]--></div><p style="margin: 0 0 1.5em 0; line-height: 1.6        em; color: #15212A;">Meanwhile, be sure to check out the latest posts on Ea    rthen that you might have missed any. The last two essays Russell has been     slow and steady working on for the last two years!</p><div>
-    <!--[if !mso !vml]-->
-    <div class="kg-card kg-bookmark-card " style="margin: 0 0 1    .5em; padding: 0; width: 100%;">
-    <a class="kg-bookmark-container" href="https://earthen.       io/r/9f8ce9c4?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style="display: f    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color:     #4B8501; text-decoration: none;" target="_blank">
-    <div class="kg-bookmark-content" style="display: in            line-block; width: 100%; padding: 20px;">
-    <div class="kg-bookmark-title" style="color: #1            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">Writing Eart    h Right</div>
-    <div class="kg-bookmark-description" style="dis         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px;                  color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;                 ">How we write the name of our home planet unconsciously encodes the relationship we have w<span class="desktop-only">ith it.</span><span class="h                                                                 ide-desktop" style="display: none;">&#x2026;</span></div>
-    <div class="kg-bookmark-metadata" style="displa         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15                 212A; font-size: 13px; font-weight: 400;">
-    <img class="kg-bookmark-icon" src="https://         earthen.io/content/images/icon/page-logo-11.png" alt style="border: none;    -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8px; width    : 22px; height: 22px;" width="22" height="22">
-    <span class="kg-bookmark-author" src="Earth          en" style="line-height: 1.5em;">Earthen</span>
-    <span class="kg-bookmark-publisher" src="Ru          ssell Maier" style="overflow: hidden; max-width: 240px; line-height: 1.5e    m; text-overflow: ellipsis; white-space: nowrap;"><span style="margin: 0         6px;">&#x2022;</span>Russell Maier</span>
-    </div>
-    </div>
-    <div class="kg-bookmark-thumbnail" style="min-width         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c                 over; background-position: center; border-radius: 0 2px 2px 0; background-i                 mage: url(&#39;https://earthen.io/content/images/thumbnail/earthrise-croppe    d-1.webp&#39;);">
-    <img src="https://earthen.io/content/images/thumb         nail/earthrise-cropped-1.webp" alt onerror="this.style.display=&#39;non    e&#39;" style="border: none; -ms-interpolation-mode: bicubic; max-width:     100%; display: none;"></div>
-    </a>
-     
-    </div>
-    <!--[endif]-->
-    <!--[if vml]>
-        <table class="kg-card kg-bookmark-card--outlook" style="margin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-collapse: collapse; border-spacing: 0;" width="100%">
-            <tr>
-                <td width="100%" style="padding: 20px;">
-                    <table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
-                        <tr>
-                            <td class="kg-bookmark-title--outlook">
-                                <a href="https://earthen.io/writing-earth-right/" style="text-decoration: none; color: #15212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">
-                                    Writing Earth Right
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="kg-bookmark-description--outlook">
-                                    <a href="https://earthen.io/writing-earth-right/" style="text-decoration: none; margin-top: 12px; color: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
-                                        How we write the name of our home planet unconsciously encodes the relationship we have w<span class="desktop-only">ith it.</span><span class="hide-desktop">…</span>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="kg-bookmark-metadata--outlook"style="padding-top: 14px; color: #15212A; font-size: 13px; font-weight: 400; line-height: 1.5em;">
-                                <table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
-                                    <tr>
+                                            
+</a>
                                         
-                                            <td valign="middle" class="kg-bookmark-icon--outlook" style="padding-right: 8px; font-size: 0; line-height: 1.5em;">
-                                                <a href="https://earthen.io/writing-earth-right/" style="text-decoration: none; color: #15212A;">
-                                                    <img src="https://earthen.io/content/images/icon/page-logo-11.png" width="22" height="22" alt=" ">
-                                                </a>
-                                            </td>
-                                        
-                                        <td valign="middle" class="kg-bookmark-byline--outlook">
-                                            <a href="https://earthen.io/writing-earth-right/" style="text-decoration: none; color: #15212A;">
-                                                Earthen
-                                                &nbsp;&#x2022;&nbsp;
-                                                Russell Maier
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-        <div class="kg-bookmark-spacer--outlook" style="height: 1.5em;">&nbsp;</div>
-    <![endif]--></div><div>
-    <!--[if !mso !vml]-->
-    <div class="kg-card kg-bookmark-card " style="margin: 0 0 1    .5em; padding: 0; width: 100%;">
-    <a class="kg-bookmark-container" href="https://earthen.       io/r/30e80ec0?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style="display: f    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color:     #4B8501; text-decoration: none;" target="_blank">
-    <div class="kg-bookmark-content" style="display: in            line-block; width: 100%; padding: 20px;">
-    <div class="kg-bookmark-title" style="color: #1            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">The Problem     with Google Calendar</div>
-    <div class="kg-bookmark-description" style="dis         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px;                  color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;                 ">As we hit the limits of the Roman Empire&#x2019;s 2,000-year-old Calendar, now is the time for t<span class="desktop-only">ransition from linear a    nd huma</span>&#x2026;</div>
-    <div class="kg-bookmark-metadata" style="displa         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15                 212A; font-size: 13px; font-weight: 400;">
-    <img class="kg-bookmark-icon" src="https://         earthen.io/content/images/icon/page-logo-12.png" alt style="border: none;    -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8px; width    : 22px; height: 22px;" width="22" height="22">
-    <span class="kg-bookmark-author" src="Earth          en" style="line-height: 1.5em;">Earthen</span>
-    <span class="kg-bookmark-publisher" src="Ru          ssell Maier" style="overflow: hidden; max-width: 240px; line-height: 1.5e    m; text-overflow: ellipsis; white-space: nowrap;"><span style="margin: 0         6px;">&#x2022;</span>Russell Maier</span>
-    </div>
-    </div>
-    <div class="kg-bookmark-thumbnail" style="min-width         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c                 over; background-position: center; border-radius: 0 2px 2px 0; background-i                 mage: url(&#39;https://earthen.io/content/images/thumbnail/colleuseum-engra    ving2-1-1.webp&#39;);">
-    <img src="https://earthen.io/content/images/thumb         nail/colleuseum-engraving2-1-1.webp" alt onerror="this.style.display=&#    39;none&#39;" style="border: none; -ms-interpolation-mode: bicubic; max-w    idth: 100%; display: none;"></div>
-    </a>
-     
-    </div>
-    <!--[endif]-->
-    <!--[if vml]>
-        <table class="kg-card kg-bookmark-card--outlook" style="margin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-collapse: collapse; border-spacing: 0;" width="100%">
-            <tr>
-                <td width="100%" style="padding: 20px;">
-                    <table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
-                        <tr>
-                            <td class="kg-bookmark-title--outlook">
-                                <a href="https://earthen.io/the-problem-with-google-calendar/" style="text-decoration: none; color: #15212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">
-                                    The Problem with Google Calendar
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="kg-bookmark-description--outlook">
-                                    <a href="https://earthen.io/the-problem-with-google-calendar/" style="text-decoration: none; margin-top: 12px; color: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
-                                        As we hit the limits of the Roman Empire’s 2,000-year-old Calendar, now is the time for t<span class="desktop-only">ransition from linear and huma</span>…
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="kg-bookmark-metadata--outlook"style="padding-top: 14px; color: #15212A; font-size: 13px; font-weight: 400; line-height: 1.5em;">
-                                <table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
-                                    <tr>
-                                        
-                                            <td valign="middle" class="kg-bookmark-icon--outlook" style="padding-right: 8px; font-size: 0; line-height: 1.5em;">
-                                                <a href="https://earthen.io/the-problem-with-google-calendar/" style="text-decoration: none; color: #15212A;">
-                                                    <img src="https://earthen.io/content/images/icon/page-logo-12.png" width="22" height="22" alt=" ">
-                                                </a>
-                                            </td>
-                                        
-                                        <td valign="middle" class="kg-bookmark-byline--outlook">
-                                            <a href="https://earthen.io/the-problem-with-google-calendar/" style="text-decoration: none; color: #15212A;">
-                                                Earthen
-                                                &nbsp;&#x2022;&nbsp;
-                                                Russell Maier
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-        <div class="kg-bookmark-spacer--outlook" style="height: 1.5em;">&nbsp;</div>
-    <![endif]--></div>
-    <!-- POST CONTENT END -->
-
-    </td>
-</tr>
-</table>
 </td>
+                                    
 </tr>
+                                
+</table>
+                            
+</td>
+                        
+</tr>
+                    
+</table>
+                
+</td>
+            
+</tr>
+        
+</table>
+        
+<div class="kg-bookmark-spacer--outlook" style="height: 1.5em;">&nbsp;
+</div>
+    
+<![endif]-->
+</div>
+<p style="margin: 0 0 1.5em 0; line-height: 1.6        em; color: #15212A;">Meanwhile, be sure to check out the latest posts on Ea    rthen that you might have missed any. The last two essays Russell has been     slow and steady working on for the last two years!
+</p>
+<div>
+    
+<!--[if !mso !vml]-->
+    
+<div class="kg-card kg-bookmark-card " style="margin: 0 0 1    .5em; padding: 0; width: 100%;">
+    
+<a class="kg-bookmark-container" href="https://earthen.io/r/9f8ce9c4?m={$recipient_uuid}" style="display: f    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color:     #4B8501; text-decoration: none;" target="_blank">
+    
+<div class="kg-bookmark-content" style="display: in            line-block; width: 100%; padding: 20px;">
+    
+<div class="kg-bookmark-title" style="color: #1            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">Writing Eart    h Right
+</div>
+    
+<div class="kg-bookmark-description" style="dis         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px;                  color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;                 ">How we write the name of our home planet unconsciously encodes the relationship we have w
+<span class="desktop-only">ith it.
+</span>
+<span class="h                                                                 ide-desktop" style="display: none;">&#x2026;
+</span>
+</div>
+    
+<div class="kg-bookmark-metadata" style="displa         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15                 212A; font-size: 13px; font-weight: 400;">
+    
+<img class="kg-bookmark-icon" src="https://earthen.io/content/images/icon/page-logo-11.png" alt style="border: none;    -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8px; width    : 22px; height: 22px;" width="22" height="22">
+    
+<span class="kg-bookmark-author" src="Earth          en" style="line-height: 1.5em;">Earthen
+</span>
+    
+<span class="kg-bookmark-publisher" src="Ru          ssell Maier" style="overflow: hidden; max-width: 240px; line-height: 1.5e    m; text-overflow: ellipsis; white-space: nowrap;">
+<span style="margin: 0         6px;">&#x2022;
+</span>Russell Maier
+</span>
+    
+</div>
+    
+</div>
+    
+<div class="kg-bookmark-thumbnail" style="min-width         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c                 over; background-position: center; border-radius: 0 2px 2px 0; background-i                 mage: url(&#39;https://earthen.io/content/images/thumbnail/earthrise-cropped-1.webp&#39;);">
+    
+<img src="https://earthen.io/content/images/thumbnail/earthrise-cropped-1.webp" alt onerror="this.style.display=&#39;non    e&#39;" style="border: none; -ms-interpolation-mode: bicubic; max-width:     100%; display: none;">
+</div>
+    
+</a>
+     
+    
+</div>
+    
+<!--[endif]-->
+    
+<!--[if vml]>
+        
+<table class="kg-card kg-bookmark-card--outlook" style="margin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-collapse: collapse; border-spacing: 0;" width="100%">
+            
+<tr>
+                
+<td width="100%" style="padding: 20px;">
+                    
+<table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
+                        
+<tr>
+                            
+<td class="kg-bookmark-title--outlook">
+                                
+<a href="https://earthen.io/writing-earth-right/" style="text-decoration: none; color: #15212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">
+                                    Writing Earth Right
+                                
+</a>
+                            
+</td>
+                        
+</tr>
+                        
+<tr>
+                            
+<td>
+                                
+<div class="kg-bookmark-description--outlook">
+                                    
+<a href="https://earthen.io/writing-earth-right/" style="text-decoration: none; margin-top: 12px; color: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
+                                        How we write the name of our home planet unconsciously encodes the relationship we have w
+<span class="desktop-only">ith it.
+</span>
+<span class="hide-desktop">…
+</span>
+                                    
+</a>
+                                
+</div>
+                            
+</td>
+                        
+</tr>
+                        
+<tr>
+                            
+<td class="kg-bookmark-metadata--outlook"style="padding-top: 14px; color: #15212A; font-size: 13px; font-weight: 400; line-height: 1.5em;">
+                                
+<table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
+                                    
+<tr>
+                                        
+                                            
+<td valign="middle" class="kg-bookmark-icon--outlook" style="padding-right: 8px; font-size: 0; line-height: 1.5em;">
+                                                
+<a href="https://earthen.io/writing-earth-right/" style="text-decoration: none; color: #15212A;">
+                                                    
+<img src="https://earthen.io/content/images/icon/page-logo-11.png" width="22" height="22" alt=" ">
+                                                
+</a>
+                                            
+</td>
+                                        
+                                        
+<td valign="middle" class="kg-bookmark-byline--outlook">
+                                            
+<a href="https://earthen.io/writing-earth-right/" style="text-decoration: none; color: #15212A;">
+                                                Earthen
+                                                &nbsp;&#x2022;&nbsp;
+                                                Russell Maier
+                                            
+</a>
+                                        
+</td>
+                                    
+</tr>
+                                
+</table>
+                            
+</td>
+                        
+</tr>
+                    
+</table>
+                
+</td>
+            
+</tr>
+        
+</table>
+        
+<div class="kg-bookmark-spacer--outlook" style="height: 1.5em;">&nbsp;
+</div>
+    
+<![endif]-->
+</div>
+<div>
+    
+<!--[if !mso !vml]-->
+    
+<div class="kg-card kg-bookmark-card " style="margin: 0 0 1    .5em; padding: 0; width: 100%;">
+    
+<a class="kg-bookmark-container" href="https://earthen.io/r/30e80ec0?m={$recipient_uuid}" style="display: f    lex; min-height: 148px; font-family: -apple-system, BlinkMacSystemFont, Rob    oto, Helvetica, Arial, sans-serif; border-radius: 3px; background-color: #f    fffff; background-color: rgba(255, 255, 255, 0.25); border: 1px solid #e0e7    eb; border: 1px solid rgba(0, 0, 0, 0.12); overflow-wrap: anywhere; color:     #4B8501; text-decoration: none;" target="_blank">
+    
+<div class="kg-bookmark-content" style="display: in            line-block; width: 100%; padding: 20px;">
+    
+<div class="kg-bookmark-title" style="color: #1            5212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">The Problem     with Google Calendar
+</div>
+    
+<div class="kg-bookmark-description" style="dis         play: -webkit-box; overflow-y: hidden; margin-top: 12px; max-height: 40px;                  color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px; line-height: 1.                 5em; font-weight: 400; -webkit-line-clamp: 2; -webkit-box-orient: vertical;                 ">As we hit the limits of the Roman Empire&#x2019;s 2,000-year-old Calendar, now is the time for t
+<span class="desktop-only">ransition from linear a    nd huma
+</span>&#x2026;
+</div>
+    
+<div class="kg-bookmark-metadata" style="displa         y: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; color: #15                 212A; font-size: 13px; font-weight: 400;">
+    
+<img class="kg-bookmark-icon" src="https://earthen.io/content/images/icon/page-logo-12.png" alt style="border: none;    -ms-interpolation-mode: bicubic; max-width: 100%; margin-right: 8px; width    : 22px; height: 22px;" width="22" height="22">
+    
+<span class="kg-bookmark-author" src="Earth          en" style="line-height: 1.5em;">Earthen
+</span>
+    
+<span class="kg-bookmark-publisher" src="Ru          ssell Maier" style="overflow: hidden; max-width: 240px; line-height: 1.5e    m; text-overflow: ellipsis; white-space: nowrap;">
+<span style="margin: 0         6px;">&#x2022;
+</span>Russell Maier
+</span>
+    
+</div>
+    
+</div>
+    
+<div class="kg-bookmark-thumbnail" style="min-width         : 140px; max-width: 180px; background-repeat: no-repeat; background-size: c                 over; background-position: center; border-radius: 0 2px 2px 0; background-i                 mage: url(&#39;https://earthen.io/content/images/thumbnail/colleuseum-engraving2-1-1.webp&#39;);">
+    
+<img src="https://earthen.io/content/images/thumbnail/colleuseum-engraving2-1-1.webp" alt onerror="this.style.display=&#    39;none&#39;" style="border: none; -ms-interpolation-mode: bicubic; max-w    idth: 100%; display: none;">
+</div>
+    
+</a>
+     
+    
+</div>
+    
+<!--[endif]-->
+    
+<!--[if vml]>
+        
+<table class="kg-card kg-bookmark-card--outlook" style="margin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-collapse: collapse; border-spacing: 0;" width="100%">
+            
+<tr>
+                
+<td width="100%" style="padding: 20px;">
+                    
+<table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
+                        
+<tr>
+                            
+<td class="kg-bookmark-title--outlook">
+                                
+<a href="https://earthen.io/the-problem-with-google-calendar/" style="text-decoration: none; color: #15212A; font-size: 15px; line-height: 1.5em; font-weight: 600;">
+                                    The Problem with Google Calendar
+                                
+</a>
+                            
+</td>
+                        
+</tr>
+                        
+<tr>
+                            
+<td>
+                                
+<div class="kg-bookmark-description--outlook">
+                                    
+<a href="https://earthen.io/the-problem-with-google-calendar/" style="text-decoration: none; margin-top: 12px; color: #738a94; font-size: 13px; line-height: 1.5em; font-weight: 400;">
+                                        As we hit the limits of the Roman Empire’s 2,000-year-old Calendar, now is the time for t
+<span class="desktop-only">ransition from linear and huma
+</span>…
+                                    
+</a>
+                                
+</div>
+                            
+</td>
+                        
+</tr>
+                        
+<tr>
+                            
+<td class="kg-bookmark-metadata--outlook"style="padding-top: 14px; color: #15212A; font-size: 13px; font-weight: 400; line-height: 1.5em;">
+                                
+<table style="margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0;">
+                                    
+<tr>
+                                        
+                                            
+<td valign="middle" class="kg-bookmark-icon--outlook" style="padding-right: 8px; font-size: 0; line-height: 1.5em;">
+                                                
+<a href="https://earthen.io/the-problem-with-google-calendar/" style="text-decoration: none; color: #15212A;">
+                                                    
+<img src="https://earthen.io/content/images/icon/page-logo-12.png" width="22" height="22" alt=" ">
+                                                
+</a>
+                                            
+</td>
+                                        
+                                        
+<td valign="middle" class="kg-bookmark-byline--outlook">
+                                            
+<a href="https://earthen.io/the-problem-with-google-calendar/" style="text-decoration: none; color: #15212A;">
+                                                Earthen
+                                                &nbsp;&#x2022;&nbsp;
+                                                Russell Maier
+                                            
+</a>
+                                        
+</td>
+                                    
+</tr>
+                                
+</table>
+                            
+</td>
+                        
+</tr>
+                    
+</table>
+                
+</td>
+            
+</tr>
+        
+</table>
+        
+<div class="kg-bookmark-spacer--outlook" style="height: 1.5em;">&nbsp;
+</div>
+    
+<![endif]-->
+</div>
+    
+<!-- POST CONTENT END -->
+
+    
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
 
 <!-- END MAIN CONTENT AREA -->
 
+
 <tr>
-    <td class="feedback-buttons-container    " dir="ltr" width="100%" align="center" style="font-family: -apple-    system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size    : 18px; vertical-align: top; color: #15212A; padding: 32px 0 24px; border-b    ottom: 1px solid #e0e7eb; text-align: center; background-color: #ffffff;" v    align="top" bgcolor="#ffffff">
-    <table class="feedback-buttons" r            ole="presentation" border="0" cellpadding="0" cellspacing="0" style                   ="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt                   ; margin: auto; width: 100%;" width="100%">
+    
+<td class="feedback-buttons-container    " dir="ltr" width="100%" align="center" style="font-family: -apple-    system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size    : 18px; vertical-align: top; color: #15212A; padding: 32px 0 24px; border-b    ottom: 1px solid #e0e7eb; text-align: center; background-color: #ffffff;" v    align="top" bgcolor="#ffffff">
+    
+<table class="feedback-buttons" r            ole="presentation" border="0" cellpadding="0" cellspacing="0" style                   ="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt                   ; margin: auto; width: 100%;" width="100%">
+
 <tr>
-    <td dir="ltr" valign            ="top" align="center" style="font-size: 18px; color: #15212A; display                : inline-block; vertical-align: top; font-family: inherit; text-align: cent                er; padding: 0 4px 4px; cursor: pointer; width: 30%;" width="30%">
-    <a href="https://       earthen.io/plastic-the-biosphere-ecobricks-latest-earthen-posts/#/feedback/    69146a7b1b74ba04b3f2a339/1/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&amp    ;key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc" ta    rget="_blank" style="color: #4B8501; text-decoration: none; overflow-wr    ap: anywhere;">
-    <img src="htt         ps://static.ghost.org/v5.0.0/images/more-like-this-mobile.png" border="0"    width="42" height="42" alt="More like this" style="border: none; -    ms-interpolation-mode: bicubic; max-width: 100%; display: block; margin: 0     auto; vertical-align: middle;">
-    <p class="fee       dback-button-text" style="display: inline-block; font-family: -apple-syst    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre    ak-word; font-size: 13px;">More like this</p>
-    </a>
-    </td>                      <td dir="ltr" valign="top" align="c        enter" style="font-size: 18px; color: #15212A; display: inline-block; ver    tical-align: top; font-family: inherit; text-align: center; padding: 0 4px     4px; cursor: pointer; width: 30%;" width="30%">
-    <a href="https://       earthen.io/plastic-the-biosphere-ecobricks-latest-earthen-posts/#/feedback/    69146a7b1b74ba04b3f2a339/0/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6a905&amp    ;key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc" ta    rget="_blank" style="color: #4B8501; text-decoration: none; overflow-wr    ap: anywhere;">
-    <img src="htt         ps://static.ghost.org/v5.0.0/images/less-like-this-mobile.png" border="0"    width="42" height="42" alt="Less like this" style="border: none; -    ms-interpolation-mode: bicubic; max-width: 100%; display: block; margin: 0     auto; vertical-align: middle;">
-    <p class="fee       dback-button-text" style="display: inline-block; font-family: -apple-syst    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre    ak-word; font-size: 13px;">Less like this</p>
-    </a>
-    </td>                      <td dir="ltr" valign="top" align="c        enter" style="font-size: 18px; color: #15212A; display: inline-block; ver    tical-align: top; font-family: inherit; text-align: center; padding: 0 4px     4px; cursor: pointer; width: 30%;" width="30%">
-    <a href="https://       earthen.io/r/766788b6?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" target="_    blank" style="color: #4B8501; text-decoration: none; overflow-wrap: anywh    ere;">
-    <img src="htt         ps://static.ghost.org/v5.0.0/images/comment-mobile.png" border="0" width    ="42" height="42" alt="Comment" style="border: none; -ms-interpolat    ion-mode: bicubic; max-width: 100%; display: block; margin: 0 auto; vertica    l-align: middle;">
-    <p class="fee       dback-button-text" style="display: inline-block; font-family: -apple-syst    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre    ak-word; font-size: 13px;">Comment</p>
-    </a>
-    </td>                  </tr>
+    
+<td dir="ltr" valign            ="top" align="center" style="font-size: 18px; color: #15212A; display                : inline-block; vertical-align: top; font-family: inherit; text-align: cent                er; padding: 0 4px 4px; cursor: pointer; width: 30%;" width="30%">
+    
+<a href="https://earthen.io/plastic-the-biosphere-ecobricks-latest-earthen-posts/#/feedback/69146a7b1b74ba04b3f2a339/1/?uuid={$recipient_uuid}&amp;key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc" ta    rget="_blank" style="color: #4B8501; text-decoration: none; overflow-wr    ap: anywhere;">
+    
+<img src="htt         ps://static.ghost.org/v5.0.0/images/more-like-this-mobile.png" border="0"    width="42" height="42" alt="More like this" style="border: none; -    ms-interpolation-mode: bicubic; max-width: 100%; display: block; margin: 0     auto; vertical-align: middle;">
+    
+<p class="fee       dback-button-text" style="display: inline-block; font-family: -apple-syst    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre    ak-word; font-size: 13px;">More like this
+</p>
+    
+</a>
+    
+</td>                      
+<td dir="ltr" valign="top" align="c        enter" style="font-size: 18px; color: #15212A; display: inline-block; ver    tical-align: top; font-family: inherit; text-align: center; padding: 0 4px     4px; cursor: pointer; width: 30%;" width="30%">
+    
+<a href="https://earthen.io/plastic-the-biosphere-ecobricks-latest-earthen-posts/#/feedback/69146a7b1b74ba04b3f2a339/0/?uuid={$recipient_uuid}&amp;key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc" ta    rget="_blank" style="color: #4B8501; text-decoration: none; overflow-wr    ap: anywhere;">
+    
+<img src="htt         ps://static.ghost.org/v5.0.0/images/less-like-this-mobile.png" border="0"    width="42" height="42" alt="Less like this" style="border: none; -    ms-interpolation-mode: bicubic; max-width: 100%; display: block; margin: 0     auto; vertical-align: middle;">
+    
+<p class="fee       dback-button-text" style="display: inline-block; font-family: -apple-syst    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre    ak-word; font-size: 13px;">Less like this
+</p>
+    
+</a>
+    
+</td>                      
+<td dir="ltr" valign="top" align="c        enter" style="font-size: 18px; color: #15212A; display: inline-block; ver    tical-align: top; font-family: inherit; text-align: center; padding: 0 4px     4px; cursor: pointer; width: 30%;" width="30%">
+    
+<a href="https://earthen.io/r/766788b6?m={$recipient_uuid}" target="_    blank" style="color: #4B8501; text-decoration: none; overflow-wrap: anywh    ere;">
+    
+<img src="htt         ps://static.ghost.org/v5.0.0/images/comment-mobile.png" border="0" width    ="42" height="42" alt="Comment" style="border: none; -ms-interpolat    ion-mode: bicubic; max-width: 100%; display: block; margin: 0 auto; vertica    l-align: middle;">
+    
+<p class="fee       dback-button-text" style="display: inline-block; font-family: -apple-syst    em, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; color: #15212    A; font-weight: 500; margin: 1em 0 0 0; line-height: 1.4em; word-break: bre    ak-word; font-size: 13px;">Comment
+</p>
+    
+</a>
+    
+</td>                  
+</tr>
+
 </table>
+
 </td>
+
 </tr>
 
 
 
-<tr>
-    <td class="wrapper" align="center" styl            e="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Ari                al, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; box-s                izing: border-box;" valign="top">
-    <table role="presentation" border="           0" cellpadding="0" cellspacing="0" width="100%" style="border-colla    pse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; p    adding-top: 40px; padding-bottom: 30px;">
-<tr>
-    <td class="footer" style="f        ont-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sa                ns-serif; vertical-align: top; color: #15212a; color: rgba(0, 0, 0, 0.6); m                argin-top: 20px; text-align: center; padding-bottom: 10px; padding-top: 10p                x; padding-left: 30px; padding-right: 30px; line-height: 1.5em; font-size:                 13px;" valign="top" align="center">Earthen &#xA9; 2025 &#x2013; <a href                                                                                               ="https://earthen.io/unsubscribe/?uuid=4dbbb711-73e9-4fd0-9056-a7cc1af6                                                                                       a905&key=6c3ffe5e66725cd21a19a3f06a3f9c57d439ef226283a59999acecb11fb087dc                                                                                       &newsletter=18bce2af-ca5b-4a10-bff3-f79d32479f09" style="overflow-wrap:                                                                                       anywhere; color: #15212a; color: rgba(0, 0, 0, 0.6); text-decoration: unde                                                                                               rline; font-size: 13px;" target="_blank">Unsubscribe</a></td>
-</tr>
 
-</table>
+<tr>
+    
+<td class="wrapper" align="center" styl            e="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Ari                al, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; box-s                izing: border-box;" valign="top">
+    
+<table role="presentation" border="           0" cellpadding="0" cellspacing="0" width="100%" style="border-colla    pse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; p    adding-top: 40px; padding-bottom: 30px;">
+
+<tr>
+    
+<td class="footer" style="f        ont-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sa                ns-serif; vertical-align: top; color: #15212a; color: rgba(0, 0, 0, 0.6); m                argin-top: 20px; text-align: center; padding-bottom: 10px; padding-top: 10p                x; padding-left: 30px; padding-right: 30px; line-height: 1.5em; font-size:                 13px;" valign="top" align="center">Earthen &#xA9; 2025 &#x2013; 
+<a href                                                                                               ="{{unsubscribe_link}}" style="overflow-wrap:                                                                                       anywhere; color: #15212a; color: rgba(0, 0, 0, 0.6); text-decoration: unde                                                                                               rline; font-size: 13px;" target="_blank">Unsubscribe
+</a>
 </td>
+
 </tr>
 
+
 </table>
+
+</td>
+
+</tr>
+
+
+</table>
+
 <!-- END CENTERED WHITE CONTAINER -->
+
 </div>
+
 </td>
-<td style="font-family: -apple-system, BlinkMacSystemFont        , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to            p; color: #15212A;" valign="top">&#xA0;</td>
+
+<td style="font-family: -apple-system, BlinkMacSystemFont        , Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: to            p; color: #15212A;" valign="top">&#xA0;
+</td>
+
 </tr>
+
 
 <!--[if mso]>
+
 </table>
+
 </center>
+
 </td>
+
 </tr>
+
 <![endif]-->
+
 </table>
-<img width="1" height="1" alt="" src="http://email.earthen.ecob     ricks.org/o/eJxMzkFuxCAMQNHTlN1ExjhOvPBhTHAmaKZFAtLzV6q66PLrb15RROYcXOPGxCwkKfin1fejFmVBz3uCBHkVYXBJjOYSLj0LAW1rPmkDs4jFczFCwyPCmZKHqgi4RgQEWfeIC9BpMR1omxXgPX4QuPV5-dfiR8u9Hq-xtP4MXfs9xr9dW5j6vNqYj19amJrv9-svvhV_AgAA__9M4TsM"></body>
+
+<img width="1" height="1" alt="" src="http://email.earthen.ecobricks.org/o/eJxMzkFuxCAMQNHTlN1ExjhOvPBhTHAmaKZFAtLzV6q66PLrb15RROYcXOPGxCwkKfin1fejFmVBz3uCBHkVYXBJjOYSLj0LAW1rPmkDs4jFczFCwyPCmZKHqgi4RgQEWfeIC9BpMR1omxXgPX4QuPV5-dfiR8u9Hq-xtP4MXfs9xr9dW5j6vNqYj19amJrv9-svvhV_AgAA__9M4TsM">
+</body>
+
 </html>
 HTML;
 
-$email_template = str_replace($default_unsubscribe, '{{unsubscribe_link}}', $email_template);
+$email_template = str_replace($default_unsubscribe, '{unsubscribe_link}', $email_template);
 
 $unsubscribe_href = $unsubscribe_link ?: $default_unsubscribe;
-$email_template = str_replace('{{unsubscribe_link}}', htmlspecialchars($unsubscribe_href, ENT_QUOTES, 'UTF-8'), $email_template);
+$email_template = str_replace('{unsubscribe_link}', htmlspecialchars($unsubscribe_href, ENT_QUOTES, 'UTF-8'), $email_template);
 
 ?>
