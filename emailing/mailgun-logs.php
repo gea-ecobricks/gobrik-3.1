@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             error_log('[EARTHEN] Remove event unsubscribe failed: ' . $e->getMessage());
         }
 
-        $delete_stmt = $gobrik_conn->prepare('DELETE FROM earthen_mailgun_events_tb WHERE id = ?');
+        $delete_stmt = $gobrik_conn->prepare('DELETE FROM earthen_mailgun_events_tb WHERE event_id = ?');
 
         if (!$delete_stmt) {
             respondJson(['success' => false, 'message' => 'Unable to prepare deletion.']);
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             respondJson(['success' => false, 'message' => 'Missing event id.']);
         }
 
-        $update_stmt = $gobrik_conn->prepare('UPDATE earthen_mailgun_events_tb SET event_type = "ignored", severity = "ignored" WHERE id = ?');
+        $update_stmt = $gobrik_conn->prepare('UPDATE earthen_mailgun_events_tb SET event_type = "ignored", severity = "ignored" WHERE event_id = ?');
 
         if (!$update_stmt) {
             respondJson(['success' => false, 'message' => 'Unable to prepare ignore update.']);
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unsubscribe_email']))
 $mailgun_events = [];
 $show_failed_only = isset($_GET['failed']) && $_GET['failed'] === '1';
 
-$events_query = "SELECT id, event_timestamp, recipient_email, COALESCE(event_type, 'unknown') AS event_type, COALESCE(severity, 'unknown') AS severity, COALESCE(NULLIF(error_message, ''), reason, '—') AS details FROM earthen_mailgun_events_tb";
+$events_query = "SELECT event_id, event_timestamp, recipient_email, COALESCE(event_type, 'unknown') AS event_type, COALESCE(severity, 'unknown') AS severity, COALESCE(NULLIF(error_message, ''), reason, '—') AS details FROM earthen_mailgun_events_tb";
 
 if ($show_failed_only) {
     $events_query .= " WHERE COALESCE(event_type, '') = 'failed' OR COALESCE(severity, '') LIKE '%failure%'";
@@ -400,7 +400,7 @@ if ($result = $gobrik_conn->query($events_query)) {
                         $event_sev    = strtolower($event['severity'] ?? '');
                         $is_failure   = ($event_type === 'failed') || (strpos($event_sev, 'failure') !== false);
                         $recipient    = $event['recipient_email'] ?? '';
-                        $event_id     = (int) ($event['id'] ?? 0);
+                        $event_id     = (int) ($event['event_id'] ?? 0);
                     ?>
                     <tr>
                         <td><?php echo htmlspecialchars($event['event_timestamp'] ?? '—'); ?></td>
