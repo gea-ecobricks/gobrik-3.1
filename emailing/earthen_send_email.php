@@ -19,6 +19,7 @@ $email_subject = 'Writing Earth Right';
 $email_html = $_POST['email_html'] ?? '';
 $recipient_email = $_POST['email_to'] ?? '';
 $subscriber_id = $_POST['subscriber_id'] ?? null;
+$batch_row_id = isset($_POST['batch_row_id']) ? (int) $_POST['batch_row_id'] : null;
 $is_test_mode = isset($_POST['test_mode']) && $_POST['test_mode'] == '1';
 
 $recipient_uuid = null;
@@ -57,8 +58,32 @@ try {
         }
     }
 
+    if ($batch_row_id && !$is_test_mode) {
+        $status_stmt = $gobrik_conn->prepare(
+            'UPDATE earthen_send_batch_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 0, updated_at = NOW() WHERE id = ?'
+        );
+
+        if ($status_stmt) {
+            $status_stmt->bind_param('i', $batch_row_id);
+            $status_stmt->execute();
+            $status_stmt->close();
+        }
+    }
+
     if (!$send_ok && !$is_test_mode && !empty($recipient_email)) {
         logFailedEmail($recipient_email, 'Mailgun send failure');
+
+        if ($batch_row_id) {
+            $error_stmt = $gobrik_conn->prepare(
+                'UPDATE earthen_send_batch_tb SET processing = 2, last_error = ?, updated_at = NOW() WHERE id = ?'
+            );
+
+            if ($error_stmt) {
+                $error_stmt->bind_param('si', $reason = 'Mailgun send failure', $batch_row_id);
+                $error_stmt->execute();
+                $error_stmt->close();
+            }
+        }
     }
 
     echo json_encode(['success' => $send_ok, 'message' => $send_ok ? '' : 'Sending failed']);

@@ -410,10 +410,14 @@ function fetchGhostPendingBatch(?mysqli $conn, int $limit = 100, int $offset = 0
     $sql = "SELECT m.id, m.uuid, m.email, m.name, m.email_count, m.email_opened_count
             FROM members m
             INNER JOIN members_newsletters mn ON m.id = mn.member_id
-            LEFT JOIN members_labels ml ON m.id = ml.member_id
-            LEFT JOIN labels l ON ml.label_id = l.id AND l.name = ?
             WHERE m.email IS NOT NULL AND m.email <> ''
-              AND l.id IS NULL
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM members_labels ml
+                  INNER JOIN labels l ON ml.label_id = l.id
+                  WHERE ml.member_id = m.id
+                    AND l.name LIKE CONCAT('%', ?, '%')
+              )
             GROUP BY m.id
             ORDER BY m.created_at ASC
             LIMIT ? OFFSET ?";
