@@ -96,13 +96,90 @@ if ($result->num_rows > 0) {
     }
 }
 
-$initial_member_batch = fetchGhostPendingBatch($ghoststats_conn, 100, 0);
+
+$batch_label = 'earthen-' . date('Ymd-His');
+$initial_member_batch = [];
+
+try {
+    $pending_members = fetchGhostPendingBatch($ghoststats_conn, 100, 0);
+
+    if (!empty($pending_members)) {
+        $insert_stmt = $gobrik_conn->prepare(
+            "INSERT IGNORE INTO earthen_send_batch_tb (
+                batch_label,
+                ghost_member_id,
+                ghost_email,
+                ghost_name,
+                ghost_newsletter_id,
+                ghost_newsletter_slug,
+                test_sent,
+                email_open_rate
+            ) VALUES (?, ?, ?, ?, NULL, NULL, 0, ?);"
+        );
+
+        if ($insert_stmt) {
+            foreach ($pending_members as $member) {
+                $ghost_id = $member['id'] ?? null;
+                $ghost_email = $member['email'] ?? '';
+
+                if (!$ghost_id || !$ghost_email) {
+                    continue;
+                }
+
+                $ghost_name = $member['name'] ?? null;
+                $open_rate = $member['email_open_rate'] ?? null;
+
+                $insert_stmt->bind_param('sssss', $batch_label, $ghost_id, $ghost_email, $ghost_name, $open_rate);
+                $insert_stmt->execute();
+
+                try {
+                    ensureMemberHasLabel($ghost_id, 'sent-001');
+                } catch (Exception $labelException) {
+                    error_log('[EARTHEN] ❌ Failed to apply sent label: ' . $labelException->getMessage());
+                }
+            }
+
+            $insert_stmt->close();
+
+            $fetch_stmt = $gobrik_conn->prepare(
+                "SELECT id, ghost_member_id, ghost_email, ghost_name, email_open_rate, test_sent, test_sent_date_time
+                 FROM earthen_send_batch_tb
+                 WHERE batch_label = ?
+                 ORDER BY id ASC"
+            );
+
+            if ($fetch_stmt) {
+                $fetch_stmt->bind_param('s', $batch_label);
+                $fetch_stmt->execute();
+                $result = $fetch_stmt->get_result();
+                $initial_member_batch = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+                $fetch_stmt->close();
+            }
+        }
+    }
+} catch (Exception $batchException) {
+    error_log('[EARTHEN] ❌ Failed to prepare initial batch: ' . $batchException->getMessage());
+}
+
+$all_members = array_map(function ($member) {
+    return [
+        'id' => $member['ghost_member_id'] ?? null,
+        'email' => $member['ghost_email'] ?? '',
+        'name' => $member['ghost_name'] ?? '',
+        'email_open_rate' => $member['email_open_rate'] ?? '0%',
+        'test_sent' => (int) ($member['test_sent'] ?? 0),
+        'test_sent_date_time' => $member['test_sent_date_time'] ?? 'N/A',
+        'batch_row_id' => $member['id'] ?? null,
+    ];
+}, $initial_member_batch);
+
+$first_recipient_email = $all_members[0]['email'] ?? '';
+$first_recipient_id = $all_members[0]['id'] ?? '';
 
 $total_members = $earthen_stats['total'] ?? (defined('EARTHEN_TOTAL_MEMBERS') ? EARTHEN_TOTAL_MEMBERS : 0);
 $sent_count = $earthen_stats['sent'] ?? 0;
 $sent_percentage = $earthen_stats['percentage'] ?? 0;
 $pending_count = max(0, $total_members - $sent_count);
-$all_members = $initial_member_batch;
 
 // Mailgun event breakdown for processing chart
 $mailgun_status_counts = [];
@@ -383,12 +460,12 @@ echo '<!DOCTYPE html>
     <p><strong>Subject:</strong> <?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></p>
     <label for="email_html">Newsletter HTML:</label>
     <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
-    <input type="hidden" id="subscriber_id" name="subscriber_id" value="">
+    <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($first_recipient_id); ?>">
 
     <!-- Hidden field for recipient email
         <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
     -->
-<input type="hidden" id="email_to" name="email_to" value="">
+<input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($first_recipient_email); ?>">
     <br><br>
 <!-- Auto-send Button (hidden by default unless auto-send is enabled) -->
 <button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
@@ -459,7 +536,7 @@ $(document).ready(function () {
     let batchSent = 0;
     let currentBatchSize = 0;
     let batchOffset = 0;
-    const initialBatch = <?php echo json_encode($initial_member_batch); ?>;
+    const initialBatch = <?php echo json_encode($all_members); ?>;
     const initialStats = <?php echo json_encode($earthen_stats); ?>;
     let queueStats = {
         total: <?php echo (int) ($total_members ?? 0); ?>,
@@ -525,10 +602,11 @@ $(document).ready(function () {
     function renderStatusTable() {
         if (recipientQueue.length) {
             const rows = recipientQueue.map((m) => {
-                const statusIcon = m.status === 'sent' ? '✅' : (m.status === 'failed' ? '⚠️ Failed' : '⏳ Pending');
-                const sentDate = m.sent_at
-                    ? new Date(m.sent_at).toLocaleString()
-                    : 'Queued';
+                const isSent = m.test_sent === 1 || m.status === 'sent';
+                const statusIcon = isSent ? '✅ Sent' : (m.status === 'failed' ? '⚠️ Failed' : '⏳ Pending');
+                const sentDate = m.test_sent_date_time && m.test_sent_date_time !== 'N/A'
+                    ? m.test_sent_date_time
+                    : (m.sent_at ? new Date(m.sent_at).toLocaleString() : 'Queued');
 
                 return [
                     m.name || '',
@@ -665,11 +743,20 @@ $(document).ready(function () {
 
         if (Array.isArray(initialBatch) && initialBatch.length) {
             recipientQueue = initialBatch;
-            queueIndex = 0;
             currentBatchSize = recipientQueue.length;
             batchOffset = currentBatchSize;
+            batchSent = recipientQueue.filter(m => m.test_sent === 1).length;
+
+            const firstPendingIndex = recipientQueue.findIndex(m => m.test_sent !== 1);
+            queueIndex = firstPendingIndex >= 0 ? firstPendingIndex : recipientQueue.length;
+
             renderStatusTable();
-            setActiveRecipientFromQueue(queueIndex);
+
+            if (!setActiveRecipientFromQueue(queueIndex)) {
+                handleBatchCompletion();
+            }
+        } else {
+            handleBatchCompletion();
         }
 
         updateBatchDisplay();
@@ -695,51 +782,7 @@ $(document).ready(function () {
         setActiveRecipientFromQueue(-1);
         updateBatchDisplay();
 
-        const remaining = Math.max(0, (queueStats.total || 0) - (queueStats.sent || 0));
-        if (remaining > 0) {
-            $('#auto-send-button').text("⏳ Loading next batch...").prop('disabled', false);
-            fetchRecipientBatch();
-        } else {
-            $('#auto-send-button').text("✅ All emails sent").prop('disabled', true);
-        }
-    }
-
-    function fetchRecipientBatch() {
-        const requestOffset = batchOffset;
-        $.ajax({
-            url: '../emailing/get_recipient_batch.php',
-            type: 'GET',
-            dataType: 'json',
-            data: { limit: batchSize, offset: requestOffset },
-            success: function (response) {
-                if (response.has_alerts) {
-                    alert('⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.');
-                    $('#auto-send-button, #test-send-button').prop('disabled', true);
-                    return;
-                }
-
-                if (response.stats) {
-                    updateStatsDisplay(response.stats);
-                }
-
-                if (response.success && response.batch && response.batch.length) {
-                    recipientQueue = response.batch;
-                    queueIndex = 0;
-                    batchSent = 0;
-                    currentBatchSize = recipientQueue.length;
-                    batchOffset = requestOffset + currentBatchSize;
-                    updateBatchDisplay();
-                    renderStatusTable();
-                    setActiveRecipientFromQueue(queueIndex);
-                } else {
-                    batchOffset = requestOffset + batchSize;
-                    handleBatchCompletion();
-                }
-            },
-            error: function () {
-                logError('Failed to fetch recipient batch.');
-            }
-        });
+        $('#auto-send-button').text("✅ All batch emails sent!").prop('disabled', true);
     }
 
     function setActiveRecipientFromQueue(index) {
@@ -780,6 +823,8 @@ $(document).ready(function () {
         current.status = status;
         if (status === 'sent') {
             current.sent_at = new Date().toISOString();
+            current.test_sent = 1;
+            current.test_sent_date_time = current.sent_at;
         }
 
         renderStatusTable();
@@ -795,7 +840,7 @@ $(document).ready(function () {
         if (autoSendEnabled()) {
             queueIndex++;
             if (!setActiveRecipientFromQueue(queueIndex)) {
-                fetchRecipientBatch();
+                handleBatchCompletion();
             }
         }
     }
@@ -839,7 +884,8 @@ function sendEmail() {
                 email_to: targetEmail,
                 email_html: emailBody,
                 test_mode: isTestMode ? 1 : 0,
-                subscriber_id: recipientId
+                subscriber_id: recipientId,
+                batch_row_id: recipientQueue[queueIndex] ? recipientQueue[queueIndex].batch_row_id : null
             },
             success: function (resp) {
                 let data = {};
@@ -856,7 +902,7 @@ function sendEmail() {
                         incrementSentStats();
                         queueIndex++;
                         if (!setActiveRecipientFromQueue(queueIndex)) {
-                            fetchRecipientBatch();
+                            handleBatchCompletion();
                         }
                     }
                 } else {
@@ -978,9 +1024,7 @@ function sendEmail() {
         alert("⚠️ Unaddressed Admin Alerts Exist! You cannot send emails until they are resolved.");
         $('#auto-send-button, #test-send-button').prop('disabled', true);
     } else {
-        if (!recipientQueue.length) {
-            fetchRecipientBatch();
-        } else if (autoSendEnabled() && recipientEmail) {
+        if (autoSendEnabled() && recipientEmail) {
             startCountdownAndSend();
         }
     }
