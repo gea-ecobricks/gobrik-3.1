@@ -32,7 +32,15 @@ if ($stmt = $gobrik_conn->prepare($roles_query)) {
 }
 
 $mailgun_events = [];
-$events_query = "SELECT event_timestamp, recipient_email, COALESCE(event_type, 'unknown') AS event_type, COALESCE(severity, 'unknown') AS severity, COALESCE(NULLIF(error_message, ''), reason, '—') AS details FROM earthen_mailgun_events_tb ORDER BY event_timestamp DESC LIMIT 200";
+$show_failed_only = isset($_GET['failed']) && $_GET['failed'] === '1';
+
+$events_query = "SELECT event_timestamp, recipient_email, COALESCE(event_type, 'unknown') AS event_type, COALESCE(severity, 'unknown') AS severity, COALESCE(NULLIF(error_message, ''), reason, '—') AS details FROM earthen_mailgun_events_tb";
+
+if ($show_failed_only) {
+    $events_query .= " WHERE COALESCE(event_type, '') = 'failed' OR COALESCE(severity, '') LIKE '%failure%'";
+}
+
+$events_query .= " ORDER BY event_timestamp DESC LIMIT 200";
 
 if ($result = $gobrik_conn->query($events_query)) {
     while ($row = $result->fetch_assoc()) {
@@ -67,8 +75,51 @@ if ($result = $gobrik_conn->query($events_query)) {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        h1 {
-            margin-top: 0;
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-bar h1 {
+            margin: 0;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #d0d7de;
+            background: #0d6efd;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+        }
+
+        .button.secondary {
+            background: #fff;
+            color: #0d6efd;
+        }
+
+        .button:hover {
+            background: #0b5ed7;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.25);
+        }
+
+        .button.secondary:hover {
+            background: #e9f2ff;
         }
 
         table.dataTable thead th {
@@ -78,8 +129,23 @@ if ($result = $gobrik_conn->query($events_query)) {
 </head>
 <body>
     <div class="container">
-        <h1>Mailgun Logs</h1>
-        <p>Latest Mailgun events for the Earthen sender (most recent 200 entries).</p>
+        <div class="header-bar">
+            <h1>Mailgun Logs</h1>
+            <div class="actions">
+                <?php if ($show_failed_only): ?>
+                    <a class="button secondary" href="mailgun-logs.php">View All Events</a>
+                <?php else: ?>
+                    <a class="button" href="mailgun-logs.php?failed=1">View Failed Events</a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <p>
+            <?php if ($show_failed_only): ?>
+                Showing failed Mailgun events for the Earthen sender (most recent 200 entries).
+            <?php else: ?>
+                Latest Mailgun events for the Earthen sender (most recent 200 entries).
+            <?php endif; ?>
+        </p>
         <table id="mailgun-log-table" class="display" style="width:100%">
             <thead>
                 <tr>
