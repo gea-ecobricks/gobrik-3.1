@@ -416,8 +416,6 @@ echo '<!DOCTYPE html>
         <label style="display:block;margin-top:15px;">🔁 Auto-load batches</label>
         <p class="form-caption" style="margin-top:10px;">When enabled, the next 100 members will load automatically after the current batch finishes and sending will continue.</p>
 
-        <p id="batch-order-caption" class="form-caption" style="margin-top:10px;">Start sending newsletters to the oldest members of Earthen first.</p>
-
         <label for="send-delay-slider" style="display:block;margin-top:20px;margin-bottom: 5px;">⏱️ Send Delay</label>
         <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:90%;accent-color:var(--emblem-green);">
                 <p class="form-caption" style="margin-top:5px;">Adjust sending delay from 1 to 10 seconds.</p>
@@ -434,12 +432,6 @@ echo '<!DOCTYPE html>
             <label class="toggle-switch">
                 <input type="checkbox" id="auto-load-toggle" value="1">
                 <span class="slider"></span>
-            </label>
-        </div>
-        <div style="margin-top:10px;">
-            <label class="toggle-switch">
-                <input type="checkbox" id="batch-order-toggle" value="1">
-                <span id="batch-order-slider" class="slider order-oldest"></span>
             </label>
         </div>
         <div style="margin-top:auto;margin-bottom:10px">
@@ -631,24 +623,6 @@ $(document).ready(function () {
         return $('#auto-load-toggle').is(':checked');
     }
 
-    function getBatchOrder() {
-        return $('#batch-order-toggle').is(':checked') ? 'desc' : 'asc';
-    }
-
-    function updateBatchOrderDisplay() {
-        const newestFirst = $('#batch-order-toggle').is(':checked');
-        const captionText = newestFirst
-            ? 'Start sending newsletters to the newest members of Earthen first.'
-            : 'Start sending newsletters to the oldest members of Earthen first.';
-
-        $('#batch-order-caption').text(captionText);
-        $('#batch-order-slider')
-            .toggleClass('order-newest', newestFirst)
-            .toggleClass('order-oldest', !newestFirst);
-
-        localStorage.setItem('batchOrder', getBatchOrder());
-    }
-
     function renderStatusTable() {
         if (recipientQueue.length) {
             const rows = recipientQueue.map((m) => {
@@ -807,11 +781,6 @@ $(document).ready(function () {
     function loadInitialBatch() {
         updateStatsDisplay(initialStats);
 
-        if (getBatchOrder() === 'desc') {
-            fetchNextBatch();
-            return;
-        }
-
         if (Array.isArray(initialBatch) && initialBatch.length) {
             setBatchFromData(initialBatch);
         } else {
@@ -859,7 +828,7 @@ $(document).ready(function () {
             url: '../emailing/get_recipient_batch.php',
             method: 'GET',
             dataType: 'json',
-            data: { limit: batchSize, offset: batchOffset, order: getBatchOrder() },
+            data: { limit: batchSize, offset: batchOffset },
             success: function (resp) {
                 isLoadingBatch = false;
 
@@ -1104,10 +1073,6 @@ function sendEmail() {
         }
     });
 
-    $('#batch-order-toggle').on('change', function () {
-        updateBatchOrderDisplay();
-    });
-
     $('#send-delay-slider').on('input change', function () {
         sendDelay = parseInt($(this).val());
         localStorage.setItem('sendDelay', sendDelay);
@@ -1144,7 +1109,6 @@ function sendEmail() {
     const savedAutoSend = localStorage.getItem('autoSend') === 'true';
     const savedTestSend = localStorage.getItem('testSend') === 'true';
     const savedAutoLoad = localStorage.getItem('autoLoad') === 'true';
-    const savedBatchOrder = localStorage.getItem('batchOrder');
     sendDelay = parseInt(localStorage.getItem('sendDelay')) || 1;
     $('#send-delay-slider').val(sendDelay);
     $('#delay-display').text(sendDelay);
@@ -1152,12 +1116,6 @@ function sendEmail() {
     $('#auto-send-toggle').prop('checked', savedAutoSend);
     $('#test-email-toggle').prop('checked', savedTestSend);
     $('#auto-load-toggle').prop('checked', savedAutoLoad);
-
-    if (savedBatchOrder === 'desc') {
-        $('#batch-order-toggle').prop('checked', true);
-    }
-
-    updateBatchOrderDisplay();
 
     loadInitialBatch();
     updateVisibleButton();
