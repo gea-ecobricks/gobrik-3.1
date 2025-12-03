@@ -16,6 +16,11 @@
     // Set default in case something goes wrong
     $active_url = isset($uriParts[2]) ? $uriParts[2] : '';
 
+    $gobrik_client_id = 'gbrk_f2c61a85a4cd4b8b89a7';
+    $buwana_id_for_feedback = $buwana_id ?? ($_SESSION['buwana_id'] ?? '');
+    $feedback_lang = isset($lang) ? $lang : 'en';
+    $bug_report_url = "https://buwana.ecobricks.org/{$feedback_lang}/feedback.php?buwana=" . urlencode($buwana_id_for_feedback) . "&app=" . urlencode($gobrik_client_id);
+
     ?>
 
 
@@ -513,12 +518,12 @@ display: none;
 </div>
 -->
 
-<div class="menu-page-item">
-  <a href="feedback.php" data-lang-id="1000-bug-report">
-    Support Chats
-  </a>
-  <span class="status-circle" style="background-color: RED;" title="Working."></span>
-</div>
+  <div class="menu-page-item">
+    <a href="<?php echo htmlspecialchars($bug_report_url); ?>" data-lang-id="1000-bug-report" target="_blank" rel="noopener">
+      Support Chats
+    </a>
+    <span class="status-circle" style="background-color: RED;" title="Working."></span>
+  </div>
 
 <!--
     <div class="menu-page-item">
@@ -529,18 +534,13 @@ display: none;
   <span class="status-circle" style="background-color: yellow;" title="Under development. Only working on desktop"></span>
 </div>-->
 
-<div class="menu-page-item">
-  <a href="index.php" data-lang-id="1000-landing-page">
-    Home page
-  </a>
-  <span class="status-circle" style="background-color: fuchsia;" title="Deployed. Working well!"></span>
-</div>
-
-
     <!-- GoBrik Tour at the bottom -->
     <div class="menu-page-item">
       <a data-lang-id="1001-gobrik-tour" onclick="closeSettings(); setTimeout(guidedTour, 500);">GoBrik Tour</a>
       <span class="status-circle" style="background-color: #00B5FF;" title="Working. Not translated."></span>
+    </div>
+    <div class="menu-page-item" style="cursor: default;">
+      <span data-lang-id="1002-authentication-by-buwana">Authentication by <a href="https://buwana.ecobricks.org" target="_blank" rel="noopener">Buwana</a></span>
     </div>
   </div> <!-- close overlay-content-settings -->
 </div> <!-- close main menu -->

@@ -49,6 +49,7 @@ const id_Translations = {
     "1000-featured-projects": "Proyek Unggulan",
     "1000-latest-trainings": "Pelatihan Terbaru",
     "1000-landing-page": "Halaman Utama",
+    "1002-authentication-by-buwana": "Otentikasi oleh <a href=\"https://buwana.ecobricks.org\" target=\"_blank\" rel=\"noopener\">Buwana</a>",
     "1000-about-gobrik": `<a href="https://ecobricks.org/gobrik" target="_blank">Proyek GoBrik</a> dikembangkan oleh <a href="https://ecobricks.org/about" target="_blank">Global Ecobrick Alliance</a>, sebuah perusahaan nirlaba untuk Bumi yang didedikasikan untuk mempercepat transisi plastik dan petro-kapital.`,
 
 /*Teks Umum*/
