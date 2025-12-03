@@ -429,7 +429,7 @@ display: none;
 
 
       <div class="gobrik-logo-holder">
-        <div class="gobrik-app-logo" style="margin-right: auto;margin-left: auto;margin-bottom: 20px;width:175px;height:175px;"></div>
+        <div class="gobrik-app-logo" style="margin-right: auto;margin-left: auto;margin-bottom: 20px;width:150px;height:150px;background:url('/svgs/gobrik-3-emblem-tight.svg') no-repeat center/contain;"></div>
       </div>
 
 
@@ -457,12 +457,13 @@ display: none;
            <p style="font-size:0.9em; margin-bottom: 3px;
   margin-top: 5px;"><span id="continent-icon"><?php echo htmlspecialchars($user_continent_icon); ?> </span> <span style="color:green;"><?php echo htmlspecialchars($user_location_watershed); ?></span> <span style="color:grey">| <?php echo htmlspecialchars($user_community_name); ?></span></p>
 
-           <p style="font-size:0.9em; display:flex; align-items:center; gap:6px; white-space: nowrap;">
-            <span aria-hidden="true">⚙️</span>
+           <p style="font-size:0.9em; display:flex; align-items:center; gap:8px; white-space: nowrap; margin: 0;">
             <a href="<?php echo htmlspecialchars($profile_edit_url); ?>" target="_blank" rel="noopener" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" title="Update your user settings">Profile settings</a>
             <span aria-hidden="true">|</span>
-            <span aria-hidden="true">🐳</span>
-            <span onclick="logoutUser()" class="underline-link" data-lang-id="1000-log-out" style="cursor: pointer;" class="underline-link" title="Log out completely">Log out</span>
+            <span style="display:flex; align-items:center; gap:4px;">
+              <span aria-hidden="true">🐳</span>
+              <span onclick="logoutUser()" class="underline-link" data-lang-id="1000-log-out" style="cursor: pointer;" title="Log out completely">Log out</span>
+            </span>
           </p>
 
         </div>
@@ -549,8 +550,8 @@ display: none;
       <span class="status-circle" style="background-color: #00B5FF;" title="Working. Not translated."></span>
     </div>
     </div>
-    <div class="menu-auth-footer">
-      <span data-lang-id="1002-authentication-by-buwana">Authentication by <a href="https://buwana.ecobricks.org" target="_blank" rel="noopener">Buwana</a></span>
+    <div class="menu-auth-footer" style="margin-top:auto;margin-bottom:20px;font-size:0.9em;color:gray;">
+      <span data-lang-id="1002-authentication-by-buwana">Authentication by <a href="https://buwana.ecobricks.org" target="_blank" rel="noopener" style="color:inherit;">Buwana</a></span>
     </div>
   </div> <!-- close overlay-content-settings -->
 </div> <!-- close main menu -->
