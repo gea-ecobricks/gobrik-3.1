@@ -311,6 +311,46 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         position: relative !important;
         top: auto !important;
     }
+
+    .vertical-toggle {
+        position: relative;
+        width: 32px;
+        height: 70px;
+        border: 1px solid #d0d0d0;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #ffffff 0%, #f1f1f1 100%);
+        padding: 6px 4px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease, box-shadow 0.2s ease, align-items 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+    }
+
+    .vertical-toggle:focus-visible {
+        outline: 2px solid #1976d2;
+        outline-offset: 3px;
+    }
+
+    .vertical-toggle.down {
+        align-items: flex-end;
+        background: linear-gradient(180deg, #e8f0ff 0%, #d0e0ff 100%);
+        box-shadow: inset 0 1px 2px rgba(25, 118, 210, 0.25);
+    }
+
+    .vertical-toggle .toggle-knob {
+        width: 18px;
+        height: 26px;
+        background: #1976d2;
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        transition: background 0.2s ease;
+    }
+
+    .vertical-toggle.down .toggle-knob {
+        background: #0d47a1;
+    }
 </style>
 
 <div id="slider-box">
@@ -433,10 +473,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div id="validation-panel" class="dashboard-panel" style="text-align:center;">
         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
             <div style="text-align:center;">
-                <div style="font-size:3em;font-weight:700;line-height:1;">
-                    <?php echo number_format((int) $awaiting_validation_count); ?>
+                <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
+                    ⏲️ <?php echo number_format((int) $awaiting_validation_count); ?>
                 </div>
-                <div style="font-size:1.1em;margin-top: 6px;">⏱ Awaiting Validation</div>
+                <div style="font-size:1em;margin-top: 6px;">Awaiting Review</div>
             </div>
             <div style="text-align:center;">
                 <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
@@ -451,7 +491,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <div style="font-size:1em;margin-top: 6px;">Rejected Today</div>
             </div>
         </div>
-        <a href="admin-review.php" class="page-button">Admin Validation</a>
+        <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
     </div>
 <?php endif; ?>
 
@@ -461,37 +501,43 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php if ($is_admin): ?>
     <div id="dash-notice-control" class="dashboard-panel">
-        <h4 class="panel-title">Update Dashboard Notice</h4>
-        <p>Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
-        <form action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form">
-            <div class="form-field" style="margin-bottom:15px;">
-                <label for="notice-message-body" style="display:block;margin-bottom:5px;">Message</label>
-                <textarea id="notice-message-body" name="message_body" rows="3" required style="width:100%;padding:10px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <div>
+                <h4 class="panel-title" style="margin-bottom:4px;">Update Dashboard Notice</h4>
+                <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
             </div>
-            <div class="form-field" style="margin-bottom:15px;">
-                <label for="notice-featured-text" style="display:block;margin-bottom:5px;">Featured Text</label>
-                <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:10px;"
+            <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
+                <span class="toggle-knob"></span>
+            </button>
+        </div>
+        <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
+            <div class="form-field" style="margin-bottom:10px;">
+                <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
+                <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+            </div>
+            <div class="form-field" style="margin-bottom:10px;">
+                <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
+                <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"
                        value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             </div>
-            <div class="form-field" style="margin-bottom:15px;">
-                <label for="notice-featured-url" style="display:block;margin-bottom:5px;">Featured URL</label>
-                <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:10px;"
+            <div class="form-field" style="margin-bottom:10px;">
+                <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
+                <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"
                        value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             </div>
-            <div class="form-field" style="margin-bottom:15px;">
-                <label for="notice-message-emoji" style="display:block;margin-bottom:5px;">Message Emoji</label>
-                <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:10px;"
+            <div class="form-field" style="margin-bottom:10px;">
+                <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
+                <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"
                        value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             </div>
-            <button type="submit" class="confirm-button enabled" style="width:100%;">Save Notice</button>
+            <button type="submit" class="confirm-button enabled" style="width:100%;padding:10px 12px;">Save Notice</button>
         </form>
     </div>
 
     <div id="admin-menu" class="dashboard-panel">
-        <h4 class="panel-title">Admin Menu</h4>
-        <div class="menu-buttons-row">
-            <a href="admin-review.php" class="page-button">Admin Validation</a>
-            <a id="messenger-button" href="messenger.php" class="page-button">Messenger BETA</a>
+        <h4 class="panel-title">Admin Support Chats</h4>
+        <div class="menu-buttons-row" style="justify-content:flex-start;">
+            <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>" class="page-button">Manage Support Chats</a>
         </div>
     </div>
 <?php endif; ?>
@@ -891,8 +937,26 @@ function sendTraineeEmails(trainingId, isTest) {
 
 
 $(document).ready(function() {
+    const noticeToggle = document.getElementById('dash-notice-toggle');
+    const noticeForm = document.getElementById('dash-notice-form');
+
+    if (noticeToggle && noticeForm) {
+        const setNoticeState = (expanded) => {
+            noticeToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            noticeToggle.classList.toggle('down', expanded);
+            noticeForm.style.display = expanded ? 'block' : 'none';
+        };
+
+        setNoticeState(false);
+
+        noticeToggle.addEventListener('click', () => {
+            const isExpanded = noticeToggle.getAttribute('aria-expanded') === 'true';
+            setNoticeState(!isExpanded);
+        });
+    }
+
     $("#trainer-trainings").DataTable({
-        "pageLength": 10,
+        "pageLength": 5,
         "searching": false,
         "lengthChange": false,
         "order": [[1, "desc"]],
