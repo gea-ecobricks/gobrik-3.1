@@ -428,7 +428,9 @@ display: none;
 
 
 
-      <div class="gobrik-app-logo" style="margin-right: auto;margin-left: auto;margin-bottom: 20px;width:175px;height:175px;"></div>
+      <div class="gobrik-logo-holder">
+        <div class="gobrik-app-logo" style="margin-right: auto;margin-left: auto;margin-bottom: 20px;width:175px;height:175px;"></div>
+      </div>
 
 
     <!-- Check if the user is logged in before displaying the logged-in status box : earthen values set by earthenAuth_helper-->
@@ -455,10 +457,13 @@ display: none;
            <p style="font-size:0.9em; margin-bottom: 3px;
   margin-top: 5px;"><span id="continent-icon"><?php echo htmlspecialchars($user_continent_icon); ?> </span> <span style="color:green;"><?php echo htmlspecialchars($user_location_watershed); ?></span> <span style="color:grey">| <?php echo htmlspecialchars($user_community_name); ?></span></p>
 
-           <p style="font-size:0.9em;">
-  ⚙️ <a href="<?php echo htmlspecialchars($profile_edit_url); ?>" target="_blank" rel="noopener" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" title="Update your user settings">Profile settings</a> |
-  🐳 <span onclick="logoutUser()" class="underline-link" data-lang-id="1000-log-out" style="cursor: pointer;" class="underline-link" title="Log out completely">Log out</span>
-</p>
+           <p style="font-size:0.9em; display:flex; align-items:center; gap:6px; white-space: nowrap;">
+            <span aria-hidden="true">⚙️</span>
+            <a href="<?php echo htmlspecialchars($profile_edit_url); ?>" target="_blank" rel="noopener" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" title="Update your user settings">Profile settings</a>
+            <span aria-hidden="true">|</span>
+            <span aria-hidden="true">🐳</span>
+            <span onclick="logoutUser()" class="underline-link" data-lang-id="1000-log-out" style="cursor: pointer;" class="underline-link" title="Log out completely">Log out</span>
+          </p>
 
         </div>
       </div>

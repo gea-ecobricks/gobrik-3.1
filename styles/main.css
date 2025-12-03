@@ -2527,6 +2527,13 @@ color: var(--h1);
 text-decoration: underline;
 }
 
+.gobrik-logo-holder {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 
 .top-page-image {
     margin-bottom: 70px;
