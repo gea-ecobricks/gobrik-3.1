@@ -1,7 +1,3 @@
-function openProfile() {
-    window.location.href = 'profile.php';
-}
-
 function logoutUser() {
     const path = window.location.pathname.split("/").pop() + window.location.search;
     const redirectUrl = encodeURIComponent(path);
