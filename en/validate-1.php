@@ -2,7 +2,7 @@
 require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 require_once '../auth/session_start.php';
 
-// Set up page variables
+// Set up page variables for templating and cache busting
 $lang = basename(dirname($_SERVER['SCRIPT_NAME'])) ?? 'en';
 $version = '1.0';
 $page = 'validate-1';
@@ -10,7 +10,7 @@ $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
 
 // LOGIN AND ROLE CHECK:
-//Check if the user is logged in, if not send them to login.
+// Check if the user is logged in, if not send them to login.
 if (!isLoggedIn()) {
     header("Location: login.php");
     exit();
@@ -62,14 +62,14 @@ if ($stmt = $gobrik_conn->prepare($query)) {
 }
 //END LOGIN AND ROLE CHECK
 
-// Include database connections
+// Include database connections for Gobrik and Buwana data sources
 require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
 
  // Fetch the user's location data
     $buwana_id = $_SESSION['buwana_id'] ?? ''; // Retrieve buwana_id from session
 
-    // Fetch the user's location data
+    // Fetch the user's location data for display/context
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
 $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
@@ -99,7 +99,7 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $main_file_sizes = [];
     $thumbnail_file_sizes = [];
 
-// Validate ecobrick ID
+// Validate ecobrick ID passed into the page
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $ecobrick_unique_id = (int)$_GET['id'];
 } else {
@@ -107,7 +107,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     exit();
 }
 
-// Check ecobrick status
+// Check ecobrick status to avoid re-validating authenticated ecobricks
 $status_check_stmt = $gobrik_conn->prepare("SELECT status FROM tb_ecobricks WHERE ecobrick_unique_id = ?");
 if (!$status_check_stmt) {
     error_log("Failed to prepare status check statement: " . $gobrik_conn->error);
@@ -129,7 +129,7 @@ if ($status !== null && strcasecmp($status, "authenticated") === 0) {
     exit();
 }
 
-// Fetch ecobrick details including photo_version
+// Fetch ecobrick details including photo_version for the validation UI
 $sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, owner, weight_g, volume_ml, density, date_logged_ts, sequestration_type
         FROM tb_ecobricks
         WHERE ecobrick_unique_id = ?";
@@ -152,6 +152,7 @@ if ($stmt->execute()) {
         exit();
     }
     $stmt->close();
+    // Normalize maker_id as a string for the upcoming owner lookups
     $maker_id = $maker_id !== null ? trim((string) $maker_id) : '';
     $ecobrick_brk_amt = $ecobrick_brk_amt !== null ? (float) $ecobrick_brk_amt : 0.0;
     $owner = $owner !== null ? trim((string) $owner) : '';
@@ -174,6 +175,7 @@ if ($stmt->execute()) {
         $owner_display_name = $owner;
     }
 
+    // Try to map the maker_id from the ecobrick record to a tb_ecobrickers entry
     if ($maker_id !== '') {
         $maker_lookup = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1");
         if ($maker_lookup) {
@@ -181,21 +183,26 @@ if ($stmt->execute()) {
             $maker_lookup->execute();
             $maker_lookup->bind_result($matched_ecobricker_id);
             if ($maker_lookup->fetch()) {
+                // Store the matched ecobricker_id for later language/owner lookups
                 $maker_ecobricker_id = (int) $matched_ecobricker_id;
             }
             $maker_lookup->close();
         }
     }
+
+    // Fallback: if maker_id is numeric but not matched, assume it is the ecobricker_id
     if ($maker_ecobricker_id === null && $maker_id !== '' && ctype_digit($maker_id)) {
         $maker_ecobricker_id = (int) $maker_id;
     }
 
+    // Owner can be a string name or an ecobricker_id; capture the numeric reference when possible
     if ($owner !== '') {
         if (ctype_digit($owner)) {
             $owner_ecobricker_id = (int) $owner;
         }
     }
 
+    // If no explicit owner id exists, fall back to the maker's ecobricker_id when available
     if ($owner_ecobricker_id === null && $maker_ecobricker_id !== null) {
         $owner_ecobricker_id = $maker_ecobricker_id;
     }
