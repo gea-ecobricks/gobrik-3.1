@@ -491,13 +491,7 @@ Paula and Russell will be leading the 90 minute overview of the principles, theo
                             <tr>
                                 <td class="header-content" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding: 0; margin: 0 auto;" valign="top">
                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
-                                            <tr class="header-image-row">
-                                                <td class="header-image" width="100%" align="center" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding-top: 24px; padding-bottom: 16px;" valign="top">
-                                                    <a href="https://earthen.io/r/905f4b81?m=4dbbb711-73e9-4fd0-9056-a7cc1af6a905" style="color: #4B8501; text-decoration: none; overflow-wrap: anywhere;" target="_blank">
-                                                        <img src="https://earthen.io/content/images/size/w1200/2024/04/gea-trainer-newsletter-top-banner.png" width="600" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%;">
-                                                    </a>
-                                                </td>
-                                            </tr>
+
 
                                               <tr class="site-info-row">
                                                                                             <td class="site-info" width="100%" align="center" style="font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; font-size: 18px; vertical-align: top; color: #15212A; padding-top: 32px;" valign="top">
@@ -513,7 +507,7 @@ Paula and Russell will be leading the 90 minute overview of the principles, theo
                                                                                                         </tr>
 
                                                                                                 </table>
-                                                                                            </td>
+                                                                                    </td>
                                                                                         </tr>
 
                                             <tr>
