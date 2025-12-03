@@ -82,7 +82,8 @@ $user_capabilities_raw = $user_capabilities_raw ?? '';
 $user_capabilities_list = array_filter(array_map('trim', explode(',', $user_capabilities_raw)));
 $normalized_capabilities = array_map('strtolower', $user_capabilities_list);
 $has_review_capability = in_array('review ecobricks', $normalized_capabilities, true);
-$has_validation_access = (strpos(strtolower($user_roles ?? ''), 'admin') !== false) || $has_review_capability;
+$is_admin = strpos(strtolower($user_roles ?? ''), 'admin') !== false;
+$has_validation_access = $is_admin || $has_review_capability;
 
 $awaiting_validation_count = 0;
 $authenticated_today_count = 0;
@@ -256,6 +257,38 @@ if ($active_notice) {
     $notice_featured_url = $default_featured_url;
 }
 
+$ghost_member_stats = [
+    'total' => 0,
+    'sent_001' => 0,
+    'sent_002' => 0,
+    'remaining' => 0,
+];
+
+if ($is_admin) {
+    require_once '../emailing/earthen_helpers.php';
+
+    $ghoststats_conn = loadGhostStatsConnection();
+
+    if ($ghoststats_conn) {
+        $sent001_stats = getGhostMemberStats($ghoststats_conn, 'sent-001');
+        $sent002_stats = getGhostMemberStats($ghoststats_conn, 'sent-002');
+
+        $ghost_total = max($sent001_stats['total'] ?? 0, $sent002_stats['total'] ?? 0);
+        $ghost_remaining = max(0, $ghost_total - ($sent001_stats['sent'] ?? 0) - ($sent002_stats['sent'] ?? 0));
+
+        $ghost_member_stats = [
+            'total' => $ghost_total,
+            'sent_001' => $sent001_stats['sent'] ?? 0,
+            'sent_002' => $sent002_stats['sent'] ?? 0,
+            'remaining' => $ghost_remaining,
+        ];
+    }
+
+    if ($ghoststats_conn instanceof mysqli) {
+        $ghoststats_conn->close();
+    }
+}
+
 // 🔒 Clean exit: close DB connections
 $buwana_conn->close();
 $gobrik_conn->close();
@@ -398,21 +431,20 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php if ($has_validation_access): ?>
     <div id="validation-panel" class="dashboard-panel" style="text-align:center;">
-        <h4 class="panel-title">Validation Overview</h4>
-        <div style="margin: 20px 0;">
-            <div style="font-size:3em;font-weight:700;line-height:1;">
-                <?php echo number_format((int) $awaiting_validation_count); ?>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
+            <div style="text-align:center;">
+                <div style="font-size:3em;font-weight:700;line-height:1;">
+                    <?php echo number_format((int) $awaiting_validation_count); ?>
+                </div>
+                <div style="font-size:1.1em;margin-top: 6px;">⏱ Awaiting Validation</div>
             </div>
-            <div style="font-size:1.1em;margin-top: 6px;">⏱ Awaiting Validation</div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin-bottom:25px;">
-            <div>
+            <div style="text-align:center;">
                 <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
                     ✅<?php echo number_format((int) $authenticated_today_count); ?>
                 </div>
                 <div style="font-size:1em;margin-top: 6px;">Authenticated Today</div>
             </div>
-            <div>
+            <div style="text-align:center;">
                 <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
                      ⛔<?php echo number_format((int) $rejected_today_count); ?>
                 </div>
@@ -427,7 +459,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <!--ADMIN-->
 
-<?php if (strpos(strtolower($user_roles), 'admin') !== false): ?>
+<?php if ($is_admin): ?>
     <div id="dash-notice-control" class="dashboard-panel">
         <h4 class="panel-title">Update Dashboard Notice</h4>
         <p>Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
@@ -464,15 +496,23 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </div>
 <?php endif; ?>
 
-<?php if (strpos(strtolower($user_roles), 'admin') !== false): ?>
+<?php if ($is_admin): ?>
     <div id="admin-menu" class="dashboard-panel">
-        <h4 class="panel-title">Admin Email Subscriptions Manager</h4>
-        <div class="menu-buttons-row">
-            <a href="admin-emailer.php" class="page-button">📨 GoBrik Intro Emailer</a>
-            <a href="admin-panel.php" class="page-button">🔎 User Management</a>
-            <a href="earthen-sender.php" class="page-button">📨 Earthen Manual Mailer</a>
-            <a href="../scripts/process_email_failures.php" class="page-button">❌ Purge Failed Earthen Accounts</a>
-            <a href="https://earthen.io/ghost" class="page-button">👻 Earthen Ghost Login</a>
+        <h4 class="panel-title">Earthen Manual Mailer</h4>
+        <div style="width:100%;max-width:480px;margin:0 auto 20px;">
+            <div style="position:relative;height:260px;width:100%;">
+                <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
+                <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
+                <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
+                <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
+            </div>
+        </div>
+        <div class="menu-buttons-row" style="flex-wrap:wrap;justify-content:center;">
+            <a href="earthen-sender.php" class="page-button">Earthen Mailer</a>
+            <a href="https://earthen.io/ghost" class="page-button">Ghost Login</a>
+            <a href="admin-panel.php" class="page-button">Member Management</a>
         </div>
     </div>
 <?php endif; ?>
@@ -1504,6 +1544,47 @@ function addListingToggleListener(toggle, buttonElem) {
 
 
 </script>
+
+<?php if ($is_admin): ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartEl = document.getElementById('earthen-mailer-donut');
+    if (!chartEl || typeof Chart === 'undefined') {
+        return;
+    }
+
+    const stats = <?php echo json_encode($ghost_member_stats, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+    const totals = {
+        total: Number(stats.total) || 0,
+        sent001: Number(stats.sent_001) || 0,
+        sent002: Number(stats.sent_002) || 0,
+    };
+    const remaining = Math.max(totals.total - totals.sent001 - totals.sent002, 0);
+
+    new Chart(chartEl, {
+        type: 'doughnut',
+        data: {
+            labels: ['sent-001', 'sent-002', 'Unsent'],
+            datasets: [{
+                data: [totals.sent001, totals.sent002, remaining],
+                backgroundColor: ['#4caf50', '#2196f3', '#e0e0e0'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            cutout: '55%',
+            maintainAspectRatio: false
+        }
+    });
+});
+</script>
+<?php endif; ?>
 
 
 <script>
