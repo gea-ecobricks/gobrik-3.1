@@ -20,6 +20,7 @@
     $buwana_id_for_feedback = $buwana_id ?? ($_SESSION['buwana_id'] ?? '');
     $feedback_lang = isset($lang) ? $lang : 'en';
     $bug_report_url = "https://buwana.ecobricks.org/{$feedback_lang}/feedback.php?buwana=" . urlencode($buwana_id_for_feedback) . "&app=" . urlencode($gobrik_client_id);
+    $profile_edit_url = "https://buwana.ecobricks.org/{$feedback_lang}/edit-profile.php?buwana=" . urlencode($buwana_id_for_feedback) . "&app=" . urlencode($gobrik_client_id);
 
     ?>
 
@@ -423,6 +424,9 @@ display: none;
   <div class="overlay-content-settings">
 
 
+    <div class="menu-items-container">
+
+
 
       <div class="gobrik-app-logo" style="margin-right: auto;margin-left: auto;margin-bottom: 20px;width:175px;height:175px;"></div>
 
@@ -452,7 +456,7 @@ display: none;
   margin-top: 5px;"><span id="continent-icon"><?php echo htmlspecialchars($user_continent_icon); ?> </span> <span style="color:green;"><?php echo htmlspecialchars($user_location_watershed); ?></span> <span style="color:grey">| <?php echo htmlspecialchars($user_community_name); ?></span></p>
 
            <p style="font-size:0.9em;">
-  ⚙️ <span onclick="openProfile()" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" class="underline-link" title="Update your user settings">Profile settings</span> |
+  ⚙️ <a href="<?php echo htmlspecialchars($profile_edit_url); ?>" target="_blank" rel="noopener" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" title="Update your user settings">Profile settings</a> |
   🐳 <span onclick="logoutUser()" class="underline-link" data-lang-id="1000-log-out" style="cursor: pointer;" class="underline-link" title="Log out completely">Log out</span>
 </p>
 
@@ -539,7 +543,8 @@ display: none;
       <a data-lang-id="1001-gobrik-tour" onclick="closeSettings(); setTimeout(guidedTour, 500);">GoBrik Tour</a>
       <span class="status-circle" style="background-color: #00B5FF;" title="Working. Not translated."></span>
     </div>
-    <div class="menu-page-item" style="cursor: default;">
+    </div>
+    <div class="menu-auth-footer">
       <span data-lang-id="1002-authentication-by-buwana">Authentication by <a href="https://buwana.ecobricks.org" target="_blank" rel="noopener">Buwana</a></span>
     </div>
   </div> <!-- close overlay-content-settings -->

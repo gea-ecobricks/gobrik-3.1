@@ -772,7 +772,23 @@ Overlay Curtain */
   height: 100%;
   margin: auto;
   min-width: 300px;
+  justify-content: flex-start;
+}
+
+.menu-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.menu-auth-footer {
+  flex: 1;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  color: var(--subdued-text);
+  text-align: center;
+  padding: 20px 0;
 }
 
 @media screen and (max-width: 700px) {
