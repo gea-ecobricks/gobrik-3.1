@@ -32,6 +32,7 @@ const en_Translations = {
     "1000-featured-projects": "Featured Projects",
     "1000-latest-trainings": "Latest Trainings",
     "1000-landing-page": "Landing Page",
+    "1002-authentication-by-buwana": "Authentication by <a href=\"https://buwana.ecobricks.org\" target=\"_blank\" rel=\"noopener\">Buwana</a>",
     "1000-about-gobrik": "<a href=\"https://ecobricks.org/gobrik\" target=\"_blank\">The GoBrik project</a> is developed by the <a href=\"https://ecobricks.org/about\" target=\"_blank\">Global Ecobrick Alliance</a>, a not-for-profit Earth enterprise dedicated to accelerating plastic and petro-capital transition.",
 
     /*General Texts*/
