@@ -140,6 +140,25 @@ if ($result = $gobrik_conn->query($events_query)) {
     }
     $result->free();
 }
+
+$mailgun_status_counts = [];
+$mailgun_total_events = 0;
+$status_query = "SELECT COALESCE(event_type, 'unknown') AS status, COUNT(*) AS count FROM earthen_mailgun_events_tb WHERE LOWER(COALESCE(event_type, '')) <> 'accepted' GROUP BY status ORDER BY status";
+$status_result = $gobrik_conn->query($status_query);
+
+if ($status_result) {
+    while ($row = $status_result->fetch_assoc()) {
+        $status = $row['status'] ?: 'unknown';
+        $count = (int) ($row['count'] ?? 0);
+        $mailgun_status_counts[$status] = $count;
+        $mailgun_total_events += $count;
+    }
+    $status_result->free();
+}
+
+if (empty($mailgun_status_counts)) {
+    $mailgun_status_counts = ['no data' => 0];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -149,6 +168,7 @@ if ($result = $gobrik_conn->query($events_query)) {
     <title>Mailgun Logs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -165,6 +185,41 @@ if ($result = $gobrik_conn->query($events_query)) {
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .overview-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .chart-card {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            background: #f8f9ff;
+            border: 1px solid #d0d7de;
+            border-radius: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .chart-card canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .chart-center-label {
+            position: absolute;
+            text-align: center;
+            font-weight: 700;
+            color: #0d6efd;
+            pointer-events: none;
         }
 
         .header-bar {
@@ -393,26 +448,34 @@ if ($result = $gobrik_conn->query($events_query)) {
 </head>
 <body>
     <div class="container">
-        <div class="header-bar">
-            <h1>Mailgun Logs</h1>
-            <div class="header-controls">
-                <span class="count-badge">
-                    <?php echo count($mailgun_events); ?> events retrieved
-                </span>
-                <div class="actions">
-                    <?php if ($show_failed_only): ?>
-                        <button type="button" class="button danger" id="start-purge">Start purge</button>
-                        <a class="button secondary" href="mailgun-logs.php">View All Events</a>
-                    <?php else: ?>
-                        <a class="button" href="mailgun-logs.php?failed=1">View Failed Events</a>
-                    <?php endif; ?>
-                </div>
-                <?php if ($show_failed_only): ?>
-                    <div class="purge-status" id="purge-status" aria-live="polite">
-                        <span class="status-spinner" aria-hidden="true"></span>
-                        <span class="status-text" id="purge-status-text">Waiting to start purge…</span>
+        <div class="overview-bar">
+            <div class="chart-card" aria-label="Mailgun event breakdown" role="img">
+                <canvas id="mailgun-status-chart"></canvas>
+                <div class="chart-center-label" id="mailgun-status-total"><?php echo number_format((int) $mailgun_total_events); ?><br>events</div>
+            </div>
+            <div style="flex:1 1 320px;">
+                <div class="header-bar">
+                    <h1>Mailgun Logs</h1>
+                    <div class="header-controls">
+                        <span class="count-badge">
+                            <?php echo count($mailgun_events); ?> events retrieved
+                        </span>
+                        <div class="actions">
+                            <?php if ($show_failed_only): ?>
+                                <button type="button" class="button danger" id="start-purge">Start purge</button>
+                                <a class="button secondary" href="mailgun-logs.php">View All Events</a>
+                            <?php else: ?>
+                                <a class="button" href="mailgun-logs.php?failed=1">View Failed Events</a>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($show_failed_only): ?>
+                            <div class="purge-status" id="purge-status" aria-live="polite">
+                                <span class="status-spinner" aria-hidden="true"></span>
+                                <span class="status-text" id="purge-status-text">Waiting to start purge…</span>
+                            </div>
+                        <?php endif; ?>
                     </div>
-                <?php endif; ?>
+                </div>
             </div>
         </div>
         <p>
@@ -476,6 +539,40 @@ if ($result = $gobrik_conn->query($events_query)) {
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
+            const mailgunStatusLabels = <?php echo json_encode(array_keys($mailgun_status_counts)); ?>;
+            const mailgunStatusCounts = <?php echo json_encode(array_values($mailgun_status_counts)); ?>;
+            const mailgunTotalEvents = <?php echo json_encode((int) $mailgun_total_events); ?>;
+
+            const chartCanvas = document.getElementById('mailgun-status-chart');
+            const chartLabel = document.getElementById('mailgun-status-total');
+
+            if (chartCanvas && typeof Chart !== 'undefined') {
+                const palette = ['#0d6efd', '#4caf50', '#ff9800', '#9c27b0', '#f44336', '#03a9f4', '#8bc34a', '#ffeb3b'];
+                const backgroundColors = mailgunStatusLabels.map((_, idx) => palette[idx % palette.length]);
+
+                new Chart(chartCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: mailgunStatusLabels,
+                        datasets: [{
+                            data: mailgunStatusCounts,
+                            backgroundColor: backgroundColors,
+                            borderColor: 'transparent',
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+
+                if (chartLabel) {
+                    chartLabel.textContent = `${mailgunTotalEvents.toLocaleString()}\nevents`;
+                }
+            }
+
             const table = $('#mailgun-log-table').DataTable({
                 order: [[0, 'desc']],
                 pageLength: 25,
