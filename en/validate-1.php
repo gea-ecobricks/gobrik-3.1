@@ -77,7 +77,6 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $gea_status = getGEA_status($buwana_id);
     $user_community_name = getCommunityName($buwana_conn, $buwana_id);
     $ecobrick_unique_id = '';
-    $maker_id = '';
     $maker_ecobricker_id = null;
     $ecobrick_brk_amt = 0.0;
     $first_name = getFirstName($buwana_conn, $buwana_id);
@@ -130,7 +129,7 @@ if ($status !== null && strcasecmp($status, "authenticated") === 0) {
 }
 
 // Fetch ecobrick details including photo_version for the validation UI
-$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, maker_id, ecobricker_maker, ecobrick_brk_amt, owner, weight_g, volume_ml, density, date_logged_ts, sequestration_type
+$sql = "SELECT serial_no, ecobrick_full_photo_url, ecobrick_thumb_photo_url, selfie_photo_url, selfie_thumb_url, photo_version, ecobricker_id, ecobricker_maker, ecobrick_brk_amt, owner, weight_g, volume_ml, density, date_logged_ts, sequestration_type
         FROM tb_ecobricks
         WHERE ecobrick_unique_id = ?";
 $stmt = $gobrik_conn->prepare($sql);
@@ -141,7 +140,7 @@ if (!$stmt) {
 }
 $stmt->bind_param("i", $ecobrick_unique_id);
 if ($stmt->execute()) {
-    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $maker_id, $ecobricker_maker, $ecobrick_brk_amt, $owner, $weight_g, $volume_ml, $density, $date_logged_ts, $sequestration_type);
+    $stmt->bind_result($serial_no, $ecobrick_full_photo_url, $ecobrick_thumb_photo_url, $selfie_photo_url, $selfie_thumb_url, $photo_version, $ecobricker_id, $ecobricker_maker, $ecobrick_brk_amt, $owner, $weight_g, $volume_ml, $density, $date_logged_ts, $sequestration_type);
     if (!$stmt->fetch()) {
         // No ecobrick found
         $alert_message = getNoEcobrickAlert($lang);
@@ -152,8 +151,7 @@ if ($stmt->execute()) {
         exit();
     }
     $stmt->close();
-    // Normalize maker_id as a string for the upcoming owner lookups
-    $maker_id = $maker_id !== null ? trim((string) $maker_id) : '';
+    $ecobricker_id = $ecobricker_id !== null ? (int) $ecobricker_id : null;
     $ecobrick_brk_amt = $ecobrick_brk_amt !== null ? (float) $ecobrick_brk_amt : 0.0;
     $owner = $owner !== null ? trim((string) $owner) : '';
     $weight_g = $weight_g !== null ? (float) $weight_g : null;
@@ -175,25 +173,7 @@ if ($stmt->execute()) {
         $owner_display_name = $owner;
     }
 
-    // Try to map the maker_id from the ecobrick record to a tb_ecobrickers entry
-    if ($maker_id !== '') {
-        $maker_lookup = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1");
-        if ($maker_lookup) {
-            $maker_lookup->bind_param("s", $maker_id);
-            $maker_lookup->execute();
-            $maker_lookup->bind_result($matched_ecobricker_id);
-            if ($maker_lookup->fetch()) {
-                // Store the matched ecobricker_id for later language/owner lookups
-                $maker_ecobricker_id = (int) $matched_ecobricker_id;
-            }
-            $maker_lookup->close();
-        }
-    }
-
-    // Fallback: if maker_id is numeric but not matched, assume it is the ecobricker_id
-    if ($maker_ecobricker_id === null && $maker_id !== '' && ctype_digit($maker_id)) {
-        $maker_ecobricker_id = (int) $maker_id;
-    }
+    $maker_ecobricker_id = $ecobricker_id;
 
     // Owner can be a string name or an ecobricker_id; capture the numeric reference when possible
     if ($owner !== '') {
@@ -873,7 +853,6 @@ echo '<!DOCTYPE html>
             validation_note: validationData.validation_note || "",
             authenticator_version: validationData.authenticator_version || "",
             validator_name: validationData.validator_name || "",
-            maker_id: validationData.maker_id || "",
             brk_value: validationData.brk_value || 0,
             brk_tran_id: validationData.brk_legacy_tran_id,
             ecobrick_brk_amt: validationData.ecobrick_brk_amt || 0,

@@ -28,9 +28,9 @@ $sql = "SELECT ecobrick_thumb_photo_url, ecobrick_full_photo_url, weight_g, volu
 $bindTypes = "";
 $bindValues = [];
 
-// If ecobricker_id is provided, use it to filter by maker_id in the SQL query
+// If ecobricker_id is provided, use it to filter by ecobricker_id in the SQL query
 if (!empty($ecobricker_id)) {
-    $sql .= " WHERE maker_id = ?";
+    $sql .= " WHERE ecobricker_id = ?";
     $bindTypes .= "s";
     $bindValues[] = $ecobricker_id;
 }
@@ -47,7 +47,7 @@ if (!empty($searchValue)) {
 // Count total records before filtering
 $totalRecordsQuery = "SELECT COUNT(*) as total FROM tb_ecobricks";
 if (!empty($ecobricker_id)) {
-    $totalRecordsQuery .= " WHERE maker_id = ?";
+    $totalRecordsQuery .= " WHERE ecobricker_id = ?";
     $stmtTotal = $gobrik_conn->prepare($totalRecordsQuery);
     $stmtTotal->bind_param("s", $ecobricker_id);
 } else {
@@ -120,7 +120,7 @@ while ($row = $result->fetch_assoc()) {
 // Get total filtered records
 $totalFilteredQuery = "SELECT COUNT(*) as total FROM tb_ecobricks";
 if (!empty($ecobricker_id)) {
-    $totalFilteredQuery .= " WHERE maker_id = ?";
+    $totalFilteredQuery .= " WHERE ecobricker_id = ?";
 }
 if (!empty($searchValue)) {
     $totalFilteredQuery .= (!empty($ecobricker_id) ? " AND " : " WHERE ") .
