@@ -92,7 +92,7 @@ if ($status_normalized === 'rejected' && $feedback === '') {
 // -----------------------------------------------------------------------------
 // 5. Ecobrick Lookup & Preparation
 // -----------------------------------------------------------------------------
-$ecobrick_stmt = $gobrik_conn->prepare('SELECT serial_no, weight_g, maker_id, ecobricker_maker, ecobrick_brk_amt FROM tb_ecobricks WHERE ecobrick_unique_id = ?');
+$ecobrick_stmt = $gobrik_conn->prepare('SELECT serial_no, weight_g, ecobricker_id, ecobricker_maker, ecobrick_brk_amt FROM tb_ecobricks WHERE ecobrick_unique_id = ?');
 if (!$ecobrick_stmt) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Failed to prepare ecobrick lookup.'], JSON_UNESCAPED_UNICODE);
@@ -100,7 +100,7 @@ if (!$ecobrick_stmt) {
 }
 $ecobrick_stmt->bind_param('i', $ecobrick_id);
 $ecobrick_stmt->execute();
-$ecobrick_stmt->bind_result($serial_no, $weight_g, $maker_id, $ecobricker_maker, $existing_brk_amt);
+$ecobrick_stmt->bind_result($serial_no, $weight_g, $ecobricker_id, $ecobricker_maker, $existing_brk_amt);
 if (!$ecobrick_stmt->fetch()) {
     http_response_code(404);
     echo json_encode(['success' => false, 'error' => 'Ecobrick not found.'], JSON_UNESCAPED_UNICODE);
@@ -109,25 +109,9 @@ if (!$ecobrick_stmt->fetch()) {
 }
 $ecobrick_stmt->close();
 
-$maker_id = $maker_id !== null ? trim((string) $maker_id) : '';
 $existing_brk_amt = $existing_brk_amt !== null ? (float) $existing_brk_amt : 0.0;
 
-$maker_ecobricker_id = null;
-if ($maker_id !== '') {
-    $maker_lookup = $gobrik_conn->prepare('SELECT ecobricker_id FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1');
-    if ($maker_lookup) {
-        $maker_lookup->bind_param('s', $maker_id);
-        $maker_lookup->execute();
-        $maker_lookup->bind_result($matched_ecobricker_id);
-        if ($maker_lookup->fetch()) {
-            $maker_ecobricker_id = (int) $matched_ecobricker_id;
-        }
-        $maker_lookup->close();
-    }
-}
-if ($maker_ecobricker_id === null && ctype_digit($maker_id)) {
-    $maker_ecobricker_id = (int) $maker_id;
-}
+$maker_ecobricker_id = $ecobricker_id !== null ? (int) $ecobricker_id : null;
 
 if ($serial_no === null || $serial_no === '') {
     http_response_code(400);
@@ -311,7 +295,6 @@ echo json_encode([
     'brk_trans_no' => $brk_trans_no,
     'brk_legacy_tran_id' => $brk_tran_legacy_id,
     'serial_no' => $serial_no,
-    'maker_id' => $maker_id,
     'maker_ecobricker_id' => $maker_ecobricker_id,
     'validator_name' => $validator_name,
     'authenticator_version' => $authenticator_version,

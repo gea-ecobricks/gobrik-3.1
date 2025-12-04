@@ -28,7 +28,6 @@ if (!is_array($data)) {
 $status = trim((string) ($data['status'] ?? ''));
 $serialNo = trim((string) ($data['serial_no'] ?? ''));
 $ecobrickerId = isset($data['ecobricker_id']) ? (int) $data['ecobricker_id'] : 0;
-$makerId = trim((string) ($data['maker_id'] ?? ''));
 $validatorComments = trim((string) ($data['validator_comments'] ?? ''));
 $validationNote = trim((string) ($data['validation_note'] ?? ''));
 $authenticatorVersion = trim((string) ($data['authenticator_version'] ?? ''));
@@ -48,10 +47,6 @@ if ($starRatingRaw !== null && $starRatingRaw !== '') {
 }
 $existingBrkAmt = isset($data['existing_brk_amt']) ? (float) $data['existing_brk_amt'] : null;
 $ecobrickFullPhotoUrl = trim((string) ($data['ecobrick_full_photo_url'] ?? ''));
-
-if ($ecobrickerId <= 0 && $makerId !== '' && ctype_digit($makerId)) {
-    $ecobrickerId = (int) $makerId;
-}
 
 // -----------------------------------------------------------------------------
 // 2. Permission Verification
@@ -100,31 +95,6 @@ $makerStmt->execute();
 $makerStmt->bind_result($makerFirstName, $makerEmail);
 $makerFound = $makerStmt->fetch();
 $makerStmt->close();
-
-if (!$makerFound && $makerId !== '') {
-    if (ctype_digit($makerId)) {
-        $fallbackId = (int) $makerId;
-        $makerStmt = $gobrik_conn->prepare('SELECT first_name, email_addr FROM tb_ecobrickers WHERE ecobricker_id = ? LIMIT 1');
-        if ($makerStmt) {
-            $makerStmt->bind_param('i', $fallbackId);
-            $makerStmt->execute();
-            $makerStmt->bind_result($makerFirstName, $makerEmail);
-            $makerFound = $makerStmt->fetch();
-            $makerStmt->close();
-        }
-    }
-
-    if (!$makerFound) {
-        $makerStmt = $gobrik_conn->prepare('SELECT first_name, email_addr FROM tb_ecobrickers WHERE maker_id = ? LIMIT 1');
-        if ($makerStmt) {
-            $makerStmt->bind_param('s', $makerId);
-            $makerStmt->execute();
-            $makerStmt->bind_result($makerFirstName, $makerEmail);
-            $makerFound = $makerStmt->fetch();
-            $makerStmt->close();
-        }
-    }
-}
 
 if (!$makerFound || empty($makerEmail)) {
     http_response_code(404);
