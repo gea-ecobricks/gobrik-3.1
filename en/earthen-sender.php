@@ -196,26 +196,6 @@ $sent_count = $earthen_stats['sent'] ?? 0;
 $sent_percentage = $earthen_stats['percentage'] ?? 0;
 $pending_count = max(0, $total_members - $sent_count);
 
-// Mailgun event breakdown for processing chart
-$mailgun_status_counts = [];
-$mailgun_total_events = 0;
-$mailgun_status_query = "SELECT COALESCE(event_type, 'unknown') AS status, COUNT(*) AS count FROM earthen_mailgun_events_tb WHERE LOWER(COALESCE(event_type, '')) <> 'accepted' GROUP BY status ORDER BY status";
-$mailgun_status_result = $gobrik_conn->query($mailgun_status_query);
-
-if ($mailgun_status_result) {
-    while ($row = $mailgun_status_result->fetch_assoc()) {
-        $status = $row['status'] ?: 'unknown';
-        $count = (int) ($row['count'] ?? 0);
-        $mailgun_status_counts[$status] = $count;
-        $mailgun_total_events += $count;
-    }
-    $mailgun_status_result->free();
-}
-
-if (empty($mailgun_status_counts)) {
-    $mailgun_status_counts = ['no data' => 0];
-}
-
 $newsletter_files = [
     '001' => __DIR__ . '/../emailing/newsletters/001.php',
     '002' => __DIR__ . '/../emailing/newsletters/002.php',
@@ -440,13 +420,6 @@ echo '<!DOCTYPE html>
 <!-- SENDER FORM CONTENT -->
     <div class="form-container" style="padding-top:10px; margin-top: 100px;">
 
-        <div id="processing-chart-wrapper" style="width:300px;margin:20px auto;">
-            <div style="position:relative;">
-                <canvas id="processingChart" width="300" height="300"></canvas>
-                <div id="unsent-percentage-label" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:1.2em;color:grey;"></div>
-            </div>
-        </div>
-
         <?php if ($has_alerts): ?>
         <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
             <h3 style="color: red;">⚠️ Admin Alerts Found!</h3>
@@ -618,11 +591,6 @@ echo '<!DOCTYPE html>
 
 <!--FOOTER STARTS HERE-->
 <?php require_once ("../footer-2025.php"); ?>
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 $(document).ready(function () {
     let recipientEmail = '';
@@ -678,37 +646,6 @@ $(document).ready(function () {
 
 
     const hasAlerts = <?php echo $has_alerts ? 'true' : 'false'; ?>;
-
-    const mailgunStatusLabels = <?php echo json_encode(array_keys($mailgun_status_counts)); ?>;
-    const mailgunStatusCounts = <?php echo json_encode(array_values($mailgun_status_counts)); ?>;
-    const mailgunTotalEvents = <?php echo json_encode($mailgun_total_events); ?>;
-
-    const chartCtx = document.getElementById('processingChart');
-    if (chartCtx && typeof Chart !== 'undefined') {
-        const palette = ['#4caf50', '#2196f3', '#ff9800', '#9c27b0', '#f44336', '#03a9f4', '#8bc34a', '#ffeb3b'];
-        const backgroundColors = mailgunStatusLabels.map((_, idx) => palette[idx % palette.length]);
-
-        new Chart(chartCtx.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: mailgunStatusLabels,
-                datasets: [{
-                    data: mailgunStatusCounts,
-                    backgroundColor: backgroundColors,
-                    borderColor: 'transparent',
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: 'grey' } },
-                    tooltip: { bodyColor: 'grey', titleColor: 'grey' }
-                }
-            }
-        });
-
-        $('#unsent-percentage-label').text(`${mailgunTotalEvents} events`);
-    }
 
     // Initialize DataTable for status overview
     const statusTable = $('#email-status-table').DataTable({

@@ -312,6 +312,23 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         top: auto !important;
     }
 
+    .dashboard-panel {
+        position: relative;
+    }
+
+    .panel-pill {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #0d6efd;
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.75em;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
     .vertical-toggle {
         position: relative;
         width: 32px;
@@ -381,7 +398,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </div>
     <div style="text-align:center;width:100%;margin:auto;">
         <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
-        <p id="subgreeting">Welcome to your new dashboard.</p>
+        <p id="subgreeting">Welcome to your dashboard.</p>
     </div>
 </div>
 <!-- DASHBOARD CONTENT -->
@@ -397,12 +414,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <!-- TRAINER TRAININGS -->
 <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
         <div id="my-trainings-panel" class="dashboard-panel" style="text-align:center;width:100%;margin:25px auto 0;">
+            <span class="panel-pill">TRAINER PANEL</span>
             <h3 data-lang-id="002-my-trainings">My Trainings</h3>
             <div class="menu-buttons-row">
                             <a href="launch-training.php" class="page-button" style="margin: 10px;">🚀 New Training</a>
                             <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">📝 Log Report</a>
                         </div>
-            <p>Trainings that you are managing...</p>
 
 
             <table id="trainer-trainings" class="display" style="width:100%;">
@@ -471,6 +488,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php if ($has_validation_access): ?>
     <div id="validation-panel" class="dashboard-panel" style="text-align:center;">
+        <span class="panel-pill">VALIDATOR PANEL</span>
         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
             <div style="text-align:center;">
                 <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
@@ -502,6 +520,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php if ($is_admin): ?>
     <div style="display:flex;flex-wrap:wrap;gap:15px;">
         <div id="dash-notice-control" class="dashboard-panel" style="flex:1 1 50%;min-width:320px;">
+            <span class="panel-pill">ADMIN PANEL</span>
             <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
                 <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
@@ -534,6 +553,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
 
         <div id="admin-support-chats" class="dashboard-panel" style="flex:1 1 50%;min-width:320px;">
+            <span class="panel-pill">ADMIN PANEL</span>
             <h4 class="panel-title" style="text-align:center;">Admin Support Chats</h4>
             <div class="menu-buttons-row" style="justify-content:center;">
                 <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
@@ -544,21 +564,25 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php if ($is_admin): ?>
     <div id="admin-menu" class="dashboard-panel">
+        <span class="panel-pill">ADMIN PANEL</span>
         <h4 class="panel-title">Earthen Manual Mailer</h4>
-        <div style="width:100%;max-width:480px;margin:0 auto 20px;">
-            <div style="position:relative;height:260px;width:100%;">
-                <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
+        <div style="display:flex;flex-wrap:wrap;gap:25px;align-items:center;justify-content:space-between;">
+            <div style="flex:1 1 240px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
+                <a href="earthen-sender.php" class="page-button" style="width:100%;text-align:center;">Earthen Mailer</a>
+                <a href="https://earthen.io/ghost" class="page-button" style="width:100%;text-align:center;">Ghost Login</a>
+                <a href="admin-panel.php" class="page-button" style="width:100%;text-align:center;">Member Management</a>
+                <a href="../emailing/mailgun-logs.php" class="page-button" style="width:100%;text-align:center;">Mailgun logs</a>
             </div>
-            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
-                <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
-                <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
-                <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
+            <div style="flex:1 1 260px;max-width:360px;margin:0 auto;">
+                <div style="position:relative;height:260px;width:100%;">
+                    <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
+                    <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
+                    <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
+                    <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
+                </div>
             </div>
-        </div>
-        <div class="menu-buttons-row" style="flex-wrap:wrap;justify-content:center;">
-            <a href="earthen-sender.php" class="page-button">Earthen Mailer</a>
-            <a href="https://earthen.io/ghost" class="page-button">Ghost Login</a>
-            <a href="admin-panel.php" class="page-button">Member Management</a>
         </div>
     </div>
 <?php endif; ?>
@@ -568,6 +592,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <!--TRAINER MENU-->
 <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
     <div id="gea-trainer-menu" class="dashboard-panel">
+        <span class="panel-pill">TRAINER PANEL</span>
         <h4 class="panel-title">GEA Trainer Menu</h4>
         <div class="menu-buttons-row">
             <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
