@@ -19,6 +19,12 @@
     --advanced-background: #bad0d8;
 
 
+    --dashboard-page-background: #f5f5f5;
+    --dashboard-panel-background: #ffffff;
+    --dashboard-panel-border: #d0d7de;
+    --dashboard-panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+
     --settings-background: rgb(213, 213, 213);
     --settings-border: rgb(220, 220, 222);
     --emblem-pink: #fc02fc;
