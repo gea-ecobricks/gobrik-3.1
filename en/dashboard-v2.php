@@ -305,7 +305,7 @@ See our git hub repository for the full code and to help out:
 https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php require_once("../includes/dashboard-inc.php"); ?>
-<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v4">
+<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v5">
 
 <style>
     #header.top-menu {
