@@ -44,7 +44,6 @@ try {
     $community_name = trim($_POST['community_select']);
     $community_id = isset($_POST['community_id']) ? (int)$_POST['community_id'] : 0;
 
-
     // STEP 3: Derived values
     $user_ecobricker_id = getEcobrickerID($buwana_id);
     $ecobricker_id = $user_ecobricker_id;
