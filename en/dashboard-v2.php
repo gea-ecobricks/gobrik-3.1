@@ -371,8 +371,18 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     }
 </style>
 
+<div class="dashboard-wrapper">
 <div id="dashboard-v2-grid" class="dashboard-grid">
-    <div id="slider-box" class="dashboard-panel span-4">
+    <div id="welcome-greeting-panel" class="dashboard-panel">
+        <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
+        <p id="subgreeting">Welcome to your dashboard.</p>
+        <div class="dashboard-actions">
+            <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
+            <button id="take-gobrik-tour" class="button secondary" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()">🛳️ GoBrik Tour</button>
+        </div>
+    </div>
+
+    <div id="slider-box" class="dashboard-panel">
         <div id="registered-notice" class="top-container-notice">
             <span id="notice-icon" style="margin-right:10px;">
                 <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
@@ -400,16 +410,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
     </div>
 
-    <div id="welcome-greeting-panel" class="dashboard-panel span-2">
-        <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
-        <p id="subgreeting">Welcome to your dashboard.</p>
-        <div class="dashboard-actions">
-            <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
-            <button id="take-gobrik-tour" class="button secondary" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()">🛳️ GoBrik Tour</button>
-        </div>
-    </div>
-
-    <div id="my-ecobricks-panel" class="dashboard-panel span-3">
+    <div id="my-ecobricks-panel" class="dashboard-panel">
         <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
         <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
             <thead>
@@ -429,7 +430,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </table>
     </div>
 
-    <div id="registrations-panel" class="dashboard-panel span-3">
+    <div id="registrations-panel" class="dashboard-panel">
         <h3 data-lang-id="002-my-registrations">My Registrations</h3>
         <p>Trainings that you've registered for.</p>
 
@@ -464,8 +465,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </table>
     </div>
 
+    </div>
+</div>
+
+<div class="dashboard-columns">
     <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-        <div id="my-trainings-panel" class="dashboard-panel span-3">
+        <div id="my-trainings-panel" class="dashboard-panel">
             <span class="panel-pill">TRAINER PANEL</span>
             <h3 data-lang-id="002-my-trainings">My Trainings</h3>
             <div class="menu-buttons-row">
@@ -630,9 +635,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         </div>
     <?php endif; ?>
-+</div>
+</div>
 
-+</div><!--closes main and starry background-->
+</div><!--closes main and starry background-->
 
 <!-- FOOTER STARTS HERE -->
 <?php require_once("../footer-2025.php"); ?>
