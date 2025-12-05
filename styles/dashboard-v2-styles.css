@@ -11,13 +11,16 @@ body {
 
 #dashboard-v2-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr 2fr;
     gap: 20px;
-    align-items: stretch;
+    align-items: start;
     padding: 40px 20px 0;
-    grid-template-areas:
-        "welcome slider"
-        "ecobricks registrations";
+}
+
+.dashboard-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .dashboard-panel {
@@ -84,7 +87,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    grid-area: slider;
+    margin-top: 0;
 }
 
 #ecobrick-slider {
@@ -111,7 +114,6 @@ body {
     justify-content: center;
     gap: 12px;
     height: 555px;
-    grid-area: welcome;
 }
 
 #my-ecobricks-panel,
@@ -121,57 +123,24 @@ body {
     flex-direction: column;
 }
 
-#my-ecobricks-panel {
-    grid-area: ecobricks;
-}
-
-#registrations-panel {
-    grid-area: registrations;
-}
-
 #my-ecobricks-panel table,
 #registrations-panel table,
 #my-trainings-panel table {
     margin-top: 12px;
 }
 
-.dashboard-columns {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-
-.dashboard-columns .dashboard-panel {
-    width: 100%;
-    margin: 0;
-}
-
-.dashboard-columns .dashboard-panel.span-2,
-.dashboard-columns .dashboard-panel.span-3,
-.dashboard-columns .dashboard-panel.span-4 {
-    grid-column: 1 / -1;
-}
-
 .page-button {
     font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
-}
-
-@media (max-width: 1200px) {
-    .dashboard-columns {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 }
 
 @media (max-width: 768px) {
     #dashboard-v2-grid {
         grid-template-columns: 1fr;
         padding: 20px 12px;
-        grid-template-areas:
-            "welcome"
-            "slider"
-            "ecobricks"
-            "registrations";
+    }
+
+    .dashboard-column {
+        gap: 16px;
     }
 
     #slider-box,
@@ -180,11 +149,6 @@ body {
     #registrations-panel {
         height: auto;
         min-height: 0;
-    }
-
-    .dashboard-columns {
-        grid-template-columns: 1fr;
-        padding: 12px;
     }
 
     .dashboard-actions {
