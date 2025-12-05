@@ -345,6 +345,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         color: #b3261e;
     }
 
+    .panel-pill.latest-pill {
+        background: #fff;
+        color: #0d1b2a;
+        border: 1px solid var(--dashboard-panel-border, #d0d7de);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
     .vertical-toggle {
         position: relative;
         width: 32px;
@@ -453,6 +460,39 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
                 </div>
             </div>
+
+            <div id="dash-notice-control" class="dashboard-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
+                    <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
+                        <span class="toggle-knob"></span>
+                    </button>
+                </div>
+                <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
+                        <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
+                        <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
+                        <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
+                        <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <button type="submit" class="button secondary" style="width:100%;">Save Notice</button>
+                </form>
+            </div>
         <?php endif; ?>
 
         <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
@@ -473,7 +513,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </div>
 
     <div class="dashboard-column column-wide">
-        <div id="slider-box" class="dashboard-panel">
+        <div id="latest-ecobricks-panel" class="dashboard-panel">
+            <span class="panel-pill latest-pill">Latest Briks</span>
             <div id="ecobrick-slider">
                 <?php foreach ($featured_ecobricks as $index => $brick): ?>
                     <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
@@ -621,38 +662,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     </div>
                 </div>
                 <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($is_admin): ?>
-            <div id="dash-notice-control" class="dashboard-panel">
-                <span class="panel-pill admin-pill">Admin</span>
-                <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                    <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
-                    <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
-                        <span class="toggle-knob"></span>
-                    </button>
-                </div>
-                <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
-                    <div class="form-field" style="margin-bottom:10px;">
-                        <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
-                        <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-                    </div>
-                    <div class="form-field" style="margin-bottom:10px;">
-                        <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
-                        <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                    </div>
-                    <div class="form-field" style="margin-bottom:10px;">
-                        <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
-                        <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                    </div>
-                    <div class="form-field" style="margin-bottom:10px;">
-                        <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
-                        <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                    </div>
-                    <button type="submit" class="button secondary" style="width:100%;">Save Notice</button>
-                </form>
             </div>
         <?php endif; ?>
     </div>
@@ -1711,7 +1720,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     let startX = 0;
-    const sliderBox = document.getElementById('slider-box');
+    const sliderBox = document.getElementById('latest-ecobricks-panel');
     sliderBox.addEventListener('touchstart', e => {
         startX = e.touches[0].clientX;
     });
