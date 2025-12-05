@@ -613,7 +613,9 @@ display: none;
 
 
     <div id="header" class="top-menu" style="display: flex;
-    flex-flow: row;">
+    flex-flow: row;
+    background: none !important;
+    box-shadow: none !important;">
 
         <button type="button" class="side-menu-button"  onclick="openSideMenu()" aria-label="Open Menu">
         </button>
