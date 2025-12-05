@@ -1,6 +1,10 @@
 body {
-    background-color: #f5f5f5;
+    background-color: var(--dashboard-page-background, #f5f5f5);
     font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
+}
+
+:root {
+    --dashboard-panel-gap: 20px;
 }
 
 .dashboard-wrapper {
@@ -12,7 +16,7 @@ body {
 #dashboard-v2-grid {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: 20px;
+    gap: var(--dashboard-panel-gap);
     align-items: start;
     padding: 40px 20px 0;
 }
@@ -20,27 +24,27 @@ body {
 .dashboard-column {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--dashboard-panel-gap);
 }
 
-.dashboard-panel {
-    background: #fff;
-    border: 1px solid #d0d7de;
+.dashboard-v2-panel {
+    background: var(--dashboard-panel-background, #fff);
+    border: 1px solid var(--dashboard-panel-border, #d0d7de);
     border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--dashboard-panel-shadow, 0 2px 8px rgba(0, 0, 0, 0.08));
     padding: 20px;
     position: relative;
     min-height: 120px;
 }
 
-.dashboard-panel h2,
-.dashboard-panel h3,
-.dashboard-panel h4 {
+.dashboard-v2-panel h2,
+.dashboard-v2-panel h3,
+.dashboard-v2-panel h4 {
     margin-top: 0;
     color: #0d1b2a;
 }
 
-.dashboard-panel p {
+.dashboard-v2-panel p {
     margin-top: 0;
     color: #43505b;
 }
@@ -82,8 +86,7 @@ body {
     background: #e9f2ff;
 }
 
-#slider-box {
-    height: 555px;
+#latest-ecobricks-panel {
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -94,8 +97,9 @@ body {
     flex: 1 1 auto;
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #d0d7de;
+    border: 1px solid var(--dashboard-panel-border, #d0d7de);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+    aspect-ratio: 4 / 3;
 }
 
 #ecobrick-slider img {
@@ -109,16 +113,17 @@ body {
 }
 
 #welcome-greeting-panel {
+    --notice-height: 0px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 12px;
-    height: 555px;
+    padding-top: calc(20px + var(--notice-height));
 }
+
 
 #my-ecobricks-panel,
 #registrations-panel {
-    min-height: 555px;
     display: flex;
     flex-direction: column;
 }
@@ -133,6 +138,44 @@ body {
     font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
 }
 
+.earthen-mailer-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    align-items: stretch;
+}
+
+.earthen-mailer-actions {
+    flex: 1 1 260px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.earthen-mailer-actions .page-button {
+    width: 100%;
+    text-align: center;
+}
+
+.earthen-mailer-chart {
+    flex: 1 1 260px;
+    max-width: 420px;
+    width: 100%;
+}
+
+.earthen-mailer-chart-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 320px;
+    margin: 0 auto;
+}
+
+.earthen-mailer-chart canvas {
+    position: absolute;
+    inset: 0;
+}
+
 @media (max-width: 768px) {
     #dashboard-v2-grid {
         grid-template-columns: 1fr;
@@ -143,11 +186,10 @@ body {
         gap: 16px;
     }
 
-    #slider-box,
+    #latest-ecobricks-panel,
     #welcome-greeting-panel,
     #my-ecobricks-panel,
     #registrations-panel {
-        height: auto;
         min-height: 0;
     }
 

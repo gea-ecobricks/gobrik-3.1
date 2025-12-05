@@ -51,6 +51,11 @@
   --x-button-over: rgb(51, 52, 63);
   --input-background: rgb(164, 152, 176);
 
+  --dashboard-page-background: #0f1523;
+  --dashboard-panel-background: #1f2533;
+  --dashboard-panel-border: #2f3747;
+  --dashboard-panel-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+
   --form-background: rgb(24, 26, 44);
 
   --gallery:  rgb(51, 52, 63);

@@ -292,6 +292,7 @@ if ($is_admin) {
 // 🔒 Clean exit: close DB connections
 $buwana_conn->close();
 $gobrik_conn->close();
+$dashboard_header_version = "../header-2026.php";
 ?>
 
 
@@ -313,7 +314,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         top: auto !important;
     }
 
-    .dashboard-panel {
+    .dashboard-v2-panel {
         position: relative;
     }
 
@@ -328,6 +329,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         font-size: 0.8em;
         font-weight: 700;
         letter-spacing: 0.35px;
+        z-index: 3;
     }
 
     .panel-pill.trainer-pill {
@@ -343,6 +345,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     .panel-pill.admin-pill {
         background: #ffe5e5;
         color: #b3261e;
+    }
+
+    .panel-pill.latest-pill {
+        background: #fff;
+        color: #0d1b2a;
+        border: 1px solid var(--dashboard-panel-border, #d0d7de);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     }
 
     .vertical-toggle {
@@ -389,7 +398,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div class="dashboard-wrapper">
 <div id="dashboard-v2-grid" class="dashboard-grid">
     <div class="dashboard-column column-narrow">
-        <div id="welcome-greeting-panel" class="dashboard-panel">
+        <div id="welcome-greeting-panel" class="dashboard-v2-panel">
             <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
             <p id="subgreeting">Welcome to your dashboard.</p>
             <div id="registered-notice" class="top-container-notice">
@@ -410,7 +419,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         </div>
 
-        <div id="registrations-panel" class="dashboard-panel">
+        <div id="registrations-panel" class="dashboard-v2-panel">
             <h3 data-lang-id="002-my-registrations">My Registrations</h3>
             <p>Trainings that you've registered for.</p>
 
@@ -418,17 +427,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <thead>
                     <tr>
                         <th>Training</th>
-                        <th>Date</th>
                         <th>Location</th>
+                        <th>Date</th>
                         <th>Country</th>
                         <th>Type</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($registered_trainings as $training): ?>
+                        <?php $training_date = date('Y-m-d', strtotime($training['training_date'])); ?>
                         <tr>
                             <td><?php echo htmlspecialchars($training['training_title']); ?></td>
-                            <td><?php echo htmlspecialchars($training['training_date']); ?></td>
                             <td style="text-align:center;">
                                 <a href="javascript:void(0);"
                                    style="text-decoration:underline; font-weight:bold;"
@@ -437,6 +446,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                     <?php echo htmlspecialchars($training['training_location']); ?> 🔎
                                 </a>
                             </td>
+                            <td><?php echo htmlspecialchars($training_date); ?></td>
                             <td><?php echo htmlspecialchars($training['training_country']); ?></td>
                             <td><?php echo htmlspecialchars($training['training_type']); ?></td>
                         </tr>
@@ -446,17 +456,50 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
 
         <?php if ($is_admin): ?>
-            <div id="admin-support-chats" class="dashboard-panel">
+            <div id="admin-support-chats" class="dashboard-v2-panel">
                 <span class="panel-pill admin-pill">Admin</span>
                 <h4 class="panel-title" style="text-align:center;">Admin Support Chats</h4>
                 <div class="menu-buttons-row" style="justify-content:center;">
                     <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
                 </div>
             </div>
+
+            <div id="dash-notice-control" class="dashboard-v2-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
+                    <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
+                        <span class="toggle-knob"></span>
+                    </button>
+                </div>
+                <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
+                        <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
+                        <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
+                        <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
+                        <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <button type="submit" class="button secondary" style="width:100%;">Save Notice</button>
+                </form>
+            </div>
         <?php endif; ?>
 
         <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-            <div id="gea-trainer-menu" class="dashboard-panel">
+            <div id="gea-trainer-menu" class="dashboard-v2-panel">
                 <span class="panel-pill trainer-pill">Trainer</span>
                 <h4 class="panel-title">GEA Trainer Menu</h4>
                 <div class="menu-buttons-row">
@@ -473,7 +516,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     </div>
 
     <div class="dashboard-column column-wide">
-        <div id="slider-box" class="dashboard-panel">
+        <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
+            <span class="panel-pill latest-pill">Latest Briks</span>
             <div id="ecobrick-slider">
                 <?php foreach ($featured_ecobricks as $index => $brick): ?>
                     <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
@@ -489,7 +533,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         </div>
 
-        <div id="my-ecobricks-panel" class="dashboard-panel">
+        <div id="my-ecobricks-panel" class="dashboard-v2-panel">
             <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
             <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
                 <thead>
@@ -510,18 +554,18 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
 
         <?php if ($is_admin): ?>
-            <div id="admin-menu" class="dashboard-panel">
+            <div id="admin-menu" class="dashboard-v2-panel">
                 <span class="panel-pill admin-pill">Admin</span>
                 <h4 class="panel-title">Earthen Manual Mailer</h4>
-                <div style="display:flex;flex-wrap:wrap;gap:25px;align-items:center;justify-content:space-between;">
-                    <div style="flex:1 1 240px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
-                        <a href="earthen-sender.php" class="page-button" style="width:100%;text-align:center;">Earthen Mailer</a>
-                        <a href="https://earthen.io/ghost" class="page-button" style="width:100%;text-align:center;">Ghost Login</a>
-                        <a href="admin-panel.php" class="page-button" style="width:100%;text-align:center;">Member Management</a>
-                        <a href="../emailing/mailgun-logs.php" class="page-button" style="width:100%;text-align:center;">Mailgun logs</a>
+                <div class="earthen-mailer-layout">
+                    <div class="earthen-mailer-actions">
+                        <a href="earthen-sender.php" class="page-button">Earthen Mailer</a>
+                        <a href="https://earthen.io/ghost" class="page-button">Ghost Login</a>
+                        <a href="admin-panel.php" class="page-button">Member Management</a>
+                        <a href="../emailing/mailgun-logs.php" class="page-button">Mailgun logs</a>
                     </div>
-                    <div style="flex:1 1 260px;max-width:360px;margin:0 auto;">
-                        <div style="position:relative;height:260px;width:100%;">
+                    <div class="earthen-mailer-chart">
+                        <div class="earthen-mailer-chart-inner">
                             <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
                         </div>
                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
@@ -535,7 +579,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php endif; ?>
 
         <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-            <div id="my-trainings-panel" class="dashboard-panel">
+            <div id="my-trainings-panel" class="dashboard-v2-panel">
                 <span class="panel-pill trainer-pill">Trainer</span>
                 <h3 data-lang-id="002-my-trainings">My Trainings</h3>
                 <div class="menu-buttons-row">
@@ -598,7 +642,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php endif; ?>
 
         <?php if ($has_validation_access): ?>
-            <div id="validation-panel" class="dashboard-panel">
+            <div id="validation-panel" class="dashboard-v2-panel">
                 <span class="panel-pill validator-pill">Validator</span>
                 <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
                     <div style="text-align:center;">
@@ -623,45 +667,15 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
             </div>
         <?php endif; ?>
-
-        <?php if ($is_admin): ?>
-            <div id="dash-notice-control" class="dashboard-panel">
-                <span class="panel-pill admin-pill">Admin</span>
-                <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                    <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
-                    <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
-                        <span class="toggle-knob"></span>
-                    </button>
-                </div>
-                <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
-                    <div class="form-field" style="margin-bottom:10px;">
-                        <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
-                        <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-                    </div>
-                    <div class="form-field" style="margin-bottom:10px;">
-                        <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
-                        <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                    </div>
-                    <div class="form-field" style="margin-bottom:10px;">
-                        <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
-                        <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                    </div>
-                    <div class="form-field" style="margin-bottom:10px;">
-                        <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
-                        <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                    </div>
-                    <button type="submit" class="button secondary" style="width:100%;">Save Notice</button>
-                </form>
-            </div>
-        <?php endif; ?>
     </div>
-</div>
+</div><!-- closes main container -->
 
 </div><!--closes main and starry background-->
 
+</div>
+
 <!-- FOOTER STARTS HERE -->
-<?php require_once("../footer-2025.php"); ?>
+<?php require_once("../footer-2026.php"); ?>
 
 
 
@@ -735,9 +749,33 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             }
         });
     });
+ 
+document.addEventListener('DOMContentLoaded', () => {
+    const notice = document.getElementById('registered-notice');
+    const panel = document.getElementById('welcome-greeting-panel');
+    const closeBtn = notice?.querySelector('.notice-close');
 
+    const updateNoticeOffset = () => {
+        if (!panel) return;
+        if (notice && notice.style.display !== 'none') {
+            const noticeStyles = window.getComputedStyle(notice);
+            const extraSpace = parseFloat(noticeStyles.marginTop || '0') + parseFloat(noticeStyles.marginBottom || '0') + 8;
+            const noticeHeight = notice.getBoundingClientRect().height + extraSpace;
+            panel.style.setProperty('--notice-height', `${noticeHeight}px`);
+        } else {
+            panel.style.setProperty('--notice-height', '0px');
+        }
+    };
 
-
+    updateNoticeOffset();
+    window.addEventListener('resize', updateNoticeOffset);
+    closeBtn?.addEventListener('click', () => {
+        if (notice) {
+            notice.style.display = 'none';
+        }
+        updateNoticeOffset();
+    });
+});
 
 
 // REGISTRATION (TRAININGS)
@@ -746,6 +784,12 @@ $(document).ready(function() {
         "pageLength": 7,
         "searching": false,
         "lengthChange": false,
+        "responsive": {
+            "details": {
+                "type": "column",
+                "target": "tr"
+            }
+        },
         "language": {
             "emptyTable": "You haven't registered for any trainings yet.",
             "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
@@ -760,29 +804,11 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [2] }, // Disable sorting on "Location"
-            { "targets": [3, 4], "visible": true }, // Default: show Country, Type
-            { "targets": [3, 4], "visible": false, "responsivePriority": 1 } // Hide on small screens
+            { "responsivePriority": 1, "targets": 0 },
+            { "responsivePriority": 2, "targets": 1 },
+            { "className": "none", "targets": [2, 3, 4] },
+            { "orderable": false, "targets": [3, 4] }
         ]
-    });
-
-    // Adjust visibility based on screen size
-    function adjustTableColumns() {
-        if (window.innerWidth < 769) {
-            table.column(3).visible(false); // Hide Country
-            table.column(4).visible(false); // Hide Type
-        } else {
-            table.column(3).visible(true);
-            table.column(4).visible(true);
-        }
-    }
-
-    // Run on page load
-    adjustTableColumns();
-
-    // Run on window resize
-    $(window).resize(function() {
-        adjustTableColumns();
     });
 });
 
@@ -1711,7 +1737,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     let startX = 0;
-    const sliderBox = document.getElementById('slider-box');
+    const sliderBox = document.getElementById('latest-ecobricks-panel');
     sliderBox.addEventListener('touchstart', e => {
         startX = e.touches[0].clientX;
     });
