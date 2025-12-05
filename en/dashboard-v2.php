@@ -388,269 +388,274 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div class="dashboard-wrapper">
 <div id="dashboard-v2-grid" class="dashboard-grid">
-    <div id="welcome-greeting-panel" class="dashboard-panel">
-        <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
-        <p id="subgreeting">Welcome to your dashboard.</p>
-        <div id="registered-notice" class="top-container-notice">
-            <span id="notice-icon" style="margin-right:10px;">
-                <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
-            </span>
-            <span id="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
-                    <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
-                        <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
-                    </a>
+    <div class="dashboard-column column-narrow">
+        <div id="welcome-greeting-panel" class="dashboard-panel">
+            <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
+            <p id="subgreeting">Welcome to your dashboard.</p>
+            <div id="registered-notice" class="top-container-notice">
+                <span id="notice-icon" style="margin-right:10px;">
+                    <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
                 </span>
+                <span id="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
+                        <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
+                            <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
+                        </a>
+                    </span>
 
-            <button class="notice-close" aria-label="Close">&times;</button>
-        </div>
-        <div class="dashboard-actions">
-            <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
-            <button id="take-gobrik-tour" class="button secondary" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()">🛳️ GoBrik Tour</button>
-        </div>
-    </div>
-
-    <div id="slider-box" class="dashboard-panel">
-        <div id="ecobrick-slider">
-            <?php foreach ($featured_ecobricks as $index => $brick): ?>
-                <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
-                    <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
-                         alt="Ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                </div>
-            <?php endforeach; ?>
-            <div id="slider-dots">
-                <?php foreach ($featured_ecobricks as $index => $_): ?>
-                    <span class="dot<?php echo $index === 0 ? ' active' : ''; ?>" data-slide="<?php echo $index; ?>"></span>
-                <?php endforeach; ?>
+                <button class="notice-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="dashboard-actions">
+                <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
+                <button id="take-gobrik-tour" class="button secondary" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()">🛳️ GoBrik Tour</button>
             </div>
         </div>
-    </div>
 
-    <div id="my-ecobricks-panel" class="dashboard-panel">
-        <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
-        <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
-            <thead>
-                <tr>
-                    <th data-lang-id="1103-brik">Brik</th>
-                    <th data-lang-id="1104-weight">Weight</th>
-                    <th data-lang-id="1108-volume">Volume</th>
-                    <th data-lang-id="1109-density">Density</th>
-                    <th data-lang-id="1110-date-logged">Logged</th>
-                    <th data-lang-id="1106-status">Status</th>
-                    <th data-lang-id="1107-serial">Serial</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- DataTables will populate this via AJAX -->
-            </tbody>
-        </table>
-    </div>
+        <div id="registrations-panel" class="dashboard-panel">
+            <h3 data-lang-id="002-my-registrations">My Registrations</h3>
+            <p>Trainings that you've registered for.</p>
 
-    <div id="registrations-panel" class="dashboard-panel">
-        <h3 data-lang-id="002-my-registrations">My Registrations</h3>
-        <p>Trainings that you've registered for.</p>
-
-        <table id="trainee-trainings" class="display responsive nowrap" style="width:100%;">
-            <thead>
-                <tr>
-                    <th>Training</th>
-                    <th>Date</th>
-                    <th>Location</th>
-                    <th>Country</th>
-                    <th>Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($registered_trainings as $training): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($training['training_title']); ?></td>
-                        <td><?php echo htmlspecialchars($training['training_date']); ?></td>
-                        <td style="text-align:center;">
-                            <a href="javascript:void(0);"
-                               style="text-decoration:underline; font-weight:bold;"
-                               onclick="openRegisteredTrainingsModal(<?php echo $training['training_id']; ?>,
-                                                                  '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
-                                <?php echo htmlspecialchars($training['training_location']); ?> 🔎
-                            </a>
-                        </td>
-                        <td><?php echo htmlspecialchars($training['training_country']); ?></td>
-                        <td><?php echo htmlspecialchars($training['training_type']); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-
-    </div>
-</div>
-
-<div class="dashboard-columns">
-    <?php if ($is_admin): ?>
-        <div id="admin-menu" class="dashboard-panel span-2">
-            <span class="panel-pill admin-pill">Admin</span>
-            <h4 class="panel-title">Earthen Manual Mailer</h4>
-            <div style="display:flex;flex-wrap:wrap;gap:25px;align-items:center;justify-content:space-between;">
-                <div style="flex:1 1 240px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
-                    <a href="earthen-sender.php" class="page-button" style="width:100%;text-align:center;">Earthen Mailer</a>
-                    <a href="https://earthen.io/ghost" class="page-button" style="width:100%;text-align:center;">Ghost Login</a>
-                    <a href="admin-panel.php" class="page-button" style="width:100%;text-align:center;">Member Management</a>
-                    <a href="../emailing/mailgun-logs.php" class="page-button" style="width:100%;text-align:center;">Mailgun logs</a>
-                </div>
-                <div style="flex:1 1 260px;max-width:360px;margin:0 auto;">
-                    <div style="position:relative;height:260px;width:100%;">
-                        <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
-                    </div>
-                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
-                        <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
-                        <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
-                        <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-    <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-        <div id="my-trainings-panel" class="dashboard-panel">
-            <span class="panel-pill trainer-pill">Trainer</span>
-            <h3 data-lang-id="002-my-trainings">My Trainings</h3>
-            <div class="menu-buttons-row">
-                <a href="launch-training.php" class="page-button">🚀 New Training</a>
-                <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training">📝 Log Report</a>
-            </div>
-
-            <table id="trainer-trainings" class="display" style="width:100%;">
+            <table id="trainee-trainings" class="display responsive nowrap" style="width:100%;">
                 <thead>
                     <tr>
                         <th>Training</th>
                         <th>Date</th>
-                        <th>Signups</th>
-                        <th>Actions</th>
+                        <th>Location</th>
+                        <th>Country</th>
+                        <th>Type</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $pendingReport = null; foreach ($trainings as $training): ?>
-                        <?php
-                            $training_date_ts = strtotime($training['training_date']);
-                            $is_listed = $training['ready_to_show'] == 1;
-                            $show_report = $training['show_report'] == 1;
-
-                            if (!$is_listed) {
-                                $circle = '⚪';
-                            } elseif ($training_date_ts > time()) {
-                                $circle = '🟢';
-                            } elseif ($show_report && $is_listed) {
-                                $circle = '✅';
-                            } else {
-                                $circle = '🔴';
-                                if (!isset($pendingReport)) {
-                                    $pendingReport = [
-                                        'id' => $training['training_id'],
-                                        'title' => $training['training_title'],
-                                        'date' => date('Y-m-d', $training_date_ts)
-                                    ];
-                                }
-                            }
-                        ?>
+                    <?php foreach ($registered_trainings as $training): ?>
                         <tr>
-                            <td style="white-space:normal;"><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
-                            <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
-                            <td style="text-align:center;padding:10px;">
-                                <a href="javascript:void(0);" class="log-report-btn signup-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
-                                    <span class="signup-count"><?php echo (int) $training['trainee_count']; ?></span>
-                                    <span class="hover-emoji">👥</span>
+                            <td><?php echo htmlspecialchars($training['training_title']); ?></td>
+                            <td><?php echo htmlspecialchars($training['training_date']); ?></td>
+                            <td style="text-align:center;">
+                                <a href="javascript:void(0);"
+                                   style="text-decoration:underline; font-weight:bold;"
+                                   onclick="openRegisteredTrainingsModal(<?php echo $training['training_id']; ?>,
+                                                                      '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
+                                    <?php echo htmlspecialchars($training['training_location']); ?> 🔎
                                 </a>
                             </td>
-                            <td style="text-align:center;">
-                                <button class="serial-button settings-button" data-show-report="<?php echo $training['show_report']; ?>" data-ready-to-show="<?php echo $training['ready_to_show']; ?>" onclick="actionsTrainingModal(this, <?php echo $training['training_id']; ?>)">
-                                    <span class="default-emoji">✏️</span><span class="hover-emoji">⚙️</span>
-                                </button>
-                            </td>
+                            <td><?php echo htmlspecialchars($training['training_country']); ?></td>
+                            <td><?php echo htmlspecialchars($training['training_type']); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-        <div id="gea-trainer-menu" class="dashboard-panel span-3">
-            <span class="panel-pill trainer-pill">Trainer</span>
-            <h4 class="panel-title">GEA Trainer Menu</h4>
-            <div class="menu-buttons-row">
-                <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
-                <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>
-                <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
-                <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
-                <a href="bug-report.php" class="page-button">Report a Bug</a>
-                <a href="accounting.php" class="page-button">GEA Accounting</a>
-                <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training">+ Set Buwana Totem</a>
+
+        <?php if ($is_admin): ?>
+            <div id="admin-support-chats" class="dashboard-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <h4 class="panel-title" style="text-align:center;">Admin Support Chats</h4>
+                <div class="menu-buttons-row" style="justify-content:center;">
+                    <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
+                </div>
             </div>
-        </div>
-    <?php endif; ?>
-    <?php if ($is_admin): ?>
-        <div id="dash-notice-control" class="dashboard-panel span-2">
-            <span class="panel-pill admin-pill">Admin</span>
-            <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
-                <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
-                    <span class="toggle-knob"></span>
-                </button>
+        <?php endif; ?>
+
+        <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
+            <div id="gea-trainer-menu" class="dashboard-panel">
+                <span class="panel-pill trainer-pill">Trainer</span>
+                <h4 class="panel-title">GEA Trainer Menu</h4>
+                <div class="menu-buttons-row">
+                    <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
+                    <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>
+                    <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
+                    <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
+                    <a href="bug-report.php" class="page-button">Report a Bug</a>
+                    <a href="accounting.php" class="page-button">GEA Accounting</a>
+                    <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training">+ Set Buwana Totem</a>
+                </div>
             </div>
-            <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
-                <div class="form-field" style="margin-bottom:10px;">
-                    <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
-                    <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-                </div>
-                <div class="form-field" style="margin-bottom:10px;">
-                    <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
-                    <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"
-                           value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                </div>
-                <div class="form-field" style="margin-bottom:10px;">
-                    <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
-                    <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"
-                           value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                </div>
-                <div class="form-field" style="margin-bottom:10px;">
-                    <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
-                    <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"
-                           value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                </div>
-                <button type="submit" class="button secondary" style="width:100%;">Save Notice</button>
-            </form>
-        </div>
-        <div id="admin-support-chats" class="dashboard-panel span-2">
-            <span class="panel-pill admin-pill">Admin</span>
-            <h4 class="panel-title" style="text-align:center;">Admin Support Chats</h4>
-            <div class="menu-buttons-row" style="justify-content:center;">
-                <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
-            </div>
-        </div>
-    <?php endif; ?>
-    <?php if ($has_validation_access): ?>
-        <div id="validation-panel" class="dashboard-panel span-2">
-            <span class="panel-pill validator-pill">Validator</span>
-            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
-                <div style="text-align:center;">
-                    <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
-                        ⏲️ <?php echo number_format((int) $awaiting_validation_count); ?>
+        <?php endif; ?>
+    </div>
+
+    <div class="dashboard-column column-wide">
+        <div id="slider-box" class="dashboard-panel">
+            <div id="ecobrick-slider">
+                <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                    <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
+                        <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                             alt="Ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
                     </div>
-                    <div style="font-size:1em;margin-top: 6px;">Awaiting Review</div>
-                </div>
-                <div style="text-align:center;">
-                    <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
-                        ✅<?php echo number_format((int) $authenticated_today_count); ?>
-                    </div>
-                    <div style="font-size:1em;margin-top: 6px;">Authenticated Today</div>
-                </div>
-                <div style="text-align:center;">
-                    <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
-                         ⛔<?php echo number_format((int) $rejected_today_count); ?>
-                    </div>
-                    <div style="font-size:1em;margin-top: 6px;">Rejected Today</div>
+                <?php endforeach; ?>
+                <div id="slider-dots">
+                    <?php foreach ($featured_ecobricks as $index => $_): ?>
+                        <span class="dot<?php echo $index === 0 ? ' active' : ''; ?>" data-slide="<?php echo $index; ?>"></span>
+                    <?php endforeach; ?>
                 </div>
             </div>
-            <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
         </div>
-    <?php endif; ?>
-    
+
+        <div id="my-ecobricks-panel" class="dashboard-panel">
+            <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
+            <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th data-lang-id="1103-brik">Brik</th>
+                        <th data-lang-id="1104-weight">Weight</th>
+                        <th data-lang-id="1108-volume">Volume</th>
+                        <th data-lang-id="1109-density">Density</th>
+                        <th data-lang-id="1110-date-logged">Logged</th>
+                        <th data-lang-id="1106-status">Status</th>
+                        <th data-lang-id="1107-serial">Serial</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- DataTables will populate this via AJAX -->
+                </tbody>
+            </table>
+        </div>
+
+        <?php if ($is_admin): ?>
+            <div id="admin-menu" class="dashboard-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <h4 class="panel-title">Earthen Manual Mailer</h4>
+                <div style="display:flex;flex-wrap:wrap;gap:25px;align-items:center;justify-content:space-between;">
+                    <div style="flex:1 1 240px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
+                        <a href="earthen-sender.php" class="page-button" style="width:100%;text-align:center;">Earthen Mailer</a>
+                        <a href="https://earthen.io/ghost" class="page-button" style="width:100%;text-align:center;">Ghost Login</a>
+                        <a href="admin-panel.php" class="page-button" style="width:100%;text-align:center;">Member Management</a>
+                        <a href="../emailing/mailgun-logs.php" class="page-button" style="width:100%;text-align:center;">Mailgun logs</a>
+                    </div>
+                    <div style="flex:1 1 260px;max-width:360px;margin:0 auto;">
+                        <div style="position:relative;height:260px;width:100%;">
+                            <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
+                            <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
+                            <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
+                            <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
+            <div id="my-trainings-panel" class="dashboard-panel">
+                <span class="panel-pill trainer-pill">Trainer</span>
+                <h3 data-lang-id="002-my-trainings">My Trainings</h3>
+                <div class="menu-buttons-row">
+                    <a href="launch-training.php" class="page-button">🚀 New Training</a>
+                    <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training">📝Log Report</a>
+                </div>
+
+                <table id="trainer-trainings" class="display" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Training</th>
+                            <th>Date</th>
+                            <th>Signups</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $pendingReport = null; foreach ($trainings as $training): ?>
+                            <?php
+                                $training_date_ts = strtotime($training['training_date']);
+                                $is_listed = $training['ready_to_show'] == 1;
+                                $show_report = $training['show_report'] == 1;
+
+                                if (!$is_listed) {
+                                    $circle = '⚪';
+                                } elseif ($training_date_ts > time()) {
+                                    $circle = '🟢';
+                                } elseif ($show_report && $is_listed) {
+                                    $circle = '✅';
+                                } else {
+                                    $circle = '🔴';
+                                    if (!isset($pendingReport)) {
+                                        $pendingReport = [
+                                            'id' => $training['training_id'],
+                                            'title' => $training['training_title'],
+                                            'date' => date('Y-m-d', $training_date_ts)
+                                        ];
+                                    }
+                                }
+                            ?>
+                            <tr>
+                                <td style="white-space:normal;"><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
+                                <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
+                                <td style="text-align:center;padding:10px;">
+                                    <a href="javascript:void(0);" class="log-report-btn signup-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
+                                        <span class="signup-count"><?php echo (int) $training['trainee_count']; ?></span>
+                                        <span class="hover-emoji">👥</span>
+                                    </a>
+                                </td>
+                                <td style="text-align:center;">
+                                    <button class="serial-button settings-button" data-show-report="<?php echo $training['show_report']; ?>" data-ready-to-show="<?php echo $training['ready_to_show']; ?>" onclick="actionsTrainingModal(this, <?php echo $training['training_id']; ?>)">
+                                        <span class="default-emoji">✏️</span><span class="hover-emoji">⚙️</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($has_validation_access): ?>
+            <div id="validation-panel" class="dashboard-panel">
+                <span class="panel-pill validator-pill">Validator</span>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
+                            ⏲️ <?php echo number_format((int) $awaiting_validation_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Awaiting Review</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
+                            ✅<?php echo number_format((int) $authenticated_today_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Authenticated Today</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
+                             ⛔<?php echo number_format((int) $rejected_today_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Rejected Today</div>
+                    </div>
+                </div>
+                <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($is_admin): ?>
+            <div id="dash-notice-control" class="dashboard-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
+                    <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
+                        <span class="toggle-knob"></span>
+                    </button>
+                </div>
+                <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
+                        <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
+                        <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
+                        <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
+                        <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"                               value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <button type="submit" class="button secondary" style="width:100%;">Save Notice</button>
+                </form>
+            </div>
+        <?php endif; ?>
+    </div>
 </div>
 
 </div><!--closes main and starry background-->
