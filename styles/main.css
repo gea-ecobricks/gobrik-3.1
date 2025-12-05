@@ -2815,6 +2815,9 @@ position:relative;
     border-radius: 5px;
     padding: 10px 20px;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 1 1 90%; /* Make each button take 90% of the width of the container */
     max-width: 200px; /* Prevent buttons from becoming too wide */
     cursor: pointer;
