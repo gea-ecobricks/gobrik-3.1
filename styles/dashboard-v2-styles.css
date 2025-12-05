@@ -27,7 +27,7 @@ body {
     gap: var(--dashboard-panel-gap);
 }
 
-.dashboard-panel {
+.dashboard-v2-panel {
     background: var(--dashboard-panel-background, #fff);
     border: 1px solid var(--dashboard-panel-border, #d0d7de);
     border-radius: 16px;
@@ -37,14 +37,14 @@ body {
     min-height: 120px;
 }
 
-.dashboard-panel h2,
-.dashboard-panel h3,
-.dashboard-panel h4 {
+.dashboard-v2-panel h2,
+.dashboard-v2-panel h3,
+.dashboard-v2-panel h4 {
     margin-top: 0;
     color: #0d1b2a;
 }
 
-.dashboard-panel p {
+.dashboard-v2-panel p {
     margin-top: 0;
     color: #43505b;
 }
@@ -113,15 +113,17 @@ body {
 }
 
 #welcome-greeting-panel {
+    --notice-height: 0px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 12px;
+    padding-top: calc(20px + var(--notice-height));
 }
+
 
 #my-ecobricks-panel,
 #registrations-panel {
-    min-height: 555px;
     display: flex;
     flex-direction: column;
 }
@@ -134,6 +136,44 @@ body {
 
 .page-button {
     font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.earthen-mailer-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    align-items: stretch;
+}
+
+.earthen-mailer-actions {
+    flex: 1 1 260px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.earthen-mailer-actions .page-button {
+    width: 100%;
+    text-align: center;
+}
+
+.earthen-mailer-chart {
+    flex: 1 1 260px;
+    max-width: 420px;
+    width: 100%;
+}
+
+.earthen-mailer-chart-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 320px;
+    margin: 0 auto;
+}
+
+.earthen-mailer-chart canvas {
+    position: absolute;
+    inset: 0;
 }
 
 @media (max-width: 768px) {

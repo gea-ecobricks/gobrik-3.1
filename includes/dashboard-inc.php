@@ -317,7 +317,10 @@ margin-top:-100px !important;
 
 
 
-<?php require_once ("../header-2025.php");?>
+<?php
+    $dashboard_header_version = $dashboard_header_version ?? "../header-2025.php";
+    require_once ($dashboard_header_version);
+?>
 
 
 
