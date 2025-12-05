@@ -515,7 +515,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php endif; ?>
     </div>
 
-    <div class="dashboard-column column-wide">
+    <div class="dashboard-column column-wide" style="width:65%">
         <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
             <span class="panel-pill latest-pill">Latest Briks</span>
             <div id="ecobrick-slider">
