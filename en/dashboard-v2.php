@@ -189,7 +189,7 @@ if ($stmt_registered_trainings) {
 
 // 🧱 Fetch featured ecobricks for homepage slider
 $featured_ecobricks = [];
-$sql_featured = "SELECT ecobrick_full_photo_url, serial_no, photo_version
+$sql_featured = "SELECT ecobrick_full_photo_url, ecobrick_thumb_photo_url, serial_no, photo_version
                  FROM tb_ecobricks
                  WHERE feature = 1 AND status != 'not ready'
                  ORDER BY date_logged_ts DESC
@@ -526,8 +526,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     </div>
                 <?php endforeach; ?>
                 <div id="slider-dots">
-                    <?php foreach ($featured_ecobricks as $index => $_): ?>
-                        <span class="dot<?php echo $index === 0 ? ' active' : ''; ?>" data-slide="<?php echo $index; ?>"></span>
+                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                        <?php
+                            $thumbnail_url = $brick['ecobrick_thumb_photo_url'] ?? '';
+                            $thumbnail_src = $thumbnail_url !== '' ? $thumbnail_url : ($brick['ecobrick_full_photo_url'] ?? '');
+                        ?>
+                        <button class="dot<?php echo $index === 0 ? ' active' : ''; ?>" type="button" data-slide="<?php echo $index; ?>" aria-label="View ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                            <img src="<?php echo htmlspecialchars($thumbnail_src); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>" alt="Thumbnail of ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                        </button>
                     <?php endforeach; ?>
                 </div>
             </div>
