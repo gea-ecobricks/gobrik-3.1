@@ -189,7 +189,7 @@ if ($stmt_registered_trainings) {
 
 // 🧱 Fetch featured ecobricks for homepage slider
 $featured_ecobricks = [];
-$sql_featured = "SELECT ecobrick_full_photo_url, serial_no, photo_version
+$sql_featured = "SELECT ecobrick_full_photo_url, ecobrick_thumb_photo_url, serial_no, photo_version
                  FROM tb_ecobricks
                  WHERE feature = 1 AND status != 'not ready'
                  ORDER BY date_logged_ts DESC
@@ -515,7 +515,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php endif; ?>
     </div>
 
-    <div class="dashboard-column column-wide" style="width:65%">
+    <div class="dashboard-column column-wide">
         <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
             <span class="panel-pill latest-pill">Latest Briks</span>
             <div id="ecobrick-slider">
@@ -526,8 +526,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     </div>
                 <?php endforeach; ?>
                 <div id="slider-dots">
-                    <?php foreach ($featured_ecobricks as $index => $_): ?>
-                        <span class="dot<?php echo $index === 0 ? ' active' : ''; ?>" data-slide="<?php echo $index; ?>"></span>
+                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                        <button class="dot<?php echo $index === 0 ? ' active' : ''; ?>" type="button" data-slide="<?php echo $index; ?>" aria-label="View ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                            <img src="<?php echo htmlspecialchars($brick['ecobrick_thumb_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>" alt="Thumbnail of ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                        </button>
                     <?php endforeach; ?>
                 </div>
             </div>
