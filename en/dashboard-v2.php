@@ -527,12 +527,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <?php endforeach; ?>
                 <div id="slider-dots">
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
-                        <?php
-                            $thumbnail_url = $brick['ecobrick_thumb_photo_url'] ?? '';
-                            $thumbnail_src = $thumbnail_url !== '' ? $thumbnail_url : ($brick['ecobrick_full_photo_url'] ?? '');
-                        ?>
                         <button class="dot<?php echo $index === 0 ? ' active' : ''; ?>" type="button" data-slide="<?php echo $index; ?>" aria-label="View ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                            <img src="<?php echo htmlspecialchars($thumbnail_src); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>" alt="Thumbnail of ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                            <img src="<?php echo htmlspecialchars($brick['ecobrick_thumb_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>" alt="Thumbnail of ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
                         </button>
                     <?php endforeach; ?>
                 </div>
