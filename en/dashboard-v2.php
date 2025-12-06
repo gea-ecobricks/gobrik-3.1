@@ -189,7 +189,7 @@ if ($stmt_registered_trainings) {
 
 // 🧱 Fetch featured ecobricks for homepage slider
 $featured_ecobricks = [];
-$sql_featured = "SELECT ecobrick_full_photo_url, serial_no, photo_version
+$sql_featured = "SELECT ecobrick_full_photo_url, ecobrick_thumb_photo_url, serial_no, photo_version
                  FROM tb_ecobricks
                  WHERE feature = 1 AND status != 'not ready'
                  ORDER BY date_logged_ts DESC
