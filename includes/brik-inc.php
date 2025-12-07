@@ -14,6 +14,11 @@
 
 <STYLE>
 
+    body {
+      background: var(--dashboard-page-background, #f5f5f5);
+      font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
+    }
+
     :root {
         --brik-panel-bg: #ffffff;
         --brik-panel-border: #d0d7de;

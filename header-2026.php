@@ -86,10 +86,7 @@
 
 <?php if ($page === "messenger"): ?>
     <style>
-body {
-  background: var(--dashboard-page-background, #f5f5f5);
-  font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
-}
+
 
     @media screen and (max-width: 800px) {
 
@@ -180,6 +177,8 @@ body {
         #main {
         background: var(--top-header-main)};
                 }
+
+
 
 
         .messenger-container {
