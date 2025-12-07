@@ -43,8 +43,8 @@
     --sub-menu:  rgb(179, 179, 179);
     --modal-background: rgb(231, 231, 231);
     --search-row: rgba(255, 255, 255, 0.192);
-    --slide-overlays: rgb(225, 225, 225);
-    --side-overlays: rgb(225, 225, 225, 0.66);
+    --slide-overlays: rgb(225, 225, 225, 0.66);
+    --side-overlays: rgb(225, 225, 225 );
     --slide-highlight: rgb(212, 212, 213);
     --show-hide: rgba(225, 225, 225, 0.809);
     --darker:rgba(0, 0, 0, 0.07);
