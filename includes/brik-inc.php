@@ -43,9 +43,8 @@
 .brik-content-block {
     display: flex;
     width: 100%;
-    padding: 18px;
-    background: var(--brik-panel-bg);
-    border: 1px solid var(--brik-panel-border);
+    background-color: var(--form-background);
+      border: 1px solid var(--divider-line);
     border-radius: 16px;
     box-shadow: var(--brik-panel-shadow);
     gap: 18px;

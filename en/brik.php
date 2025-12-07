@@ -40,7 +40,7 @@ echo '<!DOCTYPE html>
 
 require_once ("../includes/brik-inc.php");
 
-echo '<div class="splash-title-block"></div>
+echo '
 
     <div id="form-submission-box" style="margin-top:80px;">
         <div class="form-container-v2" style="padding-top:0px !important">';
