@@ -187,40 +187,48 @@ if ($stmt_registered_trainings) {
     die("Error preparing statement for registered trainings: " . $gobrik_conn->error);
 }
 
-// 🧱 Fetch featured ecobricks for homepage slider
-$featured_ecobricks = [];
-$sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full
-                 FROM tb_ecobricks
-                 WHERE feature = 1
-                   AND status != 'not ready'
-                   AND selfie_photo_url IS NOT NULL
-                   AND selfie_photo_url != ''
-                 ORDER BY date_logged_ts DESC
-                 LIMIT 9";
-$stmt_featured = $gobrik_conn->prepare($sql_featured);
-if ($stmt_featured) {
-    $stmt_featured->execute();
-    $result_featured = $stmt_featured->get_result();
-    while ($row = $result_featured->fetch_assoc()) {
-        $location_parts = array_filter(array_map('trim', explode(',', $row['location_full'] ?? '')));
-        $location_tail = implode(', ', array_slice($location_parts, -2));
-
-        $featured_ecobricks[] = [
-            'selfie_photo_url' => $row['selfie_photo_url'] ?? '',
-            'selfie_thumb_url' => $row['selfie_thumb_url'] ?? '',
-            'serial_no' => $row['serial_no'] ?? '',
-            'photo_version' => $row['photo_version'] ?? '',
-            'weight_g' => $row['weight_g'] ?? '',
-            'ecobricker_maker' => $row['ecobricker_maker'] ?? '',
-            'location_display' => $location_tail,
-        ];
-    }
-    $stmt_featured->close();
-} else {
-    die("Error preparing statement for featured ecobricks: " . $gobrik_conn->error);
+// 🧱 Fetch featured ecobricks for homepage slider and grid
+function formatLocationTail(?string $location_full): string {
+    $location_parts = array_filter(array_map('trim', explode(',', $location_full ?? '')));
+    return implode(', ', array_slice($location_parts, -2));
 }
 
-$featured_ecobricks = array_slice($featured_ecobricks, 0, 9);
+function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): array {
+    $sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full
+                     FROM tb_ecobricks
+                     WHERE selfie_photo_url IS NOT NULL
+                       AND selfie_photo_url != ''
+                       AND ((feature = 1 AND status != 'not ready') OR LOWER(status) = 'authenticated')
+                     ORDER BY feature DESC, date_logged_ts DESC
+                     LIMIT ? OFFSET ?";
+
+    $featured_ecobricks = [];
+
+    $stmt_featured = $conn->prepare($sql_featured);
+    if ($stmt_featured) {
+        $stmt_featured->bind_param('ii', $limit, $offset);
+        $stmt_featured->execute();
+        $result_featured = $stmt_featured->get_result();
+        while ($row = $result_featured->fetch_assoc()) {
+            $featured_ecobricks[] = [
+                'selfie_photo_url' => $row['selfie_photo_url'] ?? '',
+                'selfie_thumb_url' => $row['selfie_thumb_url'] ?? '',
+                'serial_no' => $row['serial_no'] ?? '',
+                'photo_version' => $row['photo_version'] ?? '',
+                'weight_g' => $row['weight_g'] ?? '',
+                'ecobricker_maker' => $row['ecobricker_maker'] ?? '',
+                'location_display' => formatLocationTail($row['location_full'] ?? ''),
+            ];
+        }
+        $stmt_featured->close();
+    } else {
+        die("Error preparing statement for featured ecobricks: " . $conn->error);
+    }
+
+    return $featured_ecobricks;
+}
+
+$featured_ecobricks = fetchFeaturedEcobricks($gobrik_conn, 9, 0);
 $featured_ecobricks_json = json_encode($featured_ecobricks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 // 📣 Fetch the latest dashboard notice for display and admin controls
@@ -499,35 +507,31 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div class="dashboard-column column-wide">
         <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
             <span class="panel-pill latest-pill">Latest Briks</span>
-            <?php if (!empty($featured_ecobricks)): ?>
-                <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
+            <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
+                <?php if (!empty($featured_ecobricks)): ?>
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
                         <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
                             <img src="<?php echo htmlspecialchars($brick['selfie_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
                                  alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
                         </div>
                     <?php endforeach; ?>
-                    <!--
-                    <div id="slider-dots">
-                        <?php foreach ($featured_ecobricks as $index => $brick): ?>
-                            <button class="dot<?php echo $index === 0 ? ' active' : ''; ?>" type="button" data-slide="<?php echo $index; ?>" aria-label="View ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                                <img src="<?php echo htmlspecialchars($brick['selfie_thumb_url'] ?? ''); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>" alt="Thumbnail of ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                            </button>
-                        <?php endforeach; ?>
-                    </div>
-                    -->
-                </div>
-                <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
+                <?php endif; ?>
+            </div>
+            <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
+                <?php if (!empty($featured_ecobricks)): ?>
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
                         <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>">
                             <img src="<?php echo htmlspecialchars($brick['selfie_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
                                  alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
                         </button>
                     <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <p style="margin:0;">No featured ecobricks to display right now.</p>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
+            <div class="ecobrick-grid-actions">
+                <button id="load-next-ecobricks" class="page-button tertiary">Load Next</button>
+                <small class="ecobrick-grid-note">Load another nine featured ecobricks</small>
+            </div>
+            <p id="featured-ecobricks-empty" class="ecobrick-empty-message" <?php echo !empty($featured_ecobricks) ? 'style="display:none;"' : ''; ?>>No featured ecobricks to display right now.</p>
         </div>
 
         <div id="my-ecobricks-panel" class="dashboard-v2-panel">
@@ -680,15 +684,170 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     //GET ECOBRICKER'S ECOBRICKS
 
     const featuredGridBricks = <?php echo $featured_ecobricks_json ?? '[]'; ?> || [];
+    const FEATURED_LIMIT = 9;
+    let featuredOffset = 0;
+    let currentFeaturedBricks = Array.isArray(featuredGridBricks) ? featuredGridBricks : [];
+
+    const sliderElement = document.getElementById('ecobrick-slider');
+    const mobileSliderQuery = window.matchMedia('(max-width: 768px)');
+    let sliderCurrentIndex = 0;
+    let sliderIntervalId = null;
+    let sliderTouchStartX = 0;
+
+    function getSliderSlides() {
+        return sliderElement ? Array.from(sliderElement.querySelectorAll('.slide')) : [];
+    }
+
+    function setActiveSlide(index) {
+        const slides = getSliderSlides();
+        if (!slides.length) return;
+
+        sliderCurrentIndex = (index + slides.length) % slides.length;
+        slides.forEach((slide, idx) => slide.classList.toggle('active', idx === sliderCurrentIndex));
+    }
+
+    function startSliderInterval() {
+        const slides = getSliderSlides();
+        if (!sliderElement || sliderIntervalId || slides.length <= 1 || !mobileSliderQuery.matches) return;
+
+        sliderIntervalId = setInterval(() => setActiveSlide(sliderCurrentIndex + 1), 3000);
+    }
+
+    function stopSliderInterval() {
+        if (sliderIntervalId) {
+            clearInterval(sliderIntervalId);
+            sliderIntervalId = null;
+        }
+    }
+
+    function resetSliderState() {
+        stopSliderInterval();
+        sliderCurrentIndex = 0;
+        setActiveSlide(0);
+        startSliderInterval();
+    }
+
+    function handleSliderTouchStart(e) {
+        if (!mobileSliderQuery.matches) return;
+        sliderTouchStartX = e.touches[0].clientX;
+        stopSliderInterval();
+    }
+
+    function handleSliderTouchEnd(e) {
+        if (!mobileSliderQuery.matches) return;
+        const diff = e.changedTouches[0].clientX - sliderTouchStartX;
+        if (diff < -50) {
+            setActiveSlide(sliderCurrentIndex + 1);
+        } else if (diff > 50) {
+            setActiveSlide(sliderCurrentIndex - 1);
+        }
+        startSliderInterval();
+    }
+
+    function handleSliderQueryChange(event) {
+        if (event.matches) {
+            startSliderInterval();
+        } else {
+            stopSliderInterval();
+            sliderCurrentIndex = 0;
+            setActiveSlide(0);
+        }
+    }
+
+    function toggleFeaturedEmptyState(hasData) {
+        const emptyMessage = document.getElementById('featured-ecobricks-empty');
+        const grid = document.querySelector('.ecobrick-grid');
+        const slider = document.getElementById('ecobrick-slider');
+
+        if (emptyMessage) {
+            emptyMessage.style.display = hasData ? 'none' : 'block';
+        }
+        if (grid) {
+            grid.style.display = hasData ? '' : 'none';
+        }
+        if (slider) {
+            slider.style.display = hasData ? '' : 'none';
+        }
+    }
 
     function preloadFeaturedEcobricks(bricks) {
         if (!Array.isArray(bricks)) return;
 
-        bricks.slice(0, 9).forEach((brick) => {
+        bricks.slice(0, FEATURED_LIMIT).forEach((brick) => {
             if (!brick || !brick.selfie_photo_url) return;
             const preloadImg = new Image();
             preloadImg.src = `${brick.selfie_photo_url}?v=${brick.photo_version ?? ''}`;
         });
+    }
+
+    function renderFeaturedEcobricks(bricks) {
+        const slider = document.getElementById('ecobrick-slider');
+        const grid = document.querySelector('.ecobrick-grid');
+
+        if (!slider || !grid) return;
+
+        slider.innerHTML = '';
+        grid.innerHTML = '';
+
+        if (!Array.isArray(bricks) || !bricks.length) {
+            toggleFeaturedEmptyState(false);
+            stopSliderInterval();
+            return;
+        }
+
+        bricks.slice(0, FEATURED_LIMIT).forEach((brick, index) => {
+            const slide = document.createElement('div');
+            slide.className = `slide${index === 0 ? ' active' : ''}`;
+
+            const slideImg = document.createElement('img');
+            slideImg.src = `${brick.selfie_photo_url}?v=${brick.photo_version ?? ''}`;
+            slideImg.alt = `Ecobrick selfie for serial ${brick.serial_no || ''}`;
+            slide.appendChild(slideImg);
+            slider.appendChild(slide);
+
+            const gridButton = document.createElement('button');
+            gridButton.className = 'ecobrick-grid-item';
+            gridButton.type = 'button';
+
+            const gridImg = document.createElement('img');
+            gridImg.src = `${brick.selfie_photo_url}?v=${brick.photo_version ?? ''}`;
+            gridImg.alt = `Ecobrick selfie for serial ${brick.serial_no || ''}`;
+            gridButton.appendChild(gridImg);
+
+            gridButton.addEventListener('click', () => openViewEcobricV2(brick));
+            grid.appendChild(gridButton);
+        });
+
+        toggleFeaturedEmptyState(true);
+        resetSliderState();
+    }
+
+    function updateFeaturedBricks(bricks) {
+        currentFeaturedBricks = Array.isArray(bricks) ? bricks : [];
+        renderFeaturedEcobricks(currentFeaturedBricks);
+        preloadFeaturedEcobricks(currentFeaturedBricks);
+    }
+
+    function loadFeaturedBatch(offset) {
+        fetch(`../api/fetch_featured_ecobricks.php?offset=${offset}&limit=${FEATURED_LIMIT}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data?.success) {
+                    throw new Error(data?.error || 'Unable to load ecobricks');
+                }
+
+                if (!Array.isArray(data.data) || !data.data.length) {
+                    featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
+                    toggleFeaturedEmptyState(false);
+                    return;
+                }
+
+                updateFeaturedBricks(data.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching featured ecobricks:', error);
+                featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
+            });
     }
 
     function closeInfoModalV2() {
@@ -730,16 +889,16 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         metaWrapper.appendChild(heading);
 
         const details = document.createElement('p');
-        const weightTxt = brickData.weight_g ? `${Number(brickData.weight_g).toLocaleString()} g` : 'Weight unavailable';
+        const weightTxt = brickData.weight_g ? `${Number(brickData.weight_g).toLocaleString()} g` : 'Unknown weight';
         const makerTxt = brickData.ecobricker_maker || 'Unknown maker';
-        const locationTxt = brickData.location_display ? ` in ${brickData.location_display}` : '';
-        details.textContent = `${weightTxt} of plastic sequestered by ${makerTxt}${locationTxt}.`;
+        const locationTxt = brickData.location_display || 'an undisclosed location';
+        details.textContent = `Ecobrick ${brickData.serial_no || ''} | ${weightTxt} of plastic sequestered by ${makerTxt} in ${locationTxt}.`;
         metaWrapper.appendChild(details);
 
         const viewButton = document.createElement('a');
         viewButton.href = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
         viewButton.className = 'view-brik-button-v2';
-        viewButton.textContent = 'View full brik page';
+        viewButton.textContent = 'ℹ️ View Ecobrick Details';
         viewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
 
         metaWrapper.appendChild(viewButton);
@@ -754,22 +913,20 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (!Array.isArray(featuredGridBricks)) return;
+        updateFeaturedBricks(currentFeaturedBricks);
 
-        if (featuredGridBricks.length < 9) {
-            console.log(`Not enough featured ecobricks to render full 3x3 grid. Found ${featuredGridBricks.length}.`);
-        }
-
-        preloadFeaturedEcobricks(featuredGridBricks);
-
-        document.querySelectorAll('.ecobrick-grid-item').forEach((item) => {
-            const brickIndex = Number(item.getAttribute('data-grid-index'));
-            const brickData = featuredGridBricks[brickIndex];
-
-            if (!brickData) return;
-
-            item.addEventListener('click', () => openViewEcobricV2(brickData));
+        const loadNextButton = document.getElementById('load-next-ecobricks');
+        loadNextButton?.addEventListener('click', () => {
+            featuredOffset += FEATURED_LIMIT;
+            loadFeaturedBatch(featuredOffset);
         });
+
+        sliderElement?.addEventListener('touchstart', handleSliderTouchStart);
+        sliderElement?.addEventListener('touchend', handleSliderTouchEnd);
+        mobileSliderQuery.addEventListener('change', handleSliderQueryChange);
+
+        setActiveSlide(0);
+        startSliderInterval();
     });
 
 
