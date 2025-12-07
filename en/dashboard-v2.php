@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '3.3';
+$version = '3.4';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
