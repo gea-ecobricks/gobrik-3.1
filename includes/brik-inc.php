@@ -212,7 +212,6 @@ margin-bottom: 31px;}
 }
 
 </style>
-<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v10">
 
 <?php require_once ("../header-2026.php");?>
 
