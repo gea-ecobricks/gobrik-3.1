@@ -320,6 +320,21 @@ function closeInfoModal() {
     document.body.classList.remove('modal-open');
 }
 
+function closeInfoModalV2() {
+    const modal = document.getElementById('form-modal-message-v2');
+    if (!modal) return;
+
+    modal.classList.add('modal-hidden');
+    modal.classList.remove('modal-shown');
+    document.body.classList.remove('modal-open');
+
+    document.getElementById('page-content')?.classList.remove('blurred');
+    document.getElementById('footer-full')?.classList.remove('blurred');
+
+    modal.querySelector('.modal-photo-v2')?.replaceChildren();
+    modal.querySelector('.modal-message-v2')?.replaceChildren();
+}
+
 function showModalInfo(type, lang) {
     const modal = document.getElementById('form-modal-message');
     const photobox = document.getElementById('modal-photo-box');

@@ -189,7 +189,7 @@ if ($stmt_registered_trainings) {
 
 // 🧱 Fetch featured ecobricks for homepage slider
 $featured_ecobricks = [];
-$sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version
+$sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full
                  FROM tb_ecobricks
                  WHERE feature = 1
                    AND status != 'not ready'
@@ -202,12 +202,26 @@ if ($stmt_featured) {
     $stmt_featured->execute();
     $result_featured = $stmt_featured->get_result();
     while ($row = $result_featured->fetch_assoc()) {
-        $featured_ecobricks[] = $row;
+        $location_parts = array_filter(array_map('trim', explode(',', $row['location_full'] ?? '')));
+        $location_tail = implode(', ', array_slice($location_parts, -2));
+
+        $featured_ecobricks[] = [
+            'selfie_photo_url' => $row['selfie_photo_url'] ?? '',
+            'selfie_thumb_url' => $row['selfie_thumb_url'] ?? '',
+            'serial_no' => $row['serial_no'] ?? '',
+            'photo_version' => $row['photo_version'] ?? '',
+            'weight_g' => $row['weight_g'] ?? '',
+            'ecobricker_maker' => $row['ecobricker_maker'] ?? '',
+            'location_display' => $location_tail,
+        ];
     }
     $stmt_featured->close();
 } else {
     die("Error preparing statement for featured ecobricks: " . $gobrik_conn->error);
 }
+
+$featured_ecobricks = array_slice($featured_ecobricks, 0, 9);
+$featured_ecobricks_json = json_encode($featured_ecobricks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 // 📣 Fetch the latest dashboard notice for display and admin controls
 function fetchLatestDashNotice($conn) {
@@ -504,11 +518,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     -->
                 </div>
                 <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
-                    <?php foreach ($featured_ecobricks as $brick): ?>
-                        <div class="ecobrick-grid-item">
+                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                        <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>">
                             <img src="<?php echo htmlspecialchars($brick['selfie_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
                                  alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                        </div>
+                        </button>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
@@ -664,6 +678,99 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <script>
     //GET ECOBRICKER'S ECOBRICKS
+
+    const featuredGridBricks = <?php echo $featured_ecobricks_json ?? '[]'; ?> || [];
+
+    function preloadFeaturedEcobricks(bricks) {
+        if (!Array.isArray(bricks)) return;
+
+        bricks.slice(0, 9).forEach((brick) => {
+            if (!brick || !brick.selfie_photo_url) return;
+            const preloadImg = new Image();
+            preloadImg.src = `${brick.selfie_photo_url}?v=${brick.photo_version ?? ''}`;
+        });
+    }
+
+    function closeInfoModalV2() {
+        const modal = document.getElementById('form-modal-message-v2');
+        if (!modal) return;
+
+        modal.classList.add('modal-hidden');
+        modal.classList.remove('modal-shown');
+        document.body.classList.remove('modal-open');
+        document.getElementById('page-content')?.classList.remove('blurred');
+        document.getElementById('footer-full')?.classList.remove('blurred');
+
+        modal.querySelector('.modal-photo-v2')?.replaceChildren();
+        modal.querySelector('.modal-message-v2')?.replaceChildren();
+    }
+
+    function openViewEcobricV2(brickData) {
+        if (!brickData) return;
+
+        const modal = document.getElementById('form-modal-message-v2');
+        const photoContainer = modal?.querySelector('.modal-photo-v2');
+        const messageContainer = modal?.querySelector('.modal-message-v2');
+
+        if (!modal || !photoContainer || !messageContainer) return;
+
+        photoContainer.replaceChildren();
+        messageContainer.replaceChildren();
+
+        const img = document.createElement('img');
+        img.src = `${brickData.selfie_photo_url}?v=${brickData.photo_version ?? ''}`;
+        img.alt = `Ecobrick selfie for serial ${brickData.serial_no || ''}`;
+        photoContainer.appendChild(img);
+
+        const metaWrapper = document.createElement('div');
+        metaWrapper.className = 'ecobrick-meta-v2';
+
+        const heading = document.createElement('h4');
+        heading.textContent = `Ecobrick ${brickData.serial_no || ''}`;
+        metaWrapper.appendChild(heading);
+
+        const details = document.createElement('p');
+        const weightTxt = brickData.weight_g ? `${Number(brickData.weight_g).toLocaleString()} g` : 'Weight unavailable';
+        const makerTxt = brickData.ecobricker_maker || 'Unknown maker';
+        const locationTxt = brickData.location_display ? ` in ${brickData.location_display}` : '';
+        details.textContent = `${weightTxt} of plastic sequestered by ${makerTxt}${locationTxt}.`;
+        metaWrapper.appendChild(details);
+
+        const viewButton = document.createElement('a');
+        viewButton.href = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
+        viewButton.className = 'view-brik-button-v2';
+        viewButton.textContent = 'View full brik page';
+        viewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
+
+        metaWrapper.appendChild(viewButton);
+        messageContainer.appendChild(metaWrapper);
+
+        modal.classList.remove('modal-hidden');
+        modal.classList.add('modal-shown');
+
+        document.getElementById('page-content')?.classList.add('blurred');
+        document.getElementById('footer-full')?.classList.add('blurred');
+        document.body.classList.add('modal-open');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!Array.isArray(featuredGridBricks)) return;
+
+        if (featuredGridBricks.length < 9) {
+            console.log(`Not enough featured ecobricks to render full 3x3 grid. Found ${featuredGridBricks.length}.`);
+        }
+
+        preloadFeaturedEcobricks(featuredGridBricks);
+
+        document.querySelectorAll('.ecobrick-grid-item').forEach((item) => {
+            const brickIndex = Number(item.getAttribute('data-grid-index'));
+            const brickData = featuredGridBricks[brickIndex];
+
+            if (!brickData) return;
+
+            item.addEventListener('click', () => openViewEcobricV2(brickData));
+        });
+    });
 
 
     $(document).ready(function() {
