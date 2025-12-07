@@ -102,7 +102,7 @@ body {
 
 .dashboard-v2-panel p {
     margin-top: 0;
-    color: #43505b;
+    color: var(--text-color, #43505b);
 }
 
 .dashboard-actions {
@@ -185,6 +185,7 @@ body {
     border: 1px solid var(--dashboard-panel-border, #d0d7de);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
     aspect-ratio: 1 / 1;
+    cursor: pointer;
 }
 
 .ecobrick-grid-item img {
@@ -197,9 +198,31 @@ body {
 .ecobrick-grid-actions {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    align-items: stretch;
+    gap: 8px;
     margin-top: 12px;
+}
+
+.ecobrick-grid-action-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.ecobrick-grid-action-row .page-button {
+    width: 100%;
+}
+
+.previous-ecobricks {
+    flex: 1;
+}
+
+.load-next-ecobricks {
+    flex: 1;
+}
+
+.load-next-ecobricks.dual-width {
+    flex: 2;
 }
 
 .ecobrick-grid-note {
