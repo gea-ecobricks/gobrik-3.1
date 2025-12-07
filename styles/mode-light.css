@@ -19,7 +19,7 @@
     --advanced-background: #bad0d8;
 
 
-    --dashboard-page-background: linear-gradient(to top, #e8fbfb 0%, #e8fbfb calc(100% - 500px), #ffffff 100%);
+    --dashboard-page-background: linear-gradient(to top, #E8FBFB 0%, #e8fbfb calc(100% - 500px), #ffffff 100%);
     --dashboard-panel-background: #ffffff;
     --dashboard-panel-border: #d0d7de;
     --dashboard-panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
