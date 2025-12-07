@@ -189,11 +189,14 @@ if ($stmt_registered_trainings) {
 
 // 🧱 Fetch featured ecobricks for homepage slider
 $featured_ecobricks = [];
-$sql_featured = "SELECT ecobrick_full_photo_url, ecobrick_thumb_photo_url, serial_no, photo_version
+$sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version
                  FROM tb_ecobricks
-                 WHERE feature = 1 AND status != 'not ready'
+                 WHERE feature = 1
+                   AND status != 'not ready'
+                   AND selfie_photo_url IS NOT NULL
+                   AND selfie_photo_url != ''
                  ORDER BY date_logged_ts DESC
-                 LIMIT 10";
+                 LIMIT 9";
 $stmt_featured = $gobrik_conn->prepare($sql_featured);
 if ($stmt_featured) {
     $stmt_featured->execute();
@@ -316,42 +319,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     .dashboard-v2-panel {
         position: relative;
-    }
-
-    .panel-pill {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #f5f7fb;
-        color: #1d2d44;
-        padding: 4px 12px;
-        border-radius: 999px;
-        font-size: 0.8em;
-        font-weight: 700;
-        letter-spacing: 0.35px;
-        z-index: 3;
-    }
-
-    .panel-pill.trainer-pill {
-        background: #fff2e0;
-        color: #c05621;
-    }
-
-    .panel-pill.validator-pill {
-        background: #ffeaf3;
-        color: #b83280;
-    }
-
-    .panel-pill.admin-pill {
-        background: #ffe5e5;
-        color: #b3261e;
-    }
-
-    .panel-pill.latest-pill {
-        background: #fff;
-        color: #0d1b2a;
-        border: 1px solid var(--dashboard-panel-border, #d0d7de);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     }
 
     .vertical-toggle {
@@ -518,21 +485,35 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div class="dashboard-column column-wide">
         <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
             <span class="panel-pill latest-pill">Latest Briks</span>
-            <div id="ecobrick-slider">
-                <?php foreach ($featured_ecobricks as $index => $brick): ?>
-                    <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
-                        <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
-                             alt="Ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                    </div>
-                <?php endforeach; ?>
-                <div id="slider-dots">
+            <?php if (!empty($featured_ecobricks)): ?>
+                <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
-                        <button class="dot<?php echo $index === 0 ? ' active' : ''; ?>" type="button" data-slide="<?php echo $index; ?>" aria-label="View ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                            <img src="<?php echo htmlspecialchars($brick['ecobrick_thumb_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>" alt="Thumbnail of ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                        </button>
+                        <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
+                            <img src="<?php echo htmlspecialchars($brick['selfie_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                                 alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                        </div>
+                    <?php endforeach; ?>
+                    <!--
+                    <div id="slider-dots">
+                        <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                            <button class="dot<?php echo $index === 0 ? ' active' : ''; ?>" type="button" data-slide="<?php echo $index; ?>" aria-label="View ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                                <img src="<?php echo htmlspecialchars($brick['selfie_thumb_url'] ?? ''); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>" alt="Thumbnail of ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+                    -->
+                </div>
+                <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
+                    <?php foreach ($featured_ecobricks as $brick): ?>
+                        <div class="ecobrick-grid-item">
+                            <img src="<?php echo htmlspecialchars($brick['selfie_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                                 alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                        </div>
                     <?php endforeach; ?>
                 </div>
-            </div>
+            <?php else: ?>
+                <p style="margin:0;">No featured ecobricks to display right now.</p>
+            <?php endif; ?>
         </div>
 
         <div id="my-ecobricks-panel" class="dashboard-v2-panel">
@@ -1706,53 +1687,64 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const slides = document.querySelectorAll('#ecobrick-slider .slide');
-    const dots = document.querySelectorAll('#slider-dots .dot');
-    let currentSlide = 0;
+    const slider = document.getElementById('ecobrick-slider');
+    if (!slider) return;
 
-    function showSlide(index) {
-        console.log('Showing slide', index);
+    const slides = slider.querySelectorAll('.slide');
+    if (!slides.length) return;
+
+    const mobileQuery = window.matchMedia('(max-width: 768px)');
+    let currentSlide = 0;
+    let intervalId = null;
+    let startX = 0;
+
+    function setActiveSlide(index) {
         slides[currentSlide].classList.remove('active');
-        dots[currentSlide].classList.remove('active');
         currentSlide = (index + slides.length) % slides.length;
         slides[currentSlide].classList.add('active');
-        dots[currentSlide].classList.add('active');
     }
 
-    function nextSlide() {
-        console.log('Auto advancing to next slide');
-        showSlide(currentSlide + 1);
+    function startInterval() {
+        if (intervalId || slides.length <= 1 || !mobileQuery.matches) return;
+        intervalId = setInterval(() => setActiveSlide(currentSlide + 1), 3000);
     }
 
-    let interval = setInterval(nextSlide, 10000);
-
-    function resetInterval() {
-        clearInterval(interval);
-        interval = setInterval(nextSlide, 10000);
+    function stopInterval() {
+        if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
     }
 
-    dots.forEach((dot, idx) => {
-        dot.addEventListener('click', () => {
-            showSlide(idx);
-            resetInterval();
-        });
-    });
-
-    let startX = 0;
-    const sliderBox = document.getElementById('latest-ecobricks-panel');
-    sliderBox.addEventListener('touchstart', e => {
-        startX = e.touches[0].clientX;
-    });
-    sliderBox.addEventListener('touchend', e => {
-        const diff = e.changedTouches[0].clientX - startX;
-        if (diff < -50) {
-            showSlide(currentSlide + 1);
-            resetInterval();
-        } else if (diff > 50) {
-            showSlide(currentSlide - 1);
-            resetInterval();
+    mobileQuery.addEventListener('change', (event) => {
+        if (event.matches) {
+            startInterval();
+        } else {
+            stopInterval();
+            currentSlide = 0;
+            slides.forEach((slide, idx) => slide.classList.toggle('active', idx === 0));
         }
     });
+
+    slider.addEventListener('touchstart', e => {
+        if (!mobileQuery.matches) return;
+        startX = e.touches[0].clientX;
+        stopInterval();
+    });
+
+    slider.addEventListener('touchend', e => {
+        if (!mobileQuery.matches) return;
+        const diff = e.changedTouches[0].clientX - startX;
+        if (diff < -50) {
+            setActiveSlide(currentSlide + 1);
+        } else if (diff > 50) {
+            setActiveSlide(currentSlide - 1);
+        }
+        startInterval();
+    });
+
+    slides.forEach((slide, idx) => slide.classList.toggle('active', idx === 0));
+    startInterval();
 });
 </script>
 
