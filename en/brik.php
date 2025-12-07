@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.448';
+$version = '1';
 $page = 'newest-briks';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -41,7 +41,7 @@ echo '<!DOCTYPE html>
 require_once ("../includes/brik-inc.php");
 
 echo '<div class="splash-title-block"></div>
-    <div id="splash-bar"></div>
+
     <div id="form-submission-box" style="margin-top:80px;">
         <div class="form-container-v2" style="padding-top:0px !important">';
 
@@ -285,9 +285,6 @@ echo '
 		</div>
 		<div class="splash-image"><img src="../webp/empty-ecobrick-450px.webp?v2" style="width: 80%; margin-top:20px;" alt="empty ecobrick"></div>
 	</div>
-	<div id="splash-bar"></div>
-
-	<a name="top"></a>
 
 	<div id="main-content">
 		<div class="row">
