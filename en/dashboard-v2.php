@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '6';
+$version = '7';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -138,6 +138,12 @@ if ($stmt_summary) {
 
 // ⚖️ Calculate net density (g/ml)
 $net_density = $total_volume_ml > 0 ? ($total_weight_kg * 1000) / $total_volume_ml : 0;
+
+$total_ecobricks_formatted = number_format((float) ($total_ecobricks ?? 0));
+$total_weight_formatted = number_format((float) ($total_weight_kg ?? 0), 1);
+$net_density_formatted = number_format((float) $net_density, 2);
+
+$dashboard_summary_text = "So far you've logged {$total_ecobricks_formatted} ecobricks. In total you've logged {$total_weight_formatted} kg with a net density of {$net_density_formatted} g/ml.";
 
 // 📍 Process user location
 $location_full_txt = $location_full_txt ?? '';
@@ -331,7 +337,7 @@ See our git hub repository for the full code and to help out:
 https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php require_once("../includes/dashboard-inc.php"); ?>
-<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v9">
+<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v10">
 
 <style>
     #header.top-menu {
@@ -389,7 +395,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <div class="dashboard-column column-narrow">
         <div id="welcome-greeting-panel" class="dashboard-v2-panel">
             <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
-            <p id="subgreeting">Welcome to your dashboard.</p>
+            <p id="subgreeting">Welcome to your new 2026 GoBrik dashboard. We've revamped it for the new year.</p>
+            <p class="dashboard-summary-text"><?php echo htmlspecialchars($dashboard_summary_text, ENT_QUOTES, 'UTF-8'); ?></p>
             <div id="registered-notice" class="top-container-notice">
                 <span id="notice-icon" style="margin-right:10px;">
                     <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
@@ -442,6 +449,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+
+        <div id="support-chats-panel" class="dashboard-v2-panel">
+            <h3>Support Chats</h3>
+            <p>Message our developers for support.</p>
+            <div class="menu-buttons-row" style="justify-content:center;">
+                <a href="https://buwana.ecobricks.org/en/feedback.php?buwana=<?php echo urlencode($buwana_id); ?>&app=<?php echo urlencode($client_id); ?>" class="page-button">Message Developers</a>
+            </div>
         </div>
 
         <?php if ($is_admin): ?>
@@ -506,7 +521,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     <div class="dashboard-column column-wide">
         <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
-            <span class="panel-pill latest-pill">Latest Briks</span>
+            <h4 style="margin:0 0 12px 0;">Latest featured ecobricks...</h4>
             <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
                 <?php if (!empty($featured_ecobricks)): ?>
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
@@ -528,8 +543,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <?php endif; ?>
             </div>
             <div class="ecobrick-grid-actions">
-                <button id="load-next-ecobricks" class="page-button tertiary">Load Next</button>
-                <small class="ecobrick-grid-note">Load another nine featured ecobricks</small>
+                <div class="ecobrick-grid-action-row" id="featured-grid-action-row">
+                    <button id="previous-ecobricks" class="page-button tertiary previous-ecobricks" style="display:none;">Previous</button>
+                    <button id="load-next-ecobricks" class="page-button tertiary load-next-ecobricks">Load Next</button>
+                </div>
+                <small class="ecobrick-grid-note">Load more of the latest authenticated ecobricks with selfies</small>
             </div>
             <p id="featured-ecobricks-empty" class="ecobrick-empty-message" <?php echo !empty($featured_ecobricks) ? 'style="display:none;"' : ''; ?>>No featured ecobricks to display right now.</p>
         </div>
@@ -689,10 +707,29 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     let currentFeaturedBricks = Array.isArray(featuredGridBricks) ? featuredGridBricks : [];
 
     const sliderElement = document.getElementById('ecobrick-slider');
+    const previousButton = document.getElementById('previous-ecobricks');
+    const gridActionRow = document.getElementById('featured-grid-action-row');
+    const loadNextButton = document.getElementById('load-next-ecobricks');
     const mobileSliderQuery = window.matchMedia('(max-width: 768px)');
     let sliderCurrentIndex = 0;
     let sliderIntervalId = null;
     let sliderTouchStartX = 0;
+
+    function updateFeaturedControls() {
+        if (!loadNextButton) return;
+
+        const hasPrevious = featuredOffset > 0;
+
+        if (previousButton) {
+            previousButton.style.display = hasPrevious ? 'inline-flex' : 'none';
+        }
+
+        if (gridActionRow) {
+            gridActionRow.classList.toggle('showing-previous', hasPrevious);
+        }
+
+        loadNextButton.classList.toggle('dual-width', hasPrevious);
+    }
 
     function getSliderSlides() {
         return sliderElement ? Array.from(sliderElement.querySelectorAll('.slide')) : [];
@@ -826,6 +863,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         currentFeaturedBricks = Array.isArray(bricks) ? bricks : [];
         renderFeaturedEcobricks(currentFeaturedBricks);
         preloadFeaturedEcobricks(currentFeaturedBricks);
+        updateFeaturedControls();
     }
 
     function loadFeaturedBatch(offset) {
@@ -839,6 +877,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 if (!Array.isArray(data.data) || !data.data.length) {
                     featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
                     toggleFeaturedEmptyState(false);
+                    updateFeaturedControls();
                     return;
                 }
 
@@ -847,6 +886,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             .catch((error) => {
                 console.error('Error fetching featured ecobricks:', error);
                 featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
+                updateFeaturedControls();
             });
     }
 
@@ -915,9 +955,15 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     document.addEventListener('DOMContentLoaded', () => {
         updateFeaturedBricks(currentFeaturedBricks);
 
-        const loadNextButton = document.getElementById('load-next-ecobricks');
         loadNextButton?.addEventListener('click', () => {
             featuredOffset += FEATURED_LIMIT;
+            updateFeaturedControls();
+            loadFeaturedBatch(featuredOffset);
+        });
+
+        previousButton?.addEventListener('click', () => {
+            featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
+            updateFeaturedControls();
             loadFeaturedBatch(featuredOffset);
         });
 
@@ -1924,12 +1970,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
     // Check if the tour has been taken
-    document.addEventListener('DOMContentLoaded', function() {
-        if (localStorage.getItem('gobrikTourTaken') === 'true') {
-            // If the tour has been taken, hide the button
-            document.getElementById('take-gobrik-tour').style.display = 'none';
-        }
-    });
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     if (localStorage.getItem('gobrikTourTaken') === 'true') {
+    //         // If the tour has been taken, hide the button
+    //         document.getElementById('take-gobrik-tour').style.display = 'none';
+    //     }
+    // });
 
     // Function to start the guided tour and set localStorage
     function startTour() {
@@ -1939,7 +1985,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('gobrikTourTaken', 'true');
 
         // Hide the button after it is clicked
-        document.getElementById('take-gobrik-tour').style.display = 'none';
+        // document.getElementById('take-gobrik-tour').style.display = 'none';
     }
 
     // Example function for guided tour (replace with your actual guidedTour function)
