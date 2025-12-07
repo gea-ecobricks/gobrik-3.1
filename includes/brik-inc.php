@@ -202,10 +202,10 @@ margin-bottom: 31px;}
 }
 
 .form-container-v2 {
-    background: var(--brik-panel-bg);
-    border: 1px solid var(--brik-panel-border);
+    background: var(--dashboard-panel-background, #fff);
+    border: 1px solid var(--dashboard-panel-border, #d0d7de);
     border-radius: 18px;
-    box-shadow: var(--brik-panel-shadow);
+    box-shadow: var(--dashboard-panel-shadow;
     padding: 24px;
     margin: 0 auto;
     max-width: 1100px;
