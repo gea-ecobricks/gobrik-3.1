@@ -43,7 +43,7 @@ require_once ("../includes/brik-inc.php");
 echo '<div class="splash-title-block"></div>
     <div id="splash-bar"></div>
     <div id="form-submission-box" style="margin-top:80px;">
-        <div class="form-container" style="padding-top:0px !important">';
+        <div class="form-container-v2" style="padding-top:0px !important">';
 
 // Get the contents from the Ecobrick table using the serial_no from the URL
 $serialNo = isset($_GET['serial_no']) ? $_GET['serial_no'] : null;
@@ -81,7 +81,20 @@ if ($serialNo) {
         while ($stmt->fetch()) {
             // Check the status of the ecobrick
             $status = strtolower($status);
+            $statusClass = 'status-waiting';
+            $statusLabel = '🕙 Waiting for validations';
+
+            if (strpos($status, 'reject') !== false) {
+                $statusClass = 'status-rejected';
+                $statusLabel = '⛔ Rejected';
+            }
+
             $isAuthenticated = ($status === "authenticated");
+
+            if ($isAuthenticated) {
+                $statusClass = 'status-authenticated';
+                $statusLabel = '✅ Authenticated';
+            }
 
             // AUTHENTICATED ECOBRICK
             if ($isAuthenticated) {
@@ -101,11 +114,11 @@ if ($serialNo) {
                     echo htmlspecialchars($weight_g, ENT_QUOTES, 'UTF-8') .
                         '&#8202;g <span data-lang-id="002-splash-subtitle">of plastic has been secured out of the biosphere in</span> ' .
                         htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8');
-                }
+                        }
 
                 echo '
                         </div>
-                        <div class="brik-status authenticated">✅ Authenticated</div>
+                        <div class="brik-status brik-status-pill ' . $statusClass . '">' . $statusLabel . '</div>
                     </div>
                     <div class="brik-image">
                         <a href="javascript:void(0);" onclick="viewGalleryImage(\'' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=' . htmlspecialchars($photo_version, ENT_QUOTES, 'UTF-8') . '\', \'Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '\')">
@@ -139,7 +152,7 @@ if ($serialNo) {
 
             echo '
                     </div>
-                    <div class="brik-status waiting">🕙 Waiting for validations</div>
+                    <div class="brik-status brik-status-pill ' . $statusClass . '">' . $statusLabel . '</div>
                 </div>
                 <div class="brik-image">
                     <a href="javascript:void(0);" onclick="viewGalleryImage(\'' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=\', \'Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '\')">
@@ -356,7 +369,7 @@ echo '
 </div>
 
 <!--FOOTER STARTS HERE-->
-<?php require_once ("../footer-2025.php");?>
+<?php require_once ("../footer-2026.php");?>
 
 
 <script>

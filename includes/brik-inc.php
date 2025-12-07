@@ -14,6 +14,18 @@
 
 <STYLE>
 
+    :root {
+        --brik-panel-bg: #ffffff;
+        --brik-panel-border: #d0d7de;
+        --brik-panel-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        --brik-pill-blue-bg: #e3f2ff;
+        --brik-pill-blue-text: #0b5ed7;
+        --brik-pill-green-bg: #e6f4ea;
+        --brik-pill-green-text: #1e8e3e;
+        --brik-pill-red-bg: #fdecea;
+        --brik-pill-red-text: #b3261e;
+    }
+
 
 #main {
         height: fit-content !important;
@@ -26,24 +38,27 @@
 .brik-content-block {
     display: flex;
     width: 100%;
-    padding: 10px;
-    background: var(--darker);
-    border-radius: 0px 0px 10px 10px;
+    padding: 18px;
+    background: var(--brik-panel-bg);
+    border: 1px solid var(--brik-panel-border);
+    border-radius: 16px;
+    box-shadow: var(--brik-panel-shadow);
+    gap: 18px;
     }
 
 .brik-image {
-padding 15px;
+padding: 10px;
 
 }
 
 @media screen and (max-width: 768px) {
-	.brik-content-block {
-		flex-flow: column;
-		flex-direction: column-reverse;
-	}
+        .brik-content-block {
+                flex-flow: column;
+                flex-direction: column-reverse;
+        }
 
     .brik-image img {
-	  border-width: 1px;
+      border-width: 1px;
       border-color: gray;
       width: 90%;
       box-shadow: 0 0px 10px rgba(85, 84, 84, 0.4);
@@ -68,10 +83,10 @@ padding 15px;
 
 
 @media screen and (min-width: 769px) {
-	.brik-content-block {
-		flex-flow:row;
+        .brik-content-block {
+                flex-flow:row;
 
-	}
+        }
 
     .brik-image {
         width:50%;
@@ -123,20 +138,36 @@ padding 15px;
 
 
 
-.brik-status {
-padding: 5px 8px 5px 8px;
-  border-radius: 5px;
-  width: fit-content;
-  color: var(--main-background);
+.brik-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    width: fit-content;
+    font-weight: 700;
+    font-size: 0.95em;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
-.waiting {
-  background: gray;
-  }
+.status-waiting {
+    background: var(--brik-pill-blue-bg);
+    color: var(--brik-pill-blue-text);
+    border-color: rgba(11, 94, 215, 0.12);
+}
 
-.authenticated {
-  background: green;
-  }
+.status-authenticated {
+    background: var(--brik-pill-green-bg);
+    color: var(--brik-pill-green-text);
+    border-color: rgba(30, 142, 62, 0.16);
+}
+
+.status-rejected {
+    background: var(--brik-pill-red-bg);
+    color: var(--brik-pill-red-text);
+    border-color: rgba(179, 38, 30, 0.2);
+}
 
 .vision-quote {
 font-size: 1.4em;
@@ -166,10 +197,19 @@ margin-bottom: 31px;}
   background: var(--emblem-blue-over);
 }
 
+.form-container-v2 {
+    background: var(--brik-panel-bg);
+    border: 1px solid var(--brik-panel-border);
+    border-radius: 18px;
+    box-shadow: var(--brik-panel-shadow);
+    padding: 24px;
+    margin: 0 auto;
+    max-width: 1100px;
+}
 
 </style>
 
-<?php require_once ("../header-2025.php");?>
+<?php require_once ("../header-2026.php");?>
 
 
 
