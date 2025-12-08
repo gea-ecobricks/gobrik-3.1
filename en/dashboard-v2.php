@@ -200,7 +200,7 @@ function formatLocationTail(?string $location_full): string {
 }
 
 function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): array {
-    $sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full
+    $sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full, vision, date_logged, status
                      FROM tb_ecobricks
                      WHERE selfie_photo_url IS NOT NULL
                        AND selfie_photo_url != ''
@@ -224,6 +224,9 @@ function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): 
                 'weight_g' => $row['weight_g'] ?? '',
                 'ecobricker_maker' => $row['ecobricker_maker'] ?? '',
                 'location_display' => formatLocationTail($row['location_full'] ?? ''),
+                'vision' => $row['vision'] ?? '',
+                'date_logged' => $row['date_logged'] ?? '',
+                'status' => $row['status'] ?? '',
             ];
         }
         $stmt_featured->close();
@@ -394,6 +397,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div id="dashboard-v2-grid" class="dashboard-grid">
     <div class="dashboard-column column-narrow">
         <div id="welcome-greeting-panel" class="dashboard-v2-panel">
+            <span class="dashboard-status-pill logged-in-pill">Logged in</span>
             <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
             <p id="subgreeting">Welcome to your new 2026 GoBrik dashboard. We've revamped it for the new year.</p>
             <p class="dashboard-summary-text"><?php echo htmlspecialchars($dashboard_summary_text, ENT_QUOTES, 'UTF-8'); ?></p>
@@ -535,7 +539,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
                 <?php if (!empty($featured_ecobricks)): ?>
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
-                        <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>">
+                        <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>" title="<?php echo htmlspecialchars($brick['vision'] ?? $brick['location_display'] ?? 'View featured ecobrick'); ?>">
                             <img src="<?php echo htmlspecialchars($brick['selfie_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
                                  alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
                         </button>
@@ -545,7 +549,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <div class="ecobrick-grid-actions">
                 <div class="ecobrick-grid-action-row" id="featured-grid-action-row">
                     <button id="previous-ecobricks" class="page-button tertiary previous-ecobricks" style="display:none;">Previous</button>
-                    <button id="load-next-ecobricks" class="page-button tertiary load-next-ecobricks">Load Next</button>
+                    <button id="load-next-ecobricks" class="page-button tertiary load-next-ecobricks">Next Selfies</button>
                 </div>
                 <small class="ecobrick-grid-note">Load more of the latest authenticated ecobricks with selfies</small>
             </div>
@@ -845,6 +849,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             const gridButton = document.createElement('button');
             gridButton.className = 'ecobrick-grid-item';
             gridButton.type = 'button';
+            gridButton.title = brick.vision || brick.location_display || 'View featured ecobrick';
 
             const gridImg = document.createElement('img');
             gridImg.src = `${brick.selfie_photo_url}?v=${brick.photo_version ?? ''}`;

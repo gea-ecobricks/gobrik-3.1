@@ -174,13 +174,13 @@ body {
 }
 
 .ecobrick-grid {
-    display: none;
-    gap: 12px;
+    display: grid;
+    gap: 5px;
     grid-template-columns: repeat(3, 1fr);
 }
 
 .ecobrick-grid-item {
-    border-radius: 10px;
+    border-radius: 7px;
     overflow: hidden;
     border: 1px solid var(--dashboard-panel-border, #d0d7de);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -189,6 +189,7 @@ body {
 }
 
 .ecobrick-grid-item img {
+    border-radius: 7px;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -205,6 +206,7 @@ body {
 
 .ecobrick-grid-action-row {
     display: flex;
+    flex-direction: column;
     gap: 10px;
     width: 100%;
 }
@@ -243,6 +245,23 @@ body {
     justify-content: flex-start;
     gap: 12px;
     padding-top: calc(20px + var(--notice-height));
+}
+
+#welcome-greeting-panel #greeting {
+    margin: 0 0 15px 0;
+}
+
+.dashboard-status-pill {
+    align-self: flex-end;
+    background: #2e7d32;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-size: 0.95em;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    margin-bottom: 15px;
 }
 
 
@@ -330,7 +349,7 @@ body {
     }
 
     .ecobrick-grid {
-        display: none;
+        grid-template-columns: repeat(3, minmax(90px, 1fr));
     }
 }
 
@@ -350,7 +369,6 @@ body {
     }
 
     .ecobrick-grid {
-        display: grid;
         grid-template-columns: repeat(3, minmax(120px, 1fr));
     }
 }
@@ -370,6 +388,6 @@ body {
     }
 
     .ecobrick-grid {
-        display: grid;
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
     }
 }
