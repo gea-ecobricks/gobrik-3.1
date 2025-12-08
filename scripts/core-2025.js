@@ -336,6 +336,7 @@ function ecobrickPreview(imageUrl, brik_serial, weight, owner, location) {
 SCROLL CONTROL
 
 -------------------------------------------*/
+/*
 let lastScrollTop = 0;
 
 window.onscroll = function() {
@@ -399,6 +400,7 @@ function scrollLessThan800() {
         document.getElementById("header").style.top = "0";
     }
 }
+*/
 
 
 /* ---------- ------------------------------
