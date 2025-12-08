@@ -420,7 +420,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <div class="dashboard-actions">
                 <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
                 <a href="add-project.php" class="button ghost" data-lang-id="001c-register-project">🏗️ Register Project</a>
-                <button id="take-gobrik-tour" class="button secondary" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()">🛳️ GoBrik Tour</button>
             </div>
         </div>
 
@@ -506,9 +505,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
             <div id="dash-notice-control" class="dashboard-v2-panel">
                 <span class="panel-pill admin-pill">Admin</span>
-                <h3>Update Dashboard Notice</h3>
-                <p style="margin:0 0 8px 0;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div class="dash-notice-header">
+                    <div>
+                        <h3>Dashboard Notice</h3>
+                        <p style="margin:0 0 8px 0;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
+                    </div>
                     <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
                         <span class="toggle-knob"></span>
                     </button>
@@ -2074,38 +2075,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <?php endif; ?>
 
-
-<script>
-    // Check if the tour has been taken
-    document.addEventListener('DOMContentLoaded', function() {
-        const tourButton = document.getElementById('take-gobrik-tour');
-        if (!tourButton) return;
-
-        if (localStorage.getItem('gobrikTourTaken') === 'true') {
-            tourButton.style.display = 'none';
-        }
-    });
-
-    // Function to start the guided tour and set localStorage
-    function startTour() {
-        guidedTour();  // Call your guided tour function
-
-        // Record in localStorage that the tour has been taken
-        localStorage.setItem('gobrikTourTaken', 'true');
-
-        // Hide the button after it is clicked
-        const tourButton = document.getElementById('take-gobrik-tour');
-        if (tourButton) {
-            tourButton.style.display = 'none';
-        }
-    }
-
-    // Example function for guided tour (replace with your actual guidedTour function)
-    function guidedTour() {
-        // Your guided tour logic here
-        alert("Starting the GoBrik guided tour!");
-    }
-</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
