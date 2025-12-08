@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '7.1';
+$version = '7.3';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -200,7 +200,7 @@ function formatLocationTail(?string $location_full): string {
 }
 
 function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): array {
-    $sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full, vision, date_logged, status
+    $sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full, vision, date_logged_ts, status
                      FROM tb_ecobricks
                      WHERE selfie_photo_url IS NOT NULL
                        AND selfie_photo_url != ''
@@ -225,7 +225,7 @@ function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): 
                 'ecobricker_maker' => $row['ecobricker_maker'] ?? '',
                 'location_display' => formatLocationTail($row['location_full'] ?? ''),
                 'vision' => $row['vision'] ?? '',
-                'date_logged' => $row['date_logged'] ?? '',
+                'date_logged_ts' => $row['date_logged_ts'] ?? '',
                 'status' => $row['status'] ?? '',
             ];
         }
@@ -340,7 +340,7 @@ See our git hub repository for the full code and to help out:
 https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php require_once("../includes/dashboard-inc.php"); ?>
-<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v10.11">
+<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v10.2">
 
 <style>
     #header.top-menu {

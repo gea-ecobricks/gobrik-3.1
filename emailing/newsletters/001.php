@@ -598,11 +598,11 @@ Today, as we become more and more aware of the ecological crises that beset our 
                             
                         </div>
                     </div>
-                    <div class="kg-bookmark-thumbnail" style="min-width: 140px; max-width: 180px; background-repeat: no-repeat; background-size: cover; background-position: center; border-radius: 0 2px 2px 0; background-image: url(&#39;https://earthen.io/content/images/thumbnail/starter-workshop-feature-1-en-3.webp&#39;);">
-                        <img src="https://earthen.io/content/images/thumbnail/starter-workshop-feature-1-en-3.webp" alt onerror="this.style.display=&#39;none&#39;" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%; display: none;"></div>
-                </a>
-                <div class="kg-card-figcaption" style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; padding-top: 10px; padding-bottom: 10px; line-height: 1.5em; color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px;"><p style="margin: 0 0 1.5em 0; line-height: 1.6em; color: inherit;"><span style="white-space: pre-wrap;">Heads up: I will be leading an intro to ecobrick course early December with GEA co-trainer Paula. Registration is free.</span></p></div>
-            </div>
+<!--                     <div class="kg-bookmark-thumbnail" style="min-width: 140px; max-width: 180px; background-repeat: no-repeat; background-size: cover; background-position: center; border-radius: 0 2px 2px 0; background-image: url(&#39;https://earthen.io/content/images/thumbnail/starter-workshop-feature-1-en-3.webp&#39;);"> -->
+<!--                         <img src="https://earthen.io/content/images/thumbnail/starter-workshop-feature-1-en-3.webp" alt onerror="this.style.display=&#39;none&#39;" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%; display: none;"></div> -->
+<!--                 </a> -->
+<!--                 <div class="kg-card-figcaption" style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; padding-top: 10px; padding-bottom: 10px; line-height: 1.5em; color: #15212a; color: rgba(0, 0, 0, 0.6); font-size: 13px;"><p style="margin: 0 0 1.5em 0; line-height: 1.6em; color: inherit;"><span style="white-space: pre-wrap;">Heads up: I will be leading an intro to ecobrick course early December with GEA co-trainer Paula. Registration is free.</span></p></div> -->
+<!--             </div> -->
         <!--[endif]-->
         <!--[if vml]>
             <table class="kg-card kg-bookmark-card--outlook" style="margin: 0; padding: 0; width: 100%; border: 1px solid #e5eff5; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-collapse: collapse; border-spacing: 0;" width="100%">
