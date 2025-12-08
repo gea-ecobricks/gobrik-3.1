@@ -1009,6 +1009,16 @@ border-color: #00a112 !important;
   width: min(960px, 100%);
 }
 
+.modal-top-actions {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 45;
+}
+
 .modal-content-box-v2 {
   display: none;
   background: var(--main-background, #fff);
@@ -1024,11 +1034,22 @@ border-color: #00a112 !important;
   flex-direction: column;
   gap: 16px;
   align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   border-radius: 0;
   padding: 0;
   box-shadow: none;
+}
+
+.modal-photo-v2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  text-align: center;
 }
 
 .modal-photo-v2 img {
@@ -1056,9 +1077,7 @@ border-color: #00a112 !important;
 }
 
 .modal-status-pill {
-  position: absolute;
-  top: 18px;
-  right: 66px;
+  position: static;
   display: none;
   z-index: 45;
   pointer-events: none;
@@ -1085,6 +1104,7 @@ border-color: #00a112 !important;
   display: inline-block;
   border-radius: 10px;
   overflow: hidden;
+  text-align: center;
 }
 
 .ecobrick-status-pill {
@@ -1100,6 +1120,7 @@ border-color: #00a112 !important;
   flex-direction: column;
   gap: 10px;
   text-align: center;
+  align-items: center;
 }
 
 .ecobrick-meta-v2 h4 {
@@ -1129,6 +1150,38 @@ border-color: #00a112 !important;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   width: fit-content;
   margin: 0 auto;
+}
+
+.ghost-link,
+.modal-view-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 1px solid #0d6efd;
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ghost-link:hover,
+.ghost-link:focus-visible,
+.modal-view-button:hover,
+.modal-view-button:focus-visible {
+  background: rgba(13, 110, 253, 0.08);
+  box-shadow: 0 6px 14px rgba(13, 110, 253, 0.2);
+}
+
+.modal-v2 .x-button.modal-close-inline {
+  position: static;
+  margin: 0;
+  height: 34px;
+  width: 34px;
 }
 
 .view-brik-button-v2:hover,

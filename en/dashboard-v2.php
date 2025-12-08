@@ -412,12 +412,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
 
         <div id="welcome-greeting-panel" class="dashboard-v2-panel">
-            <span class="dashboard-status-pill logged-in-pill">Logged in 🟢</span>
+            <span class="dashboard-status-pill logged-in-pill">Logged in <?php echo htmlspecialchars($earthling_emoji ?? '🟢', ENT_QUOTES, 'UTF-8'); ?></span>
             <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
             <p id="subgreeting">Welcome to your new 2026 GoBrik dashboard. We've revamped it for the new year.</p>
             <p class="dashboard-summary-text"><?php echo htmlspecialchars($dashboard_summary_text, ENT_QUOTES, 'UTF-8'); ?></p>
             <div class="dashboard-actions">
                 <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
+                <a href="add-project.php" class="button ghost" data-lang-id="001c-register-project">🏗️ Register Project</a>
                 <button id="take-gobrik-tour" class="button secondary" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()">🛳️ GoBrik Tour</button>
             </div>
         </div>
@@ -459,11 +460,40 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
 
         <div id="support-chats-panel" class="dashboard-v2-panel">
-            <h3>Support Chats</h3>
-            <p>Message our developers for support.</p>
+            <div class="support-chats-header">
+                <div>
+                    <h3>Support Chats</h3>
+                    <p>Message our developers for support.</p>
+                </div>
+                <button id="support-chat-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle support chat form">
+                    <span class="toggle-knob"></span>
+                </button>
+            </div>
             <div class="menu-buttons-row" style="justify-content:center;">
                 <a href="https://buwana.ecobricks.org/en/feedback.php?buwana=<?php echo urlencode($buwana_id); ?>&app=<?php echo urlencode($client_id); ?>" class="page-button">Message Developers</a>
             </div>
+            <form class="support-chat-form" id="support-chat-form">
+                <div>
+                    <label for="support-subject">Subject</label>
+                    <input type="text" id="support-subject" name="subject" placeholder="Give your chat a subject" />
+                </div>
+                <div>
+                    <label for="support-priority">Priority</label>
+                    <select id="support-priority" name="priority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="support-description">Issue</label>
+                    <textarea id="support-description" name="description" placeholder="Describe your issue..."></textarea>
+                </div>
+                <div class="support-chat-actions">
+                    <button type="button" class="page-button">Start Chat</button>
+                    <button type="button" class="page-button secondary">Your Support Chats</button>
+                </div>
+            </form>
         </div>
 
         <?php if ($is_admin): ?>
@@ -933,10 +963,16 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         modal.querySelector('.modal-message-v2')?.replaceChildren();
 
         const modalStatusPill = modal.querySelector('.modal-status-pill');
+        const modalViewButton = modal.querySelector('.modal-view-button');
         if (modalStatusPill) {
             modalStatusPill.textContent = '';
             modalStatusPill.className = 'modal-status-pill status-pill status-default';
             modalStatusPill.style.display = 'none';
+        }
+
+        if (modalViewButton) {
+            modalViewButton.href = '#';
+            modalViewButton.style.display = 'none';
         }
     }
 
@@ -970,6 +1006,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         const photoContainer = modal?.querySelector('.modal-photo-v2');
         const messageContainer = modal?.querySelector('.modal-message-v2');
         const modalStatusPill = modal?.querySelector('.modal-status-pill');
+        const modalViewButton = modal?.querySelector('.modal-view-button');
 
         if (!modal || !photoContainer || !messageContainer) return;
 
@@ -983,11 +1020,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         img.src = `${brickData.selfie_photo_url}?v=${brickData.photo_version ?? ''}`;
         img.alt = `Ecobrick selfie for serial ${brickData.serial_no || ''}`;
 
-        const statusPill = document.createElement('span');
-        statusPill.className = 'ecobrick-status-pill status-pill';
-        applyStatusPill(statusPill, brickData.status);
-
-        photoWrapper.appendChild(statusPill);
         photoWrapper.appendChild(img);
         photoContainer.appendChild(photoWrapper);
 
@@ -1002,14 +1034,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         details.textContent = `This ${weightTxt} ecobrick ${serialTxt} was made by ${makerTxt} in ${locationTxt}.`;
         metaWrapper.appendChild(details);
 
-        const viewButton = document.createElement('a');
-        viewButton.href = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
-        viewButton.className = 'view-brik-button-v2';
-        viewButton.textContent = 'View Ecobrick';
-        viewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
-
-        metaWrapper.appendChild(viewButton);
         photoContainer.appendChild(metaWrapper);
+
+        const viewHref = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
+        if (modalViewButton) {
+            modalViewButton.href = viewHref;
+            modalViewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
+            modalViewButton.style.display = 'inline-flex';
+        }
 
         applyStatusPill(modalStatusPill, brickData.status);
 
@@ -1314,6 +1346,8 @@ function sendTraineeEmails(trainingId, isTest) {
 $(document).ready(function() {
     const noticeToggle = document.getElementById('dash-notice-toggle');
     const noticeForm = document.getElementById('dash-notice-form');
+    const supportToggle = document.getElementById('support-chat-toggle');
+    const supportForm = document.getElementById('support-chat-form');
 
     if (noticeToggle && noticeForm) {
         const setNoticeState = (expanded) => {
@@ -1327,6 +1361,21 @@ $(document).ready(function() {
         noticeToggle.addEventListener('click', () => {
             const isExpanded = noticeToggle.getAttribute('aria-expanded') === 'true';
             setNoticeState(!isExpanded);
+        });
+    }
+
+    if (supportToggle && supportForm) {
+        const setSupportState = (expanded) => {
+            supportToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            supportToggle.classList.toggle('down', expanded);
+            supportForm.style.display = expanded ? 'flex' : 'none';
+        };
+
+        setSupportState(false);
+
+        supportToggle.addEventListener('click', () => {
+            const isExpanded = supportToggle.getAttribute('aria-expanded') === 'true';
+            setSupportState(!isExpanded);
         });
     }
 
@@ -2028,12 +2077,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
     // Check if the tour has been taken
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     if (localStorage.getItem('gobrikTourTaken') === 'true') {
-    //         // If the tour has been taken, hide the button
-    //         document.getElementById('take-gobrik-tour').style.display = 'none';
-    //     }
-    // });
+    document.addEventListener('DOMContentLoaded', function() {
+        const tourButton = document.getElementById('take-gobrik-tour');
+        if (!tourButton) return;
+
+        if (localStorage.getItem('gobrikTourTaken') === 'true') {
+            tourButton.style.display = 'none';
+        }
+    });
 
     // Function to start the guided tour and set localStorage
     function startTour() {
@@ -2043,7 +2094,10 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('gobrikTourTaken', 'true');
 
         // Hide the button after it is clicked
-        // document.getElementById('take-gobrik-tour').style.display = 'none';
+        const tourButton = document.getElementById('take-gobrik-tour');
+        if (tourButton) {
+            tourButton.style.display = 'none';
+        }
     }
 
     // Example function for guided tour (replace with your actual guidedTour function)
