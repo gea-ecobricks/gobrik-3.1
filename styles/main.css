@@ -1121,18 +1121,20 @@ border-color: #00a112 !important;
   gap: 10px;
   text-align: center;
   align-items: center;
+  color: #fff;
+  font-weight: 500;
 }
 
 .ecobrick-meta-v2 h4 {
   margin: 4px 0 0 0;
   font-size: 1.2em;
-  color: var(--panel-heading, #0b2435);
+  color: #fff;
 }
 
 .ecobrick-meta-v2 p {
   margin: 0;
   font-size: 1em;
-  color: var(--text-color, #0b2435);
+  color: #fff;
 }
 
 .view-brik-button-v2 {
@@ -1159,13 +1161,14 @@ border-color: #00a112 !important;
   justify-content: center;
   gap: 6px;
   padding: 8px 12px;
-  background: #6b7280;
+  background: transparent;
   color: #ffffff;
   text-decoration: none;
   font-weight: 700;
-  border-radius: 10px;
+  font-size: 0.95em;
+  border-radius: 999px;
   border: 1px solid #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: none;
   transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -1173,7 +1176,7 @@ border-color: #00a112 !important;
 .ghost-link:focus-visible,
 .modal-view-button:hover,
 .modal-view-button:focus-visible {
-  background: #4b5563;
+  background: rgba(255, 255, 255, 0.1);
   border-color: #ffffff;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
 }
