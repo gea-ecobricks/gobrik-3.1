@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '7.4';
+$version = '7.5';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -340,7 +340,7 @@ See our git hub repository for the full code and to help out:
 https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <?php require_once("../includes/dashboard-inc.php"); ?>
-<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v11">
+<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v11.1">
 
 <style>
     #header.top-menu {
