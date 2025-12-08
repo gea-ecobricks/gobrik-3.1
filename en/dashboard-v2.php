@@ -396,16 +396,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div class="dashboard-wrapper">
 <div id="dashboard-v2-grid" class="dashboard-grid">
     <div class="dashboard-column column-narrow">
-        <div id="welcome-greeting-panel" class="dashboard-v2-panel">
-            <span class="dashboard-status-pill logged-in-pill">Logged in 🟢</span>
-            <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
-            <p id="subgreeting">Welcome to your new 2026 GoBrik dashboard. We've revamped it for the new year.</p>
-            <p class="dashboard-summary-text"><?php echo htmlspecialchars($dashboard_summary_text, ENT_QUOTES, 'UTF-8'); ?></p>
+        <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel">
             <div id="registered-notice" class="top-container-notice">
-                <span id="notice-icon" style="margin-right:10px;">
+                <span id="notice-icon" class="notice-icon">
                     <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
                 </span>
-                <span id="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
+                <span id="notice-text" class="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
                         <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
                             <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
                         </a>
@@ -413,6 +409,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
                 <button class="notice-close" aria-label="Close">&times;</button>
             </div>
+        </div>
+
+        <div id="welcome-greeting-panel" class="dashboard-v2-panel">
+            <span class="dashboard-status-pill logged-in-pill">Logged in 🟢</span>
+            <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
+            <p id="subgreeting">Welcome to your new 2026 GoBrik dashboard. We've revamped it for the new year.</p>
+            <p class="dashboard-summary-text"><?php echo htmlspecialchars($dashboard_summary_text, ENT_QUOTES, 'UTF-8'); ?></p>
             <div class="dashboard-actions">
                 <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
                 <button id="take-gobrik-tour" class="button secondary" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()">🛳️ GoBrik Tour</button>
@@ -928,6 +931,36 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         modal.querySelector('.modal-photo-v2')?.replaceChildren();
         modal.querySelector('.modal-message-v2')?.replaceChildren();
+
+        const modalStatusPill = modal.querySelector('.modal-status-pill');
+        if (modalStatusPill) {
+            modalStatusPill.textContent = '';
+            modalStatusPill.className = 'modal-status-pill status-pill status-default';
+            modalStatusPill.style.display = 'none';
+        }
+    }
+
+    function getStatusClassName(statusText = '') {
+        const normalized = statusText.toLowerCase();
+
+        if (normalized.includes('auth')) return 'status-authenticated';
+        if (normalized.includes('await')) return 'status-awaiting';
+        if (normalized.includes('reject')) return 'status-rejected';
+
+        return 'status-default';
+    }
+
+    function applyStatusPill(pillElement, statusText) {
+        if (!pillElement) return;
+
+        const baseClass = pillElement.classList.contains('ecobrick-status-pill')
+            ? 'ecobrick-status-pill status-pill'
+            : 'modal-status-pill status-pill';
+        const statusClass = getStatusClassName(statusText);
+
+        pillElement.className = `${baseClass} ${statusClass}`;
+        pillElement.textContent = statusText || 'Status unknown';
+        pillElement.style.display = 'inline-flex';
     }
 
     function openViewEcobricV2(brickData) {
@@ -936,6 +969,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         const modal = document.getElementById('form-modal-message-v2');
         const photoContainer = modal?.querySelector('.modal-photo-v2');
         const messageContainer = modal?.querySelector('.modal-message-v2');
+        const modalStatusPill = modal?.querySelector('.modal-status-pill');
 
         if (!modal || !photoContainer || !messageContainer) return;
 
@@ -950,8 +984,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         img.alt = `Ecobrick selfie for serial ${brickData.serial_no || ''}`;
 
         const statusPill = document.createElement('span');
-        statusPill.className = 'ecobrick-status-pill';
-        statusPill.textContent = brickData.status || 'Status unknown';
+        statusPill.className = 'ecobrick-status-pill status-pill';
+        applyStatusPill(statusPill, brickData.status);
 
         photoWrapper.appendChild(statusPill);
         photoWrapper.appendChild(img);
@@ -969,13 +1003,15 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         metaWrapper.appendChild(details);
 
         const viewButton = document.createElement('a');
-        viewButton.href = `brik.php?serial=${encodeURIComponent(brickData.serial_no || '')}`;
+        viewButton.href = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
         viewButton.className = 'view-brik-button-v2';
         viewButton.textContent = 'View Ecobrick';
         viewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
 
         metaWrapper.appendChild(viewButton);
         photoContainer.appendChild(metaWrapper);
+
+        applyStatusPill(modalStatusPill, brickData.status);
 
         modal.classList.remove('modal-hidden');
         modal.classList.add('modal-shown');
@@ -1080,28 +1116,15 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
  
 document.addEventListener('DOMContentLoaded', () => {
     const notice = document.getElementById('registered-notice');
-    const panel = document.getElementById('welcome-greeting-panel');
+    const panel = document.getElementById('registered-notice-panel');
     const closeBtn = notice?.querySelector('.notice-close');
 
-    const updateNoticeOffset = () => {
-        if (!panel) return;
-        if (notice && notice.style.display !== 'none') {
-            const noticeStyles = window.getComputedStyle(notice);
-            const extraSpace = parseFloat(noticeStyles.marginTop || '0') + parseFloat(noticeStyles.marginBottom || '0') + 8;
-            const noticeHeight = notice.getBoundingClientRect().height + extraSpace;
-            panel.style.setProperty('--notice-height', `${noticeHeight}px`);
-        } else {
-            panel.style.setProperty('--notice-height', '0px');
-        }
-    };
-
-    updateNoticeOffset();
-    window.addEventListener('resize', updateNoticeOffset);
     closeBtn?.addEventListener('click', () => {
-        if (notice) {
+        if (panel) {
+            panel.style.display = 'none';
+        } else if (notice) {
             notice.style.display = 'none';
         }
-        updateNoticeOffset();
     });
 });
 

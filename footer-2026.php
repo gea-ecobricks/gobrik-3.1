@@ -333,6 +333,13 @@ function closeInfoModalV2() {
 
     modal.querySelector('.modal-photo-v2')?.replaceChildren();
     modal.querySelector('.modal-message-v2')?.replaceChildren();
+
+    const modalStatusPill = modal.querySelector('.modal-status-pill');
+    if (modalStatusPill) {
+        modalStatusPill.textContent = '';
+        modalStatusPill.className = 'modal-status-pill status-pill status-default';
+        modalStatusPill.style.display = 'none';
+    }
 }
 
 function showModalInfo(type, lang) {

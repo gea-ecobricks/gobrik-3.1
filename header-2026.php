@@ -349,6 +349,7 @@ display: none;
 
 <div id="form-modal-message-v2" class="modal-hidden modal-v2" aria-modal="true" role="dialog">
     <button type="button" onclick="closeInfoModalV2()" aria-label="Click to close modal" class="x-button"></button>
+    <span class="modal-status-pill status-pill" aria-live="polite"></span>
     <div class="modal-content-box-v2" id="modal-content-box-v2">
         <div class="modal-message-v2"></div>
     </div>
