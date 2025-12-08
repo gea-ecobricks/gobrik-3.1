@@ -1036,7 +1036,7 @@ border-color: #00a112 !important;
   height: auto;
   max-height: 60vh;
   object-fit: contain;
-  border-radius: 0;
+  border-radius: 10px;
   background: none;
   border: none;
 }
@@ -1044,6 +1044,8 @@ border-color: #00a112 !important;
 .ecobrick-photo-wrapper {
   position: relative;
   display: inline-block;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .ecobrick-status-pill {

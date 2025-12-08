@@ -397,7 +397,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div id="dashboard-v2-grid" class="dashboard-grid">
     <div class="dashboard-column column-narrow">
         <div id="welcome-greeting-panel" class="dashboard-v2-panel">
-            <span class="dashboard-status-pill logged-in-pill">Logged in</span>
+            <span class="dashboard-status-pill logged-in-pill">Logged in 🟢</span>
             <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
             <p id="subgreeting">Welcome to your new 2026 GoBrik dashboard. We've revamped it for the new year.</p>
             <p class="dashboard-summary-text"><?php echo htmlspecialchars($dashboard_summary_text, ENT_QUOTES, 'UTF-8'); ?></p>
@@ -715,6 +715,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     const gridActionRow = document.getElementById('featured-grid-action-row');
     const loadNextButton = document.getElementById('load-next-ecobricks');
     const mobileSliderQuery = window.matchMedia('(max-width: 768px)');
+    const welcomePanel = document.getElementById('welcome-greeting-panel');
+    const latestPanel = document.getElementById('latest-ecobricks-panel');
+    const narrowColumn = document.querySelector('.dashboard-column.column-narrow');
+    const wideColumn = document.querySelector('.dashboard-column.column-wide');
+    const latestOriginalNextSibling = latestPanel?.nextElementSibling ?? null;
     let sliderCurrentIndex = 0;
     let sliderIntervalId = null;
     let sliderTouchStartX = 0;
@@ -895,6 +900,22 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             });
     }
 
+    function repositionLatestPanel() {
+        if (!latestPanel || !welcomePanel || !narrowColumn || !wideColumn) return;
+
+        if (mobileSliderQuery.matches) {
+            if (latestPanel.parentElement !== narrowColumn || latestPanel.previousElementSibling !== welcomePanel) {
+                welcomePanel.insertAdjacentElement('afterend', latestPanel);
+            }
+        } else if (latestPanel.parentElement !== wideColumn) {
+            if (latestOriginalNextSibling && latestOriginalNextSibling.parentElement === wideColumn) {
+                wideColumn.insertBefore(latestPanel, latestOriginalNextSibling);
+            } else {
+                wideColumn.insertBefore(latestPanel, wideColumn.firstChild);
+            }
+        }
+    }
+
     function closeInfoModalV2() {
         const modal = document.getElementById('form-modal-message-v2');
         if (!modal) return;
@@ -954,7 +975,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         viewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
 
         metaWrapper.appendChild(viewButton);
-        messageContainer.appendChild(metaWrapper);
+        photoContainer.appendChild(metaWrapper);
 
         modal.classList.remove('modal-hidden');
         modal.classList.add('modal-shown');
@@ -982,9 +1003,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         sliderElement?.addEventListener('touchstart', handleSliderTouchStart);
         sliderElement?.addEventListener('touchend', handleSliderTouchEnd);
         mobileSliderQuery.addEventListener('change', handleSliderQueryChange);
+        mobileSliderQuery.addEventListener('change', repositionLatestPanel);
 
         setActiveSlide(0);
         startSliderInterval();
+        repositionLatestPanel();
     });
 
 
