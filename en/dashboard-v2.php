@@ -469,9 +469,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <span class="toggle-knob"></span>
                 </button>
             </div>
-            <div class="menu-buttons-row" style="justify-content:center;">
-                <a href="https://buwana.ecobricks.org/en/feedback.php?buwana=<?php echo urlencode($buwana_id); ?>&app=<?php echo urlencode($client_id); ?>" class="page-button">Message Developers</a>
-            </div>
             <form class="support-chat-form" id="support-chat-form">
                 <div>
                     <label for="support-subject">Subject</label>
@@ -491,7 +488,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </div>
                 <div class="support-chat-actions">
                     <button type="button" class="page-button">Start Chat</button>
-                    <button type="button" class="page-button secondary">Your Support Chats</button>
+                    <button type="button" class="page-button">Your Support Chats</button>
                 </div>
             </form>
         </div>
@@ -499,7 +496,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php if ($is_admin): ?>
             <div id="admin-support-chats" class="dashboard-v2-panel">
                 <span class="panel-pill admin-pill">Admin</span>
-                <h4 class="panel-title" style="text-align:center;">Admin Support Chats</h4>
+                <h3>Manage Support Chats</h3>
+                <p>Admins manage user chats on development issues.</p>
                 <div class="menu-buttons-row" style="justify-content:center;">
                     <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
                 </div>
@@ -507,9 +505,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
             <div id="dash-notice-control" class="dashboard-v2-panel">
                 <span class="panel-pill admin-pill">Admin</span>
-                <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
+                <h3>Update Dashboard Notice</h3>
+                <p style="margin:0 0 8px 0;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                    <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
                     <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
                         <span class="toggle-knob"></span>
                     </button>
@@ -542,7 +540,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
             <div id="gea-trainer-menu" class="dashboard-v2-panel">
                 <span class="panel-pill trainer-pill">Trainer</span>
-                <h4 class="panel-title">GEA Trainer Menu</h4>
+                <h3>GEA Trainer Menu</h3>
+                <p>Trainer tools and resources.</p>
                 <div class="menu-buttons-row">
                     <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
                     <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>

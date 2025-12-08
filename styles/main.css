@@ -1159,22 +1159,23 @@ border-color: #00a112 !important;
   justify-content: center;
   gap: 6px;
   padding: 8px 12px;
-  background: transparent;
-  color: #0d6efd;
+  background: #6b7280;
+  color: #ffffff;
   text-decoration: none;
   font-weight: 700;
   border-radius: 10px;
-  border: 1px solid #0d6efd;
-  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15);
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .ghost-link:hover,
 .ghost-link:focus-visible,
 .modal-view-button:hover,
 .modal-view-button:focus-visible {
-  background: rgba(13, 110, 253, 0.08);
-  box-shadow: 0 6px 14px rgba(13, 110, 253, 0.2);
+  background: #4b5563;
+  border-color: #ffffff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
 }
 
 .modal-v2 .x-button.modal-close-inline {
@@ -3051,7 +3052,6 @@ position:relative;
     align-items: center;
     justify-content: center;
     flex: 1 1 90%; /* Make each button take 90% of the width of the container */
-    max-width: 200px; /* Prevent buttons from becoming too wide */
     cursor: pointer;
 }
 
