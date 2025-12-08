@@ -916,29 +916,36 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         photoContainer.replaceChildren();
         messageContainer.replaceChildren();
 
+        const photoWrapper = document.createElement('div');
+        photoWrapper.className = 'ecobrick-photo-wrapper';
+
         const img = document.createElement('img');
         img.src = `${brickData.selfie_photo_url}?v=${brickData.photo_version ?? ''}`;
         img.alt = `Ecobrick selfie for serial ${brickData.serial_no || ''}`;
-        photoContainer.appendChild(img);
+
+        const statusPill = document.createElement('span');
+        statusPill.className = 'ecobrick-status-pill';
+        statusPill.textContent = brickData.status || 'Status unknown';
+
+        photoWrapper.appendChild(statusPill);
+        photoWrapper.appendChild(img);
+        photoContainer.appendChild(photoWrapper);
 
         const metaWrapper = document.createElement('div');
         metaWrapper.className = 'ecobrick-meta-v2';
 
-        const heading = document.createElement('h4');
-        heading.textContent = `Ecobrick ${brickData.serial_no || ''}`;
-        metaWrapper.appendChild(heading);
-
         const details = document.createElement('p');
-        const weightTxt = brickData.weight_g ? `${Number(brickData.weight_g).toLocaleString()} g` : 'Unknown weight';
-        const makerTxt = brickData.ecobricker_maker || 'Unknown maker';
+        const weightTxt = brickData.weight_g ? `${Number(brickData.weight_g).toLocaleString()} gram` : 'an unknown weight';
+        const makerTxt = brickData.ecobricker_maker || 'an unknown maker';
         const locationTxt = brickData.location_display || 'an undisclosed location';
-        details.textContent = `Ecobrick ${brickData.serial_no || ''} | ${weightTxt} of plastic sequestered by ${makerTxt} in ${locationTxt}.`;
+        const serialTxt = brickData.serial_no || 'an unlisted serial';
+        details.textContent = `This ${weightTxt} ecobrick ${serialTxt} was made by ${makerTxt} in ${locationTxt}.`;
         metaWrapper.appendChild(details);
 
         const viewButton = document.createElement('a');
-        viewButton.href = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
+        viewButton.href = `brik.php?serial=${encodeURIComponent(brickData.serial_no || '')}`;
         viewButton.className = 'view-brik-button-v2';
-        viewButton.textContent = 'ℹ️ View Ecobrick Details';
+        viewButton.textContent = 'View Ecobrick';
         viewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
 
         metaWrapper.appendChild(viewButton);
