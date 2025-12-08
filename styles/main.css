@@ -1041,6 +1041,25 @@ border-color: #00a112 !important;
   border: none;
 }
 
+.ecobrick-photo-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.ecobrick-status-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(9, 117, 46, 0.92);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95em;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  text-transform: capitalize;
+}
+
 .ecobrick-meta-v2 {
   width: 100%;
   display: flex;
