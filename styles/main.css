@@ -1036,28 +1036,62 @@ border-color: #00a112 !important;
   height: auto;
   max-height: 60vh;
   object-fit: contain;
-  border-radius: 0;
+  border-radius: 10px;
   background: none;
   border: none;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.95em;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  text-transform: capitalize;
+}
+
+.modal-status-pill {
+  position: absolute;
+  top: 18px;
+  right: 66px;
+  display: none;
+  z-index: 45;
+  pointer-events: none;
+}
+
+.status-authenticated {
+  background: #2e7d32;
+}
+
+.status-awaiting {
+  background: #f59e0b;
+}
+
+.status-rejected {
+  background: #b91c1c;
+}
+
+.status-default {
+  background: #4b5563;
 }
 
 .ecobrick-photo-wrapper {
   position: relative;
   display: inline-block;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .ecobrick-status-pill {
   position: absolute;
   top: 12px;
   right: 12px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(9, 117, 46, 0.92);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.95em;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-  text-transform: capitalize;
 }
 
 .ecobrick-meta-v2 {

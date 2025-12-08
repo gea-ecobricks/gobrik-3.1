@@ -240,11 +240,59 @@ body {
 
 #welcome-greeting-panel {
     --notice-height: 0px;
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     gap: 12px;
-    padding-top: calc(20px + var(--notice-height));
+    padding-top: calc(26px + var(--notice-height));
+}
+
+#registered-notice-panel {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.top-container-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    margin: 0;
+    border-radius: 14px;
+    background: #fff3dc;
+    border: 1px solid #f3c97a;
+    color: #5c3b07;
+    font-weight: 600;
+    position: relative;
+}
+
+.notice-panel .top-container-notice {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.notice-icon {
+    flex-shrink: 0;
+    font-size: 1.1em;
+}
+
+.notice-text a {
+    font-weight: 800;
+    color: #a86200;
+    text-decoration: underline;
+}
+
+.notice-close {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: inherit;
 }
 
 #welcome-greeting-panel #greeting {
@@ -252,16 +300,18 @@ body {
 }
 
 .dashboard-status-pill {
-    align-self: flex-end;
-    background: #2e7d32;
-    color: #ffffff;
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: #f1f3f5;
+    color: #4b5563;
     padding: 6px 12px;
     border-radius: 999px;
     font-weight: 700;
     letter-spacing: 0.02em;
     font-size: 0.95em;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    z-index: 35;
 }
 
 
@@ -345,7 +395,7 @@ body {
     }
 
     .ecobrick-mobile-slider {
-        display: block;
+        display: none;
     }
 
     .ecobrick-grid {

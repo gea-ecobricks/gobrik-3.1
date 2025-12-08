@@ -81,10 +81,12 @@ if ($serialNo) {
         while ($stmt->fetch()) {
             // Check the status of the ecobrick
             $status = strtolower($status);
+            $isAwaitingValidation = ($status === 'awaiting validations');
+            $isRejected = (strpos($status, 'reject') !== false);
             $statusClass = 'status-waiting';
             $statusLabel = '🕙 Waiting for validations';
 
-            if (strpos($status, 'reject') !== false) {
+            if ($isRejected) {
                 $statusClass = 'status-rejected';
                 $statusLabel = '⛔ Rejected';
             }
@@ -177,11 +179,18 @@ if ($serialNo) {
     exit();  // Exit to prevent further execution
 }
 // Continue with the rest of the page content as it is
-if (strpos(strtolower($status), 'authenticated') === false) {
-    echo '
-    <div class="row-details">
-        <p>This ecobrick was logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '. It is pending review and authentication.</p>
-    </div>';
+if (!$isAuthenticated) {
+    if ($isAwaitingValidation) {
+        echo '
+        <div class="row-details">
+            <p>This ecobrick was logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '. It is pending review and authentication.</p>
+        </div>';
+    } elseif ($isRejected) {
+        echo '
+        <div class="row-details">
+            <p>This ecobrick was logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '. This ecobrick has been rejected for authentication.  It has not met the criteria of ecobrick sequestered plastic.  For the criteria of authenticated sequestered plastic see <a href="https://ecobricks.org/en/what.php" target="_blank">ecobricks.org/en/what</a>.</p>
+        </div>';
+    }
 }
 
 
@@ -201,8 +210,8 @@ if (!empty(trim($vision))) {
 // Additional explanation about the ecobrick
 echo '<p><span data-lang-id="114">This ecobrick has a density of </span>' . htmlspecialchars($density, ENT_QUOTES, 'UTF-8') . '&#8202;g/ml <span data-lang-id="115">and represents </span>' . htmlspecialchars($CO2_kg, ENT_QUOTES, 'UTF-8') . '&#8202;kg <span data-lang-id="116">of sequestered CO2. The ecobrick is permanently marked with Serial Number </span>' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . '<span data-lang-id="117"> and was added to the validation queue on </span>' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '.</p>';
 
-// Check if $status does not contain "authenticated"
-if (strpos(strtolower($status), 'authenticated') === false) {
+// Show peer-review notice only while awaiting validation
+if ($isAwaitingValidation) {
     echo '<p>This ecobrick has not yet been peer-reviewed. Its plastic has not been authenticated as sequestered.</p>';
 }
 
