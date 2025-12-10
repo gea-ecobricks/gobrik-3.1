@@ -383,14 +383,13 @@ function sendEmail($to, $htmlBody) {
 
 
 // Output the HTML structure
-echo '<!DOCTYPE html>
-<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
-<head>
-<meta charset="UTF-8">
-';
 ?>
 
-<?php require_once("../includes/admin-panel-inc.php"); ?>
+<?php
+    $dashboard_header_version = "../header-2026.php";
+    require_once("../includes/dashboard-inc.php");
+?>
+<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v13">
 
 <style>
     .toggle-switch .slider.order-oldest {
@@ -412,185 +411,259 @@ echo '<!DOCTYPE html>
         min-width: 120px;
         display: inline-block;
     }
+
+    .dashboard-wrapper {
+        padding-bottom: 60px;
+    }
+
+    .sender-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: var(--dashboard-panel-gap);
+        align-items: start;
+        margin-top: var(--dashboard-panel-gap);
+    }
+
+    .sender-stat-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .stat-pill {
+        background: var(--pill-default-bg);
+        color: var(--pill-default-text);
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .stat-pill strong {
+        font-weight: 800;
+    }
+
+    .sender-panel h2 {
+        margin-bottom: 8px;
+    }
+
+    .sender-panel p {
+        margin: 0 0 6px;
+    }
+
+    .control-card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .control-row {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .control-row .toggle-switch {
+        margin: 0;
+    }
+
+    #test-email-container,
+    .control-card,
+    #send-controls {
+        width: 100%;
+    }
+
+    #send-controls form {
+        margin-top: 20px;
+    }
+
+    #send-controls textarea {
+        border-radius: 12px;
+        border: 1px solid #d8d8d8;
+        padding: 10px;
+        font-family: inherit;
+    }
+
+    #email-status-table {
+        margin-top: 10px;
+    }
+
+    @media (max-width: 1024px) {
+        .sender-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 700px) {
+        #order-toggle-wrapper {
+            align-items: flex-start;
+        }
+    }
 </style>
 
 
 
 
-<!-- SENDER FORM CONTENT -->
-    <div class="form-container" style="padding-top:10px; margin-top: 100px;">
-
+<div class="dashboard-wrapper">
+    <div class="dashboard-v2-panel sender-panel">
         <?php if ($has_alerts): ?>
-        <div style="background: #ffdddd; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
-            <h3 style="color: red;">⚠️ Admin Alerts Found!</h3>
-            <ul>
-                <?php foreach ($alerts as $alert): ?>
-                    <li><strong><?php echo htmlspecialchars($alert['alert_title']); ?>:</strong> <?php echo htmlspecialchars($alert['alert_message']); ?></li>
-                <?php endforeach; ?>
-            </ul>
-            <p>Please resolve these alerts before proceeding.</p>
-            <button id="reset-alerts-button" class="confirm-button delete" style="margin-top:10px;">✅ Alerts Resolved</button>
-        </div>
-    <?php endif; ?>
-
-        <div id="greeting" style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-            <h2 id="greeting">Earthen Manual Sender</h2>
-            <p id="subgreeting">Our tool for sending our newsletter our email by email to our Earthen Database.</p>
-        </div>
-
-
-
-<p id="overall-stats">Total Members: <strong id="total-members"><?php echo number_format($total_members); ?></strong>  |  Total Sent <strong id="sent-count"><?php echo $sent_count; ?></strong> (<span id="sent-percentage"><?php echo number_format($sent_percentage, 3); ?></span>%)</p>
-<p id="batch-stats">Current Batch: <strong id="batch-size">0</strong>  |  Batch Sent: <strong id="batch-sent">0</strong> (<span id="batch-percentage">0.00</span>%)</p>
-
-
-
-<!-- Auto-send toggle -->
-<div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
-    <div id="left-colum" style="width: 100%;">
-        <label>✉️ Auto Send Emails</label>
-        <p class="form-caption" style="margin-top:10px;">Uncheck to prevent the email from sending automatically after countdown.</p>
-
-        <label style="display:block;margin-top:15px;">🔁 Auto-load batches</label>
-        <p class="form-caption" style="margin-top:10px;">When enabled, the next 100 members will load automatically after the current batch finishes and sending will continue.</p>
-
-        <div id="order-toggle-wrapper">
-            <strong>🧭 Member order</strong>
-            <label class="toggle-switch" style="margin:0;">
-                <input type="checkbox" id="order-toggle" value="1">
-                <span class="slider"></span>
-            </label>
-            <span id="order-label" class="form-caption">Oldest first</span>
-        </div>
-
-        <label for="send-delay-slider" style="display:block;margin-top:20px;margin-bottom: 5px;">⏱️ Send Delay</label>
-        <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:90%;accent-color:var(--emblem-green);">
-                <p class="form-caption" style="margin-top:5px;">Adjust sending delay from 1 to 10 seconds.</p>
-
-    </div>
-
-
-    <div id="right-column" style="width:100px; justify-content:center;">
-        <label class="toggle-switch">
-            <input type="checkbox" id="auto-send-toggle" value="1">
-            <span class="slider"></span>
-        </label>
-        <div style="margin-top:10px;">
-            <label class="toggle-switch">
-                <input type="checkbox" id="auto-load-toggle" value="1">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div style="margin-top:auto;margin-bottom:10px">
-            <p style="text-align:center;margin:45px 30px 10px 0px;font-weight:bold;">⏱ <span id="delay-display">5</span>s</p>
-        </div>
-
-    </div>
-</div>
-
-
-
-        <!-- Send one test email (hidden unless auto-send is off) -->
-        <div id="test-email-container" class="form-row" style="display:none;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;gap:20px;align-items:flex-start;flex-wrap:wrap;">
-            <div id="left-colum" style="flex: 1 1 280px;">
-                <label for="test-email-toggle">📨 Send One Test Email</label>
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
-                    <button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
-                        📨 Send to russmaier@gmail.com
-                    </button>
-                    <p class="form-caption" style="margin:0;">Will send this email once to <span id="test-email-display">russmaier@gmail.com</span></p>
-                </div>
+            <div class="dashboard-v2-panel notice-panel" style="padding:15px 18px;">
+                <h3 style="color: #b3261e; margin-top:0;">⚠️ Admin Alerts Found!</h3>
+                <ul style="margin: 10px 0 12px 18px;">
+                    <?php foreach ($alerts as $alert): ?>
+                        <li><strong><?php echo htmlspecialchars($alert['alert_title']); ?>:</strong> <?php echo htmlspecialchars($alert['alert_message']); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+                <p style="margin:0 0 10px;">Please resolve these alerts before proceeding.</p>
+                <button id="reset-alerts-button" class="confirm-button delete" style="margin-top:10px;">✅ Alerts Resolved</button>
             </div>
-            <div id="right-column" style="width:180px;display:flex;flex-direction:column;align-items:center;gap:12px;">
-                <label class="toggle-switch" style="margin-bottom:0;">
-                    <input type="checkbox" id="test-email-toggle" value="1">
+        <?php endif; ?>
+
+        <h2 id="greeting" style="margin-top:10px;">Earthen Manual Sender</h2>
+        <p id="subgreeting">Our tool for sending our newsletter email by email to our Earthen Database.</p>
+
+        <div class="sender-stat-row">
+            <div class="stat-pill" id="overall-stats">Total Members: <strong id="total-members"><?php echo number_format($total_members); ?></strong></div>
+            <div class="stat-pill">Total Sent: <strong id="sent-count"><?php echo $sent_count; ?></strong> (<span id="sent-percentage"><?php echo number_format($sent_percentage, 3); ?></span>%)</div>
+            <div class="stat-pill" id="batch-stats">Current Batch: <strong id="batch-size">0</strong> | Batch Sent: <strong id="batch-sent">0</strong> (<span id="batch-percentage">0.00</span>%)</div>
+        </div>
+    </div>
+
+    <div class="sender-grid">
+        <div class="dashboard-v2-panel control-card">
+            <div class="control-row">
+                <div>
+                    <label>✉️ Auto Send Emails</label>
+                    <p class="form-caption" style="margin-top:6px;">Uncheck to prevent the email from sending automatically after countdown.</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-send-toggle" value="1">
                     <span class="slider"></span>
                 </label>
-                <button type="button" id="test-email-settings" aria-label="Configure test email address" style="background:none;border:none;font-size:24px;cursor:pointer;line-height:1;">
-                    ⚙️
-                </button>
-                <div id="test-email-config" style="display:none;width:100%;margin-top:5px;">
-                    <label for="test-email-input" style="display:block;margin-bottom:6px;text-align:center;">Test email address</label>
-                    <input type="email" id="test-email-input" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;" value="russmaier@gmail.com" autocomplete="email">
+            </div>
+
+            <div class="control-row">
+                <div>
+                    <label>🔁 Auto-load batches</label>
+                    <p class="form-caption" style="margin-top:6px;">When enabled, the next 100 members will load automatically after the current batch finishes and sending will continue.</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-load-toggle" value="1">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div id="order-toggle-wrapper">
+                <strong>🧭 Member order</strong>
+                <label class="toggle-switch" style="margin:0;">
+                    <input type="checkbox" id="order-toggle" value="1">
+                    <span class="slider"></span>
+                </label>
+                <span id="order-label" class="form-caption">Oldest first</span>
+            </div>
+
+            <div class="control-row" style="align-items:flex-start;">
+                <div style="flex:1; min-width:220px;">
+                    <label for="send-delay-slider" style="display:block;margin-bottom: 5px;">⏱️ Send Delay</label>
+                    <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;accent-color:var(--emblem-green);">
+                    <p class="form-caption" style="margin-top:5px;">Adjust sending delay from 1 to 10 seconds.</p>
+                </div>
+                <div style="text-align:center; min-width:80px;">
+                    <p style="font-weight:bold;">⏱ <span id="delay-display">5</span>s</p>
+                </div>
+            </div>
+
+            <!-- Send one test email (hidden unless auto-send is off) -->
+            <div id="test-email-container" class="form-row" style="display:none;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+                <div id="left-colum" style="flex: 1 1 280px;">
+                    <label for="test-email-toggle">📨 Send One Test Email</label>
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                        <button id="test-send-button" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+                            📨 Send to russmaier@gmail.com
+                        </button>
+                        <p class="form-caption" style="margin:0;">Will send this email once to <span id="test-email-display">russmaier@gmail.com</span></p>
+                    </div>
+                </div>
+                <div id="right-column" style="width:180px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+                    <label class="toggle-switch" style="margin-bottom:0;">
+                        <input type="checkbox" id="test-email-toggle" value="1">
+                        <span class="slider"></span>
+                    </label>
+                    <button type="button" id="test-email-settings" aria-label="Configure test email address" style="background:none;border:none;font-size:24px;cursor:pointer;line-height:1;">
+                        ⚙️
+                    </button>
+                    <div id="test-email-config" style="display:none;width:100%;margin-top:5px;">
+                        <label for="test-email-input" style="display:block;margin-bottom:6px;text-align:center;">Test email address</label>
+                        <input type="email" id="test-email-input" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;" value="russmaier@gmail.com" autocomplete="email">
+                    </div>
+                </div>
+            </div>
+
+            <div id="send-controls">
+                <form id="email-form" method="POST">
+                    <p><strong>From:</strong> <span id="email-from-display"><?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></span></p>
+                    <p><strong>Reply:</strong> <span id="email-reply-display"><?php echo htmlspecialchars($email_reply_to, ENT_QUOTES, 'UTF-8'); ?></span></p>
+                    <p><strong>Subject:</strong> <span id="email-subject-display"><?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></span></p>
+                    <label for="email_html">Newsletter HTML:</label>
+                    <div style="margin:8px 0 12px;">
+                        <select id="newsletter-selector" name="newsletter_choice" style="padding:8px;border-radius:8px;min-width:200px;">
+                            <?php foreach ($newsletter_templates as $newsletter_id => $template_html): ?>
+                                <option value="<?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $newsletter_id == $selected_newsletter ? 'selected' : ''; ?>>
+                                    Newsletter <?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
+                    <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($first_recipient_id); ?>">
+                    <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($first_recipient_email); ?>">
+                    <br><br>
+                    <button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+                        📨 Send
+                    </button>
+                </form>
+
+                <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
+                    <p>Email will send in <span id="countdown">5</span> seconds...</p>
+                    <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
                 </div>
             </div>
         </div>
 
-
-
-
-
-<div id="send-controls" style="height:500px;">
-<form id="email-form" method="POST" style="margin-top: 50px;">
-    <p><strong>From:</strong> <span id="email-from-display"><?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></span></p>
-    <p><strong>Reply:</strong> <span id="email-reply-display"><?php echo htmlspecialchars($email_reply_to, ENT_QUOTES, 'UTF-8'); ?></span></p>
-    <p><strong>Subject:</strong> <span id="email-subject-display"><?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></span></p>
-    <label for="email_html">Newsletter HTML:</label>
-    <div style="margin:8px 0 12px;">
-        <select id="newsletter-selector" name="newsletter_choice" style="padding:8px;border-radius:8px;min-width:200px;">
-            <?php foreach ($newsletter_templates as $newsletter_id => $template_html): ?>
-                <option value="<?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $newsletter_id === $selected_newsletter ? 'selected' : ''; ?>>
-                    Newsletter <?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+        <div class="dashboard-v2-panel">
+            <h3 style="margin-top:0;">Email Sending Status</h3>
+            <table id="email-status-table" class="display responsive nowrap mdl-data-table" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Open Rate</th>
+                        <th>Sent Date</th>
+                        <th>Sent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($all_members as $member): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($member['name'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($member['email'] ?? ''); ?></td>
+                            <td><?php echo $member['email_open_rate'] ?? '0%'; ?></td>
+                            <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
+                            <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
-    <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($first_recipient_id); ?>">
-
-    <!-- Hidden field for recipient email
-        <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($recipient_email); ?>">
-    -->
-<input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($first_recipient_email); ?>">
-    <br><br>
-<!-- Auto-send Button (hidden by default unless auto-send is enabled) -->
-<button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
-    📨 Send
-</button>
-
-
-</form>
-
-<div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
-    <p>Email will send in <span id="countdown">5</span> seconds...</p>
-    <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
 </div>
 
-</div>
-
-
-
-
-
-    <h3>Email Sending Status:</h3>
-    <table id="email-status-table" class="display responsive nowrap mdl-data-table" style="width:100%">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Open Rate</th>
-                <th>Sent Date</th>
-                <th>Sent</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($all_members as $member): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($member['name'] ?? ''); ?></td>
-                    <td><?php echo htmlspecialchars($member['email'] ?? ''); ?></td>
-                    <td><?php echo $member['email_open_rate'] ?? '0%'; ?></td>
-                    <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
-                    <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
-</div>
-
-
-<!--FOOTER STARTS HERE-->
-<?php require_once ("../footer-2025.php"); ?>
+<?php require_once ("../footer-2026.php"); ?>
 <script>
 $(document).ready(function () {
     let recipientEmail = '';
