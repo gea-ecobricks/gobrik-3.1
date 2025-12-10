@@ -1,71 +1,105 @@
 <?php
+require_once '../earthenAuth_helper.php';
+require_once '../auth/session_start.php';
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// PART 1: Set up page variables
+$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
+$version = '2.50';
+$page = 'add-project';
+$lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-include '../gobrikconn_env.php';
-$conn->set_charset("utf8mb4");
+// PART 2: Check if user is logged in and session active
+if (!$is_logged_in) {
+    header('Location: login.php?redirect=' . urlencode($page));
+    exit();
+}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    include '../project-photo-functions.php'; // Ensure this path is correct
+// PART 3: Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once '../gobrikconn_env.php';
 
-    $location_full = $_POST['location_address'] ?? 'Default Location';
-    $project_name = $_POST['project_name'];
-    $description_short = $_POST['description_short'];
-    $description_long = $_POST['description_long'];
-    $project_type = $_POST['project_type'];
-    $construction_type = $_POST['construction_type'];  // keep this as it is
-    $community = $_POST['community'] ?? '';
-    $project_admins = $_POST['project_admins'] ?? '';
-    $start_dt = $_POST['start_dt'];
-    $briks_used = $_POST['briks_used'];
-    $est_avg_brik_weight = $_POST['est_avg_brik_weight'];
-    $latitude = (double)$_POST['latitude'];
-    $longitude = (double)$_POST['longitude'];
-    $connected_ecobricks = $_POST['connected_ecobricks'] ?? '';
-    $end_dt = $_POST['end_dt'];
-    $project_sort = $_POST['project_sort'] ?? '';
+    $location_full = trim($_POST['location_address'] ?? '');
+    $project_name = trim($_POST['project_name'] ?? '');
+    $description_short = trim($_POST['description_short'] ?? '');
+    $description_long = trim($_POST['description_long'] ?? '');
+    $project_type = trim($_POST['project_type'] ?? '');
+    $construction_type = trim($_POST['construction_type'] ?? '');
+    $community = trim($_POST['community'] ?? '');
+    $project_admins = trim($_POST['project_admins'] ?? '');
+    $start_dt = trim($_POST['start_dt'] ?? '');
+    $end_dt = trim($_POST['end_dt'] ?? '');
+    $project_sort = trim($_POST['project_sort'] ?? '');
+    $briks_used = (int)($_POST['briks_used'] ?? 0);
+    $est_avg_brik_weight = (int)($_POST['est_avg_brik_weight'] ?? 0);
+    $latitude = isset($_POST['latitude']) ? (float)$_POST['latitude'] : null;
+    $longitude = isset($_POST['longitude']) ? (float)$_POST['longitude'] : null;
+    $connected_ecobricks = trim($_POST['connected_ecobricks'] ?? '');
 
-    $sql = "INSERT INTO tb_projects (project_name, description_short, description_long, location_full, project_type, construction_type, community, project_admins, start_dt, briks_used, est_avg_brik_weight, location_lat, location_long, connected_ecobricks, end_dt, project_sort) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-if ($stmt = $conn->prepare($sql)) {
-$stmt->bind_param("sssssssssiiddsss", $project_name, $description_short, $description_long, $location_full, $project_type, $construction_type, $community, $project_admins, $start_dt, $briks_used, $est_avg_brik_weight, $latitude, $longitude, $connected_ecobricks, $end_dt, $project_sort);
-if ($stmt->execute()) {
-            $project_id = $conn->insert_id;
+    $project_end = !empty($end_dt) ? $end_dt : $start_dt;
+    $briks_required = $briks_used > 0 ? $briks_used : 0;
+    $logged_ts = date('Y-m-d H:i:s');
 
-        // Get the last inserted project_id
-        $project_id = $conn->insert_id;
+    $insert_sql = "INSERT INTO tb_projects (project_name, description_short, description_long, start_dt, end_dt, project_end, briks_required, briks_used, est_avg_brik_weight, project_type, construction_type, project_sort, community, project_admins, location_full, location_lat, location_long, connected_ecobricks, logged_ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        // Calculate `est_total_weight`
-        $est_total_weight = ($briks_used * $est_avg_brik_weight) / 1000;
+    if ($stmt = $gobrik_conn->prepare($insert_sql)) {
+        $stmt->bind_param(
+            'ssssssiiissssssddss',
+            $project_name,
+            $description_short,
+            $description_long,
+            $start_dt,
+            $end_dt,
+            $project_end,
+            $briks_required,
+            $briks_used,
+            $est_avg_brik_weight,
+            $project_type,
+            $construction_type,
+            $project_sort,
+            $community,
+            $project_admins,
+            $location_full,
+            $latitude,
+            $longitude,
+            $connected_ecobricks,
+            $logged_ts
+        );
 
-        // Update `est_total_weight`
-        $update_weight_sql = "UPDATE tb_projects SET est_total_weight = ? WHERE project_id = ?";
-        $update_weight_stmt = $conn->prepare($update_weight_sql);
-        $update_weight_stmt->bind_param("di", $est_total_weight, $project_id);
-        $update_weight_stmt->execute();
-        $update_weight_stmt->close();
+        if ($stmt->execute()) {
+            $project_id = $gobrik_conn->insert_id;
 
-        // Update `project_url`
-        $project_url = "https://ecobricks.org/en/project.php?id=" . $project_id;
-        $update_url_sql = "UPDATE tb_projects SET project_url = ? WHERE project_id = ?";
-        $update_url_stmt = $conn->prepare($update_url_sql);
-        $update_url_stmt->bind_param("si", $project_url, $project_id);
-        $update_url_stmt->execute();
-        $update_url_stmt->close();
+            $est_total_weight = ($briks_used * $est_avg_brik_weight) / 1000;
+            $update_weight_sql = "UPDATE tb_projects SET est_total_weight = ? WHERE project_id = ?";
+            $update_weight_stmt = $gobrik_conn->prepare($update_weight_sql);
+            if ($update_weight_stmt) {
+                $update_weight_stmt->bind_param('di', $est_total_weight, $project_id);
+                $update_weight_stmt->execute();
+                $update_weight_stmt->close();
+            }
 
+            $project_url = "https://ecobricks.org/en/project.php?id=" . $project_id;
+            $update_url_sql = "UPDATE tb_projects SET project_url = ? WHERE project_id = ?";
+            $update_url_stmt = $gobrik_conn->prepare($update_url_sql);
+            if ($update_url_stmt) {
+                $update_url_stmt->bind_param('si', $project_url, $project_id);
+                $update_url_stmt->execute();
+                $update_url_stmt->close();
+            }
 
-        $stmt->close();
-        $conn->close();
+            $stmt->close();
+            $gobrik_conn->close();
             echo "<script>window.location.href = 'add-project-images.php?project_id=" . $project_id . "';</script>";
         } else {
             echo "Error: " . $stmt->error . "<br>";
+            $stmt->close();
         }
-        $stmt->close();
     } else {
-        echo "Prepare failed: " . $conn->error;
+        echo "Prepare failed: " . $gobrik_conn->error;
     }
-    $conn->close();
+
+    if ($gobrik_conn) {
+        $gobrik_conn->close();
+    }
 }
 ?>
 
@@ -83,12 +117,12 @@ if ($stmt->execute()) {
 <?php require_once ("../includes/add-project-inc.php");?>
 
 
-<div class="splash-content-block"></div>
+<div class="splash-title-block"></div>
 <div id="splash-bar"></div>
 
  <!-- PAGE CONTENT-->
 
- <div id="form-submission-box">
+ <div id="form-submission-box" class="landing-page-form" style="height:auto !important;">
     <div class="form-container">
         <div class="form-top-header" style="display:flex;flex-flow:row;">
             <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
