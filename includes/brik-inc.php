@@ -44,9 +44,9 @@
     display: flex;
     width: 100%;
     background-color: var(--form-background);
-      border: 1px solid var(--divider-line);
-    border-radius: 16px;
-    box-shadow: var(--brik-panel-shadow);
+    border: none;
+    border-radius: 0 0 16px 16px;
+    box-shadow: none;
     gap: 18px;
     }
 
@@ -163,7 +163,7 @@ padding: 10px;
 
 .status-authenticated {
     background: var(--brik-pill-green-bg);
-    color: var(--brik-pill-green-text);
+    color: #ffffff;
     border-color: rgba(30, 142, 62, 0.16);
 }
 
@@ -175,6 +175,37 @@ padding: 10px;
 
 .vision-quote {
 font-size: 1.4em;
+}
+
+.details-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.details-layout.has-selfie {
+  align-items: stretch;
+}
+
+.details-layout .main-details,
+.details-layout .side-details {
+  width: 100%;
+}
+
+.details-layout .side-details img {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 0px 10px rgba(85, 84, 84, 0.4);
+}
+
+@media screen and (min-width: 769px) {
+  .details-layout.has-selfie {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 24px;
+  }
 }
 
 

@@ -93,6 +93,8 @@ if ($serialNo) {
 
             $isAuthenticated = ($status === "authenticated");
 
+            $hasSelfie = !empty($selfie_photo_url);
+
             if ($isAuthenticated) {
                 $statusClass = 'status-authenticated';
                 $statusLabel = '✅ Authenticated';
@@ -123,7 +125,7 @@ if ($serialNo) {
                         <div class="brik-status brik-status-pill ' . $statusClass . '">' . $statusLabel . '</div>
                     </div>
                     <div class="brik-image">
-                        <a href="javascript:void(0);" onclick="viewGalleryImage(\'' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=' . htmlspecialchars($photo_version, ENT_QUOTES, 'UTF-8') . '\', \'Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '\')">
+                        <a class="brik-image-link" href="javascript:void(0);" onclick="openViewEcobricV2(window.brikPreviewData, window.brikPreviewData.ecobrick_full_photo_url)">
                             <img src="../' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=' . htmlspecialchars($photo_version, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . '" title="Ecobrick Serial ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and authenticated on ' . htmlspecialchars($last_validation_ts, ENT_QUOTES, 'UTF-8') . '">
                         </a>
                     </div>
@@ -157,7 +159,7 @@ if ($serialNo) {
                     <div class="brik-status brik-status-pill ' . $statusClass . '">' . $statusLabel . '</div>
                 </div>
                 <div class="brik-image">
-                    <a href="javascript:void(0);" onclick="viewGalleryImage(\'' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=\', \'Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '\')">
+                    <a class="brik-image-link" href="javascript:void(0);" onclick="openViewEcobricV2(window.brikPreviewData, window.brikPreviewData.ecobrick_full_photo_url)">
                         <img src="../' . htmlspecialchars($ecobrick_full_photo_url, ENT_QUOTES, 'UTF-8') . '?v=' . htmlspecialchars($photo_version, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . ' and logged on ' . htmlspecialchars($date_logged_ts, ENT_QUOTES, 'UTF-8') . '" title="Ecobrick Serial ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . ' was made in ' . htmlspecialchars($location_full, ENT_QUOTES, 'UTF-8') . '.">
                     </a>
                 
@@ -195,6 +197,8 @@ if (!$isAuthenticated) {
 
 
 // EXPLANATION
+echo '<div class="details-layout ' . ($hasSelfie ? 'has-selfie' : 'no-selfie') . '">';
+
 echo '<div class="main-details">';
 
 // Check if $vision is not empty
@@ -215,14 +219,18 @@ if ($isAwaitingValidation) {
     echo '<p>This ecobrick has not yet been peer-reviewed. Its plastic has not been authenticated as sequestered.</p>';
 }
 
-echo '<br></div>'; // Close main-details div
+echo '</div>'; // Close main-details div
 
 // IF THERE'S A SELFIE IT GOES HERE
-if (!empty($selfie_photo_url)) {
+if ($hasSelfie) {
     echo '<div class="side-details">
-            <img src="' . htmlspecialchars($selfie_photo_url, ENT_QUOTES, 'UTF-8') . '?v=' . htmlspecialchars($photo_version, ENT_QUOTES, 'UTF-8') . '" width="100%">
+            <a class="side-selfie-link" href="javascript:void(0);" onclick="openViewEcobricV2(window.brikPreviewData, window.brikPreviewData.selfie_photo_url)">
+                <img src="' . htmlspecialchars($selfie_photo_url, ENT_QUOTES, 'UTF-8') . '?v=' . htmlspecialchars($photo_version, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick selfie for serial ' . htmlspecialchars($serial_no, ENT_QUOTES, 'UTF-8') . '">
+            </a>
           </div>';
 }
+
+echo '</div>'; // Close details-layout
 
 
 // Get the contents from the Ecobrick table as an ordered View, using the serial_no from the URL.  See: https://www.w3schools.com/php/php_mysql_select_where.asp1
@@ -324,9 +332,112 @@ echo '
 		}
 		$gobrik_conn->close();
 
-		?>
+                ?>
 
-			<!--
+                <?php if (!empty($serial_no)) { ?>
+                <script>
+                    if (typeof getStatusClassName !== 'function') {
+                        function getStatusClassName(statusText = '') {
+                            const normalized = statusText.toLowerCase();
+
+                            if (normalized.includes('auth')) return 'status-authenticated';
+                            if (normalized.includes('await') || normalized.includes('wait')) return 'status-awaiting';
+                            if (normalized.includes('reject')) return 'status-rejected';
+
+                            return 'status-default';
+                        }
+                    }
+
+                    if (typeof applyStatusPill !== 'function') {
+                        function applyStatusPill(pillElement, statusText) {
+                            if (!pillElement) return;
+
+                            const baseClass = pillElement.classList.contains('ecobrick-status-pill')
+                                ? 'ecobrick-status-pill status-pill'
+                                : 'modal-status-pill status-pill';
+                            const statusClass = getStatusClassName(statusText);
+
+                            pillElement.className = `${baseClass} ${statusClass}`;
+                            pillElement.textContent = statusText || 'Status unknown';
+                            pillElement.style.display = 'inline-flex';
+                        }
+                    }
+
+                    if (typeof openViewEcobricV2 !== 'function') {
+                        function openViewEcobricV2(brickData, photoOverride = '') {
+                            if (!brickData) return;
+
+                            const modal = document.getElementById('form-modal-message-v2');
+                            const photoContainer = modal?.querySelector('.modal-photo-v2');
+                            const messageContainer = modal?.querySelector('.modal-message-v2');
+                            const modalStatusPill = modal?.querySelector('.modal-status-pill');
+                            const modalViewButton = modal?.querySelector('.modal-view-button');
+
+                            if (!modal || !photoContainer || !messageContainer) return;
+
+                            photoContainer.replaceChildren();
+                            messageContainer.replaceChildren();
+
+                            const photoWrapper = document.createElement('div');
+                            photoWrapper.className = 'ecobrick-photo-wrapper';
+
+                            const img = document.createElement('img');
+                            const versionSuffix = brickData.photo_version ? `?v=${brickData.photo_version}` : '';
+                            const photoSrc = photoOverride || brickData.selfie_photo_url || brickData.ecobrick_full_photo_url;
+
+                            if (!photoSrc) return;
+
+                            img.src = `${photoSrc}${versionSuffix}`;
+                            img.alt = `Ecobrick photo for serial ${brickData.serial_no || ''}`;
+
+                            photoWrapper.appendChild(img);
+                            photoContainer.appendChild(photoWrapper);
+
+                            const metaWrapper = document.createElement('div');
+                            metaWrapper.className = 'ecobrick-meta-v2';
+
+                            const details = document.createElement('p');
+                            const weightTxt = brickData.weight_g ? `${Number(brickData.weight_g).toLocaleString()} gram` : 'an unknown weight';
+                            const makerTxt = brickData.ecobricker_maker || 'an unknown maker';
+                            const locationTxt = brickData.location_display || 'an undisclosed location';
+                            const serialTxt = brickData.serial_no || 'an unlisted serial';
+                            details.textContent = `This ${weightTxt} ecobrick ${serialTxt} was made by ${makerTxt} in ${locationTxt}.`;
+                            metaWrapper.appendChild(details);
+
+                            photoContainer.appendChild(metaWrapper);
+
+                            const viewHref = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
+                            if (modalViewButton) {
+                                modalViewButton.href = viewHref;
+                                modalViewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
+                                modalViewButton.style.display = 'inline-flex';
+                            }
+
+                            applyStatusPill(modalStatusPill, brickData.status);
+
+                            modal.classList.remove('modal-hidden');
+                            modal.classList.add('modal-shown');
+
+                            document.getElementById('page-content')?.classList.add('blurred');
+                            document.getElementById('footer-full')?.classList.add('blurred');
+                            document.body.classList.add('modal-open');
+                        }
+                    }
+
+                    window.brikPreviewData = {
+                        serial_no: <?php echo json_encode($serial_no); ?>,
+                        weight_g: <?php echo json_encode($weight_g); ?>,
+                        ecobricker_maker: <?php echo json_encode($owner); ?>,
+                        location_display: <?php echo json_encode($location_full); ?>,
+                        status: <?php echo json_encode($statusLabel); ?>,
+                        selfie_photo_url: <?php echo json_encode($hasSelfie ? $selfie_photo_url : ''); ?>,
+                        ecobrick_full_photo_url: <?php echo json_encode(!empty($ecobrick_full_photo_url) ? '../' . $ecobrick_full_photo_url : ''); ?>,
+                        photo_version: <?php echo json_encode($photo_version); ?>
+                    };
+                </script>
+                <?php } ?>
+
+                        <!--
 
 
             <table id="singleEcobrickTable" class="display">
