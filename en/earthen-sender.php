@@ -534,6 +534,39 @@ function sendEmail($to, $htmlBody) {
         </div>
     </div>
 
+    <div class="dashboard-v2-panel" id="send-controls-panel">
+        <h3 style="margin-top:0;">Newsletter Details &amp; Sender</h3>
+        <div id="send-controls">
+            <form id="email-form" method="POST">
+                <p><strong>From:</strong> <span id="email-from-display"><?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></span></p>
+                <p><strong>Reply:</strong> <span id="email-reply-display"><?php echo htmlspecialchars($email_reply_to, ENT_QUOTES, 'UTF-8'); ?></span></p>
+                <p><strong>Subject:</strong> <span id="email-subject-display"><?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></span></p>
+                <label for="email_html">Newsletter HTML:</label>
+                <div style="margin:8px 0 12px;">
+                    <select id="newsletter-selector" name="newsletter_choice" style="padding:8px;border-radius:8px;min-width:200px;">
+                        <?php foreach ($newsletter_templates as $newsletter_id => $template_html): ?>
+                            <option value="<?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $newsletter_id == $selected_newsletter ? 'selected' : ''; ?>>
+                                Newsletter <?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
+                <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($first_recipient_id); ?>">
+                <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($first_recipient_email); ?>">
+                <br><br>
+                <button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+                    📨 Send
+                </button>
+            </form>
+
+            <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
+                <p>Email will send in <span id="countdown">5</span> seconds...</p>
+                <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
+            </div>
+        </div>
+    </div>
+
     <div class="sender-grid">
         <div class="dashboard-v2-panel control-card">
             <div class="control-row">
@@ -604,35 +637,6 @@ function sendEmail($to, $htmlBody) {
                 </div>
             </div>
 
-            <div id="send-controls">
-                <form id="email-form" method="POST">
-                    <p><strong>From:</strong> <span id="email-from-display"><?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></span></p>
-                    <p><strong>Reply:</strong> <span id="email-reply-display"><?php echo htmlspecialchars($email_reply_to, ENT_QUOTES, 'UTF-8'); ?></span></p>
-                    <p><strong>Subject:</strong> <span id="email-subject-display"><?php echo htmlspecialchars($email_subject, ENT_QUOTES, 'UTF-8'); ?></span></p>
-                    <label for="email_html">Newsletter HTML:</label>
-                    <div style="margin:8px 0 12px;">
-                        <select id="newsletter-selector" name="newsletter_choice" style="padding:8px;border-radius:8px;min-width:200px;">
-                            <?php foreach ($newsletter_templates as $newsletter_id => $template_html): ?>
-                                <option value="<?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $newsletter_id == $selected_newsletter ? 'selected' : ''; ?>>
-                                    Newsletter <?php echo htmlspecialchars($newsletter_id, ENT_QUOTES, 'UTF-8'); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <textarea name="email_html" id="email_html" rows="10" style="width:100%;"><?php echo htmlspecialchars($email_template); ?></textarea>
-                    <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($first_recipient_id); ?>">
-                    <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($first_recipient_email); ?>">
-                    <br><br>
-                    <button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
-                        📨 Send
-                    </button>
-                </form>
-
-                <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
-                    <p>Email will send in <span id="countdown">5</span> seconds...</p>
-                    <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
-                </div>
-            </div>
         </div>
 
         <div class="dashboard-v2-panel">
@@ -643,7 +647,6 @@ function sendEmail($to, $htmlBody) {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Open Rate</th>
-                        <th>Sent Date</th>
                         <th>Sent</th>
                     </tr>
                 </thead>
@@ -653,8 +656,8 @@ function sendEmail($to, $htmlBody) {
                             <td><?php echo htmlspecialchars($member['name'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($member['email'] ?? ''); ?></td>
                             <td><?php echo $member['email_open_rate'] ?? '0%'; ?></td>
-                            <td><?php echo $member['test_sent_date_time'] ?? 'N/A'; ?></td>
-                            <td><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
+                            <?php $sentDate = $member['test_sent_date_time'] ?? 'N/A'; ?>
+                            <td title="<?php echo htmlspecialchars($sentDate); ?>"><?php echo $member['test_sent'] ? '✅' : '❌'; ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
