@@ -11,7 +11,7 @@ function formatLocationTail(?string $location_full): string {
     return implode(', ', array_slice($location_parts, -2));
 }
 
-$sql = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full, vision, date_logged, status
+$sql = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full, vision, date_logged_ts, status
         FROM tb_ecobricks
         WHERE selfie_photo_url IS NOT NULL
           AND selfie_photo_url != ''
@@ -44,7 +44,7 @@ while ($row = $result->fetch_assoc()) {
         'ecobricker_maker' => $row['ecobricker_maker'] ?? '',
         'location_display' => formatLocationTail($row['location_full'] ?? ''),
         'vision' => $row['vision'] ?? '',
-        'date_logged' => $row['date_logged'] ?? '',
+        'date_logged_ts' => $row['date_logged_ts'] ?? '',
         'status' => $row['status'] ?? '',
     ];
 }
