@@ -573,8 +573,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
                 <?php if (!empty($featured_ecobricks)): ?>
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                        <?php
+                            $grid_image_src = !empty($brick['selfie_thumb_url']) ? $brick['selfie_thumb_url'] : ($brick['selfie_photo_url'] ?? '');
+                        ?>
                         <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>" title="<?php echo htmlspecialchars($brick['vision'] ?? $brick['location_display'] ?? 'View featured ecobrick'); ?>">
-                            <img src="<?php echo htmlspecialchars($brick['selfie_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                            <img src="<?php echo htmlspecialchars($grid_image_src); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
                                  alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
                         </button>
                     <?php endforeach; ?>
@@ -583,9 +586,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <div class="ecobrick-grid-actions">
                 <div class="ecobrick-grid-action-row" id="featured-grid-action-row">
                     <button id="previous-ecobricks" class="page-button tertiary previous-ecobricks" style="display:none;">Previous</button>
-                    <button id="load-next-ecobricks" class="page-button tertiary load-next-ecobricks">Next Selfies</button>
+                    <button id="load-next-ecobricks" class="page-button tertiary load-next-ecobricks" title="Load more of the latest authenticated ecobricks with selfies">More Ecobrick Selfies</button>
                 </div>
-                <small class="ecobrick-grid-note">Load more of the latest authenticated ecobricks with selfies</small>
+                <div class="ecobrick-grid-action-row">
+                    <button id="load-featured-ecobricks" class="page-button tertiary">Load Featured Ecobricks</button>
+                </div>
             </div>
             <p id="featured-ecobricks-empty" class="ecobrick-empty-message" <?php echo !empty($featured_ecobricks) ? 'style="display:none;"' : ''; ?>>No featured ecobricks to display right now.</p>
         </div>
@@ -891,7 +896,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             gridButton.title = brick.vision || brick.location_display || 'View featured ecobrick';
 
             const gridImg = document.createElement('img');
-            gridImg.src = `${brick.selfie_photo_url}?v=${brick.photo_version ?? ''}`;
+            const gridImageUrl = brick.selfie_thumb_url || brick.selfie_photo_url || '';
+            gridImg.src = `${gridImageUrl}?v=${brick.photo_version ?? ''}`;
             gridImg.alt = `Ecobrick selfie for serial ${brick.serial_no || ''}`;
             gridButton.appendChild(gridImg);
 
@@ -911,7 +917,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     }
 
     function loadFeaturedBatch(offset) {
-        fetch(`../api/fetch_featured_ecobricks.php?offset=${offset}&limit=${FEATURED_LIMIT}`)
+        fetch(`../api/fetch_featured_selfies.php?offset=${offset}&limit=${FEATURED_LIMIT}`)
             .then((response) => response.json())
             .then((data) => {
                 if (!data?.success) {
