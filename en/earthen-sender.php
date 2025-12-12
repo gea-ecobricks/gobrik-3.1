@@ -400,18 +400,6 @@ function sendEmail($to, $htmlBody) {
         background-color: #ff9800;
     }
 
-    #order-toggle-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 12px;
-    }
-
-    #order-toggle-wrapper strong {
-        min-width: 120px;
-        display: inline-block;
-    }
-
     .dashboard-wrapper {
         padding-bottom: 60px;
     }
@@ -446,22 +434,102 @@ function sendEmail($to, $htmlBody) {
         margin: 0 0 6px;
     }
 
+    .sender-actions {
+        margin-top: 16px;
+        width: 100%;
+    }
+
+    .sender-actions .button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .auto-send-box {
+        margin-top: 12px;
+        width: 100%;
+        min-height: 110px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    #auto-send-button {
+        width: 100%;
+        max-width: 100%;
+        justify-content: center;
+    }
+
     .control-card {
         display: flex;
         flex-direction: column;
         gap: 16px;
     }
 
-    .control-row {
+    .control-card h3 {
+        margin: 0;
+    }
+
+    .toggle-row {
+        background: #f7f9fb;
+        border: 1px solid #e1e5e9;
+        border-radius: 12px;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .toggle-row-title {
+        font-weight: 700;
+        width: 100%;
+    }
+
+    .toggle-row-body {
         display: flex;
         gap: 14px;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
+        width: 100%;
     }
 
-    .control-row .toggle-switch {
+    .toggle-description {
         margin: 0;
+        flex: 1;
+        color: var(--text-color, #43505b);
+    }
+
+    .toggle-action {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .toggle-row .toggle-switch {
+        margin: 0;
+    }
+
+    .send-delay-slider-row {
+        width: 100%;
+    }
+
+    .send-delay-slider-row input {
+        width: 100%;
+        accent-color: var(--emblem-green);
+    }
+
+    .send-delay-footer {
+        display: flex;
+        gap: 14px;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .delay-count {
+        font-weight: 700;
+        white-space: nowrap;
     }
 
     #test-email-container,
@@ -490,11 +558,6 @@ function sendEmail($to, $htmlBody) {
         top: auto;
     }
 
-    @media (max-width: 700px) {
-        #order-toggle-wrapper {
-            align-items: flex-start;
-        }
-    }
 </style>
 
 
@@ -526,51 +589,72 @@ function sendEmail($to, $htmlBody) {
                     <div class="stat-pill" id="batch-stats">Current Batch: <strong id="batch-size">0</strong> | Batch Sent: <strong id="batch-sent">0</strong> (<span id="batch-percentage">0.00</span>%)</div>
                 </div>
 
-                <div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:10px;">
-                    <a class="confirm-button enabled" href="../emailing/mailgun-logs.php" target="_blank" rel="noopener">View Mailgun Logs</a>
+                <div class="sender-actions">
+                    <a class="button ghost" href="../emailing/mailgun-logs.php" target="_blank" rel="noopener">View Mailgun Logs</a>
+                </div>
+
+                <div class="auto-send-box">
+                    <button id="auto-send-button" style="display:none" type="submit" form="email-form" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
+                        📨 Send
+                    </button>
+
+                    <div id="countdown-timer" style="margin-top: 4px; display: none; text-align:center; width:100%;">
+                        <p>Email will send in <span id="countdown">5</span> seconds...</p>
+                        <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
+                    </div>
                 </div>
             </div>
 
             <div class="dashboard-v2-panel control-card" id="sending-control">
-                <div class="control-row">
-                    <div>
-                        <label>✉️ Auto Send Emails</label>
-                        <p class="form-caption" style="margin-top:6px;">Uncheck to prevent the email from sending automatically after countdown.</p>
+                <h3>Sending Controls</h3>
+
+                <div class="toggle-row">
+                    <div class="toggle-row-title">✉️ Auto Send Emails</div>
+                    <div class="toggle-row-body">
+                        <p class="form-caption toggle-description">Uncheck to prevent the email from sending automatically after countdown.</p>
+                        <div class="toggle-action">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="auto-send-toggle" value="1">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="auto-send-toggle" value="1">
-                        <span class="slider"></span>
-                    </label>
                 </div>
 
-                <div class="control-row">
-                    <div>
-                        <label>🔁 Auto-load batches</label>
-                        <p class="form-caption" style="margin-top:6px;">When enabled, the next 100 members will load automatically after the current batch finishes and sending will continue.</p>
+                <div class="toggle-row">
+                    <div class="toggle-row-title">🔁 Auto-load batches</div>
+                    <div class="toggle-row-body">
+                        <p class="form-caption toggle-description">When enabled, the next 100 members will load automatically after the current batch finishes and sending will continue.</p>
+                        <div class="toggle-action">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="auto-load-toggle" value="1">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="auto-load-toggle" value="1">
-                        <span class="slider"></span>
-                    </label>
                 </div>
 
-                <div id="order-toggle-wrapper">
-                    <strong>🧭 Member order</strong>
-                    <label class="toggle-switch" style="margin:0;">
-                        <input type="checkbox" id="order-toggle" value="1">
-                        <span class="slider"></span>
-                    </label>
-                    <span id="order-label" class="form-caption">Oldest first</span>
+                <div class="toggle-row">
+                    <div class="toggle-row-title">🧭 Member order</div>
+                    <div class="toggle-row-body">
+                        <p id="order-label" class="form-caption toggle-description">Oldest first</p>
+                        <div class="toggle-action">
+                            <label class="toggle-switch" style="margin:0;">
+                                <input type="checkbox" id="order-toggle" value="1">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="control-row" style="align-items:flex-start;">
-                    <div style="flex:1; min-width:220px;">
-                        <label for="send-delay-slider" style="display:block;margin-bottom: 5px;">⏱️ Send Delay</label>
-                        <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1" style="width:100%;accent-color:var(--emblem-green);">
-                        <p class="form-caption" style="margin-top:5px;">Adjust sending delay from 1 to 10 seconds.</p>
+                <div class="toggle-row">
+                    <div class="toggle-row-title">⏱️ Send Delay</div>
+                    <div class="send-delay-slider-row">
+                        <input type="range" id="send-delay-slider" min="1" max="10" value="5" step="1">
                     </div>
-                    <div style="text-align:center; min-width:80px;">
-                        <p style="font-weight:bold;">⏱ <span id="delay-display">5</span>s</p>
+                    <div class="send-delay-footer">
+                        <p class="form-caption toggle-description">Adjust sending delay from 1 to 10 seconds.</p>
+                        <p class="delay-count">⏱ <span id="delay-display">5</span>s</p>
                     </div>
                 </div>
 
@@ -604,7 +688,7 @@ function sendEmail($to, $htmlBody) {
 
         <div class="dashboard-column column-wide">
             <div class="dashboard-v2-panel" id="newsletter-setup">
-                <h3 style="margin-top:0;">Newsletter Details &amp; Sender</h3>
+                <h3 style="margin-top:0;">Newsletter Details</h3>
                 <div id="send-controls">
                     <form id="email-form" method="POST">
                         <p><strong>From:</strong> <span id="email-from-display"><?php echo htmlspecialchars($email_from, ENT_QUOTES, 'UTF-8'); ?></span></p>
@@ -624,15 +708,7 @@ function sendEmail($to, $htmlBody) {
                         <input type="hidden" id="subscriber_id" name="subscriber_id" value="<?php echo htmlspecialchars($first_recipient_id); ?>">
                         <input type="hidden" id="email_to" name="email_to" value="<?php echo htmlspecialchars($first_recipient_email); ?>">
                         <br><br>
-                        <button id="auto-send-button" style="display:none" type="submit" name="send_email" class="confirm-button enabled" <?php echo $has_alerts ? 'disabled' : ''; ?>>
-                            📨 Send
-                        </button>
                     </form>
-
-                    <div id="countdown-timer" style="margin-top: 10px; display: none; text-align:center; width:100%;">
-                        <p>Email will send in <span id="countdown">5</span> seconds...</p>
-                        <button type="button" id="stop-timer-btn" class="confirm-button delete">🛑 Stop Timer</button>
-                    </div>
                 </div>
             </div>
 
