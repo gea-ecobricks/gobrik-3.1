@@ -200,12 +200,13 @@ function formatLocationTail(?string $location_full): string {
 }
 
 function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): array {
-    $sql_featured = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full, vision, date_logged_ts, status
+    $sql_featured = "SELECT ecobrick_full_photo_url, ecobrick_thumb_photo_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full, vision, date_logged_ts, status
                      FROM tb_ecobricks
-                     WHERE selfie_photo_url IS NOT NULL
-                       AND selfie_photo_url != ''
-                       AND ((feature = 1 AND status != 'not ready') OR LOWER(status) = 'authenticated')
-                     ORDER BY feature DESC, date_logged_ts DESC
+                     WHERE ecobrick_full_photo_url IS NOT NULL
+                       AND ecobrick_full_photo_url != ''
+                       AND feature = 1
+                       AND status != 'not ready'
+                     ORDER BY date_logged_ts DESC
                      LIMIT ? OFFSET ?";
 
     $featured_ecobricks = [];
@@ -217,8 +218,8 @@ function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): 
         $result_featured = $stmt_featured->get_result();
         while ($row = $result_featured->fetch_assoc()) {
             $featured_ecobricks[] = [
-                'selfie_photo_url' => $row['selfie_photo_url'] ?? '',
-                'selfie_thumb_url' => $row['selfie_thumb_url'] ?? '',
+                'ecobrick_full_photo_url' => $row['ecobrick_full_photo_url'] ?? '',
+                'ecobrick_thumb_photo_url' => $row['ecobrick_thumb_photo_url'] ?? '',
                 'serial_no' => $row['serial_no'] ?? '',
                 'photo_version' => $row['photo_version'] ?? '',
                 'weight_g' => $row['weight_g'] ?? '',
@@ -353,6 +354,39 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         position: relative;
     }
 
+    #welcome-greeting-panel {
+        background-image: url('../svgs/cloud-top-down.svg');
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-size: contain;
+    }
+
+    #registrations-panel .trainee-launch-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: #2e7d32;
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid #1b5e20;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    #registrations-panel .trainee-launch-button:hover,
+    #registrations-panel .trainee-launch-button:focus {
+        background: #1b5e20;
+        transform: translateY(-1px);
+    }
+
+    .ecobrick-vision-v2 {
+        font-style: italic;
+        margin-top: 8px;
+    }
+
     .vertical-toggle {
         position: relative;
         width: 32px;
@@ -431,7 +465,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <thead>
                     <tr>
                         <th>Training</th>
-                        <th>Location</th>
+                        <th>Launch</th>
                         <th>Date</th>
                         <th>Country</th>
                         <th>Type</th>
@@ -444,10 +478,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             <td><?php echo htmlspecialchars($training['training_title']); ?></td>
                             <td style="text-align:center;">
                                 <a href="javascript:void(0);"
-                                   style="text-decoration:underline; font-weight:bold;"
+                                   class="trainee-launch-button"
                                    onclick="openRegisteredTrainingsModal(<?php echo $training['training_id']; ?>,
                                                                       '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
-                                    <?php echo htmlspecialchars($training['training_location']); ?> 🔎
+                                    Open
                                 </a>
                             </td>
                             <td><?php echo htmlspecialchars($training_date); ?></td>
@@ -564,8 +598,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <?php if (!empty($featured_ecobricks)): ?>
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
                         <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
-                            <img src="<?php echo htmlspecialchars($brick['selfie_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
-                                 alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                            <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                                 alt="Ecobrick photo for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -574,11 +608,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <?php if (!empty($featured_ecobricks)): ?>
                     <?php foreach ($featured_ecobricks as $index => $brick): ?>
                         <?php
-                            $grid_image_src = !empty($brick['selfie_thumb_url']) ? $brick['selfie_thumb_url'] : ($brick['selfie_photo_url'] ?? '');
+                            $grid_image_src = !empty($brick['ecobrick_thumb_photo_url']) ? $brick['ecobrick_thumb_photo_url'] : ($brick['ecobrick_full_photo_url'] ?? '');
                         ?>
                         <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>" title="<?php echo htmlspecialchars($brick['vision'] ?? $brick['location_display'] ?? 'View featured ecobrick'); ?>">
                             <img src="<?php echo htmlspecialchars($grid_image_src); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
-                                 alt="Ecobrick selfie for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                                 alt="Ecobrick photo for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
                         </button>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -614,6 +648,33 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </tbody>
             </table>
         </div>
+
+        <?php if ($has_validation_access): ?>
+            <div id="validation-panel" class="dashboard-v2-panel">
+                <span class="panel-pill validator-pill">Validator</span>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
+                            ⏲️ <?php echo number_format((int) $awaiting_validation_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Awaiting Review</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
+                            ✅<?php echo number_format((int) $authenticated_today_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Authenticated Today</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
+                             ⛔<?php echo number_format((int) $rejected_today_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Rejected Today</div>
+                    </div>
+                </div>
+                <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
+            </div>
+        <?php endif; ?>
 
         <?php if ($is_admin): ?>
             <div id="admin-menu" class="dashboard-v2-panel">
@@ -702,33 +763,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </table>
             </div>
         <?php endif; ?>
-
-        <?php if ($has_validation_access): ?>
-            <div id="validation-panel" class="dashboard-v2-panel">
-                <span class="panel-pill validator-pill">Validator</span>
-                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
-                    <div style="text-align:center;">
-                        <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
-                            ⏲️ <?php echo number_format((int) $awaiting_validation_count); ?>
-                        </div>
-                        <div style="font-size:1em;margin-top: 6px;">Awaiting Review</div>
-                    </div>
-                    <div style="text-align:center;">
-                        <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
-                            ✅<?php echo number_format((int) $authenticated_today_count); ?>
-                        </div>
-                        <div style="font-size:1em;margin-top: 6px;">Authenticated Today</div>
-                    </div>
-                    <div style="text-align:center;">
-                        <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
-                             ⛔<?php echo number_format((int) $rejected_today_count); ?>
-                        </div>
-                        <div style="font-size:1em;margin-top: 6px;">Rejected Today</div>
-                    </div>
-                </div>
-                <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
-            </div>
-        <?php endif; ?>
     </div>
 </div><!-- closes main container -->
 
@@ -746,8 +780,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     const featuredGridBricks = <?php echo $featured_ecobricks_json ?? '[]'; ?> || [];
     const FEATURED_LIMIT = 9;
+    const SELFIE_ENDPOINT = '../api/fetch_featured_selfies.php';
+    const ECOBRICK_ENDPOINT = '../api/fetch_featured_ecobricks.php';
     let featuredOffset = 0;
     let currentFeaturedBricks = Array.isArray(featuredGridBricks) ? featuredGridBricks : [];
+    let currentFeaturedEndpoint = ECOBRICK_ENDPOINT;
 
     const sliderElement = document.getElementById('ecobrick-slider');
     const previousButton = document.getElementById('previous-ecobricks');
@@ -859,9 +896,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         if (!Array.isArray(bricks)) return;
 
         bricks.slice(0, FEATURED_LIMIT).forEach((brick) => {
-            if (!brick || !brick.selfie_photo_url) return;
+            if (!brick) return;
+            const photoUrl = brick.ecobrick_full_photo_url || brick.selfie_photo_url;
+            if (!photoUrl) return;
             const preloadImg = new Image();
-            preloadImg.src = `${brick.selfie_photo_url}?v=${brick.photo_version ?? ''}`;
+            preloadImg.src = `${photoUrl}?v=${brick.photo_version ?? ''}`;
         });
     }
 
@@ -884,9 +923,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             const slide = document.createElement('div');
             slide.className = `slide${index === 0 ? ' active' : ''}`;
 
+            const photoUrl = brick.ecobrick_full_photo_url || brick.selfie_photo_url || '';
             const slideImg = document.createElement('img');
-            slideImg.src = `${brick.selfie_photo_url}?v=${brick.photo_version ?? ''}`;
-            slideImg.alt = `Ecobrick selfie for serial ${brick.serial_no || ''}`;
+            slideImg.src = `${photoUrl}?v=${brick.photo_version ?? ''}`;
+            slideImg.alt = `Ecobrick photo for serial ${brick.serial_no || ''}`;
             slide.appendChild(slideImg);
             slider.appendChild(slide);
 
@@ -896,9 +936,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             gridButton.title = brick.vision || brick.location_display || 'View featured ecobrick';
 
             const gridImg = document.createElement('img');
-            const gridImageUrl = brick.selfie_thumb_url || brick.selfie_photo_url || '';
+            const gridImageUrl = brick.ecobrick_thumb_photo_url || brick.selfie_thumb_photo_url || photoUrl;
             gridImg.src = `${gridImageUrl}?v=${brick.photo_version ?? ''}`;
-            gridImg.alt = `Ecobrick selfie for serial ${brick.serial_no || ''}`;
+            gridImg.alt = `Ecobrick photo for serial ${brick.serial_no || ''}`;
             gridButton.appendChild(gridImg);
 
             gridButton.addEventListener('click', () => openViewEcobricV2(brick));
@@ -917,7 +957,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     }
 
     function loadFeaturedBatch(offset) {
-        fetch(`../api/fetch_featured_selfies.php?offset=${offset}&limit=${FEATURED_LIMIT}`)
+        fetch(`${currentFeaturedEndpoint}?offset=${offset}&limit=${FEATURED_LIMIT}`)
             .then((response) => response.json())
             .then((data) => {
                 if (!data?.success) {
@@ -1024,8 +1064,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         photoWrapper.className = 'ecobrick-photo-wrapper';
 
         const img = document.createElement('img');
-        img.src = `${brickData.selfie_photo_url}?v=${brickData.photo_version ?? ''}`;
-        img.alt = `Ecobrick selfie for serial ${brickData.serial_no || ''}`;
+        const primaryPhotoUrl = brickData.ecobrick_full_photo_url || brickData.selfie_photo_url || '';
+        img.src = `${primaryPhotoUrl}?v=${brickData.photo_version ?? ''}`;
+        img.alt = `Ecobrick photo for serial ${brickData.serial_no || ''}`;
 
         photoWrapper.appendChild(img);
         photoContainer.appendChild(photoWrapper);
@@ -1040,6 +1081,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         const serialTxt = brickData.serial_no || 'an unlisted serial';
         details.textContent = `This ${weightTxt} ecobrick ${serialTxt} was made by ${makerTxt} in ${locationTxt}.`;
         metaWrapper.appendChild(details);
+
+        const visionText = brickData.vision || '';
+        if (visionText) {
+            const visionEl = document.createElement('div');
+            visionEl.className = 'ecobrick-vision-v2';
+            visionEl.textContent = visionText;
+            metaWrapper.appendChild(visionEl);
+        }
 
         photoContainer.appendChild(metaWrapper);
 
@@ -1064,13 +1113,27 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         updateFeaturedBricks(currentFeaturedBricks);
 
         loadNextButton?.addEventListener('click', () => {
-            featuredOffset += FEATURED_LIMIT;
+            const switchingEndpoint = currentFeaturedEndpoint !== SELFIE_ENDPOINT;
+            currentFeaturedEndpoint = SELFIE_ENDPOINT;
+
+            if (switchingEndpoint) {
+                featuredOffset = 0;
+            } else {
+                featuredOffset += FEATURED_LIMIT;
+            }
             updateFeaturedControls();
             loadFeaturedBatch(featuredOffset);
         });
 
         previousButton?.addEventListener('click', () => {
             featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
+            updateFeaturedControls();
+            loadFeaturedBatch(featuredOffset);
+        });
+
+        document.getElementById('load-featured-ecobricks')?.addEventListener('click', () => {
+            currentFeaturedEndpoint = ECOBRICK_ENDPOINT;
+            featuredOffset = 0;
             updateFeaturedControls();
             loadFeaturedBatch(featuredOffset);
         });
