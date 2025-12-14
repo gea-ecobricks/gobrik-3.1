@@ -15,9 +15,8 @@ $sql = "SELECT selfie_photo_url, selfie_thumb_url, serial_no, photo_version, wei
         FROM tb_ecobricks
         WHERE selfie_photo_url IS NOT NULL
           AND selfie_photo_url != ''
-          AND feature = 1
-          AND status != 'not ready'
-        ORDER BY date_logged_ts DESC
+          AND ((feature = 1 AND status != 'not ready') OR LOWER(status) = 'authenticated')
+        ORDER BY feature DESC, date_logged_ts DESC
         LIMIT ? OFFSET ?";
 
 $stmt = $gobrik_conn->prepare($sql);
