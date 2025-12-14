@@ -77,6 +77,26 @@
     }
 
 
+.dashboard-wrapper {
+    padding: 40px 20px 60px;
+}
+
+.dashboard-v2-panel.form-container {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 28px;
+}
+
+.dashboard-v2-panel.form-container .menu-buttons-row {
+    justify-content: center;
+    gap: 12px;
+}
+
+.dashboard-v2-panel.form-container .menu-buttons-row .page-button {
+    flex: 0 1 auto;
+}
+
+
 .ecobrick-action-button {
     width: 100%;           /* Ensures the button takes the full width */
     display: block;        /* Ensures the button behaves as a block element */
