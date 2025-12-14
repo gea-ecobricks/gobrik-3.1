@@ -87,15 +87,11 @@ $subject = "Please activate your 2025 GoBrik account";
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <?php require_once ("../includes/accounting-inc.php");?>
+<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v13">
+<?php require_once ("../header-2026.php");?>
 
-<div class="splash-title-block"></div>
-<div id="splash-bar"></div>
-
-<!-- PAGE CONTENT -->
-<div id="top-page-image" class="open-books-top top-page-image"></div>
-
-<div id="form-submission-box" class="landing-page-form">
-    <div class="form-container">
+<div class="dashboard-wrapper">
+    <div class="dashboard-v2-panel form-container" id="accounting-panel">
 
        <!-- Email confirmation form -->
 
@@ -142,7 +138,7 @@ $subject = "Please activate your 2025 GoBrik account";
 
 
 <!--FOOTER STARTS HERE-->
-<?php require_once ("../footer-2025.php"); ?>
+<?php require_once ("../footer-2026.php"); ?>
 
 
 
