@@ -52,6 +52,10 @@ body {
     min-height: 120px;
 }
 
+#welcome-greeting-panel #greeting {
+    color: #ffffff;
+}
+
 .panel-pill {
     position: absolute;
     top: 10px;
@@ -395,6 +399,13 @@ body {
     margin-top: 12px;
 }
 
+#registrations-panel table.dataTable th:first-child,
+#registrations-panel table.dataTable td:first-child {
+    white-space: normal;
+    min-width: 0;
+    word-break: break-word;
+}
+
 .page-button {
     font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
 }
@@ -440,11 +451,13 @@ body {
 @media (max-width: 768px) {
     #dashboard-v2-grid {
         grid-template-columns: 1fr;
-        padding: 20px 0;
+        padding: 0;
     }
 
     .dashboard-wrapper {
-        padding: 0 14px;
+        max-width: none;
+        padding: 0;
+        width: 100vw;
     }
 
     .dashboard-column {
@@ -456,6 +469,7 @@ body {
     #my-ecobricks-panel,
     #registrations-panel {
         min-height: 0;
+        width: 100%;
     }
 
     .dashboard-actions {

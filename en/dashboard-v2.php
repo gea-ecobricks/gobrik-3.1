@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '7.77';
+$version = '7.78';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -355,10 +355,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     }
 
     #welcome-greeting-panel {
-        background-image: url('../svgs/cloud-top-down.svg');
         background-repeat: no-repeat;
         background-position: top center;
         background-size: contain;
+    }
+
+    #welcome-greeting-panel #greeting {
+        color: #ffffff;
     }
 
     #registrations-panel .trainee-launch-button {
@@ -461,7 +464,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <h3 data-lang-id="002-my-registrations">My Registrations</h3>
             <p>Trainings that you've registered for.</p>
 
-            <table id="trainee-trainings" class="display responsive nowrap" style="width:100%;">
+            <table id="trainee-trainings" class="display responsive" style="width:100%;">
                 <thead>
                     <tr>
                         <th>Training</th>
@@ -1580,128 +1583,55 @@ function openTraineesModal(trainingId, trainingTitle) {
 
 <script type="text/javascript">
 
-// JavaScript to determine the user's time of day and display an appropriate greeting
-window.onload = function() {
-    var now = new Date();
-    var hours = now.getHours();
-    var greeting;
-    var lang = "<?php echo htmlspecialchars($lang); ?>"; // Get the language from PHP
+// Determine greeting and corresponding welcome panel background based on the time of day
+function getGreetingConfig(lang) {
+    const now = new Date();
+    const hours = now.getHours();
+    const timeOfDay = hours < 12
+        ? 'morning'
+        : hours < 17
+            ? 'afternoon'
+            : hours < 21
+                ? 'evening'
+                : 'night';
 
-    // Determine greeting based on the time of day
-    if (hours < 12) {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bonjour";
-                break;
-            case 'es':
-                greeting = "Buenos días";
-                break;
-            case 'id':
-                greeting = "Selamat pagi";
-                break;
-            case 'en':
-            default:
-                greeting = "Good morning";
-                break;
-        }
-    } else if (hours < 18) {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bon après-midi";
-                break;
-            case 'es':
-                greeting = "Buenas tardes";
-                break;
-            case 'id':
-                greeting = "Selamat siang";
-                break;
-            case 'en':
-            default:
-                greeting = "Good afternoon";
-                break;
-        }
-    } else {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bonsoir";
-                break;
-            case 'es':
-                greeting = "Buenas noches";
-                break;
-            case 'id':
-                greeting = "Selamat malam";
-                break;
-            case 'en':
-            default:
-                greeting = "Good evening";
-                break;
-        }
-    }
+    const greetings = {
+        en: { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening', night: 'Good night' },
+        fr: { morning: 'Bonjour', afternoon: 'Bon après-midi', evening: 'Bonsoir', night: 'Bonne nuit' },
+        es: { morning: 'Buenos días', afternoon: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches' },
+        id: { morning: 'Selamat pagi', afternoon: 'Selamat siang', evening: 'Selamat malam', night: 'Selamat malam' }
+    };
 
-    document.getElementById("greeting").innerHTML = greeting + " <?php echo htmlspecialchars($first_name); ?>!";
+    const backgrounds = {
+        morning: 'good-morning',
+        afternoon: 'good-afternoon',
+        evening: 'good-evening',
+        night: 'good-night'
+    };
+
+    const selectedGreeting = greetings[lang]?.[timeOfDay] || greetings.en[timeOfDay];
+    const selectedBackground = backgrounds[timeOfDay];
+
+    return { greeting: selectedGreeting, background: selectedBackground };
 }
-
-
 
 // Main greeting function to determine the user's time of day and display an appropriate greeting
 function mainGreeting() {
-    var now = new Date();
-    var hours = now.getHours();
-    var greeting;
-    var lang = "<?php echo htmlspecialchars($lang); ?>"; // Get the language from PHP
+    const lang = "<?php echo htmlspecialchars($lang); ?>"; // Get the language from PHP
+    const greetingElement = document.getElementById("greeting");
+    const welcomePanelElement = document.getElementById('welcome-greeting-panel');
+    const { greeting, background } = getGreetingConfig(lang);
 
-    // Determine greeting based on the time of day
-    if (hours < 12) {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bonjour";
-                break;
-            case 'es':
-                greeting = "Buenos días";
-                break;
-            case 'id':
-                greeting = "Selamat pagi";
-                break;
-            case 'en':
-            default:
-                greeting = "Good morning";
-                break;
-        }
-    } else if (hours < 18) {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bon après-midi";
-                break;
-            case 'es':
-                greeting = "Buenas tardes";
-                break;
-            case 'id':
-                greeting = "Selamat siang";
-                break;
-            case 'en':
-            default:
-                greeting = "Good afternoon";
-                break;
-        }
-    } else {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bonsoir";
-                break;
-            case 'es':
-                greeting = "Buenas noches";
-                break;
-            case 'id':
-                greeting = "Selamat malam";
-                break;
-            case 'en':
-            default:
-                greeting = "Good evening";
-                break;
-        }
+    if (greetingElement) {
+        greetingElement.innerHTML = greeting + " <?php echo htmlspecialchars($first_name); ?>!";
     }
 
-    document.getElementById("greeting").innerHTML = greeting + " <?php echo htmlspecialchars($first_name); ?>!";
+    if (welcomePanelElement && background) {
+        welcomePanelElement.style.backgroundImage = "url('../svgs/" + background + ".svg')";
+        welcomePanelElement.style.backgroundRepeat = 'no-repeat';
+        welcomePanelElement.style.backgroundPosition = 'center';
+        welcomePanelElement.style.backgroundSize = 'cover';
+    }
 }
 
 
