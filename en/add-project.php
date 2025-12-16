@@ -115,21 +115,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 <?php require_once ("../includes/add-project-inc.php");?>
+<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v13">
+<?php require_once ("../header-2026.php");?>
 
 
-<div class="splash-title-block"></div>
-<div id="splash-bar"></div>
 
  <!-- PAGE CONTENT-->
 
- <div id="form-submission-box" class="landing-page-form" style="height:auto !important;">
-    <div class="form-container">
-        <div class="form-top-header" style="display:flex;flex-flow:row;">
-            <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
-                <img src="../svgs/step1-log-project.svg" style="height:25px;">
+ <div class="dashboard-wrapper">
+    <div id="form-submission-box" class="dashboard-v2-panel form-container-v2 landing-page-form" style="height:auto !important;">
+        <div class="form-container">
+            <div class="form-top-header" style="display:flex;flex-flow:row;">
+                <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
+                    <img src="../svgs/step1-log-project.svg" style="height:25px;">
+                </div>
             </div>
-            <div id="language-code" onclick="showLangSelector()" aria-label="Switch languages"><span data-lang-id="000-language-code">🌐 EN</span></div>
-        </div>
 
         <div class="splash-form-content-block">  
             <div class="splash-box">
@@ -336,6 +336,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </form>
 
+        </div>
     </div>
 </div>
 
@@ -658,7 +659,7 @@ $(document).ready(function() {
        
 	<!--FOOTER STARTS HERE-->
 
-	<?php require_once ("../footer-2025.php");?>
+        <?php require_once ("../footer-2026.php");?>
 
 </div>
 

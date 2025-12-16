@@ -2,7 +2,7 @@
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-include '../gobrikconn_env.php';
+require_once '../gobrikconn_env.php';
 
 $error_message = '';
 $full_urls = [];
@@ -12,7 +12,7 @@ $thumbnail_file_sizes = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['project_id'])) {
     $project_id = $_POST['project_id'];
-    include '../project-photo-functions.php';
+    include '../scripts/photo-functions.php';
 
 
     // Handle project deletion
