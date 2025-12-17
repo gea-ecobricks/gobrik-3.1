@@ -241,6 +241,42 @@ function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): 
 $featured_ecobricks = fetchFeaturedEcobricks($gobrik_conn, 9, 0);
 $featured_ecobricks_json = json_encode($featured_ecobricks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
+// 🧱 Fetch latest projects
+function fetchLatestProjects(mysqli $conn, int $limit = 9, int $offset = 0): array {
+    $sql_projects = "SELECT project_id, project_name, description_short, briks_used, photo1_main, photo1_tmb
+                     FROM tb_projects
+                     WHERE ready_to_show = 1
+                     ORDER BY project_id DESC
+                     LIMIT ? OFFSET ?";
+
+    $latest_projects = [];
+
+    $stmt_projects = $conn->prepare($sql_projects);
+    if ($stmt_projects) {
+        $stmt_projects->bind_param('ii', $limit, $offset);
+        $stmt_projects->execute();
+        $result_projects = $stmt_projects->get_result();
+        while ($row = $result_projects->fetch_assoc()) {
+            $latest_projects[] = [
+                'project_id' => (int) ($row['project_id'] ?? 0),
+                'project_name' => $row['project_name'] ?? '',
+                'description_short' => $row['description_short'] ?? '',
+                'briks_used' => (int) ($row['briks_used'] ?? 0),
+                'photo1_main' => $row['photo1_main'] ?? '',
+                'photo1_tmb' => $row['photo1_tmb'] ?? '',
+            ];
+        }
+        $stmt_projects->close();
+    } else {
+        die("Error preparing statement for latest projects: " . $conn->error);
+    }
+
+    return $latest_projects;
+}
+
+$latest_projects = fetchLatestProjects($gobrik_conn, 9, 0);
+$latest_projects_json = json_encode($latest_projects, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+
 // 📣 Fetch the latest dashboard notice for display and admin controls
 function fetchLatestDashNotice($conn) {
     $latest_notice = null;
@@ -679,6 +715,28 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         <?php endif; ?>
 
+        <div id="latest-projects-panel" class="dashboard-v2-panel">
+            <h4 style="margin:0 0 12px 0;">Latest Projects</h4>
+            <div id="project-grid" class="ecobrick-grid project-grid" aria-label="Latest showcased projects">
+                <?php if (!empty($latest_projects)): ?>
+                    <?php foreach ($latest_projects as $project): ?>
+                        <button class="ecobrick-grid-item project-grid-item" type="button"
+                                data-project-id="<?php echo (int) $project['project_id']; ?>"
+                                title="<?php echo htmlspecialchars($project['project_name'] ?? 'View project'); ?>">
+                            <?php $project_thumb = !empty($project['photo1_tmb']) ? $project['photo1_tmb'] : ($project['photo1_main'] ?? ''); ?>
+                            <img src="<?php echo htmlspecialchars($project_thumb); ?>"
+                                 alt="<?php echo htmlspecialchars($project['project_name'] ?? 'Project photo'); ?>">
+                            <span class="project-grid-title"><?php echo htmlspecialchars($project['project_name'] ?? ''); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            <p id="projects-empty" class="ecobrick-empty-message" <?php echo !empty($latest_projects) ? 'style="display:none;"' : ''; ?>>No projects to display right now.</p>
+            <div class="ecobrick-grid-actions">
+                <button id="load-more-projects" class="page-button tertiary">Load more projects</button>
+            </div>
+        </div>
+
         <?php if ($is_admin): ?>
             <div id="admin-menu" class="dashboard-v2-panel">
                 <span class="panel-pill admin-pill">Admin</span>
@@ -789,6 +847,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     let currentFeaturedBricks = Array.isArray(featuredGridBricks) ? featuredGridBricks : [];
     let currentFeaturedEndpoint = ECOBRICK_ENDPOINT;
 
+    const latestProjects = <?php echo $latest_projects_json ?? '[]'; ?> || [];
+    const PROJECT_LIMIT = 9;
+    const PROJECT_ENDPOINT = '../api/fetch_latest_projects.php';
+    let projectOffset = 0;
+
     const sliderElement = document.getElementById('ecobrick-slider');
     const previousButton = document.getElementById('previous-ecobricks');
     const gridActionRow = document.getElementById('featured-grid-action-row');
@@ -802,6 +865,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     let sliderCurrentIndex = 0;
     let sliderIntervalId = null;
     let sliderTouchStartX = 0;
+
+    const projectGrid = document.getElementById('project-grid');
+    const projectEmptyMessage = document.getElementById('projects-empty');
+    const loadMoreProjectsButton = document.getElementById('load-more-projects');
 
     function updateFeaturedControls() {
         if (!loadNextButton) return;
@@ -959,6 +1026,91 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         updateFeaturedControls();
     }
 
+    function toggleProjectsEmptyState(hasProjects) {
+        if (projectEmptyMessage) {
+            projectEmptyMessage.style.display = hasProjects ? 'none' : 'block';
+        }
+
+        if (projectGrid) {
+            projectGrid.style.display = hasProjects ? 'grid' : 'none';
+        }
+    }
+
+    function renderProjectGrid(projects, append = false) {
+        if (!projectGrid) return;
+
+        if (!append) {
+            projectGrid.replaceChildren();
+        }
+
+        projects.forEach((project) => {
+            const gridButton = document.createElement('button');
+            gridButton.className = 'ecobrick-grid-item project-grid-item';
+            gridButton.type = 'button';
+            gridButton.title = project.project_name || 'View project';
+
+            const projectThumb = project.photo1_tmb || project.photo1_main || '';
+
+            const gridImg = document.createElement('img');
+            gridImg.src = projectThumb;
+            gridImg.alt = project.project_name || 'Project photo';
+            gridButton.appendChild(gridImg);
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'project-grid-title';
+            titleSpan.textContent = project.project_name || '';
+            gridButton.appendChild(titleSpan);
+
+            gridButton.addEventListener('click', () => projectPreview(project));
+            projectGrid.appendChild(gridButton);
+        });
+
+        toggleProjectsEmptyState(projectGrid.children.length > 0);
+    }
+
+    function updateProjects(projects, append = false) {
+        const list = Array.isArray(projects) ? projects : [];
+        if (!list.length && !append) {
+            toggleProjectsEmptyState(false);
+            return;
+        }
+
+        renderProjectGrid(list, append);
+    }
+
+    function loadMoreProjects() {
+        if (loadMoreProjectsButton) {
+            loadMoreProjectsButton.disabled = true;
+            loadMoreProjectsButton.setAttribute('aria-busy', 'true');
+        }
+
+        fetch(`${PROJECT_ENDPOINT}?offset=${projectOffset}&limit=${PROJECT_LIMIT}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data?.success) {
+                    throw new Error(data?.error || 'Unable to load projects');
+                }
+
+                if (!Array.isArray(data.data) || !data.data.length) {
+                    projectOffset = Math.max(0, projectOffset - PROJECT_LIMIT);
+                    return;
+                }
+
+                updateProjects(data.data, projectOffset > 0);
+                projectOffset += PROJECT_LIMIT;
+            })
+            .catch((error) => {
+                console.error('Error fetching projects:', error);
+                projectOffset = Math.max(0, projectOffset - PROJECT_LIMIT);
+            })
+            .finally(() => {
+                if (loadMoreProjectsButton) {
+                    loadMoreProjectsButton.disabled = false;
+                    loadMoreProjectsButton.removeAttribute('aria-busy');
+                }
+            });
+    }
+
     function loadFeaturedBatch(offset) {
         fetch(`${currentFeaturedEndpoint}?offset=${offset}&limit=${FEATURED_LIMIT}`)
             .then((response) => response.json())
@@ -1022,6 +1174,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         if (modalViewButton) {
             modalViewButton.href = '#';
+            modalViewButton.textContent = 'View Ecobrick';
             modalViewButton.style.display = 'none';
         }
     }
@@ -1098,6 +1251,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         const viewHref = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
         if (modalViewButton) {
             modalViewButton.href = viewHref;
+            modalViewButton.textContent = 'View Ecobrick';
             modalViewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
             modalViewButton.style.display = 'inline-flex';
         }
@@ -1112,8 +1266,66 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         document.body.classList.add('modal-open');
     }
 
+    function projectPreview(projectData) {
+        if (!projectData) return;
+
+        const modal = document.getElementById('form-modal-message-v2');
+        const photoContainer = modal?.querySelector('.modal-photo-v2');
+        const messageContainer = modal?.querySelector('.modal-message-v2');
+        const modalStatusPill = modal?.querySelector('.modal-status-pill');
+        const modalViewButton = modal?.querySelector('.modal-view-button');
+
+        if (!modal || !photoContainer || !messageContainer) return;
+
+        photoContainer.replaceChildren();
+        messageContainer.replaceChildren();
+
+        const photoWrapper = document.createElement('div');
+        photoWrapper.className = 'ecobrick-photo-wrapper';
+
+        const img = document.createElement('img');
+        const primaryPhotoUrl = projectData.photo1_main || projectData.photo1_tmb || '';
+        img.src = primaryPhotoUrl;
+        img.alt = projectData.project_name || 'Project photo';
+
+        photoWrapper.appendChild(img);
+        photoContainer.appendChild(photoWrapper);
+
+        const title = document.createElement('h4');
+        title.textContent = projectData.project_name || 'Project';
+        messageContainer.appendChild(title);
+
+        if (projectData.description_short) {
+            const desc = document.createElement('p');
+            desc.textContent = projectData.description_short;
+            messageContainer.appendChild(desc);
+        }
+
+        if (modalViewButton) {
+            modalViewButton.href = `project.php?id=${encodeURIComponent(projectData.project_id || '')}`;
+            modalViewButton.textContent = 'View project';
+            modalViewButton.setAttribute('aria-label', `Open project ${projectData.project_name || ''}`);
+            modalViewButton.style.display = 'inline-flex';
+        }
+
+        if (modalStatusPill) {
+            modalStatusPill.className = 'modal-status-pill status-pill status-default';
+            modalStatusPill.textContent = `${projectData.briks_used ?? 0} ecobricks`;
+            modalStatusPill.style.display = 'inline-flex';
+        }
+
+        modal.classList.remove('modal-hidden');
+        modal.classList.add('modal-shown');
+        document.getElementById('page-content')?.classList.add('blurred');
+        document.getElementById('footer-full')?.classList.add('blurred');
+        document.body.classList.add('modal-open');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         updateFeaturedBricks(currentFeaturedBricks);
+
+        updateProjects(latestProjects);
+        projectOffset = Array.isArray(latestProjects) ? latestProjects.length : 0;
 
         loadNextButton?.addEventListener('click', () => {
             const switchingEndpoint = currentFeaturedEndpoint !== SELFIE_ENDPOINT;
@@ -1132,6 +1344,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
             updateFeaturedControls();
             loadFeaturedBatch(featuredOffset);
+        });
+
+        loadMoreProjectsButton?.addEventListener('click', () => {
+            loadMoreProjects();
         });
 
         document.getElementById('load-featured-ecobricks')?.addEventListener('click', () => {
