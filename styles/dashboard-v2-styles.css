@@ -274,14 +274,14 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 14px 16px;
+    padding: 25px 25px 16px 10px;
     margin: 0;
     width: 100%;
     box-sizing: border-box;
     border-radius: 14px;
-    background: #fff3dc;
-    border: 1px solid #f3c97a;
-    color: #5c3b07;
+    background: #c66a0f;
+    border: 1px solid #c66a0f;
+    color: #ffffff;
     font-weight: 600;
     position: relative;
 }
@@ -344,7 +344,7 @@ body {
 
 .notice-text a {
     font-weight: 800;
-    color: #a86200;
+    color: #ffffff;
     text-decoration: underline;
 }
 
