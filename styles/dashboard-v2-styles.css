@@ -279,8 +279,7 @@ body {
     width: 100%;
     box-sizing: border-box;
     border-radius: 14px;
-    background: #c66a0f;
-    border: 1px solid #c66a0f;
+    background: var(--notice-bg, rgba(198, 106, 15, 0.8));
     color: #ffffff;
     font-weight: 600;
     position: relative;
