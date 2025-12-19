@@ -53,7 +53,8 @@ body {
 }
 
 #welcome-greeting-panel #greeting {
-    color: #ffffff;
+    color: var(--h1);
+    text-align: right;
 }
 
 .panel-pill {
@@ -91,6 +92,12 @@ body {
     background: var(--pill-latest-bg);
     color: var(--pill-latest-text);
     border-color: var(--dashboard-panel-border, #d0d7de);
+}
+
+.panel-pill.warning-pill {
+    background: #ffb74d;
+    color: #4e2600;
+    border-color: #f57c00;
 }
 
 .dashboard-v2-panel h2,
@@ -279,7 +286,7 @@ body {
     width: 100%;
     box-sizing: border-box;
     border-radius: 14px;
-    background: var(--notice-bg, rgba(198, 106, 15, 0.8));
+    background: var(--notice-bg, rgba(198, 106, 15, 0.8)) !important;
     color: #ffffff;
     font-weight: 600;
     position: relative;

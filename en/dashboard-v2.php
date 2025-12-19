@@ -433,28 +433,38 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     }
 
     #welcome-greeting-panel #greeting {
-        color: #ffffff;
+        color: var(--h1);
+        text-align: right;
     }
 
     #registrations-panel .trainee-launch-button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 6px 14px;
+        padding: 5px 11px;
         border-radius: 999px;
-        background: #2e7d32;
+        background: var(--emblem-green);
         color: #ffffff;
         font-weight: 700;
         text-decoration: none;
-        border: 1px solid #1b5e20;
+        border: none;
+        font-size: 0.8em;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
-        transition: background 0.2s ease, transform 0.2s ease;
+        transition: background 0.2s ease, transform 0.2s ease, filter 0.2s ease;
     }
 
     #registrations-panel .trainee-launch-button:hover,
     #registrations-panel .trainee-launch-button:focus {
-        background: #1b5e20;
+        filter: brightness(0.92);
         transform: translateY(-1px);
+    }
+
+    #registrations-panel .trainee-launch-button.is-past {
+        background: #9e9e9e;
+    }
+
+    #registrations-panel .trainee-launch-button.is-upcoming {
+        background: var(--emblem-green);
     }
 
     .ecobrick-vision-v2 {
@@ -548,12 +558,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </thead>
                 <tbody>
                     <?php foreach ($registered_trainings as $training): ?>
-                        <?php $training_date = date('Y-m-d', strtotime($training['training_date'])); ?>
+                        <?php
+                            $training_date_ts = strtotime($training['training_date']);
+                            $training_date = date('Y-m-d', $training_date_ts);
+                            $is_past_training = $training_date_ts < strtotime('today');
+                            $launch_class = $is_past_training ? 'is-past' : 'is-upcoming';
+                        ?>
                         <tr>
                             <td><?php echo htmlspecialchars($training['training_title']); ?></td>
                             <td style="text-align:center;">
                                 <a href="javascript:void(0);"
-                                   class="trainee-launch-button"
+                                   class="trainee-launch-button <?php echo $launch_class; ?>"
                                    onclick="openRegisteredTrainingsModal(<?php echo $training['training_id']; ?>,
                                                                       '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
                                     Open
@@ -569,6 +584,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         </div>
 
         <div id="support-chats-panel" class="dashboard-v2-panel">
+            <span class="panel-pill warning-pill">🚧 Under construction</span>
             <div class="support-chats-header">
                 <div>
                     <h3>Support Chats</h3>
@@ -774,7 +790,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
             <p id="projects-empty" class="ecobrick-empty-message" <?php echo !empty($latest_projects) ? 'style="display:none;"' : ''; ?>>No projects to display right now.</p>
             <div class="ecobrick-grid-actions">
+                <button id="previous-projects" class="page-button tertiary" style="display:none;">Previous projects</button>
                 <button id="load-more-projects" class="page-button tertiary">Load more projects</button>
+                <a href="add-project.php" class="page-button" style="background:#0d6efd;color:#ffffff;text-decoration:none;">Post your project</a>
             </div>
         </div>
 
@@ -910,6 +928,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     const projectGrid = document.getElementById('project-grid');
     const projectEmptyMessage = document.getElementById('projects-empty');
     const loadMoreProjectsButton = document.getElementById('load-more-projects');
+    const previousProjectsButton = document.getElementById('previous-projects');
 
     function updateFeaturedControls() {
         if (!loadNextButton) return;
@@ -1077,12 +1096,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         }
     }
 
-    function renderProjectGrid(projects, append = false) {
+    function renderProjectGrid(projects) {
         if (!projectGrid) return;
 
-        if (!append) {
-            projectGrid.replaceChildren();
-        }
+        projectGrid.replaceChildren();
 
         projects.forEach((project) => {
             const gridButton = document.createElement('button');
@@ -1109,14 +1126,20 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         toggleProjectsEmptyState(projectGrid.children.length > 0);
     }
 
-    function updateProjects(projects, append = false) {
+    function updateProjects(projects) {
         const list = Array.isArray(projects) ? projects : [];
-        if (!list.length && !append) {
+        if (!list.length) {
             toggleProjectsEmptyState(false);
             return;
         }
 
-        renderProjectGrid(list, append);
+        renderProjectGrid(list);
+    }
+
+    function updateProjectControls() {
+        if (previousProjectsButton) {
+            previousProjectsButton.style.display = projectOffset > 0 ? 'inline-flex' : 'none';
+        }
     }
 
     function loadMoreProjects() {
@@ -1125,7 +1148,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             loadMoreProjectsButton.setAttribute('aria-busy', 'true');
         }
 
-        fetch(`${PROJECT_ENDPOINT}?offset=${projectOffset}&limit=${PROJECT_LIMIT}`)
+        const nextOffset = projectOffset + PROJECT_LIMIT;
+        fetch(`${PROJECT_ENDPOINT}?offset=${nextOffset}&limit=${PROJECT_LIMIT}`)
             .then((response) => response.json())
             .then((data) => {
                 if (!data?.success) {
@@ -1133,21 +1157,53 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 }
 
                 if (!Array.isArray(data.data) || !data.data.length) {
-                    projectOffset = Math.max(0, projectOffset - PROJECT_LIMIT);
                     return;
                 }
 
-                updateProjects(data.data, projectOffset > 0);
-                projectOffset += PROJECT_LIMIT;
+                updateProjects(data.data);
+                projectOffset = nextOffset;
+                updateProjectControls();
             })
             .catch((error) => {
                 console.error('Error fetching projects:', error);
-                projectOffset = Math.max(0, projectOffset - PROJECT_LIMIT);
             })
             .finally(() => {
                 if (loadMoreProjectsButton) {
                     loadMoreProjectsButton.disabled = false;
                     loadMoreProjectsButton.removeAttribute('aria-busy');
+                }
+            });
+    }
+
+    function loadPreviousProjects() {
+        if (previousProjectsButton) {
+            previousProjectsButton.disabled = true;
+            previousProjectsButton.setAttribute('aria-busy', 'true');
+        }
+
+        const previousOffset = Math.max(0, projectOffset - PROJECT_LIMIT);
+        fetch(`${PROJECT_ENDPOINT}?offset=${previousOffset}&limit=${PROJECT_LIMIT}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data?.success) {
+                    throw new Error(data?.error || 'Unable to load projects');
+                }
+
+                if (!Array.isArray(data.data) || !data.data.length) {
+                    return;
+                }
+
+                updateProjects(data.data);
+                projectOffset = previousOffset;
+                updateProjectControls();
+            })
+            .catch((error) => {
+                console.error('Error fetching projects:', error);
+            })
+            .finally(() => {
+                if (previousProjectsButton) {
+                    previousProjectsButton.disabled = false;
+                    previousProjectsButton.removeAttribute('aria-busy');
                 }
             });
     }
@@ -1366,7 +1422,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         updateFeaturedBricks(currentFeaturedBricks);
 
         updateProjects(latestProjects);
-        projectOffset = Array.isArray(latestProjects) ? latestProjects.length : 0;
+        projectOffset = 0;
+        updateProjectControls();
 
         loadNextButton?.addEventListener('click', () => {
             const switchingEndpoint = currentFeaturedEndpoint !== SELFIE_ENDPOINT;
@@ -1389,6 +1446,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         loadMoreProjectsButton?.addEventListener('click', () => {
             loadMoreProjects();
+        });
+
+        previousProjectsButton?.addEventListener('click', () => {
+            loadPreviousProjects();
         });
 
         document.getElementById('load-featured-ecobricks')?.addEventListener('click', () => {
