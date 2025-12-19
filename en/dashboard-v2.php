@@ -1945,9 +1945,9 @@ function mainGreeting() {
     }
 
     if (welcomePanelElement && background) {
-        welcomePanelElement.style.backgroundImage = "url('../svgs/" + background + ".svg?v=2')";
+        welcomePanelElement.style.backgroundImage = "url('../svgs/" + background + ".svg?v=3')";
         welcomePanelElement.style.backgroundRepeat = 'no-repeat';
-        welcomePanelElement.style.backgroundPosition = 'top center';
+        welcomePanelElement.style.backgroundPosition = 'top';
         welcomePanelElement.style.backgroundSize = 'contain';
     }
 }
