@@ -278,9 +278,39 @@ $latest_projects = fetchLatestProjects($gobrik_conn, 9, 0);
 $latest_projects_json = json_encode($latest_projects, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 // 📣 Fetch the latest dashboard notice for display and admin controls
+function normalizeHexColor(?string $color, string $fallback = '#c66a0f'): string {
+    $color = trim((string) $color);
+
+    if (preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $color)) {
+        if (strlen($color) === 4) {
+            $color = sprintf('#%1$s%1$s%2$s%2$s%3$s%3$s', $color[1], $color[2], $color[3]);
+        }
+
+        return strtoupper($color);
+    }
+
+    return strtoupper($fallback);
+}
+
+function hexToRgba(string $hexColor, float $alpha = 1.0, string $fallback = '#c66a0f'): string {
+    $alpha = max(0, min(1, $alpha));
+    $normalized_hex = normalizeHexColor($hexColor, $fallback);
+    $hex = ltrim($normalized_hex, '#');
+
+    if (strlen($hex) !== 6) {
+        $hex = ltrim(normalizeHexColor($fallback, $fallback), '#');
+    }
+
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+
+    return "rgba({$r}, {$g}, {$b}, {$alpha})";
+}
+
 function fetchLatestDashNotice($conn) {
     $latest_notice = null;
-    $sql_notice = "SELECT notice_id, message_body, message_emoji, featured_url, featured_text, status
+    $sql_notice = "SELECT notice_id, message_body, message_emoji, featured_url, featured_text, status, background_colour
                    FROM dash_notices_tb
                    ORDER BY date_created DESC, notice_id DESC
                    LIMIT 1";
@@ -288,7 +318,7 @@ function fetchLatestDashNotice($conn) {
     $stmt_notice = $conn->prepare($sql_notice);
     if ($stmt_notice) {
         if ($stmt_notice->execute()) {
-            $stmt_notice->bind_result($notice_id, $message_body, $message_emoji, $featured_url, $featured_text, $status);
+            $stmt_notice->bind_result($notice_id, $message_body, $message_emoji, $featured_url, $featured_text, $status, $background_colour);
             if ($stmt_notice->fetch()) {
                 $latest_notice = [
                     'notice_id' => $notice_id,
@@ -296,7 +326,8 @@ function fetchLatestDashNotice($conn) {
                     'message_emoji' => $message_emoji,
                     'featured_url' => $featured_url,
                     'featured_text' => $featured_text,
-                    'status' => $status
+                    'status' => $status,
+                    'background_colour' => $background_colour
                 ];
             }
         }
@@ -315,18 +346,23 @@ if ($latest_notice && (!isset($latest_notice['status']) || strtolower($latest_no
 $default_notice_text = 'Updated: Free October 20th Ecobrick Intro course.';
 $default_featured_text = 'Register';
 $default_featured_url = 'https://gobrik.com/en/courses.php';
+$default_notice_color = '#c66a0f';
 
 if ($active_notice) {
     $notice_icon = $active_notice['message_emoji'] ?? '👉';
     $notice_text = $active_notice['message_body'] ?? $default_notice_text;
     $notice_featured_text = $active_notice['featured_text'] ?? '';
     $notice_featured_url = $active_notice['featured_url'] ?? '';
+    $notice_background_hex = normalizeHexColor($active_notice['background_colour'] ?? $default_notice_color, $default_notice_color);
 } else {
     $notice_icon = '👉';
     $notice_text = $default_notice_text;
     $notice_featured_text = $default_featured_text;
     $notice_featured_url = $default_featured_url;
+    $notice_background_hex = $default_notice_color;
 }
+
+$notice_background_rgba = hexToRgba($notice_background_hex, 0.8, $default_notice_color);
 
 $ghost_member_stats = [
     'total' => 0,
@@ -470,7 +506,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div class="dashboard-wrapper">
 <div id="dashboard-v2-grid" class="dashboard-grid">
     <div class="dashboard-column column-narrow">
-        <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel">
+        <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel" style="--notice-bg: <?php echo htmlspecialchars($notice_background_rgba, ENT_QUOTES, 'UTF-8'); ?>;">
             <div id="registered-notice" class="top-container-notice">
                 <span id="notice-icon" class="notice-icon">
                     <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
@@ -607,7 +643,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                         <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"
                                value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
-                    <button type="submit" class="button secondary" style="width:100%;">Save Notice</button>
+                    <div class="form-field" style="margin-bottom:12px;">
+                        <label for="notice-background-colour" style="display:block;margin-bottom:4px;">Background Colour</label>
+                        <input type="color" id="notice-background-colour" name="background_colour" style="width:100%;padding:8px;height:42px;"
+                               value="<?php echo htmlspecialchars($notice_background_hex ?? $default_notice_color, ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <button type="submit" class="button secondary" style="width:100%;background:#0d6efd;color:#ffffff;">Save Notice</button>
                 </form>
             </div>
         <?php endif; ?>
