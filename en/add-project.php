@@ -1,19 +1,56 @@
 <?php
-require_once '../earthenAuth_helper.php';
-require_once '../auth/session_start.php';
+require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
-// PART 1: Set up page variables
+// 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '2.50';
+$version = '3.0';
 $page = 'add-project';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// PART 2: Check if user is logged in and session active
-if (!$is_logged_in) {
-    header('Location: login.php?redirect=' . urlencode($page));
-    exit();
-}
+// 🔐 Start session and verify Buwana JWT (auto-redirects if not logged in)
+require_once '../auth/session_start.php';
 
+// 🆔 Retrieve the authenticated user's Buwana ID
+$buwana_id = $_SESSION['buwana_id'] ?? '';
+
+// 🧭 Buwana app registration check
+// --------------------------------------------------
+// Even though the user is logged in with Buwana, there is still a chance they
+// have not connected their Buwana account to this specific client app yet.
+// We call the shared Buwana API to confirm the "registered" connection and
+// redirect them to the app-connect flow if the relationship is missing.
+$client_id = 'gbrk_f2c61a85a4cd4b8b89a7';
+if (!empty($buwana_id)) {
+    $api_endpoint = 'https://buwana.ecobricks.org/api/check_user_app_connection.php';
+    $query = http_build_query([
+        'buwana_id' => $buwana_id,
+        'client_id' => $client_id,
+        'lang' => $lang ?? 'en'
+    ]);
+
+    $ch = curl_init("{$api_endpoint}?{$query}");
+    if ($ch) {
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $api_response = curl_exec($ch);
+        $curl_error = curl_error($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($api_response !== false && $http_code === 200) {
+            $connection_status = json_decode($api_response, true);
+            if (json_last_error() === JSON_ERROR_NONE && isset($connection_status['connected']) && !$connection_status['connected']) {
+                $redirect_url = $connection_status['app_login_url'] ?? '';
+                if (!empty($redirect_url)) {
+                    header("Location: {$redirect_url}");
+                    exit();
+                }
+            }
+        } else {
+            error_log('Buwana connection check failed: ' . ($curl_error ?: 'Unexpected HTTP ' . $http_code));
+        }
+    }
+}
 
 // 🔗 Establish DB connections to GoBrik and Buwana
 require_once '../gobrikconn_env.php';
