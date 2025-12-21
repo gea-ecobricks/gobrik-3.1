@@ -14,6 +14,33 @@ if (!$is_logged_in) {
     exit();
 }
 
+
+// 🔗 Establish DB connections to GoBrik and Buwana
+require_once '../gobrikconn_env.php';
+require_once '../buwanaconn_env.php';
+
+// 🌎 Fetch user meta from Buwana database
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_roles = getUser_Role($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+
+// 👤 Look up user's GoBrik account info
+$sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
+$stmt_lookup_user = $gobrik_conn->prepare($sql_lookup_user);
+if ($stmt_lookup_user) {
+    $stmt_lookup_user->bind_param("i", $buwana_id);
+    $stmt_lookup_user->execute();
+    $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt, $user_capabilities_raw);
+    $stmt_lookup_user->fetch();
+    $stmt_lookup_user->close();
+} else {
+    die("Error preparing statement for tb_ecobrickers: " . $gobrik_conn->error);
+}
+
 // PART 3: Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once '../gobrikconn_env.php';
@@ -120,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
  <!-- PAGE CONTENT-->
 
-    <div id="form-submission-box" class="dashboard-v2-panel form-container-v2 landing-page-form" style="height:auto !important;">
+    <div id="form-submission-box" class="form-container-v2 landing-page-form" style="height:auto !important;">
         <div class="form-container">
 
         <div class="splash-form-content-block">  
