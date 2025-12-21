@@ -437,51 +437,49 @@ display: none;
 <!-- MAIN MENU -->
 <div id="main-menu-overlay" class="overlay-settings" style="display:none;">
   <button type="button" onclick="closeSettings()" aria-label="Click to close settings page" class="x-button"></button>
+  <div class="gobrik-logo-holder">
+    <div class="gobrik-app-logo"></div>
+  </div>
   <div class="overlay-content-settings">
 
 
     <div class="menu-items-container">
 
-
-
-      <div class="gobrik-logo-holder">
-        <div class="gobrik-app-logo" style="margin-right: auto;margin-left: auto;margin-bottom: 20px;width:150px;height:150px;background:url('/svgs/gobrik-3-emblem-tight.svg') no-repeat center/contain;"></div>
-      </div>
-
-
     <!-- Check if the user is logged in before displaying the logged-in status box : earthen values set by earthenAuth_helper-->
     <?php if ($is_logged_in): ?>
-      <div class="menu-page-item" style="display: flex; flex-direction: column; align-items: flex-start; cursor:unset;">
-        <div style="width:100%; display: flex; align-items: center;">
-          <div style="color: var(--text-color); margin-left: 0px;">
-              <span data-lang-id="1000-logged-user"></span>
-              <span><?php echo htmlspecialchars($earthling_emoji); ?> <?php echo htmlspecialchars($first_name); ?></span>
-              <span style="color: var(--subdued);">
-                <?php
-                if ($gea_status !== null) {
-                    echo "  |  " . htmlspecialchars($gea_status);
-                } else {
-                    $response['error'] = 'gea_status_error';
-                    echo "GEA Status: Not available"; // Optional: display an alternative message
-                }
-                ?>
-                </span>
-            </div>
-        </div>
+      <div class="logged-in-pill">
+        <div class="menu-page-item" style="display: flex; flex-direction: column; align-items: flex-start; cursor:unset;">
+          <div style="width:100%; display: flex; align-items: center;">
+            <div style="color: var(--text-color); margin-left: 0px;">
+                <span data-lang-id="1000-logged-user"></span>
+                <span><?php echo htmlspecialchars($earthling_emoji); ?> <?php echo htmlspecialchars($first_name); ?></span>
+                <span style="color: var(--subdued);">
+                  <?php
+                  if ($gea_status !== null) {
+                      echo "  |  " . htmlspecialchars($gea_status);
+                  } else {
+                      $response['error'] = 'gea_status_error';
+                      echo "GEA Status: Not available"; // Optional: display an alternative message
+                  }
+                  ?>
+                  </span>
+              </div>
+          </div>
 
-        <div class="logged-in-links" style="width:100%; font-size: 0.8em; margin-top: 5px; text-align: left;">
-           <p style="font-size:0.9em; margin-bottom: 3px;
-  margin-top: 5px;"><span id="continent-icon"><?php echo htmlspecialchars($user_continent_icon); ?> </span> <span style="color:green;"><?php echo htmlspecialchars($user_location_watershed); ?></span> <span style="color:grey">| <?php echo htmlspecialchars($user_community_name); ?></span></p>
+          <div class="logged-in-links" style="width:100%; font-size: 0.8em; margin-top: 5px; text-align: left;">
+             <p style="font-size:0.9em; margin-bottom: 3px;
+    margin-top: 5px;"><span id="continent-icon"><?php echo htmlspecialchars($user_continent_icon); ?> </span> <span style="color:green;"><?php echo htmlspecialchars($user_location_watershed); ?></span> <span style="color:grey">| <?php echo htmlspecialchars($user_community_name); ?></span></p>
 
-           <p style="font-size:0.9em; display:flex; align-items:center; gap:8px; white-space: nowrap; margin: 0;">
-            <a href="<?php echo htmlspecialchars($profile_edit_url); ?>" target="_blank" rel="noopener" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" title="Update your user settings">Profile settings</a>
-            <span aria-hidden="true">|</span>
-            <span style="display:flex; align-items:center; gap:4px;">
-              <span aria-hidden="true">🐳</span>
-              <span onclick="logoutUser()" class="underline-link" data-lang-id="1000-log-out" style="cursor: pointer;" title="Log out completely">Log out</span>
-            </span>
-          </p>
+             <p style="font-size:0.9em; display:flex; align-items:center; gap:8px; white-space: nowrap; margin: 0;">
+              <a href="<?php echo htmlspecialchars($profile_edit_url); ?>" target="_blank" rel="noopener" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" title="Update your user settings">Profile settings</a>
+              <span aria-hidden="true">|</span>
+              <span style="display:flex; align-items:center; gap:4px;">
+                <span aria-hidden="true">🐳</span>
+                <span onclick="logoutUser()" class="underline-link" data-lang-id="1000-log-out" style="cursor: pointer;" title="Log out completely">Log out</span>
+              </span>
+            </p>
 
+          </div>
         </div>
       </div>
       <div class="menu-page-item">
@@ -566,7 +564,7 @@ display: none;
       <span class="status-circle" style="background-color: #00B5FF;" title="Working. Not translated."></span>
     </div>
     </div>
-    <div class="menu-auth-footer" style="margin-top:auto;margin-bottom:20px;font-size:0.9em;color:gray;">
+    <div class="menu-auth-footer">
       <span data-lang-id="1002-authentication-by-buwana">Authentication by <a href="https://buwana.ecobricks.org" target="_blank" rel="noopener" style="color:inherit;">Buwana</a></span>
     </div>
   </div> <!-- close overlay-content-settings -->
