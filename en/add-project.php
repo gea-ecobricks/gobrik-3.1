@@ -115,8 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 <?php require_once ("../includes/add-project-inc.php");?>
-<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v13">
-<?php require_once ("../header-2026.php");?>
 
 
 

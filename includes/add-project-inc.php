@@ -386,5 +386,6 @@ input[type="submit"]:hover {
 
 
 </style>	
+<link rel="stylesheet" href="../styles/dashboard-v2-styles.css?v13">
 
-<?php require_once ("../header-2025.php");?>
+<?php require_once ("../header-2026.php");?>
