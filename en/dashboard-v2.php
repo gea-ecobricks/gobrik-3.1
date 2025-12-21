@@ -1941,7 +1941,7 @@ function mainGreeting() {
     const { greeting, background } = getGreetingConfig(lang);
 
     if (greetingElement) {
-        greetingElement.innerHTML = greeting + " <?php echo htmlspecialchars($first_name); ?>!";
+        greetingElement.innerHTML = greeting + "<br><?php echo htmlspecialchars($first_name); ?>!";
     }
 
     if (welcomePanelElement && background) {
