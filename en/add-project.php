@@ -120,14 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
  <!-- PAGE CONTENT-->
 
- <div class="dashboard-wrapper">
     <div id="form-submission-box" class="dashboard-v2-panel form-container-v2 landing-page-form" style="height:auto !important;">
         <div class="form-container">
-            <div class="form-top-header" style="display:flex;flex-flow:row;">
-                <div class="step-graphic" style="width:fit-content;margin:auto;margin-left:0px">
-                    <img src="../svgs/step1-log-project.svg" style="height:25px;">
-                </div>
-            </div>
 
         <div class="splash-form-content-block">  
             <div class="splash-box">
@@ -336,7 +330,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         </div>
     </div>
-</div>
 
 
 
