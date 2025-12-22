@@ -2534,7 +2534,6 @@ label {
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 1.1em;
 font-family: 'Mulish', sans-serif;
   z-index: 30;
 }
