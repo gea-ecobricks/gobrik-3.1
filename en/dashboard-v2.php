@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '8.64';
+$version = '8.7';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -1944,7 +1944,7 @@ function mainGreeting() {
     }
 
     if (welcomePanelElement && background) {
-        welcomePanelElement.style.backgroundImage = "url('../svgs/" + background + ".svg?v=3')";
+        welcomePanelElement.style.backgroundImage = "url('../svgs/" + background + ".svg?v=')";
         welcomePanelElement.style.backgroundRepeat = 'no-repeat';
         welcomePanelElement.style.backgroundPosition = 'top';
         welcomePanelElement.style.backgroundSize = 'contain';

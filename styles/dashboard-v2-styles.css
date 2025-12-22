@@ -49,7 +49,7 @@ body {
     box-shadow: var(--dashboard-panel-shadow, 0 2px 8px rgba(0, 0, 0, 0.08));
     padding: 20px;
     position: relative;
-    min-height: 120px;
+    /*min-height: 120px;*/
 }
 
 #welcome-greeting-panel #greeting {
@@ -457,7 +457,8 @@ body {
 @media (max-width: 768px) {
     #dashboard-v2-grid {
         grid-template-columns: 1fr;
-        padding: 0;
+        padding: 5px;
+        margin-top: 12px;
     }
 
     .dashboard-wrapper {
