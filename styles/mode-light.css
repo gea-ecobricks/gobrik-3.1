@@ -17,6 +17,7 @@
     --accordion-background: #f6f6f6;
     --accordion-highlight: #fff;
     --advanced-background: #bad0d8;
+       --notice-bg: rgba(18, 158, 226, 0.8);
 
 
     --dashboard-page-background: linear-gradient(to top, #E8FBFB 0%, #e8fbfb calc(100% - 500px), #ffffff 100%);

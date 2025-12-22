@@ -790,7 +790,7 @@ Overlay Curtain */
 }
 
 .logged-in-pill {
-  background-color: var(--main-background);
+  background-color: var(--darker);
   border-radius: 16px;
   padding: 14px 16px;
   margin-bottom: 16px;
@@ -3103,7 +3103,7 @@ position:relative;
     color: var(--text-color);
     text-decoration: none;
     border-radius: 5px;
-    padding: 10px 20px;
+    padding: 10px 0px;
     text-align: center;
     display: inline-flex;
     align-items: center;
