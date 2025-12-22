@@ -53,8 +53,8 @@
 
     --dashboard-page-background: linear-gradient(to top, #21232f 0%, #21232f calc(100% - 500px), #181921 100%);
 
-  --dashboard-panel-background: #1f2533;
-  --dashboard-panel-border: #2f3747;
+  --dashboard-panel-background: #252b3a; /*#1f2533*/
+  --dashboard-panel-border: #475572;;
   --dashboard-panel-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 
   --pill-default-bg: #2b3141;
