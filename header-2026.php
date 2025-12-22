@@ -448,7 +448,7 @@ display: none;
     <!-- Check if the user is logged in before displaying the logged-in status box : earthen values set by earthenAuth_helper-->
     <?php if ($is_logged_in): ?>
       <div class="logged-in-pill">
-        <div class="menu-page-item" style="display: flex; flex-direction: column; align-items: flex-start; cursor:unset;">
+        <div class="logged-in-pill-content">
           <div style="width:100%; display: flex; align-items: center;">
             <div style="color: var(--text-color); margin-left: 0px;">
                 <span data-lang-id="1000-logged-user"></span>
@@ -470,8 +470,8 @@ display: none;
              <p style="font-size:0.9em; margin-bottom: 3px;
     margin-top: 5px;"><span id="continent-icon"><?php echo htmlspecialchars($user_continent_icon); ?> </span> <span style="color:green;"><?php echo htmlspecialchars($user_location_watershed); ?></span> <span style="color:grey">| <?php echo htmlspecialchars($user_community_name); ?></span></p>
 
-             <p style="font-size:0.9em; display:flex; align-items:center; gap:8px; white-space: nowrap; margin: 0;">
-              <a href="<?php echo htmlspecialchars($profile_edit_url); ?>" target="_blank" rel="noopener" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" title="Update your user settings">Profile settings</a>
+             <p class="logged-in-actions" style="font-size:0.9em; display:flex; align-items:center; gap:8px; white-space: nowrap; margin: 0;">
+              <a href="<?php echo htmlspecialchars($profile_edit_url); ?>" target="_blank" rel="noopener" class="underline-link" data-lang-id="1000-profile-settings" style="cursor: pointer;" title="Update your user settings">Profile settings <span aria-hidden="true">⚙️</span></a>
               <span aria-hidden="true">|</span>
               <span style="display:flex; align-items:center; gap:4px;">
                 <span aria-hidden="true">🐳</span>

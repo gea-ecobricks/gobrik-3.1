@@ -791,10 +791,22 @@ Overlay Curtain */
 
 .logged-in-pill {
   background-color: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--divider-line);
   border-radius: 16px;
-  padding: 8px 10px;
+  padding: 14px 16px;
   margin-bottom: 16px;
+}
+
+.logged-in-pill-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: unset;
+}
+
+.logged-in-actions {
+  width: 100%;
+  justify-content: flex-end;
+  text-align: right;
 }
 
 .menu-auth-footer {
@@ -829,19 +841,19 @@ Overlay Curtain */
   }
 
   .menu-page-item {
-    font-size: 1.15em;
+    font-size: 1.3em;
   }
 }
 
 @media screen and (min-width: 700px) and (max-width: 1324px) {
   .menu-page-item {
-    font-size: 1.05em;
+    font-size: 1.2em;
   }
 }
 
 .menu-page-item {
   font-family: 'Mulish';
-  font-size: 1em;
+  font-size: 1.1em;
   color: var(--text-color);
   border-bottom: 1px solid var(--divider-line);
   cursor: pointer;
@@ -866,6 +878,10 @@ Overlay Curtain */
 .menu-page-item:hover {
   color: var(--header-accent);
   border-bottom: 1px solid rgba(128, 128, 128, 0.75);
+}
+
+.menu-items-container .menu-page-item:last-of-type {
+  border-bottom: none;
 }
 
 /* Status Circle */
