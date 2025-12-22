@@ -1944,7 +1944,7 @@ function mainGreeting() {
     }
 
     if (welcomePanelElement && background) {
-        welcomePanelElement.style.backgroundImage = "url('../svgs/" + background + ".svg?v=5')";
+        welcomePanelElement.style.backgroundImage = "url('../svgs/" + background + ".svg?v=')";
         welcomePanelElement.style.backgroundRepeat = 'no-repeat';
         welcomePanelElement.style.backgroundPosition = 'top';
         welcomePanelElement.style.backgroundSize = 'contain';
