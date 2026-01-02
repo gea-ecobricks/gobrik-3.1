@@ -441,7 +441,6 @@ function sendEmail($to, $htmlBody) {
     }
 
     .sender-actions .button {
-        width: 100%;
         justify-content: center;
     }
 
@@ -531,12 +530,6 @@ function sendEmail($to, $htmlBody) {
     .delay-count {
         font-weight: 700;
         white-space: nowrap;
-    }
-
-    #test-email-container,
-    .control-card,
-    #send-controls {
-        width: 100%;
     }
 
     #send-controls form {
