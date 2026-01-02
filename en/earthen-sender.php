@@ -199,6 +199,7 @@ $pending_count = max(0, $total_members - $sent_count);
 $newsletter_files = [
     '001' => __DIR__ . '/../emailing/newsletters/001.php',
     '002' => __DIR__ . '/../emailing/newsletters/002.php',
+    '003' => __DIR__ . '/../emailing/newsletters/003.php',
 ];
 
 $newsletter_templates = [];
