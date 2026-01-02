@@ -419,6 +419,22 @@ table.body h2 span {
     height: 52px !important;
   }
 }
+
+  /* Ensure content images scale to the container on all devices */
+  .post-content-sans-serif img,
+  .post-content-sans-serif .kg-image,
+  .feature-image img {
+    display: block !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 auto !important;
+  }
+
+  .post-content-sans-serif figure.kg-image-card {
+    width: 100% !important;
+    margin: 0 0 1.5em 0 !important;
+  }
 @media all {
   .subscription-details p.hidden {
     display: none !important;
