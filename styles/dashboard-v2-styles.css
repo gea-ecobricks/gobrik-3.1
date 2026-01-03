@@ -397,12 +397,16 @@ body {
 #registrations-panel {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    overflow-x: auto;
 }
 
 #my-ecobricks-panel table,
 #registrations-panel table,
 #my-trainings-panel table {
     margin-top: 12px;
+    width: 100%;
+    max-width: 100%;
 }
 
 #registrations-panel table.dataTable th:first-child,
