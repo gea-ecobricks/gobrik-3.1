@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '1.04';
+$version = '8.71';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -139,6 +139,12 @@ if ($stmt_summary) {
 // ⚖️ Calculate net density (g/ml)
 $net_density = $total_volume_ml > 0 ? ($total_weight_kg * 1000) / $total_volume_ml : 0;
 
+$total_ecobricks_formatted = number_format((float) ($total_ecobricks ?? 0));
+$total_weight_formatted = number_format((float) ($total_weight_kg ?? 0), 1);
+$net_density_formatted = number_format((float) $net_density, 2);
+
+$dashboard_summary_text = "So far you've logged {$total_ecobricks_formatted} ecobricks. In total you've logged {$total_weight_formatted} kg with a net density of {$net_density_formatted} g/ml.";
+
 // 📍 Process user location
 $location_full_txt = $location_full_txt ?? '';
 $location_parts = array_map('trim', explode(',', $location_full_txt));
@@ -187,29 +193,124 @@ if ($stmt_registered_trainings) {
     die("Error preparing statement for registered trainings: " . $gobrik_conn->error);
 }
 
-// 🧱 Fetch featured ecobricks for homepage slider
-$featured_ecobricks = [];
-$sql_featured = "SELECT ecobrick_full_photo_url, serial_no, photo_version
-                 FROM tb_ecobricks
-                 WHERE feature = 1 AND status != 'not ready'
-                 ORDER BY date_logged_ts DESC
-                 LIMIT 10";
-$stmt_featured = $gobrik_conn->prepare($sql_featured);
-if ($stmt_featured) {
-    $stmt_featured->execute();
-    $result_featured = $stmt_featured->get_result();
-    while ($row = $result_featured->fetch_assoc()) {
-        $featured_ecobricks[] = $row;
-    }
-    $stmt_featured->close();
-} else {
-    die("Error preparing statement for featured ecobricks: " . $gobrik_conn->error);
+// 🧱 Fetch featured ecobricks for homepage slider and grid
+function formatLocationTail(?string $location_full): string {
+    $location_parts = array_filter(array_map('trim', explode(',', $location_full ?? '')));
+    return implode(', ', array_slice($location_parts, -2));
 }
 
+function fetchFeaturedEcobricks(mysqli $conn, int $limit = 9, int $offset = 0): array {
+    $sql_featured = "SELECT ecobrick_full_photo_url, ecobrick_thumb_photo_url, serial_no, photo_version, weight_g, ecobricker_maker, location_full, vision, date_logged_ts, status
+                     FROM tb_ecobricks
+                     WHERE ecobrick_full_photo_url IS NOT NULL
+                       AND ecobrick_full_photo_url != ''
+                       AND feature = 1
+                       AND status != 'not ready'
+                     ORDER BY date_logged_ts DESC
+                     LIMIT ? OFFSET ?";
+
+    $featured_ecobricks = [];
+
+    $stmt_featured = $conn->prepare($sql_featured);
+    if ($stmt_featured) {
+        $stmt_featured->bind_param('ii', $limit, $offset);
+        $stmt_featured->execute();
+        $result_featured = $stmt_featured->get_result();
+        while ($row = $result_featured->fetch_assoc()) {
+            $featured_ecobricks[] = [
+                'ecobrick_full_photo_url' => $row['ecobrick_full_photo_url'] ?? '',
+                'ecobrick_thumb_photo_url' => $row['ecobrick_thumb_photo_url'] ?? '',
+                'serial_no' => $row['serial_no'] ?? '',
+                'photo_version' => $row['photo_version'] ?? '',
+                'weight_g' => $row['weight_g'] ?? '',
+                'ecobricker_maker' => $row['ecobricker_maker'] ?? '',
+                'location_display' => formatLocationTail($row['location_full'] ?? ''),
+                'vision' => $row['vision'] ?? '',
+                'date_logged_ts' => $row['date_logged_ts'] ?? '',
+                'status' => $row['status'] ?? '',
+            ];
+        }
+        $stmt_featured->close();
+    } else {
+        die("Error preparing statement for featured ecobricks: " . $conn->error);
+    }
+
+    return $featured_ecobricks;
+}
+
+$featured_ecobricks = fetchFeaturedEcobricks($gobrik_conn, 9, 0);
+$featured_ecobricks_json = json_encode($featured_ecobricks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+
+// 🧱 Fetch latest projects
+function fetchLatestProjects(mysqli $conn, int $limit = 9, int $offset = 0): array {
+    $sql_projects = "SELECT project_id, project_name, description_short, briks_used, photo1_main, photo1_tmb
+                     FROM tb_projects
+                     WHERE ready_to_show = 1
+                     ORDER BY project_id DESC
+                     LIMIT ? OFFSET ?";
+
+    $latest_projects = [];
+
+    $stmt_projects = $conn->prepare($sql_projects);
+    if ($stmt_projects) {
+        $stmt_projects->bind_param('ii', $limit, $offset);
+        $stmt_projects->execute();
+        $result_projects = $stmt_projects->get_result();
+        while ($row = $result_projects->fetch_assoc()) {
+            $latest_projects[] = [
+                'project_id' => (int) ($row['project_id'] ?? 0),
+                'project_name' => $row['project_name'] ?? '',
+                'description_short' => $row['description_short'] ?? '',
+                'briks_used' => (int) ($row['briks_used'] ?? 0),
+                'photo1_main' => $row['photo1_main'] ?? '',
+                'photo1_tmb' => $row['photo1_tmb'] ?? '',
+            ];
+        }
+        $stmt_projects->close();
+    } else {
+        die("Error preparing statement for latest projects: " . $conn->error);
+    }
+
+    return $latest_projects;
+}
+
+$latest_projects = fetchLatestProjects($gobrik_conn, 9, 0);
+$latest_projects_json = json_encode($latest_projects, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+
 // 📣 Fetch the latest dashboard notice for display and admin controls
+function normalizeHexColor(?string $color, string $fallback = '#c66a0f'): string {
+    $color = trim((string) $color);
+
+    if (preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $color)) {
+        if (strlen($color) === 4) {
+            $color = sprintf('#%1$s%1$s%2$s%2$s%3$s%3$s', $color[1], $color[2], $color[3]);
+        }
+
+        return strtoupper($color);
+    }
+
+    return strtoupper($fallback);
+}
+
+function hexToRgba(string $hexColor, float $alpha = 1.0, string $fallback = '#c66a0f'): string {
+    $alpha = max(0, min(1, $alpha));
+    $normalized_hex = normalizeHexColor($hexColor, $fallback);
+    $hex = ltrim($normalized_hex, '#');
+
+    if (strlen($hex) !== 6) {
+        $hex = ltrim(normalizeHexColor($fallback, $fallback), '#');
+    }
+
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+
+    return "rgba({$r}, {$g}, {$b}, {$alpha})";
+}
+
 function fetchLatestDashNotice($conn) {
     $latest_notice = null;
-    $sql_notice = "SELECT notice_id, message_body, message_emoji, featured_url, featured_text, status
+    $sql_notice = "SELECT notice_id, message_body, message_emoji, featured_url, featured_text, status, background_colour
                    FROM dash_notices_tb
                    ORDER BY date_created DESC, notice_id DESC
                    LIMIT 1";
@@ -217,7 +318,7 @@ function fetchLatestDashNotice($conn) {
     $stmt_notice = $conn->prepare($sql_notice);
     if ($stmt_notice) {
         if ($stmt_notice->execute()) {
-            $stmt_notice->bind_result($notice_id, $message_body, $message_emoji, $featured_url, $featured_text, $status);
+            $stmt_notice->bind_result($notice_id, $message_body, $message_emoji, $featured_url, $featured_text, $status, $background_colour);
             if ($stmt_notice->fetch()) {
                 $latest_notice = [
                     'notice_id' => $notice_id,
@@ -225,7 +326,8 @@ function fetchLatestDashNotice($conn) {
                     'message_emoji' => $message_emoji,
                     'featured_url' => $featured_url,
                     'featured_text' => $featured_text,
-                    'status' => $status
+                    'status' => $status,
+                    'background_colour' => $background_colour
                 ];
             }
         }
@@ -244,18 +346,23 @@ if ($latest_notice && (!isset($latest_notice['status']) || strtolower($latest_no
 $default_notice_text = 'Updated: Free October 20th Ecobrick Intro course.';
 $default_featured_text = 'Register';
 $default_featured_url = 'https://gobrik.com/en/courses.php';
+$default_notice_color = '#c66a0f';
 
 if ($active_notice) {
     $notice_icon = $active_notice['message_emoji'] ?? '👉';
     $notice_text = $active_notice['message_body'] ?? $default_notice_text;
     $notice_featured_text = $active_notice['featured_text'] ?? '';
     $notice_featured_url = $active_notice['featured_url'] ?? '';
+    $notice_background_hex = normalizeHexColor($active_notice['background_colour'] ?? $default_notice_color, $default_notice_color);
 } else {
     $notice_icon = '👉';
     $notice_text = $default_notice_text;
     $notice_featured_text = $default_featured_text;
     $notice_featured_url = $default_featured_url;
+    $notice_background_hex = $default_notice_color;
 }
+
+$notice_background_rgba = hexToRgba($notice_background_hex, 0.8, $default_notice_color);
 
 $ghost_member_stats = [
     'total' => 0,
@@ -292,7 +399,9 @@ if ($is_admin) {
 // 🔒 Clean exit: close DB connections
 $buwana_conn->close();
 $gobrik_conn->close();
+$dashboard_header_version = "../header-2026.php";
 ?>
+
 
 
 
@@ -312,21 +421,54 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         top: auto !important;
     }
 
-    .dashboard-panel {
+    .dashboard-v2-panel {
         position: relative;
     }
 
-    .panel-pill {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #0d6efd;
-        color: #fff;
-        padding: 4px 10px;
+    #welcome-greeting-panel {
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-size: contain;
+    }
+
+    #welcome-greeting-panel #greeting {
+        color: var(--h1);
+        text-align: right;
+    }
+
+    #registrations-panel .trainee-launch-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 11px;
         border-radius: 999px;
-        font-size: 0.75em;
+        background: var(--emblem-green);
+        color: #ffffff;
         font-weight: 700;
-        letter-spacing: 0.5px;
+        text-decoration: none;
+        border: none;
+        font-size: 0.8em;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
+        transition: background 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+    }
+
+    #registrations-panel .trainee-launch-button:hover,
+    #registrations-panel .trainee-launch-button:focus {
+        filter: brightness(0.92);
+        transform: translateY(-1px);
+    }
+
+    #registrations-panel .trainee-launch-button.is-past {
+        background: #9e9e9e;
+    }
+
+    #registrations-panel .trainee-launch-button.is-upcoming {
+        background: var(--emblem-green);
+    }
+
+    .ecobrick-vision-v2 {
+        font-style: italic;
+        margin-top: 8px;
     }
 
     .vertical-toggle {
@@ -370,330 +512,961 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     }
 </style>
 
-<div id="slider-box">
-    <div id="registered-notice" class="top-container-notice">
-        <span id="notice-icon" style="margin-right:10px;">
-            <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
-        </span>
-        <span id="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
-                <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
-                    <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
-                </a>
-            </span>
+<div class="dashboard-wrapper">
+<div id="dashboard-v2-grid" class="dashboard-grid">
+    <div class="dashboard-column column-narrow">
+        <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel" style="--notice-bg: <?php echo htmlspecialchars($notice_background_rgba, ENT_QUOTES, 'UTF-8'); ?>;">
+            <div id="registered-notice" class="top-container-notice">
+                <span id="notice-icon" class="notice-icon">
+                    <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
+                </span>
+                <span id="notice-text" class="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
+                        <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
+                            <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
+                        </a>
+                    </span>
 
-        <button class="notice-close" aria-label="Close">&times;</button>
-    </div>
-    <div id="ecobrick-slider">
-        <?php foreach ($featured_ecobricks as $index => $brick): ?>
-            <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
-                <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
-                     alt="Ecobrick <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                <button class="notice-close" aria-label="Close">&times;</button>
             </div>
-        <?php endforeach; ?>
-        <div id="slider-dots">
-            <?php foreach ($featured_ecobricks as $index => $_): ?>
-                <span class="dot<?php echo $index === 0 ? ' active' : ''; ?>" data-slide="<?php echo $index; ?>"></span>
-            <?php endforeach; ?>
-        </div>
-    </div>
-    <div style="text-align:center;width:100%;margin:auto;">
-        <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
-        <p id="subgreeting">Welcome to your dashboard.</p>
-    </div>
-</div>
-<!-- DASHBOARD CONTENT -->
-<div id="form-submission-box" style="height:fit-content;margin-top: 110px;">
-    <div class="form-container">
-
-        <div style="display:flex;flex-flow:row;width:100%;justify-content:center;">
-            <a href="log.php" class="confirm-button enabled" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick" style="margin: 10px;">➕ Log an Ecobrick</a>
-            <button id="take-gobrik-tour" style="margin: 10px;" class="confirm-button enabled" data-lang-id="001b-take-gobrik-tour" aria-label="Tour" onclick="startTour()"> 🛳️ GoBrik Tour</button>
-
         </div>
 
-        <!-- TRAINER TRAININGS -->
-<?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-        <div id="my-trainings-panel" class="dashboard-panel" style="text-align:center;width:100%;margin:25px auto 0;">
-            <span class="panel-pill">TRAINER PANEL</span>
-            <h3 data-lang-id="002-my-trainings">My Trainings</h3>
-            <div class="menu-buttons-row">
-                            <a href="launch-training.php" class="page-button" style="margin: 10px;">🚀 New Training</a>
-                            <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training" style="margin: 10px;">📝 Log Report</a>
-                        </div>
+        <div id="welcome-greeting-panel" class="dashboard-v2-panel">
+            <span class="dashboard-status-pill logged-in-pill">Logged in <?php echo htmlspecialchars($earthling_emoji ?? '🟢', ENT_QUOTES, 'UTF-8'); ?></span>
+            <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
+            <p id="subgreeting">Welcome to your new 2026 GoBrik dashboard. We've revamped it for the new year.</p>
+            <p class="dashboard-summary-text"><?php echo htmlspecialchars($dashboard_summary_text, ENT_QUOTES, 'UTF-8'); ?></p>
+            <div class="dashboard-actions">
+                <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
+                <a href="add-project.php" class="button ghost" data-lang-id="001c-register-project">🏗️ Register Project</a>
+            </div>
+        </div>
 
+        <div id="registrations-panel" class="dashboard-v2-panel">
+            <h3 data-lang-id="002-my-registrations">My Registrations</h3>
+            <p>Trainings that you've registered for.</p>
 
-            <table id="trainer-trainings" class="display" style="width:100%;">
+            <table id="trainee-trainings" class="display responsive" style="width:100%;">
                 <thead>
                     <tr>
                         <th>Training</th>
+                        <th>Launch</th>
                         <th>Date</th>
-                        <th>Signups</th>
-                        <th>Actions</th>
+                        <th>Country</th>
+                        <th>Type</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $pendingReport = null; foreach ($trainings as $training): ?>
+                    <?php foreach ($registered_trainings as $training): ?>
                         <?php
                             $training_date_ts = strtotime($training['training_date']);
-                            $is_listed = $training['ready_to_show'] == 1;
-                            $show_report = $training['show_report'] == 1;
-
-                            if (!$is_listed) {
-                                // Training not listed yet
-                                $circle = '⚪';
-                            } elseif ($training_date_ts > time()) {
-                                // Listed and upcoming
-                                $circle = '🟢';
-                            } elseif ($show_report && $is_listed) {
-                                // Report complete and public after the date
-                                $circle = '✅';
-                            } else {
-                                // Listed, past and no report yet
-                                $circle = '🔴';
-                                if (!isset($pendingReport)) {
-                                    $pendingReport = [
-                                        'id' => $training['training_id'],
-                                        'title' => $training['training_title'],
-                                        'date' => date('Y-m-d', $training_date_ts)
-                                    ];
-                                }
-                            }
+                            $training_date = date('Y-m-d', $training_date_ts);
+                            $is_past_training = $training_date_ts < strtotime('today');
+                            $launch_class = $is_past_training ? 'is-past' : 'is-upcoming';
                         ?>
                         <tr>
-                            <td style="white-space:normal;"><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
-
-                            <!-- Format the date to remove time -->
-                            <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
-
-                            <!-- Updated Signups Column -->
-                            <td style="text-align:center;padding:10px;">
-                                <a href="javascript:void(0);" class="log-report-btn signup-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
-                                    <span class="signup-count"><?php echo (int) $training['trainee_count']; ?></span>
-                                    <span class="hover-emoji">👥</span>
+                            <td><?php echo htmlspecialchars($training['training_title']); ?></td>
+                            <td style="text-align:center;">
+                                <a href="javascript:void(0);"
+                                   class="trainee-launch-button <?php echo $launch_class; ?>"
+                                   onclick="openRegisteredTrainingsModal(<?php echo $training['training_id']; ?>,
+                                                                      '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
+                                    Open
                                 </a>
                             </td>
-
-                            <!-- Actions column -->
-                            <td style="text-align:center;">
-                                <button class="serial-button settings-button" data-show-report="<?php echo $training['show_report']; ?>" data-ready-to-show="<?php echo $training['ready_to_show']; ?>" onclick="actionsTrainingModal(this, <?php echo $training['training_id']; ?>)">
-                                    <span class="default-emoji">✏️</span><span class="hover-emoji">⚙️</span>
-                                </button>
-                            </td>
+                            <td><?php echo htmlspecialchars($training_date); ?></td>
+                            <td><?php echo htmlspecialchars($training['training_country']); ?></td>
+                            <td><?php echo htmlspecialchars($training['training_type']); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-<?php endif; ?>
 
-<?php if ($has_validation_access): ?>
-    <div id="validation-panel" class="dashboard-panel" style="text-align:center;">
-        <span class="panel-pill">VALIDATOR PANEL</span>
-        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
-            <div style="text-align:center;">
-                <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
-                    ⏲️ <?php echo number_format((int) $awaiting_validation_count); ?>
+        <div id="support-chats-panel" class="dashboard-v2-panel">
+            <span class="panel-pill warning-pill">🚧 Under construction</span>
+            <div class="support-chats-header">
+                <div>
+                    <h3>Support Chats</h3>
+                    <p>Message our developers for support.</p>
                 </div>
-                <div style="font-size:1em;margin-top: 6px;">Awaiting Review</div>
-            </div>
-            <div style="text-align:center;">
-                <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
-                    ✅<?php echo number_format((int) $authenticated_today_count); ?>
-                </div>
-                <div style="font-size:1em;margin-top: 6px;">Authenticated Today</div>
-            </div>
-            <div style="text-align:center;">
-                <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
-                     ⛔<?php echo number_format((int) $rejected_today_count); ?>
-                </div>
-                <div style="font-size:1em;margin-top: 6px;">Rejected Today</div>
-            </div>
-        </div>
-        <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
-    </div>
-<?php endif; ?>
-
-
-
-<!--ADMIN-->
-
-<?php if ($is_admin): ?>
-    <div style="display:flex;flex-wrap:wrap;gap:15px;">
-        <div id="dash-notice-control" class="dashboard-panel" style="flex:1 1 50%;min-width:320px;">
-            <span class="panel-pill">ADMIN PANEL</span>
-            <h4 class="panel-title" style="margin-bottom:6px;text-align:center;">Update Dashboard Notice</h4>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                <p style="margin:0;font-size:0.95em;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
-                <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
+                <button id="support-chat-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle support chat form">
                     <span class="toggle-knob"></span>
                 </button>
             </div>
-            <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
-                <div class="form-field" style="margin-bottom:10px;">
-                    <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
-                    <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+            <form class="support-chat-form" id="support-chat-form">
+                <div>
+                    <label for="support-subject">Subject</label>
+                    <input type="text" id="support-subject" name="subject" placeholder="Give your chat a subject" />
                 </div>
-                <div class="form-field" style="margin-bottom:10px;">
-                    <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
-                    <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"
-                           value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                <div>
+                    <label for="support-priority">Priority</label>
+                    <select id="support-priority" name="priority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
                 </div>
-                <div class="form-field" style="margin-bottom:10px;">
-                    <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
-                    <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"
-                           value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                <div>
+                    <label for="support-description">Issue</label>
+                    <textarea id="support-description" name="description" placeholder="Describe your issue..."></textarea>
                 </div>
-                <div class="form-field" style="margin-bottom:10px;">
-                    <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
-                    <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"
-                           value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="support-chat-actions">
+                    <button type="button" class="page-button">Start Chat</button>
+                    <button type="button" class="page-button">Your Support Chats</button>
                 </div>
-                <button type="submit" class="confirm-button enabled" style="width:100%;padding:10px 12px;">Save Notice</button>
             </form>
         </div>
 
-        <div id="admin-support-chats" class="dashboard-panel" style="flex:1 1 50%;min-width:320px;">
-            <span class="panel-pill">ADMIN PANEL</span>
-            <h4 class="panel-title" style="text-align:center;">Admin Support Chats</h4>
-            <div class="menu-buttons-row" style="justify-content:center;">
-                <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
-
-<?php if ($is_admin): ?>
-    <div id="admin-menu" class="dashboard-panel">
-        <span class="panel-pill">ADMIN PANEL</span>
-        <h4 class="panel-title">Earthen Manual Mailer</h4>
-        <div style="display:flex;flex-wrap:wrap;gap:25px;align-items:center;justify-content:space-between;">
-            <div style="flex:1 1 240px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
-                <a href="earthen-sender.php" class="page-button" style="width:100%;text-align:center;">Earthen Mailer</a>
-                <a href="https://earthen.io/ghost" class="page-button" style="width:100%;text-align:center;">Ghost Login</a>
-                <a href="admin-panel.php" class="page-button" style="width:100%;text-align:center;">Member Management</a>
-                <a href="../emailing/mailgun-logs.php" class="page-button" style="width:100%;text-align:center;">Mailgun logs</a>
-            </div>
-            <div style="flex:1 1 260px;max-width:360px;margin:0 auto;">
-                <div style="position:relative;height:260px;width:100%;">
-                    <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
-                </div>
-                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
-                    <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
-                    <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
-                    <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
+        <?php if ($is_admin): ?>
+            <div id="admin-support-chats" class="dashboard-v2-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <h3>Manage Support Chats</h3>
+                <p>Admins manage user chats on development issues.</p>
+                <div class="menu-buttons-row" style="justify-content:center;">
+                    <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
                 </div>
             </div>
+
+            <div id="dash-notice-control" class="dashboard-v2-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <div class="dash-notice-header">
+                    <div>
+                        <h3>Dashboard Notice</h3>
+                        <p style="margin:0 0 8px 0;">Admins use this to feature special news. The message will be featured at the top of everyone's dashboard.</p>
+                    </div>
+                    <button id="dash-notice-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle dashboard notice form">
+                        <span class="toggle-knob"></span>
+                    </button>
+                </div>
+                <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
+                        <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
+                        <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
+                        <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:10px;">
+                        <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
+                        <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"
+                               value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <div class="form-field" style="margin-bottom:12px;">
+                        <label for="notice-background-colour" style="display:block;margin-bottom:4px;">Background Colour</label>
+                        <input type="color" id="notice-background-colour" name="background_colour" style="width:100%;padding:8px;height:42px;"
+                               value="<?php echo htmlspecialchars($notice_background_hex ?? $default_notice_color, ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+                    <button type="submit" class="button secondary" style="width:100%;background:#0d6efd;color:#ffffff;">Save Notice</button>
+                </form>
+            </div>
+        <?php endif; ?>
+
+        <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
+            <div id="gea-trainer-menu" class="dashboard-v2-panel">
+                <span class="panel-pill trainer-pill">Trainer</span>
+                <h3>GEA Trainer Menu</h3>
+                <p>Trainer tools and resources.</p>
+                <div class="menu-buttons-row">
+                    <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
+                    <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>
+                    <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
+                    <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
+                    <a href="bug-report.php" class="page-button">Report a Bug</a>
+                    <a href="accounting.php" class="page-button">GEA Accounting</a>
+                    <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training">+ Set Buwana Totem</a>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="dashboard-column column-wide">
+        <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
+            <h4 style="margin:0 0 12px 0;">Latest featured ecobricks...</h4>
+            <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
+                <?php if (!empty($featured_ecobricks)): ?>
+                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                        <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
+                            <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                                 alt="Ecobrick photo for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
+                <?php if (!empty($featured_ecobricks)): ?>
+                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                        <?php
+                            $grid_image_src = !empty($brick['ecobrick_thumb_photo_url']) ? $brick['ecobrick_thumb_photo_url'] : ($brick['ecobrick_full_photo_url'] ?? '');
+                        ?>
+                        <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>" title="<?php echo htmlspecialchars($brick['vision'] ?? $brick['location_display'] ?? 'View featured ecobrick'); ?>">
+                            <img src="<?php echo htmlspecialchars($grid_image_src); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                                 alt="Ecobrick photo for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                        </button>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            <div class="ecobrick-grid-actions">
+                <div class="ecobrick-grid-action-row" id="featured-grid-action-row">
+                    <button id="previous-ecobricks" class="page-button tertiary previous-ecobricks" style="display:none;">Previous</button>
+                    <button id="load-next-ecobricks" class="page-button tertiary load-next-ecobricks" title="Load more of the latest authenticated ecobricks with selfies">More Ecobrick Selfies</button>
+                </div>
+                <div class="ecobrick-grid-action-row">
+                    <button id="load-featured-ecobricks" class="page-button tertiary">Load Featured Ecobricks</button>
+                </div>
+            </div>
+            <p id="featured-ecobricks-empty" class="ecobrick-empty-message" <?php echo !empty($featured_ecobricks) ? 'style="display:none;"' : ''; ?>>No featured ecobricks to display right now.</p>
         </div>
-    </div>
-<?php endif; ?>
 
-
-
-<!--TRAINER MENU-->
-<?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-    <div id="gea-trainer-menu" class="dashboard-panel">
-        <span class="panel-pill">TRAINER PANEL</span>
-        <h4 class="panel-title">GEA Trainer Menu</h4>
-        <div class="menu-buttons-row">
-            <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
-            <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>
-            <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
-            <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
-            <a href="bug-report.php" class="page-button">Report a Bug</a>
-            <a href="accounting.php" class="page-button">GEA Accounting</a>
-            <!-- Training management buttons moved below -->
-            <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training" style="margin: 10px;">+ Set Buwana Totem</a>
-
-
-
+        <div id="my-ecobricks-panel" class="dashboard-v2-panel">
+            <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
+            <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th data-lang-id="1103-brik">Brik</th>
+                        <th data-lang-id="1104-weight">Weight</th>
+                        <th data-lang-id="1108-volume">Volume</th>
+                        <th data-lang-id="1109-density">Density</th>
+                        <th data-lang-id="1110-date-logged">Logged</th>
+                        <th data-lang-id="1106-status">Status</th>
+                        <th data-lang-id="1107-serial">Serial</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- DataTables will populate this via AJAX -->
+                </tbody>
+            </table>
         </div>
+
+        <?php if ($has_validation_access): ?>
+            <div id="validation-panel" class="dashboard-v2-panel">
+                <span class="panel-pill validator-pill">Validator</span>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
+                            ⏲️ <?php echo number_format((int) $awaiting_validation_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Awaiting Review</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#2e7d32;line-height:1;">
+                            ✅<?php echo number_format((int) $authenticated_today_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Authenticated Today</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:1.9em;font-weight:600;color:#c62828;line-height:1;">
+                             ⛔<?php echo number_format((int) $rejected_today_count); ?>
+                        </div>
+                        <div style="font-size:1em;margin-top: 6px;">Rejected Today</div>
+                    </div>
+                </div>
+                <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
+            </div>
+        <?php endif; ?>
+
+        <div id="latest-projects-panel" class="dashboard-v2-panel">
+            <h4 style="margin:0 0 12px 0;">Latest Projects</h4>
+            <div id="project-grid" class="ecobrick-grid project-grid" aria-label="Latest showcased projects">
+                <?php if (!empty($latest_projects)): ?>
+                    <?php foreach ($latest_projects as $project): ?>
+                        <button class="ecobrick-grid-item project-grid-item" type="button"
+                                data-project-id="<?php echo (int) $project['project_id']; ?>"
+                                title="<?php echo htmlspecialchars($project['project_name'] ?? 'View project'); ?>">
+                            <?php $project_thumb = !empty($project['photo1_tmb']) ? $project['photo1_tmb'] : ($project['photo1_main'] ?? ''); ?>
+                            <img src="<?php echo htmlspecialchars($project_thumb); ?>"
+                                 alt="<?php echo htmlspecialchars($project['project_name'] ?? 'Project photo'); ?>">
+                            <span class="project-grid-title"><?php echo htmlspecialchars($project['project_name'] ?? ''); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            <p id="projects-empty" class="ecobrick-empty-message" <?php echo !empty($latest_projects) ? 'style="display:none;"' : ''; ?>>No projects to display right now.</p>
+            <div class="ecobrick-grid-actions">
+                <button id="previous-projects" class="page-button tertiary" style="display:none;">Previous projects</button>
+                <button id="load-more-projects" class="page-button tertiary">Load more projects</button>
+                <a href="add-project.php" class="page-button" style="background:#0d6efd;color:#ffffff;text-decoration:none;">Post your project</a>
+            </div>
+        </div>
+
+        <?php if ($is_admin): ?>
+            <div id="admin-menu" class="dashboard-v2-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <h4 class="panel-title">Earthen Manual Mailer</h4>
+                <div class="earthen-mailer-layout">
+                    <div class="earthen-mailer-actions">
+                        <a href="earthen-sender.php" class="page-button">Earthen Mailer</a>
+                        <a href="https://earthen.io/ghost" class="page-button">Ghost Login</a>
+                        <a href="admin-panel.php" class="page-button">Member Management</a>
+                        <a href="../emailing/mailgun-logs.php" class="page-button">Mailgun logs</a>
+                    </div>
+                    <div class="earthen-mailer-chart">
+                        <div class="earthen-mailer-chart-inner">
+                            <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
+                            <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
+                            <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
+                            <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
+            <div id="my-trainings-panel" class="dashboard-v2-panel">
+                <span class="panel-pill trainer-pill">Trainer</span>
+                <h3 data-lang-id="002-my-trainings">My Trainings</h3>
+                <div class="menu-buttons-row">
+                    <a href="launch-training.php" class="page-button">🚀 New Training</a>
+                    <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training">📝Log Report</a>
+                </div>
+
+                <table id="trainer-trainings" class="display" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Training</th>
+                            <th>Date</th>
+                            <th>Signups</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $pendingReport = null; foreach ($trainings as $training): ?>
+                            <?php
+                                $training_date_ts = strtotime($training['training_date']);
+                                $is_listed = $training['ready_to_show'] == 1;
+                                $show_report = $training['show_report'] == 1;
+
+                                if (!$is_listed) {
+                                    $circle = '⚪';
+                                } elseif ($training_date_ts > time()) {
+                                    $circle = '🟢';
+                                } elseif ($show_report && $is_listed) {
+                                    $circle = '✅';
+                                } else {
+                                    $circle = '🔴';
+                                    if (!isset($pendingReport)) {
+                                        $pendingReport = [
+                                            'id' => $training['training_id'],
+                                            'title' => $training['training_title'],
+                                            'date' => date('Y-m-d', $training_date_ts)
+                                        ];
+                                    }
+                                }
+                            ?>
+                            <tr>
+                                <td style="white-space:normal;"><?php echo $circle . ' ' . htmlspecialchars($training['training_title']); ?></td>
+                                <td><?php echo date("Y-m-d", strtotime($training['training_date'])); ?></td>
+                                <td style="text-align:center;padding:10px;">
+                                    <a href="javascript:void(0);" class="log-report-btn signup-btn" onclick="openTraineesModal(<?php echo $training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>')" style="display:inline-block;">
+                                        <span class="signup-count"><?php echo (int) $training['trainee_count']; ?></span>
+                                        <span class="hover-emoji">👥</span>
+                                    </a>
+                                </td>
+                                <td style="text-align:center;">
+                                    <button class="serial-button settings-button" data-show-report="<?php echo $training['show_report']; ?>" data-ready-to-show="<?php echo $training['ready_to_show']; ?>" onclick="actionsTrainingModal(this, <?php echo $training['training_id']; ?>)">
+                                        <span class="default-emoji">✏️</span><span class="hover-emoji">⚙️</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
     </div>
-<?php endif; ?>
-
-
-
-
-
-<!-- MY REGISTRATIONS -->
-<div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-    <h3 data-lang-id="002-my-registrations">My Registrations</h3>
-    <p>Trainings that you've registered for.</p>
-
-    <table id="trainee-trainings" class="display responsive nowrap" style="width:100%;">
-        <thead>
-            <tr>
-                <th>Training</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Country</th>
-                <th>Type</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($registered_trainings as $training): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($training['training_title']); ?></td>
-                    <td><?php echo htmlspecialchars($training['training_date']); ?></td>
-                    <td style="text-align:center;">
-                        <a href="javascript:void(0);"
-                           style="text-decoration:underline; font-weight:bold;"
-                           onclick="openRegisteredTrainingsModal(<?php echo $training['training_id']; ?>,
-                                                                  '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
-                            <?php echo htmlspecialchars($training['training_location']); ?> 🔎
-                        </a>
-                    </td>
-                    <td><?php echo htmlspecialchars($training['training_country']); ?></td>
-                    <td><?php echo htmlspecialchars($training['training_type']); ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
-
-
-
-
-<!-- populated by fetch_newest_briks.php -->
-<div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
-    <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
-    <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
-        <thead>
-            <tr>
-                <th data-lang-id="1103-brik">Brik</th>
-                <th data-lang-id="1104-weight">Weight</th>
-                <th data-lang-id="1108-volume">Volume</th>
-                <th data-lang-id="1109-density">Density</th>
-                <th data-lang-id="1110-date-logged">Logged</th>
-                <th data-lang-id="1106-status">Status</th>
-                <th data-lang-id="1107-serial">Serial</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- DataTables will populate this via AJAX -->
-        </tbody>
-    </table>
-</div>
-
-
-
-
-
-
-
-
-
-    </div>
-</div>
+</div><!-- closes main container -->
 
 </div><!--closes main and starry background-->
 
+</div>
+
 <!-- FOOTER STARTS HERE -->
-<?php require_once("../footer-2025.php"); ?>
+<?php require_once("../footer-2026.php"); ?>
 
 
 
 <script>
     //GET ECOBRICKER'S ECOBRICKS
+
+    const featuredGridBricks = <?php echo $featured_ecobricks_json ?? '[]'; ?> || [];
+    const FEATURED_LIMIT = 9;
+    const SELFIE_ENDPOINT = '../api/fetch_featured_selfies.php';
+    const ECOBRICK_ENDPOINT = '../api/fetch_featured_ecobricks.php';
+    let featuredOffset = 0;
+    let currentFeaturedBricks = Array.isArray(featuredGridBricks) ? featuredGridBricks : [];
+    let currentFeaturedEndpoint = ECOBRICK_ENDPOINT;
+
+    const latestProjects = <?php echo $latest_projects_json ?? '[]'; ?> || [];
+    const PROJECT_LIMIT = 9;
+    const PROJECT_ENDPOINT = '../api/fetch_latest_projects.php';
+    let projectOffset = 0;
+
+    const sliderElement = document.getElementById('ecobrick-slider');
+    const previousButton = document.getElementById('previous-ecobricks');
+    const gridActionRow = document.getElementById('featured-grid-action-row');
+    const loadNextButton = document.getElementById('load-next-ecobricks');
+    const mobileSliderQuery = window.matchMedia('(max-width: 768px)');
+    const welcomePanel = document.getElementById('welcome-greeting-panel');
+    const latestPanel = document.getElementById('latest-ecobricks-panel');
+    const narrowColumn = document.querySelector('.dashboard-column.column-narrow');
+    const wideColumn = document.querySelector('.dashboard-column.column-wide');
+    const latestOriginalNextSibling = latestPanel?.nextElementSibling ?? null;
+    let sliderCurrentIndex = 0;
+    let sliderIntervalId = null;
+    let sliderTouchStartX = 0;
+
+    const projectGrid = document.getElementById('project-grid');
+    const projectEmptyMessage = document.getElementById('projects-empty');
+    const loadMoreProjectsButton = document.getElementById('load-more-projects');
+    const previousProjectsButton = document.getElementById('previous-projects');
+
+    function updateFeaturedControls() {
+        if (!loadNextButton) return;
+
+        const hasPrevious = featuredOffset > 0;
+
+        if (previousButton) {
+            previousButton.style.display = hasPrevious ? 'inline-flex' : 'none';
+        }
+
+        if (gridActionRow) {
+            gridActionRow.classList.toggle('showing-previous', hasPrevious);
+        }
+
+        loadNextButton.classList.toggle('dual-width', hasPrevious);
+    }
+
+    function getSliderSlides() {
+        return sliderElement ? Array.from(sliderElement.querySelectorAll('.slide')) : [];
+    }
+
+    function setActiveSlide(index) {
+        const slides = getSliderSlides();
+        if (!slides.length) return;
+
+        sliderCurrentIndex = (index + slides.length) % slides.length;
+        slides.forEach((slide, idx) => slide.classList.toggle('active', idx === sliderCurrentIndex));
+    }
+
+    function startSliderInterval() {
+        const slides = getSliderSlides();
+        if (!sliderElement || sliderIntervalId || slides.length <= 1 || !mobileSliderQuery.matches) return;
+
+        sliderIntervalId = setInterval(() => setActiveSlide(sliderCurrentIndex + 1), 3000);
+    }
+
+    function stopSliderInterval() {
+        if (sliderIntervalId) {
+            clearInterval(sliderIntervalId);
+            sliderIntervalId = null;
+        }
+    }
+
+    function resetSliderState() {
+        stopSliderInterval();
+        sliderCurrentIndex = 0;
+        setActiveSlide(0);
+        startSliderInterval();
+    }
+
+    function handleSliderTouchStart(e) {
+        if (!mobileSliderQuery.matches) return;
+        sliderTouchStartX = e.touches[0].clientX;
+        stopSliderInterval();
+    }
+
+    function handleSliderTouchEnd(e) {
+        if (!mobileSliderQuery.matches) return;
+        const diff = e.changedTouches[0].clientX - sliderTouchStartX;
+        if (diff < -50) {
+            setActiveSlide(sliderCurrentIndex + 1);
+        } else if (diff > 50) {
+            setActiveSlide(sliderCurrentIndex - 1);
+        }
+        startSliderInterval();
+    }
+
+    function handleSliderQueryChange(event) {
+        if (event.matches) {
+            startSliderInterval();
+        } else {
+            stopSliderInterval();
+            sliderCurrentIndex = 0;
+            setActiveSlide(0);
+        }
+    }
+
+    function toggleFeaturedEmptyState(hasData) {
+        const emptyMessage = document.getElementById('featured-ecobricks-empty');
+        const grid = document.querySelector('.ecobrick-grid');
+        const slider = document.getElementById('ecobrick-slider');
+
+        if (emptyMessage) {
+            emptyMessage.style.display = hasData ? 'none' : 'block';
+        }
+        if (grid) {
+            grid.style.display = hasData ? '' : 'none';
+        }
+        if (slider) {
+            slider.style.display = hasData ? '' : 'none';
+        }
+    }
+
+    function preloadFeaturedEcobricks(bricks) {
+        if (!Array.isArray(bricks)) return;
+
+        bricks.slice(0, FEATURED_LIMIT).forEach((brick) => {
+            if (!brick) return;
+            const photoUrl = brick.ecobrick_full_photo_url || brick.selfie_photo_url;
+            if (!photoUrl) return;
+            const preloadImg = new Image();
+            preloadImg.src = `${photoUrl}?v=${brick.photo_version ?? ''}`;
+        });
+    }
+
+    function renderFeaturedEcobricks(bricks) {
+        const slider = document.getElementById('ecobrick-slider');
+        const grid = document.querySelector('.ecobrick-grid');
+
+        if (!slider || !grid) return;
+
+        slider.innerHTML = '';
+        grid.innerHTML = '';
+
+        if (!Array.isArray(bricks) || !bricks.length) {
+            toggleFeaturedEmptyState(false);
+            stopSliderInterval();
+            return;
+        }
+
+        bricks.slice(0, FEATURED_LIMIT).forEach((brick, index) => {
+            const slide = document.createElement('div');
+            slide.className = `slide${index === 0 ? ' active' : ''}`;
+
+            const photoUrl = brick.ecobrick_full_photo_url || brick.selfie_photo_url || '';
+            const slideImg = document.createElement('img');
+            slideImg.src = `${photoUrl}?v=${brick.photo_version ?? ''}`;
+            slideImg.alt = `Ecobrick photo for serial ${brick.serial_no || ''}`;
+            slide.appendChild(slideImg);
+            slider.appendChild(slide);
+
+            const gridButton = document.createElement('button');
+            gridButton.className = 'ecobrick-grid-item';
+            gridButton.type = 'button';
+            gridButton.title = brick.vision || brick.location_display || 'View featured ecobrick';
+
+            const gridImg = document.createElement('img');
+            const gridImageUrl = brick.ecobrick_thumb_photo_url || brick.selfie_thumb_photo_url || photoUrl;
+            gridImg.src = `${gridImageUrl}?v=${brick.photo_version ?? ''}`;
+            gridImg.alt = `Ecobrick photo for serial ${brick.serial_no || ''}`;
+            gridButton.appendChild(gridImg);
+
+            gridButton.addEventListener('click', () => openViewEcobricV2(brick));
+            grid.appendChild(gridButton);
+        });
+
+        toggleFeaturedEmptyState(true);
+        resetSliderState();
+    }
+
+    function updateFeaturedBricks(bricks) {
+        currentFeaturedBricks = Array.isArray(bricks) ? bricks : [];
+        renderFeaturedEcobricks(currentFeaturedBricks);
+        preloadFeaturedEcobricks(currentFeaturedBricks);
+        updateFeaturedControls();
+    }
+
+    function toggleProjectsEmptyState(hasProjects) {
+        if (projectEmptyMessage) {
+            projectEmptyMessage.style.display = hasProjects ? 'none' : 'block';
+        }
+
+        if (projectGrid) {
+            projectGrid.style.display = hasProjects ? 'grid' : 'none';
+        }
+    }
+
+    function renderProjectGrid(projects) {
+        if (!projectGrid) return;
+
+        projectGrid.replaceChildren();
+
+        projects.forEach((project) => {
+            const gridButton = document.createElement('button');
+            gridButton.className = 'ecobrick-grid-item project-grid-item';
+            gridButton.type = 'button';
+            gridButton.title = project.project_name || 'View project';
+
+            const projectThumb = project.photo1_tmb || project.photo1_main || '';
+
+            const gridImg = document.createElement('img');
+            gridImg.src = projectThumb;
+            gridImg.alt = project.project_name || 'Project photo';
+            gridButton.appendChild(gridImg);
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'project-grid-title';
+            titleSpan.textContent = project.project_name || '';
+            gridButton.appendChild(titleSpan);
+
+            gridButton.addEventListener('click', () => projectPreview(project));
+            projectGrid.appendChild(gridButton);
+        });
+
+        toggleProjectsEmptyState(projectGrid.children.length > 0);
+    }
+
+    function updateProjects(projects) {
+        const list = Array.isArray(projects) ? projects : [];
+        if (!list.length) {
+            toggleProjectsEmptyState(false);
+            return;
+        }
+
+        renderProjectGrid(list);
+    }
+
+    function updateProjectControls() {
+        if (previousProjectsButton) {
+            previousProjectsButton.style.display = projectOffset > 0 ? 'inline-flex' : 'none';
+        }
+    }
+
+    function loadMoreProjects() {
+        if (loadMoreProjectsButton) {
+            loadMoreProjectsButton.disabled = true;
+            loadMoreProjectsButton.setAttribute('aria-busy', 'true');
+        }
+
+        const nextOffset = projectOffset + PROJECT_LIMIT;
+        fetch(`${PROJECT_ENDPOINT}?offset=${nextOffset}&limit=${PROJECT_LIMIT}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data?.success) {
+                    throw new Error(data?.error || 'Unable to load projects');
+                }
+
+                if (!Array.isArray(data.data) || !data.data.length) {
+                    return;
+                }
+
+                updateProjects(data.data);
+                projectOffset = nextOffset;
+                updateProjectControls();
+            })
+            .catch((error) => {
+                console.error('Error fetching projects:', error);
+            })
+            .finally(() => {
+                if (loadMoreProjectsButton) {
+                    loadMoreProjectsButton.disabled = false;
+                    loadMoreProjectsButton.removeAttribute('aria-busy');
+                }
+            });
+    }
+
+    function loadPreviousProjects() {
+        if (previousProjectsButton) {
+            previousProjectsButton.disabled = true;
+            previousProjectsButton.setAttribute('aria-busy', 'true');
+        }
+
+        const previousOffset = Math.max(0, projectOffset - PROJECT_LIMIT);
+        fetch(`${PROJECT_ENDPOINT}?offset=${previousOffset}&limit=${PROJECT_LIMIT}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data?.success) {
+                    throw new Error(data?.error || 'Unable to load projects');
+                }
+
+                if (!Array.isArray(data.data) || !data.data.length) {
+                    return;
+                }
+
+                updateProjects(data.data);
+                projectOffset = previousOffset;
+                updateProjectControls();
+            })
+            .catch((error) => {
+                console.error('Error fetching projects:', error);
+            })
+            .finally(() => {
+                if (previousProjectsButton) {
+                    previousProjectsButton.disabled = false;
+                    previousProjectsButton.removeAttribute('aria-busy');
+                }
+            });
+    }
+
+    function loadFeaturedBatch(offset) {
+        fetch(`${currentFeaturedEndpoint}?offset=${offset}&limit=${FEATURED_LIMIT}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data?.success) {
+                    throw new Error(data?.error || 'Unable to load ecobricks');
+                }
+
+                if (!Array.isArray(data.data) || !data.data.length) {
+                    featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
+                    toggleFeaturedEmptyState(false);
+                    updateFeaturedControls();
+                    return;
+                }
+
+                updateFeaturedBricks(data.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching featured ecobricks:', error);
+                featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
+                updateFeaturedControls();
+            });
+    }
+
+    function repositionLatestPanel() {
+        if (!latestPanel || !welcomePanel || !narrowColumn || !wideColumn) return;
+
+        if (mobileSliderQuery.matches) {
+            if (latestPanel.parentElement !== narrowColumn || latestPanel.previousElementSibling !== welcomePanel) {
+                welcomePanel.insertAdjacentElement('afterend', latestPanel);
+            }
+        } else if (latestPanel.parentElement !== wideColumn) {
+            if (latestOriginalNextSibling && latestOriginalNextSibling.parentElement === wideColumn) {
+                wideColumn.insertBefore(latestPanel, latestOriginalNextSibling);
+            } else {
+                wideColumn.insertBefore(latestPanel, wideColumn.firstChild);
+            }
+        }
+    }
+
+    function closeInfoModalV2() {
+        const modal = document.getElementById('form-modal-message-v2');
+        if (!modal) return;
+
+        modal.classList.add('modal-hidden');
+        modal.classList.remove('modal-shown');
+        document.body.classList.remove('modal-open');
+        document.getElementById('page-content')?.classList.remove('blurred');
+        document.getElementById('footer-full')?.classList.remove('blurred');
+
+        modal.querySelector('.modal-photo-v2')?.replaceChildren();
+        modal.querySelector('.modal-message-v2')?.replaceChildren();
+
+        const modalStatusPill = modal.querySelector('.modal-status-pill');
+        const modalViewButton = modal.querySelector('.modal-view-button');
+        if (modalStatusPill) {
+            modalStatusPill.textContent = '';
+            modalStatusPill.className = 'modal-status-pill status-pill status-default';
+            modalStatusPill.style.display = 'none';
+        }
+
+        if (modalViewButton) {
+            modalViewButton.href = '#';
+            modalViewButton.textContent = 'View Ecobrick';
+            modalViewButton.style.display = 'none';
+        }
+    }
+
+    function getStatusClassName(statusText = '') {
+        const normalized = statusText.toLowerCase();
+
+        if (normalized.includes('auth')) return 'status-authenticated';
+        if (normalized.includes('await')) return 'status-awaiting';
+        if (normalized.includes('reject')) return 'status-rejected';
+
+        return 'status-default';
+    }
+
+    function applyStatusPill(pillElement, statusText) {
+        if (!pillElement) return;
+
+        const baseClass = pillElement.classList.contains('ecobrick-status-pill')
+            ? 'ecobrick-status-pill status-pill'
+            : 'modal-status-pill status-pill';
+        const statusClass = getStatusClassName(statusText);
+
+        pillElement.className = `${baseClass} ${statusClass}`;
+        pillElement.textContent = statusText || 'Status unknown';
+        pillElement.style.display = 'inline-flex';
+    }
+
+    function openViewEcobricV2(brickData) {
+        if (!brickData) return;
+
+        const modal = document.getElementById('form-modal-message-v2');
+        const photoContainer = modal?.querySelector('.modal-photo-v2');
+        const messageContainer = modal?.querySelector('.modal-message-v2');
+        const modalStatusPill = modal?.querySelector('.modal-status-pill');
+        const modalViewButton = modal?.querySelector('.modal-view-button');
+
+        if (!modal || !photoContainer || !messageContainer) return;
+
+        photoContainer.replaceChildren();
+        messageContainer.replaceChildren();
+
+        const photoWrapper = document.createElement('div');
+        photoWrapper.className = 'ecobrick-photo-wrapper';
+
+        const img = document.createElement('img');
+        const primaryPhotoUrl = brickData.ecobrick_full_photo_url || brickData.selfie_photo_url || '';
+        img.src = `${primaryPhotoUrl}?v=${brickData.photo_version ?? ''}`;
+        img.alt = `Ecobrick photo for serial ${brickData.serial_no || ''}`;
+
+        photoWrapper.appendChild(img);
+        photoContainer.appendChild(photoWrapper);
+
+        const metaWrapper = document.createElement('div');
+        metaWrapper.className = 'ecobrick-meta-v2';
+
+        const details = document.createElement('p');
+        const weightTxt = brickData.weight_g ? `${Number(brickData.weight_g).toLocaleString()} gram` : 'an unknown weight';
+        const makerTxt = brickData.ecobricker_maker || 'an unknown maker';
+        const locationTxt = brickData.location_display || 'an undisclosed location';
+        const serialTxt = brickData.serial_no || 'an unlisted serial';
+        details.textContent = `This ${weightTxt} ecobrick ${serialTxt} was made by ${makerTxt} in ${locationTxt}.`;
+        metaWrapper.appendChild(details);
+
+        const visionText = brickData.vision || '';
+        if (visionText) {
+            const visionEl = document.createElement('div');
+            visionEl.className = 'ecobrick-vision-v2';
+            visionEl.textContent = visionText;
+            metaWrapper.appendChild(visionEl);
+        }
+
+        photoContainer.appendChild(metaWrapper);
+
+        const viewHref = `brik.php?serial_no=${encodeURIComponent(brickData.serial_no || '')}`;
+        if (modalViewButton) {
+            modalViewButton.href = viewHref;
+            modalViewButton.textContent = 'View Ecobrick';
+            modalViewButton.setAttribute('aria-label', `Open ecobrick ${brickData.serial_no || ''} details`);
+            modalViewButton.style.display = 'inline-flex';
+        }
+
+        applyStatusPill(modalStatusPill, brickData.status);
+
+        modal.classList.remove('modal-hidden');
+        modal.classList.add('modal-shown');
+
+        document.getElementById('page-content')?.classList.add('blurred');
+        document.getElementById('footer-full')?.classList.add('blurred');
+        document.body.classList.add('modal-open');
+    }
+
+    function projectPreview(projectData) {
+        if (!projectData) return;
+
+        const modal = document.getElementById('form-modal-message-v2');
+        const photoContainer = modal?.querySelector('.modal-photo-v2');
+        const messageContainer = modal?.querySelector('.modal-message-v2');
+        const modalStatusPill = modal?.querySelector('.modal-status-pill');
+        const modalViewButton = modal?.querySelector('.modal-view-button');
+
+        if (!modal || !photoContainer || !messageContainer) return;
+
+        photoContainer.replaceChildren();
+        messageContainer.replaceChildren();
+
+        const photoWrapper = document.createElement('div');
+        photoWrapper.className = 'ecobrick-photo-wrapper';
+
+        const img = document.createElement('img');
+        const primaryPhotoUrl = projectData.photo1_main || projectData.photo1_tmb || '';
+        img.src = primaryPhotoUrl;
+        img.alt = projectData.project_name || 'Project photo';
+
+        photoWrapper.appendChild(img);
+        photoContainer.appendChild(photoWrapper);
+
+        const title = document.createElement('h4');
+        title.textContent = projectData.project_name || 'Project';
+        messageContainer.appendChild(title);
+
+        if (projectData.description_short) {
+            const desc = document.createElement('p');
+            desc.textContent = projectData.description_short;
+            messageContainer.appendChild(desc);
+        }
+
+        if (modalViewButton) {
+            modalViewButton.href = `project.php?id=${encodeURIComponent(projectData.project_id || '')}`;
+            modalViewButton.textContent = 'View project';
+            modalViewButton.setAttribute('aria-label', `Open project ${projectData.project_name || ''}`);
+            modalViewButton.style.display = 'inline-flex';
+        }
+
+        if (modalStatusPill) {
+            modalStatusPill.className = 'modal-status-pill status-pill status-default';
+            modalStatusPill.textContent = `${projectData.briks_used ?? 0} ecobricks`;
+            modalStatusPill.style.display = 'inline-flex';
+        }
+
+        modal.classList.remove('modal-hidden');
+        modal.classList.add('modal-shown');
+        document.getElementById('page-content')?.classList.add('blurred');
+        document.getElementById('footer-full')?.classList.add('blurred');
+        document.body.classList.add('modal-open');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateFeaturedBricks(currentFeaturedBricks);
+
+        updateProjects(latestProjects);
+        projectOffset = 0;
+        updateProjectControls();
+
+        loadNextButton?.addEventListener('click', () => {
+            const switchingEndpoint = currentFeaturedEndpoint !== SELFIE_ENDPOINT;
+            currentFeaturedEndpoint = SELFIE_ENDPOINT;
+
+            if (switchingEndpoint) {
+                featuredOffset = 0;
+            } else {
+                featuredOffset += FEATURED_LIMIT;
+            }
+            updateFeaturedControls();
+            loadFeaturedBatch(featuredOffset);
+        });
+
+        previousButton?.addEventListener('click', () => {
+            featuredOffset = Math.max(0, featuredOffset - FEATURED_LIMIT);
+            updateFeaturedControls();
+            loadFeaturedBatch(featuredOffset);
+        });
+
+        loadMoreProjectsButton?.addEventListener('click', () => {
+            loadMoreProjects();
+        });
+
+        previousProjectsButton?.addEventListener('click', () => {
+            loadPreviousProjects();
+        });
+
+        document.getElementById('load-featured-ecobricks')?.addEventListener('click', () => {
+            currentFeaturedEndpoint = ECOBRICK_ENDPOINT;
+            featuredOffset = 0;
+            updateFeaturedControls();
+            loadFeaturedBatch(featuredOffset);
+        });
+
+        sliderElement?.addEventListener('touchstart', handleSliderTouchStart);
+        sliderElement?.addEventListener('touchend', handleSliderTouchEnd);
+        mobileSliderQuery.addEventListener('change', handleSliderQueryChange);
+        mobileSliderQuery.addEventListener('change', repositionLatestPanel);
+
+        setActiveSlide(0);
+        startSliderInterval();
+        repositionLatestPanel();
+    });
 
 
     $(document).ready(function() {
@@ -711,7 +1484,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     d.ecobricker_id = ecobrickerId; // Pass the ecobricker_id to filter the results to the user's ecobricks
                 }
             },
-            "pageLength": 10, // Show 10 briks per page
+            "pageLength": 7, // Show 7 briks per page
             "language": {
                 "emptyTable": "It looks like you haven't logged any ecobricks yet!",
                 "lengthMenu": "Show _MENU_ briks",
@@ -762,17 +1535,34 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             }
         });
     });
+ 
+document.addEventListener('DOMContentLoaded', () => {
+    const notice = document.getElementById('registered-notice');
+    const panel = document.getElementById('registered-notice-panel');
+    const closeBtn = notice?.querySelector('.notice-close');
 
-
-
+    closeBtn?.addEventListener('click', () => {
+        if (panel) {
+            panel.style.display = 'none';
+        } else if (notice) {
+            notice.style.display = 'none';
+        }
+    });
+});
 
 
 // REGISTRATION (TRAININGS)
 $(document).ready(function() {
     let table = $("#trainee-trainings").DataTable({
-        "pageLength": 10,
+        "pageLength": 7,
         "searching": false,
         "lengthChange": false,
+        "responsive": {
+            "details": {
+                "type": "column",
+                "target": "tr"
+            }
+        },
         "language": {
             "emptyTable": "You haven't registered for any trainings yet.",
             "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
@@ -787,29 +1577,11 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "orderable": false, "targets": [2] }, // Disable sorting on "Location"
-            { "targets": [3, 4], "visible": true }, // Default: show Country, Type
-            { "targets": [3, 4], "visible": false, "responsivePriority": 1 } // Hide on small screens
+            { "responsivePriority": 1, "targets": 0 },
+            { "responsivePriority": 2, "targets": 1 },
+            { "className": "none", "targets": [2, 3, 4] },
+            { "orderable": false, "targets": [3, 4] }
         ]
-    });
-
-    // Adjust visibility based on screen size
-    function adjustTableColumns() {
-        if (window.innerWidth < 769) {
-            table.column(3).visible(false); // Hide Country
-            table.column(4).visible(false); // Hide Type
-        } else {
-            table.column(3).visible(true);
-            table.column(4).visible(true);
-        }
-    }
-
-    // Run on page load
-    adjustTableColumns();
-
-    // Run on window resize
-    $(window).resize(function() {
-        adjustTableColumns();
     });
 });
 
@@ -964,6 +1736,8 @@ function sendTraineeEmails(trainingId, isTest) {
 $(document).ready(function() {
     const noticeToggle = document.getElementById('dash-notice-toggle');
     const noticeForm = document.getElementById('dash-notice-form');
+    const supportToggle = document.getElementById('support-chat-toggle');
+    const supportForm = document.getElementById('support-chat-form');
 
     if (noticeToggle && noticeForm) {
         const setNoticeState = (expanded) => {
@@ -977,6 +1751,21 @@ $(document).ready(function() {
         noticeToggle.addEventListener('click', () => {
             const isExpanded = noticeToggle.getAttribute('aria-expanded') === 'true';
             setNoticeState(!isExpanded);
+        });
+    }
+
+    if (supportToggle && supportForm) {
+        const setSupportState = (expanded) => {
+            supportToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            supportToggle.classList.toggle('down', expanded);
+            supportForm.style.display = expanded ? 'flex' : 'none';
+        };
+
+        setSupportState(false);
+
+        supportToggle.addEventListener('click', () => {
+            const isExpanded = supportToggle.getAttribute('aria-expanded') === 'true';
+            setSupportState(!isExpanded);
         });
     }
 
@@ -1111,128 +1900,55 @@ function openTraineesModal(trainingId, trainingTitle) {
 
 <script type="text/javascript">
 
-// JavaScript to determine the user's time of day and display an appropriate greeting
-window.onload = function() {
-    var now = new Date();
-    var hours = now.getHours();
-    var greeting;
-    var lang = "<?php echo htmlspecialchars($lang); ?>"; // Get the language from PHP
+// Determine greeting and corresponding welcome panel background based on the time of day
+function getGreetingConfig(lang) {
+    const now = new Date();
+    const hours = now.getHours();
+    const timeOfDay = hours < 12
+        ? 'morning'
+        : hours < 17
+            ? 'afternoon'
+            : hours < 21
+                ? 'evening'
+                : 'night';
 
-    // Determine greeting based on the time of day
-    if (hours < 12) {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bonjour";
-                break;
-            case 'es':
-                greeting = "Buenos días";
-                break;
-            case 'id':
-                greeting = "Selamat pagi";
-                break;
-            case 'en':
-            default:
-                greeting = "Good morning";
-                break;
-        }
-    } else if (hours < 18) {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bon après-midi";
-                break;
-            case 'es':
-                greeting = "Buenas tardes";
-                break;
-            case 'id':
-                greeting = "Selamat siang";
-                break;
-            case 'en':
-            default:
-                greeting = "Good afternoon";
-                break;
-        }
-    } else {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bonsoir";
-                break;
-            case 'es':
-                greeting = "Buenas noches";
-                break;
-            case 'id':
-                greeting = "Selamat malam";
-                break;
-            case 'en':
-            default:
-                greeting = "Good evening";
-                break;
-        }
-    }
+    const greetings = {
+        en: { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening', night: 'Good night' },
+        fr: { morning: 'Bonjour', afternoon: 'Bon après-midi', evening: 'Bonsoir', night: 'Bonne nuit' },
+        es: { morning: 'Buenos días', afternoon: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches' },
+        id: { morning: 'Selamat pagi', afternoon: 'Selamat siang', evening: 'Selamat malam', night: 'Selamat malam' }
+    };
 
-    document.getElementById("greeting").innerHTML = greeting + " <?php echo htmlspecialchars($first_name); ?>!";
+    const backgrounds = {
+        morning: 'good-morning',
+        afternoon: 'good-afternoon',
+        evening: 'good-evening',
+        night: 'good-night'
+    };
+
+    const selectedGreeting = greetings[lang]?.[timeOfDay] || greetings.en[timeOfDay];
+    const selectedBackground = backgrounds[timeOfDay];
+
+    return { greeting: selectedGreeting, background: selectedBackground };
 }
-
-
 
 // Main greeting function to determine the user's time of day and display an appropriate greeting
 function mainGreeting() {
-    var now = new Date();
-    var hours = now.getHours();
-    var greeting;
-    var lang = "<?php echo htmlspecialchars($lang); ?>"; // Get the language from PHP
+    const lang = "<?php echo htmlspecialchars($lang); ?>"; // Get the language from PHP
+    const greetingElement = document.getElementById("greeting");
+    const welcomePanelElement = document.getElementById('welcome-greeting-panel');
+    const { greeting, background } = getGreetingConfig(lang);
 
-    // Determine greeting based on the time of day
-    if (hours < 12) {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bonjour";
-                break;
-            case 'es':
-                greeting = "Buenos días";
-                break;
-            case 'id':
-                greeting = "Selamat pagi";
-                break;
-            case 'en':
-            default:
-                greeting = "Good morning";
-                break;
-        }
-    } else if (hours < 18) {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bon après-midi";
-                break;
-            case 'es':
-                greeting = "Buenas tardes";
-                break;
-            case 'id':
-                greeting = "Selamat siang";
-                break;
-            case 'en':
-            default:
-                greeting = "Good afternoon";
-                break;
-        }
-    } else {
-        switch (lang) {
-            case 'fr':
-                greeting = "Bonsoir";
-                break;
-            case 'es':
-                greeting = "Buenas noches";
-                break;
-            case 'id':
-                greeting = "Selamat malam";
-                break;
-            case 'en':
-            default:
-                greeting = "Good evening";
-                break;
-        }
+    if (greetingElement) {
+        greetingElement.innerHTML = greeting + "<br><?php echo htmlspecialchars($first_name); ?>!";
     }
 
-    document.getElementById("greeting").innerHTML = greeting + " <?php echo htmlspecialchars($first_name); ?>!";
+    if (welcomePanelElement && background) {
+        welcomePanelElement.style.backgroundImage = "url('../svgs/" + background + ".svg?v=')";
+        welcomePanelElement.style.backgroundRepeat = 'no-repeat';
+        welcomePanelElement.style.backgroundPosition = 'top';
+        welcomePanelElement.style.backgroundSize = 'contain';
+    }
 }
 
 
@@ -1677,81 +2393,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <script>
-    // Check if the tour has been taken
-    document.addEventListener('DOMContentLoaded', function() {
-        if (localStorage.getItem('gobrikTourTaken') === 'true') {
-            // If the tour has been taken, hide the button
-            document.getElementById('take-gobrik-tour').style.display = 'none';
-        }
-    });
-
-    // Function to start the guided tour and set localStorage
-    function startTour() {
-        guidedTour();  // Call your guided tour function
-
-        // Record in localStorage that the tour has been taken
-        localStorage.setItem('gobrikTourTaken', 'true');
-
-        // Hide the button after it is clicked
-        document.getElementById('take-gobrik-tour').style.display = 'none';
-    }
-
-    // Example function for guided tour (replace with your actual guidedTour function)
-    function guidedTour() {
-        // Your guided tour logic here
-        alert("Starting the GoBrik guided tour!");
-    }
-</script>
-
-<script>
 document.addEventListener('DOMContentLoaded', function() {
-    const slides = document.querySelectorAll('#ecobrick-slider .slide');
-    const dots = document.querySelectorAll('#slider-dots .dot');
-    let currentSlide = 0;
+    const slider = document.getElementById('ecobrick-slider');
+    if (!slider) return;
 
-    function showSlide(index) {
-        console.log('Showing slide', index);
+    const slides = slider.querySelectorAll('.slide');
+    if (!slides.length) return;
+
+    const mobileQuery = window.matchMedia('(max-width: 768px)');
+    let currentSlide = 0;
+    let intervalId = null;
+    let startX = 0;
+
+    function setActiveSlide(index) {
         slides[currentSlide].classList.remove('active');
-        dots[currentSlide].classList.remove('active');
         currentSlide = (index + slides.length) % slides.length;
         slides[currentSlide].classList.add('active');
-        dots[currentSlide].classList.add('active');
     }
 
-    function nextSlide() {
-        console.log('Auto advancing to next slide');
-        showSlide(currentSlide + 1);
+    function startInterval() {
+        if (intervalId || slides.length <= 1 || !mobileQuery.matches) return;
+        intervalId = setInterval(() => setActiveSlide(currentSlide + 1), 3000);
     }
 
-    let interval = setInterval(nextSlide, 10000);
-
-    function resetInterval() {
-        clearInterval(interval);
-        interval = setInterval(nextSlide, 10000);
+    function stopInterval() {
+        if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
     }
 
-    dots.forEach((dot, idx) => {
-        dot.addEventListener('click', () => {
-            showSlide(idx);
-            resetInterval();
-        });
-    });
-
-    let startX = 0;
-    const sliderBox = document.getElementById('slider-box');
-    sliderBox.addEventListener('touchstart', e => {
-        startX = e.touches[0].clientX;
-    });
-    sliderBox.addEventListener('touchend', e => {
-        const diff = e.changedTouches[0].clientX - startX;
-        if (diff < -50) {
-            showSlide(currentSlide + 1);
-            resetInterval();
-        } else if (diff > 50) {
-            showSlide(currentSlide - 1);
-            resetInterval();
+    mobileQuery.addEventListener('change', (event) => {
+        if (event.matches) {
+            startInterval();
+        } else {
+            stopInterval();
+            currentSlide = 0;
+            slides.forEach((slide, idx) => slide.classList.toggle('active', idx === 0));
         }
     });
+
+    slider.addEventListener('touchstart', e => {
+        if (!mobileQuery.matches) return;
+        startX = e.touches[0].clientX;
+        stopInterval();
+    });
+
+    slider.addEventListener('touchend', e => {
+        if (!mobileQuery.matches) return;
+        const diff = e.changedTouches[0].clientX - startX;
+        if (diff < -50) {
+            setActiveSlide(currentSlide + 1);
+        } else if (diff > 50) {
+            setActiveSlide(currentSlide - 1);
+        }
+        startInterval();
+    });
+
+    slides.forEach((slide, idx) => slide.classList.toggle('active', idx === 0));
+    startInterval();
 });
 </script>
 
