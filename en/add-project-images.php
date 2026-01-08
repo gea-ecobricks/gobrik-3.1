@@ -1,8 +1,83 @@
 <?php
+require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// 🌍 Set up page environment
+$lang = basename(dirname($_SERVER['SCRIPT_NAME']));
+$version = '3.0';
+$page = 'add-project-images';
+$lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
+
+// 🔐 Start session and verify Buwana JWT (auto-redirects if not logged in)
+require_once '../auth/session_start.php';
+
+// 🆔 Retrieve the authenticated user's Buwana ID
+$buwana_id = $_SESSION['buwana_id'] ?? '';
+
+// 🧭 Buwana app registration check
+// --------------------------------------------------
+// Even though the user is logged in with Buwana, there is still a chance they
+// have not connected their Buwana account to this specific client app yet.
+// We call the shared Buwana API to confirm the "registered" connection and
+// redirect them to the app-connect flow if the relationship is missing.
+$client_id = 'gbrk_f2c61a85a4cd4b8b89a7';
+if (!empty($buwana_id)) {
+    $api_endpoint = 'https://buwana.ecobricks.org/api/check_user_app_connection.php';
+    $query = http_build_query([
+        'buwana_id' => $buwana_id,
+        'client_id' => $client_id,
+        'lang' => $lang ?? 'en'
+    ]);
+
+    $ch = curl_init("{$api_endpoint}?{$query}");
+    if ($ch) {
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $api_response = curl_exec($ch);
+        $curl_error = curl_error($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($api_response !== false && $http_code === 200) {
+            $connection_status = json_decode($api_response, true);
+            if (json_last_error() === JSON_ERROR_NONE && isset($connection_status['connected']) && !$connection_status['connected']) {
+                $redirect_url = $connection_status['app_login_url'] ?? '';
+                if (!empty($redirect_url)) {
+                    header("Location: {$redirect_url}");
+                    exit();
+                }
+            }
+        } else {
+            error_log('Buwana connection check failed: ' . ($curl_error ?: 'Unexpected HTTP ' . $http_code));
+        }
+    }
+}
+
+// 🔗 Establish DB connections to GoBrik and Buwana
 require_once '../gobrikconn_env.php';
+require_once '../buwanaconn_env.php';
+$conn = $gobrik_conn;
+
+// 🌎 Fetch user meta from Buwana database
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_roles = getUser_Role($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+
+// 👤 Look up user's GoBrik account info
+$sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
+$stmt_lookup_user = $gobrik_conn->prepare($sql_lookup_user);
+if ($stmt_lookup_user) {
+    $stmt_lookup_user->bind_param("i", $buwana_id);
+    $stmt_lookup_user->execute();
+    $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt, $user_capabilities_raw);
+    $stmt_lookup_user->fetch();
+    $stmt_lookup_user->close();
+} else {
+    die("Error preparing statement for tb_ecobrickers: " . $gobrik_conn->error);
+}
 
 $error_message = '';
 $full_urls = [];
@@ -17,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['project_id'])) {
 
     // Handle project deletion
     if (isset($_POST['action']) && $_POST['action'] == 'delete_project') {
-        $deleteResult = deleteProject($project_id, $conn);
+        $deleteResult = deleteProject($project_id, $gobrik_conn);
         if ($deleteResult === true) {
             echo "<script>alert('Project has been successfully deleted.'); window.location.href='add-project.php';</script>";
             exit;
@@ -67,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['project_id'])) {
         $db_values[] = $project_id;
         $db_types .= "i";
 
-        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt = $gobrik_conn->prepare($update_sql);
         $update_stmt->bind_param($db_types, ...$db_values);
         if (!$update_stmt->execute()) {
             $error_message .= "Database update failed: " . $update_stmt->error;
