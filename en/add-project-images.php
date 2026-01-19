@@ -278,7 +278,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['project_id'])) {
             <img src="../svgs/step3-log-project.svg" style="height:30px;margin-bottom:40px;" alt="Step 3: Upload Success">
         </div>
         <div id="upload-success-message"></div>
-        <a class="confirm-button" href="project.php?project_id=<?php echo $_GET['project_id']; ?>" data-lang-id="013-view-project-post">🎉 View Project Post</a>
+        <a class="confirm-button" href="project.php?id=<?php echo htmlspecialchars($_GET['project_id']); ?>" data-lang-id="013-view-project-post">🎉 View Project Post</a>
         <a class="confirm-button" data-lang-id="014-edit-project" href="edit-project.php?project_id=<?php echo $_GET['project_id']; ?>">Edit Project Post</a>
       
 
@@ -415,8 +415,8 @@ function uploadSuccess(data) {
     // Define messages for different languages
     var messages = {
         en: {
-            heading: "Upload Successful!",
-            description: "Nice. Your project has now been added to the database.",
+            heading: "Project Posted!",
+            description: "Your project is now featured on Ecobricks.org and GoBrik.com to inspire the world.",
             button: "➕ Add Next Project"
         },
         es: {
@@ -439,10 +439,10 @@ function uploadSuccess(data) {
     var currentLang = window.currentLanguage || 'en';
     var selectedMessage = messages[currentLang] || messages.en;
 
-    var successMessage = '<h1>' + selectedMessage.heading + '</h1>';
-    successMessage += '<p>' + selectedMessage.description + '</p><br>';
+    var successMessage = '<div class="upload-success-message"><h1>' + selectedMessage.heading + '</h1>';
+    successMessage += '<p>' + selectedMessage.description + '</p></div><br>';
     
-    var galleryHTML = '<div id="three-column-gal" class="three-column-gal">';
+    var galleryHTML = '<div id="three-column-gal" class="three-column-gal upload-success-gallery">';
 
     // Iterate over the thumbnail_paths and full_urls to build the gallery items with added file size details
     for (var i = 0; i < data.thumbnail_paths.length; i++) {

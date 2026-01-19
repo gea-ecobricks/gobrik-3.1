@@ -151,6 +151,26 @@ label {
   font-size: 1.3em;
 }
 
+.upload-success-message {
+  text-align: center;
+}
+
+.upload-success-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.upload-success-gallery .gal-photo {
+  max-width: 220px;
+  text-align: center;
+}
+
+.upload-success-gallery .gal-photo img {
+  margin: 0 auto;
+}
+
 .form-item select {
   background: var(--input-background);
   font-size: 1.2em;
