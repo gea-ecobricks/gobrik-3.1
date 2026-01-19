@@ -196,33 +196,35 @@ if ($project && !empty($project['connected_ecobricks'])) {
                 <br><hr><br>
 
                 <div class="page-paragraph">
-                    <h3><p data-lang-id="151">Ecobrick Applications</p></h3>
-                    <p data-lang-id="152">There are all sorts of ways to build with ecobricks! We invite you to get inspired by our searchable arcive of ecobrick projects. Search by location, project type, construction type and location.</p>
-                    <p data-lang-id="153">Then, when you're ready to go, check out our ecobrick building guidelines. We've got in-depth resources on general building, modules, open space, earth building and earth building techniques.</p>
-                    <br>
-                    <p><a class="action-btn-blue" href="build.php" data-lang-id="154">🔎 Browse the Archive</a></p>
-                    <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="155">The live archive of ecobrick projects around the world.</p>
-                    <br>
-                    <p><a class="action-btn-blue" href="build.php" data-lang-id="154">🔎 Ecobrick Applications</a></p>
-                    <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="155">An overview of ecobrick applications.</p>
-                </div>
+                                    <h3><p data-lang-id="151">Ecobrick Applications</p></h3>
+                                    <p data-lang-id="152">There are all sorts of ways to build with ecobricks! We invite you to get inspired by our searchable archive of ecobrick projects. Search by location, project type, construction type and location.</p>
+                                    <p data-lang-id="153">Then, when you're ready to go, check out our ecobrick building guidelines. We've got in-depth resources on general building, modules, open space, earth building and earth building techniques.</p>
+                                    <br>
+                                    <p><a class="action-btn-blue" href="featured-projects.php" data-lang-id="154">🔎 Featured Projects</a></p>
+                                    <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="155">The live archive of ecobrick projects around the world.</p>
+                                    <br>
+                                    <p><a class="action-btn-blue" href="https://ecobricks.org/build.php" data-lang-id="154">🔎 Learn about Ecobrick Building</a></p>
+                                    <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="155">An overview of ecobrick applications.</p>
+                                </div>
     <?php else: ?>
         <div class="lead-page-paragraph">
             <p data-lang-id="152">🚧 It seems project <?php echo htmlspecialchars((string) $projectId, ENT_QUOTES, 'UTF-8'); ?> has not been published to the ecobricks.org database. This could be because of a publication error. It could also be because the project ID is mis-entered in the URL.</p>
         </div>
         <br><hr><br>
         <div class="page-paragraph">
-            <h4 data-lang-id="151">Ecobrick Applications</h4>
-            <p data-lang-id="152">There are all sorts of ways to build with ecobricks! We invite you to get inspired by our searchable arcive of ecobrick projects. Search by location, project type, construction type and location.</p>
-            <p data-lang-id="153">Then, when you're ready to go, check out our ecobrick building guidelines. We've got in-depth resources on general building, modules, open space, earth building and earth building techniques.</p>
-            <br>
-            <p><a class="action-btn-blue" href="build.php" data-lang-id="154">🔎 Browse the Archive</a></p>
-            <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="155">The live archive of ecobrick projects around the world.</p>
-            <br>
-            <p><a class="action-btn-blue" href="build.php" data-lang-id="154">🔎 Ecobrick Applications</a></p>
-            <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="155">An overview of ecobrick applications.</p>
-        </div>
+                            <h3><p data-lang-id="151">Ecobrick Applications</p></h3>
+                            <p data-lang-id="152">There are all sorts of ways to build with ecobricks! We invite you to get inspired by our searchable archive of ecobrick projects. Search by location, project type, construction type and location.</p>
+                            <p data-lang-id="153">Then, when you're ready to go, check out our ecobrick building guidelines. We've got in-depth resources on general building, modules, open space, earth building and earth building techniques.</p>
+                            <br>
+                            <p><a class="action-btn-blue" href="featured-projects.php" data-lang-id="154">🔎 Featured Projects</a></p>
+                            <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="155">The live archive of ecobrick projects around the world.</p>
+                            <br>
+                            <p><a class="action-btn-blue" href="https://ecobricks.org/build.php" data-lang-id="154">🔎 Learn about Ecobrick Building</a></p>
+                            <p style="font-size: 0.85em; margin-top:20px;" data-lang-id="155">An overview of ecobrick applications.</p>
+                        </div>
+
     <?php endif; ?>
+</div>
 </div>
 
 <!--FOOTER STARTS HERE-->
