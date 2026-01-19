@@ -12,6 +12,39 @@
 
 
 
+    body {
+      background: var(--dashboard-page-background, #f5f5f5);
+      font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    :root {
+        --brik-panel-bg: #ffffff;
+        --brik-panel-border: #d0d7de;
+        --brik-panel-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        --brik-pill-blue-bg: #e3f2ff;
+        --brik-pill-blue-text: #0b5ed7;
+        --brik-pill-green-bg: #e6f4ea;
+        --brik-pill-green-text: #1e8e3e;
+        --brik-pill-red-bg: #fdecea;
+        --brik-pill-red-text: #b3261e;
+    }
+
+
+#main {
+        height: fit-content !important;
+        padding-bottom: 100px;
+    }
+
+
+.form-container-v2 {
+        background: var(--dashboard-panel-background, #fff);
+        border: 1px solid var(--dashboard-panel-border, #d0d7de);
+    border-radius: 18px;
+    box-shadow: var(--dashboard-panel-shadow, 0 2px 8px rgba(0, 0, 0, 0.08));
+    padding: 24px;
+    margin: 0 auto;
+    max-width: 1100px;
+}
 
 .featured-content-gallery {
     height: fit-content;
@@ -171,15 +204,17 @@ overflow: hidden;
 }
 
 .gal-project-photo img {
-  margin: 4px;
-  width:100px;
-  height: 100px;
-  background: grey;
-  font-family: 'Mulish';
-  font-size: 0.6em;
-  cursor: pointer;
-  color: var(--text-color);
-}
+      border-width: 1px;
+      border-color: gray;
+      width: 90%;
+      box-shadow: 0 0px 10px rgba(85, 84, 84, 0.4);
+      border-style: solid;
+      border-radius: 10px;
+      margin: auto;
+      display: block;
+      margin-top: 0px;
+      background: grey;
+
 }
 
 .modal-photo img{
@@ -264,14 +299,13 @@ overflow: hidden;
 	
 .project-content-block,
 .project-content-blok {
-	display: flex;
-	width: 100%;
-	background: url(../svgs/project-banner.svg) bottom;
-	background-color: #a05a2cff;
-	border: none;
-	border-radius: 0 0 16px 16px;
-	box-shadow: none;
-	gap: 18px;
+    display: flex;
+    width: 100%;
+    background-color: var(--form-background);
+    border: none;
+    border-radius: 0 0 16px 16px;
+    box-shadow: none;
+    gap: 18px;
 }
 
 .project-image {

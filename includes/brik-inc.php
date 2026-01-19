@@ -209,19 +209,6 @@ font-size: 1.4em;
 }
 
 
-#splash-bar {
-  background-color: var(--top-header);
-  filter: none !important;
-  margin-bottom: -200px !important;
-}
-
-
-/* hr {border: gray;
-border-style: dashed;
-border-width: 1px;
-margin-top: 31px;
-margin-bottom: 31px;}
- */
 
 
 .module-btn {
