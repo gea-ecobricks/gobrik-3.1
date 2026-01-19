@@ -410,6 +410,24 @@ overflow: hidden;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
+.project-status-pill.project-status-completed {
+	background: var(--brik-pill-green-bg);
+	color: var(--brik-pill-green-text);
+	border-color: rgba(30, 142, 62, 0.35);
+}
+
+.project-status-pill.project-status-in-progress {
+	background: #fff3e0;
+	color: #e65100;
+	border-color: rgba(230, 81, 0, 0.35);
+}
+
+.project-status-pill.project-status-incomplete {
+	background: var(--brik-pill-red-bg);
+	color: var(--brik-pill-red-text);
+	border-color: rgba(179, 38, 30, 0.35);
+}
+
 /* hr {border: gray;
 border-style: dashed;
 border-width: 1px;

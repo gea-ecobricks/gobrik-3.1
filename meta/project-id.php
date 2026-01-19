@@ -2,9 +2,15 @@
 
 <?php
 
+$projectId = 0;
 if (isset($_GET['project_id']) && !empty($_GET['project_id'])) {
     $projectId = intval($_GET['project_id']);
+}
+if (!$projectId && isset($_GET['id']) && !empty($_GET['id'])) {
+    $projectId = intval($_GET['id']);
+}
 
+if ($projectId) {
     $sql = "SELECT * FROM tb_projects WHERE project_id = ?";
     $stmt = $gobrik_conn->prepare($sql);
 
