@@ -265,7 +265,8 @@ if ($project && !empty($project['connected_ecobricks'])) {
 
 </div>
 </div>
-
+</div>
+</div>
 
 <!--FOOTER STARTS HERE-->
 <?php require_once "../footer-2026.php"; ?>
