@@ -122,7 +122,7 @@ if ($project && !empty($project['connected_ecobricks'])) {
     </div>
 </div>
 
-<div id="main-content">
+<div id="main-content-v2">
     <?php if ($project): ?>
 
                     <div class="lead-page-paragraph">
@@ -265,7 +265,7 @@ if ($project && !empty($project['connected_ecobricks'])) {
 
 </div>
 </div>
-</div>
+
 
 <!--FOOTER STARTS HERE-->
 <?php require_once "../footer-2026.php"; ?>

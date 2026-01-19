@@ -352,14 +352,16 @@ overflow: hidden;
 /* 	} */
 
 	.project-image img {
-		border-width: 10px;
-		border-color: #97C4E3;
-		width: 85%;
-		margin-top: -20px;
-		box-shadow: 0 0px 10px rgba(85, 84, 84, 0.8);
-		border-style: solid;
-		border-radius: 10px;
-		margin-left: auto;
+      border-width: 1px;
+      border-color: gray;
+      width: 90%;
+      box-shadow: 0 0px 10px rgba(85, 84, 84, 0.4);
+      border-style: solid;
+      border-radius: 10px;
+      margin: auto;
+      display: block;
+      margin-top: 0px;
+      background: grey;
 	}
 
 	.project-info-box {

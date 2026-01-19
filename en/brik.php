@@ -303,7 +303,7 @@ echo '
 		<div class="splash-image"><img src="../webp/empty-ecobrick-450px.webp?v2" style="width: 80%; margin-top:20px;" alt="empty ecobrick"></div>
 	</div>
 
-	<div id="main-content">
+	<div id="main-content-v2">
 		<div class="row">
 			<div class="main">
 				<br><br>
