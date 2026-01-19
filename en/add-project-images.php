@@ -263,7 +263,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['project_id'])) {
 
 
             <div data-lang-id="013-Xsubmit-upload-button">
-                <input type='submit' value='Next: Upload Photos ➡️' aria-label='Submit Form'>
+                <input type='submit' value='Upload Images' aria-label='Submit Form'>
+            </div>
+            <div style="margin-top: 15px;">
+                <a class="confirm-button" style="background:#bfc5c9;color:#1a1a1a;" href="add-project.php?id=<?php echo htmlspecialchars($_GET['project_id']); ?>">Go Back &amp; Edit Project</a>
             </div>
         </form>
     </div>

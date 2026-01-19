@@ -78,10 +78,58 @@ if ($stmt_lookup_user) {
     die("Error preparing statement for tb_ecobrickers: " . $gobrik_conn->error);
 }
 
+$project_id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+$project_name_value = '';
+$description_short_value = '';
+$description_long_value = '';
+$briks_used_value = '';
+$est_avg_brik_weight_value = '';
+$project_type_value = '';
+$construction_type_value = '';
+$location_full_value = '';
+$project_sort_value = '';
+$community_value = '';
+$project_admins_value = '';
+$connected_ecobricks_value = '';
+$start_dt_value = '';
+$end_dt_value = '';
+$latitude_value = '';
+$longitude_value = '';
+
+if (!empty($project_id)) {
+    $project_lookup_sql = "SELECT project_name, description_short, description_long, briks_used, est_avg_brik_weight, project_type, construction_type, location_full, project_sort, community, project_admins, connected_ecobricks, start_dt, end_dt, location_lat, location_long FROM tb_projects WHERE project_id = ?";
+    $project_lookup_stmt = $gobrik_conn->prepare($project_lookup_sql);
+    if ($project_lookup_stmt) {
+        $project_lookup_stmt->bind_param("i", $project_id);
+        $project_lookup_stmt->execute();
+        $project_lookup_stmt->bind_result(
+            $project_name_value,
+            $description_short_value,
+            $description_long_value,
+            $briks_used_value,
+            $est_avg_brik_weight_value,
+            $project_type_value,
+            $construction_type_value,
+            $location_full_value,
+            $project_sort_value,
+            $community_value,
+            $project_admins_value,
+            $connected_ecobricks_value,
+            $start_dt_value,
+            $end_dt_value,
+            $latitude_value,
+            $longitude_value
+        );
+        $project_lookup_stmt->fetch();
+        $project_lookup_stmt->close();
+    }
+}
+
 // PART 3: Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once '../gobrikconn_env.php';
 
+    $project_id = isset($_POST['project_id']) ? (int)$_POST['project_id'] : null;
     $location_full = trim($_POST['location_address'] ?? '');
     $project_name = trim($_POST['project_name'] ?? '');
     $description_short = trim($_POST['description_short'] ?? '');
@@ -103,34 +151,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $briks_required = $briks_used > 0 ? $briks_used : 0;
     $logged_ts = date('Y-m-d H:i:s');
 
-    $insert_sql = "INSERT INTO tb_projects (project_name, description_short, description_long, start_dt, end_dt, project_end, briks_required, briks_used, est_avg_brik_weight, project_type, construction_type, project_sort, community, project_admins, location_full, location_lat, location_long, connected_ecobricks, logged_ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    if (!empty($project_id)) {
+        $update_sql = "UPDATE tb_projects SET project_name = ?, description_short = ?, description_long = ?, start_dt = ?, end_dt = ?, project_end = ?, briks_required = ?, briks_used = ?, est_avg_brik_weight = ?, project_type = ?, construction_type = ?, project_sort = ?, community = ?, project_admins = ?, location_full = ?, location_lat = ?, location_long = ?, connected_ecobricks = ? WHERE project_id = ?";
+        $stmt = $gobrik_conn->prepare($update_sql);
+        if ($stmt) {
+            $stmt->bind_param(
+                'ssssssiiissssssddsi',
+                $project_name,
+                $description_short,
+                $description_long,
+                $start_dt,
+                $end_dt,
+                $project_end,
+                $briks_required,
+                $briks_used,
+                $est_avg_brik_weight,
+                $project_type,
+                $construction_type,
+                $project_sort,
+                $community,
+                $project_admins,
+                $location_full,
+                $latitude,
+                $longitude,
+                $connected_ecobricks,
+                $project_id
+            );
+        } else {
+            echo "Prepare failed: " . $gobrik_conn->error;
+        }
+    } else {
+        $insert_sql = "INSERT INTO tb_projects (project_name, description_short, description_long, start_dt, end_dt, project_end, briks_required, briks_used, est_avg_brik_weight, project_type, construction_type, project_sort, community, project_admins, location_full, location_lat, location_long, connected_ecobricks, logged_ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $gobrik_conn->prepare($insert_sql);
+        if ($stmt) {
+            $stmt->bind_param(
+                'ssssssiiissssssddss',
+                $project_name,
+                $description_short,
+                $description_long,
+                $start_dt,
+                $end_dt,
+                $project_end,
+                $briks_required,
+                $briks_used,
+                $est_avg_brik_weight,
+                $project_type,
+                $construction_type,
+                $project_sort,
+                $community,
+                $project_admins,
+                $location_full,
+                $latitude,
+                $longitude,
+                $connected_ecobricks,
+                $logged_ts
+            );
+        } else {
+            echo "Prepare failed: " . $gobrik_conn->error;
+        }
+    }
 
-    if ($stmt = $gobrik_conn->prepare($insert_sql)) {
-        $stmt->bind_param(
-            'ssssssiiissssssddss',
-            $project_name,
-            $description_short,
-            $description_long,
-            $start_dt,
-            $end_dt,
-            $project_end,
-            $briks_required,
-            $briks_used,
-            $est_avg_brik_weight,
-            $project_type,
-            $construction_type,
-            $project_sort,
-            $community,
-            $project_admins,
-            $location_full,
-            $latitude,
-            $longitude,
-            $connected_ecobricks,
-            $logged_ts
-        );
-
+    if ($stmt) {
         if ($stmt->execute()) {
-            $project_id = $gobrik_conn->insert_id;
+            if (empty($project_id)) {
+                $project_id = $gobrik_conn->insert_id;
+            }
 
             $est_total_weight = ($briks_used * $est_avg_brik_weight) / 1000;
             $update_weight_sql = "UPDATE tb_projects SET est_total_weight = ? WHERE project_id = ?";
@@ -151,7 +236,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $stmt->close();
-            $gobrik_conn->close();
             echo "<script>window.location.href = 'add-project-images.php?project_id=" . $project_id . "';</script>";
         } else {
             echo "Error: " . $stmt->error . "<br>";
@@ -202,10 +286,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <form id="submit-form" method="post" action="" enctype="multipart/form-data" novalidate>
         <!-- <form id="submit-form" method="post" action="" enctype="multipart/form-data"> -->
+            <?php if (!empty($project_id)) { ?>
+                <input type="hidden" name="project_id" value="<?php echo htmlspecialchars($project_id); ?>">
+            <?php } ?>
 
             <div class="form-item" style="margin-top: 25px;">
                 <label for="project_name" data-lang-id="005-project-name">Project Name:</label><br>
-                <input type="text" id="project_name" name="project_name" aria-label="Project Name" title="Required. Max 255 characters." required>
+                <input type="text" id="project_name" name="project_name" aria-label="Project Name" title="Required. Max 255 characters." required value="<?php echo htmlspecialchars($project_name_value); ?>">
                 <p class="form-caption" data-lang-id="005b-project-name-caption">Give a name or title to your project post.  Avoid special characters.</p>
                 
                 <!--ERRORS-->
@@ -218,7 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <div class="form-item">
         <label for="description_short" data-lang-id="004-short-project-desc">Short project description:</label><br>
-        <textarea id="description_short" name="description_short" aria-label="Project Description" title="Required. Max 150 words" required></textarea>
+        <textarea id="description_short" name="description_short" aria-label="Project Description" title="Required. Max 150 words" required><?php echo htmlspecialchars($description_short_value); ?></textarea>
         <p class="form-caption" data-lang-id="004-short-project-desc-caption">Provide a one sentence description of this project. Max 150 words.  Avoid special characters.</p>
 
          <!--ERRORS-->
@@ -232,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="form-item">
         <label for="description_long" data-lang-id="005-long-project-desc">Full project description:</label><br>
-        <textarea id="description_long" name="description_long" aria-label="Project Description" title="Required. Max 150 words"></textarea>
+        <textarea id="description_long" name="description_long" aria-label="Project Description" title="Required. Max 150 words"><?php echo htmlspecialchars($description_long_value); ?></textarea>
         <p class="form-caption" data-lang-id="005-long-project-desc-caption">Optional. Take as much space as you need as share the full details of your project. Max 1000 words.</p>
 
          <!--ERRORS-->
@@ -245,7 +332,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <div class="form-item">
     <label for="briks_used" data-lang-id="009-bricks-used">How many ecobricks does your project use?</label><br>
-    <input type="number" id="briks_used" name="briks_used" aria-label="Bricks Used" min="1" max="5000" required>
+    <input type="number" id="briks_used" name="briks_used" aria-label="Bricks Used" min="1" max="5000" required value="<?php echo htmlspecialchars($briks_used_value); ?>">
     <p class="form-caption" data-lang-id="009-bricks-used-caption">Please enter a number of ecobricks between 1-5000.</p>
      <!--ERRORS-->
      <div id="description-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
@@ -254,7 +341,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="form-item">
     <label for="est_avg_brik_weight" data-lang-id="010-est-avg-weight">Please estimate the average weight of the ecobricks used in your project in grams?</label><br>
-    <input type="number" id="est_avg_brik_weight" name="est_avg_brik_weight" aria-label="Estimate Brik Weight" min="100" max="2000" required>
+    <input type="number" id="est_avg_brik_weight" name="est_avg_brik_weight" aria-label="Estimate Brik Weight" min="100" max="2000" required value="<?php echo htmlspecialchars($est_avg_brik_weight_value); ?>">
     <p class="form-caption" data-lang-id="010-est-avg-weight-range">Just a number (between 100 and 2000).</p>
      <!--ERRORS-->
      <div id="description-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
@@ -265,13 +352,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="form-item">
     <label for="project_type" data-lang-id="011-project-type">What type of project is this?</label><br>
     <select id="project_type" name="project_type" aria-label="Project Type" required>
-        <option value="" disabled="" selected="" data-lang-id="011-select">Select project type...</option>
-        <option value="single module" data-lang-id="011-single-module">Single Module</option>
-        <option value="furniture" data-lang-id="011-modular-furniture">Furniture</option>
-        <option value="garden" data-lang-id="011-outdoor-garden">Outdoor Garden</option>
-        <option value="structure" data-lang-id="011-structure">Structure</option>
-        <option value="art" data-lang-id="011-art">Art</option>
-        <option value="other" data-lang-id="011-other">Other</option>
+        <option value="" disabled="" <?php echo empty($project_type_value) ? 'selected' : ''; ?> data-lang-id="011-select">Select project type...</option>
+        <option value="single module" <?php echo $project_type_value === 'single module' ? 'selected' : ''; ?> data-lang-id="011-single-module">Single Module</option>
+        <option value="furniture" <?php echo $project_type_value === 'furniture' ? 'selected' : ''; ?> data-lang-id="011-modular-furniture">Furniture</option>
+        <option value="garden" <?php echo $project_type_value === 'garden' ? 'selected' : ''; ?> data-lang-id="011-outdoor-garden">Outdoor Garden</option>
+        <option value="structure" <?php echo $project_type_value === 'structure' ? 'selected' : ''; ?> data-lang-id="011-structure">Structure</option>
+        <option value="art" <?php echo $project_type_value === 'art' ? 'selected' : ''; ?> data-lang-id="011-art">Art</option>
+        <option value="other" <?php echo $project_type_value === 'other' ? 'selected' : ''; ?> data-lang-id="011-other">Other</option>
     </select>
     <br><br>
     <!--ERROR-->
@@ -281,13 +368,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="form-item">
     <label for="construction_type" data-lang-id="012-construction-type">What type of construction is this?</label><br>
     <select id="construction_type" name="construction_type" aria-label="Construction Type" required>
-        <option value="" disabled="" selected="" data-lang-id="012-select">Select construction type...</option>
-        <option value="silicone" data-lang-id="012-construction-silicone">Silicone</option>
-        <option value="banding" data-lang-id="012-construction-tire-banding">Tire Banding</option>
-        <option value="ecojoiner" data-lang-id="012-construction-ecojoiner">Ecojoiner</option>
-        <option value="earth" data-lang-id="012-construction-earth">Earth/Cob</option>
-        <option value="installation" data-lang-id="012-construction-installation">Installation</option>
-        <option value="other" data-lang-id="012-other">Other</option>
+        <option value="" disabled="" <?php echo empty($construction_type_value) ? 'selected' : ''; ?> data-lang-id="012-select">Select construction type...</option>
+        <option value="silicone" <?php echo $construction_type_value === 'silicone' ? 'selected' : ''; ?> data-lang-id="012-construction-silicone">Silicone</option>
+        <option value="banding" <?php echo $construction_type_value === 'banding' ? 'selected' : ''; ?> data-lang-id="012-construction-tire-banding">Tire Banding</option>
+        <option value="ecojoiner" <?php echo $construction_type_value === 'ecojoiner' ? 'selected' : ''; ?> data-lang-id="012-construction-ecojoiner">Ecojoiner</option>
+        <option value="earth" <?php echo $construction_type_value === 'earth' ? 'selected' : ''; ?> data-lang-id="012-construction-earth">Earth/Cob</option>
+        <option value="installation" <?php echo $construction_type_value === 'installation' ? 'selected' : ''; ?> data-lang-id="012-construction-installation">Installation</option>
+        <option value="other" <?php echo $construction_type_value === 'other' ? 'selected' : ''; ?> data-lang-id="012-other">Other</option>
     </select>
     <br><br>
         <!--ERROR-->
@@ -300,7 +387,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="form-item">
     <label for="location_address" data-lang-id="015-location">Where is the project located?</label><br>
     <div class="input-container">
-        <input type="text" id="location_address" name="location_address" aria-label="Project Location" placeholder="Start typing your town..." required>
+        <input type="text" id="location_address" name="location_address" aria-label="Project Location" placeholder="Start typing your town..." required value="<?php echo htmlspecialchars($location_full_value); ?>">
         <div id="loading-spinner" class="spinner" style="display: none;"></div>
     </div>
     <p class="form-caption" data-lang-id="016-location-caption">For privacy, please don't use your exact address. Choose your general neighbourhood or town. Project locations will be shown on our project map.</p>
@@ -323,16 +410,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-item">
             <label for="project_sort" data-lang-id="012b-project-sort">What sort of project is this?</label><br>
             <select id="project_sort" name="project_sort" aria-label="Community or Personal Project">
-                <option value="" disabled="" selected="" data-lang-id="012b-select">Select sort...</option>
-                <option value="community" data-lang-id="012b-community-project">Community Project</option>
-                <option value="personal" data-lang-id="012b-personal-project">Personal Project</option>
+                <option value="" disabled="" <?php echo empty($project_sort_value) ? 'selected' : ''; ?> data-lang-id="012b-select">Select sort...</option>
+                <option value="community" <?php echo $project_sort_value === 'community' ? 'selected' : ''; ?> data-lang-id="012b-community-project">Community Project</option>
+                <option value="personal" <?php echo $project_sort_value === 'personal' ? 'selected' : ''; ?> data-lang-id="012b-personal-project">Personal Project</option>
             </select>
         </div>
 
 
         <div class="form-item">
             <label for="community" data-lang-id="013-community">What community is responsible for this project?</label><br>
-            <input type="text" id="community" name="community" aria-label="Community (optional)">
+            <input type="text" id="community" name="community" aria-label="Community (optional)" value="<?php echo htmlspecialchars($community_value); ?>">
             <p class="form-caption" data-lang-id="013b-optional">Optional</p>
 
             <!--ERRORS-->
@@ -341,7 +428,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <div class="form-item">
             <label for="project_admins" data-lang-id="014-project-admins">Who's project is this?</label><br>
-            <input type="text" id="project_admins" name="project_admins" aria-label="Project Admins (optional)">
+            <input type="text" id="project_admins" name="project_admins" aria-label="Project Admins (optional)" value="<?php echo htmlspecialchars($project_admins_value); ?>">
             <p class="form-caption" data-lang-id="014b-optional">Optional: Provide the name(s) of the project's principals. If you wish to link this to a GoBrik user account be sure to spell the name accordingly.</p>
         <!--ERRORS-->
             <div id="admins-error-long" class="form-field-error" data-lang-id="000-field-too-long-error">Entry is too long.</div>
@@ -352,7 +439,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
             <div class="form-item">
                 <label for="connected_ecobricks">The serials of ecobricks used in your project:</label><br>
-                <input type="text" id="connected_ecobricks" name="connected_ecobricks" aria-label="Connected Ecobricks" placeholder="Enter serials...">
+                <input type="text" id="connected_ecobricks" name="connected_ecobricks" aria-label="Connected Ecobricks" placeholder="Enter serials..." value="<?php echo htmlspecialchars($connected_ecobricks_value); ?>">
                 <div id="serial-select"><ul id="autocomplete-results" ></ul></div>
                 <p class="form-caption">Optional: Enter the serial numbers of ecobricks connected to this project. Separate multiple serial numbers with commas.</p>
             </div>
@@ -361,7 +448,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p data-lang-id="007-project-duration">Project Duration</p>
                 <!--START DATE-->
                 <label for="start_dt" data-lang-id="007-start-date">Start Date:</label><br>
-                <input type="date" id="start_dt" name="start_dt" aria-label="Start Date" required>
+                <input type="date" id="start_dt" name="start_dt" aria-label="Start Date" required value="<?php echo htmlspecialchars($start_dt_value); ?>">
                 <p class="form-caption" data-lang-id="008-start-date-caption">When did this project begin?</p>
                 <!--errors-->
                 <div id="description-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
@@ -369,7 +456,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!--END DATE-->
                 <label for="start_dt" data-lang-id="007b-end-date">End Date:</label><br>
-                <input type="date" id="end_dt" name="end_dt" aria-label="End Date" required>
+                <input type="date" id="end_dt" name="end_dt" aria-label="End Date" required value="<?php echo htmlspecialchars($end_dt_value); ?>">
                 <p class="form-caption" data-lang-id="008b-end-date-caption">When did this project end?</p>
                 <!--errors-->
                 <div id="description-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
@@ -383,8 +470,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-    <input type="hidden" id="lat" name="latitude">
-    <input type="hidden" id="lon" name="longitude">
+    <input type="hidden" id="lat" name="latitude" value="<?php echo htmlspecialchars($latitude_value); ?>">
+    <input type="hidden" id="lon" name="longitude" value="<?php echo htmlspecialchars($longitude_value); ?>">
     
     <div data-lang-id="017-submit-button">
         <input type="submit" value="Next: Upload Photos ➡️" aria-label="Submit Form">
@@ -449,6 +536,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Add change event listener to the project sort dropdown
     document.getElementById("project_sort").addEventListener("change", toggleFields);
+    toggleFields();
 });
 
 
