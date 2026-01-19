@@ -263,11 +263,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['project_id'])) {
 
 
             <div data-lang-id="013-Xsubmit-upload-button">
-                <button type="submit" id="upload-progress-button" aria-label="Submit Form">
-                    <div class="progress-fill"></div>
-                    <div id="loading-spinner" class="spinner"></div>
-                    <span id="button-text">⬆️ Upload Images</span>
-                </button>
+                <button type="submit" id="upload-progress-button" aria-label="Submit Form">Upload Images</button>
             </div>
             <div style="margin-top: 15px;">
                 <a class="confirm-button" style="background:#bfc5c9;color:#1a1a1a;" href="add-project.php?id=<?php echo htmlspecialchars($_GET['project_id']); ?>">Go Back &amp; Edit Project</a>
@@ -347,13 +343,8 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     event.preventDefault();
 
     var button = document.getElementById('upload-progress-button');
-    var spinner = document.getElementById('loading-spinner');
-    var buttonText = document.getElementById('button-text');
-    var progressFill = document.querySelector('.progress-fill');
-
-    var originalButtonText = buttonText.innerText.trim(); // Save the original button text
-    buttonText.innerText = 'Uploading...';
-    spinner.style.display = 'inline-block';
+    var originalButtonText = button.textContent; // Save the original button text
+    button.innerHTML = '<div class="spinner-photo-loading"></div>'; // Replace button text with spinner
     button.disabled = true; // Disable button to prevent multiple submissions
 
     var messages = {
@@ -369,8 +360,7 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     var fileInput = document.getElementById('photo1_main');
     if (fileInput.files.length === 0) {
         showFormModal(chooseFileMessage);
-        spinner.style.display = 'none';
-        buttonText.innerText = originalButtonText;
+        button.textContent = originalButtonText; // Restore button text if no file chosen
         button.disabled = false; // Enable button
         return;
     }
@@ -388,9 +378,7 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
 
     xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
-            spinner.style.display = 'none';
-            progressFill.style.width = '0%';
-            buttonText.innerText = originalButtonText; // Restore button text after upload
+            button.textContent = originalButtonText; // Restore button text after upload
             button.disabled = false; // Enable button
             handleFormResponse(xhr.responseText);
         }
