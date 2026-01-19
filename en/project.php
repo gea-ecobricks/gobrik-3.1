@@ -57,30 +57,34 @@ if ($project && !empty($project['connected_ecobricks'])) {
 <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
 <?php require_once "../includes/project-inc.php"; ?>
 
-<div class="splash-content-block">
-    <div class="splash-box">
-        <div class="splash-heading">
+<div class="project-content-block project-content-blok">
+    <div class="project-info-box">
+        <div class="project-title">
             <?php echo $project ? htmlspecialchars($project['project_name'], ENT_QUOTES, 'UTF-8') : 'Project Not Found'; ?>
         </div>
-        <div class="splash-sub">
+        <div class="project-sub-title">
             <?php if ($project): ?>
                 <?php echo htmlspecialchars($project['description_short'], ENT_QUOTES, 'UTF-8'); ?>
             <?php else: ?>
                 There are no results for project <?php echo htmlspecialchars((string) $projectId, ENT_QUOTES, 'UTF-8'); ?> in our database.
             <?php endif; ?>
         </div>
+        <?php if ($project): ?>
+            <div class="project-status project-status-pill">
+                <?php echo htmlspecialchars($project['project_phase'] ?? 'Project', ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+        <?php endif; ?>
     </div>
-    <div class="splash-image">
+    <div class="project-image">
         <?php if ($project && !empty($project['photo1_main'])): ?>
-            <a href="javascript:void(0);" onclick="viewGalleryImage('<?php echo htmlspecialchars($project['photo1_main'], ENT_QUOTES, 'UTF-8'); ?>', 'Project <?php echo htmlspecialchars($project['project_id'], ENT_QUOTES, 'UTF-8'); ?> was made in <?php echo htmlspecialchars($project['location_full'], ENT_QUOTES, 'UTF-8'); ?> and started on <?php echo htmlspecialchars($project['start_dt'], ENT_QUOTES, 'UTF-8'); ?>')">
+            <a class="project-image-link" href="javascript:void(0);" onclick="viewGalleryImage('<?php echo htmlspecialchars($project['photo1_main'], ENT_QUOTES, 'UTF-8'); ?>', 'Project <?php echo htmlspecialchars($project['project_id'], ENT_QUOTES, 'UTF-8'); ?> was made in <?php echo htmlspecialchars($project['location_full'], ENT_QUOTES, 'UTF-8'); ?> and started on <?php echo htmlspecialchars($project['start_dt'], ENT_QUOTES, 'UTF-8'); ?>')">
                 <img src="../<?php echo htmlspecialchars($project['photo1_main'], ENT_QUOTES, 'UTF-8'); ?>" alt="Project <?php echo htmlspecialchars($project['project_id'], ENT_QUOTES, 'UTF-8'); ?> was made in <?php echo htmlspecialchars($project['location_full'], ENT_QUOTES, 'UTF-8'); ?> and started on <?php echo htmlspecialchars($project['start_dt'], ENT_QUOTES, 'UTF-8'); ?>">
             </a>
         <?php else: ?>
-            <img src="../webp/empty-ecobrick-450px.webp?v2" style="width: 80%; margin-top:20px;border:none;box-shadow:none;" alt="empty ecobrick">
+            <img src="../webp/empty-ecobrick-450px.webp?v2" alt="empty ecobrick">
         <?php endif; ?>
     </div>
 </div>
-<div id="splash-bar"></div>
 
 <div id="main-content">
     <?php if ($project): ?>
@@ -123,12 +127,12 @@ if ($project && !empty($project['connected_ecobricks'])) {
                     </div>
                 </div>
 
-                <div class="featured-content-gallery" style="width:100%;">
-                    <div class="feed-live">
-                        <p>Ecobricks used in project. Click to view.</p>
-                    </div>
-                    <div class="gallery-flex-container">
-                        <?php if ($ecobricks): ?>
+                <?php if ($ecobricks): ?>
+                    <div class="featured-content-gallery" style="width:100%;">
+                        <div class="feed-live">
+                            <p>Ecobricks used in project. Click to view.</p>
+                        </div>
+                        <div class="gallery-flex-container">
                             <?php foreach ($ecobricks as $row): ?>
                                 <div class="gal-photo">
                                     <div class="photo-box">
@@ -136,11 +140,9 @@ if ($project && !empty($project['connected_ecobricks'])) {
                                     </div>
                                 </div>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <p>No ecobricks found for this project.</p>
-                        <?php endif; ?>
+                        </div>
                     </div>
-                </div>
+                <?php endif; ?>
 
                 <div id="data-chunk">
                     <div class="ecobrick-data">
@@ -163,11 +165,11 @@ if ($project && !empty($project['connected_ecobricks'])) {
                         <p><b data-lang-id="140b">Longitude:</b> <?php echo htmlspecialchars($project['location_long'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><b data-lang-id="141">Project URL:</b> <?php echo htmlspecialchars($project['project_url'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><b data-lang-id="142">Admins:</b> <?php echo htmlspecialchars($project['project_admins'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p><b data-lang-id="143">Feature Photo URL:</b> <?php echo htmlspecialchars($project['photo1_main'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p><b data-lang-id="144">Photo 2:</b> <?php echo htmlspecialchars($project['photo2_main'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p><b data-lang-id="145">Photo 3:</b> <?php echo htmlspecialchars($project['photo3_main'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p><b data-lang-id="146">Photo 4:</b> <?php echo htmlspecialchars($project['photo4_main'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p><b data-lang-id="147">Photo 5:</b> <?php echo htmlspecialchars($project['photo5_main'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><b data-lang-id="143">Feature Photo URL:</b> <?php echo htmlspecialchars($project['photo1_main'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><b data-lang-id="144">Photo 2:</b> <?php echo htmlspecialchars($project['photo2_main'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><b data-lang-id="145">Photo 3:</b> <?php echo htmlspecialchars($project['photo3_main'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><b data-lang-id="146">Photo 4:</b> <?php echo htmlspecialchars($project['photo4_main'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><b data-lang-id="147">Photo 5:</b> <?php echo htmlspecialchars($project['photo5_main'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><b data-lang-id="148">Plastic Sequestered:</b> <?php echo htmlspecialchars($project['est_total_weight'], ENT_QUOTES, 'UTF-8'); ?>&#8202;kg</p>
                         <p><b data-lang-id="149">Logged:</b> <?php echo htmlspecialchars($project['logged_ts'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><b data-lang-id="149b">Ready to Show:</b> <?php echo htmlspecialchars($project['ready_to_show'], ENT_QUOTES, 'UTF-8'); ?> | <a href="edit-project.php?project_id=<?php echo htmlspecialchars($project['project_id'], ENT_QUOTES, 'UTF-8'); ?>">e</a></p>
