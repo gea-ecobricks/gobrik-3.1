@@ -124,7 +124,7 @@ if ($project && !empty($project['connected_ecobricks'])) {
 
 <div id="main-content">
     <?php if ($project): ?>
-                <div class="row-details">
+
                     <div class="lead-page-paragraph">
                         <p>
                             <?php echo htmlspecialchars($project['project_name'], ENT_QUOTES, 'UTF-8'); ?>
@@ -161,7 +161,7 @@ if ($project && !empty($project['connected_ecobricks'])) {
                             <br>
                         </div>
                     </div>
-                </div>
+
 
                 <?php if ($ecobricks): ?>
                     <div class="featured-content-gallery" style="width:100%;">
@@ -263,6 +263,7 @@ if ($project && !empty($project['connected_ecobricks'])) {
 
     <?php endif; ?>
 
+</div>
 </div>
 </div>
 

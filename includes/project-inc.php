@@ -309,7 +309,7 @@ overflow: hidden;
 }
 
 .project-image {
-	padding: 10px;
+	padding: 20px;
 }
 
 @media screen and (max-width: 768px) {
@@ -347,9 +347,9 @@ overflow: hidden;
 		flex-flow: row;
 	}
 
-	.project-image {
-		width: 50%;
-	}
+/* 	.project-image { */
+/* 		width: 50%; */
+/* 	} */
 
 	.project-image img {
 		border-width: 10px;
