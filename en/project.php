@@ -1,6 +1,6 @@
 <?php
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '3.0';
+$version = '3.1';
 $page = 'project';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -224,13 +224,13 @@ if ($project && !empty($project['connected_ecobricks'])) {
                         </div>
 
     <?php endif; ?>
-</div>
-</div>
 
+</div>
+</div>
 <!--FOOTER STARTS HERE-->
 <?php require_once "../footer-2026.php"; ?>
 
-</div>
+
 
 <script>
 function ecobrickPreview(brik_serial, weight, owner, location) {
