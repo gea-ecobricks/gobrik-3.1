@@ -214,7 +214,7 @@ overflow: hidden;
       display: block;
       margin-top: 0px;
       background: grey;
-
+}
 }
 
 .modal-photo img{
