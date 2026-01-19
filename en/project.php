@@ -1,10 +1,52 @@
 <?php
+require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
+
+// Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '3.1';
+$version = '1.5';
 $page = 'project';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
+$is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
 
+// Check if the user is logged in
+if ($is_logged_in) {
+
+    $buwana_id = $_SESSION['buwana_id'];
+
+    // Include database connections
+    require_once '../gobrikconn_env.php';
+    require_once '../buwanaconn_env.php';
+
+    // Fetch user data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $first_name = getFirstName($buwana_conn, $buwana_id);
+
+    $buwana_conn->close();  // Close the database connection
+}
+
+// Include main database connection
 require_once '../gobrikconn_env.php';
+
+echo '<!DOCTYPE html>
+<html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') . '">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+';
+
+require_once ("../includes/project-inc.php");
+
+echo '
+
+    <div id="form-submission-box" style="margin-top:80px;">
+        <div class="form-container-v2" style="padding-top:0px !important">';
+
 $conn = $gobrik_conn;
 $conn->set_charset('utf8mb4');
 
@@ -49,13 +91,7 @@ if ($project && !empty($project['connected_ecobricks'])) {
     }
 }
 
-?><!DOCTYPE html>
-<html lang="<?php echo htmlspecialchars($lang, ENT_QUOTES, 'UTF-8'); ?>">
-<head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-<?php require_once "../includes/project-inc.php"; ?>
+?>
 
 <div class="project-content-block project-content-blok">
     <div class="project-info-box">
