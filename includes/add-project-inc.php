@@ -210,6 +210,55 @@ input[type="submit"]:hover {
     animation: spin 1s linear infinite;
 }
 
+#upload-progress-button {
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #099d09;
+  position: relative;
+  font-size: 1.3em;
+  width: 100%;
+  margin-top: 30px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#upload-progress-button .progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: #4ab54a;
+  transition: width 0.5s ease;
+  z-index: 1;
+  border-radius: 4px;
+}
+
+#upload-progress-button span {
+  z-index: 2;
+}
+
+#upload-progress-button .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #000;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    display: none;
+    z-index: 10;
+}
+
+#upload-progress-button:hover {
+  background-color: #077e07;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }

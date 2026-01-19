@@ -117,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['project_id'])) {
             $targetPath = $upload_dir . $new_file_name_webp;
 
             if (resizeAndConvertToWebP($_FILES[$file_input_name]['tmp_name'], $targetPath, 1000, 88)) {
-                createThumbnail($targetPath, $thumbnail_dir . $new_file_name_webp, 250, 77);
+                createThumbnail($targetPath, $thumbnail_dir . $new_file_name_webp, 250, 250, 77);
                 $full_urls[] = $targetPath;
                 $thumbnail_paths[] = $thumbnail_dir . $new_file_name_webp;
                 $main_file_sizes[] = filesize($targetPath) / 1024;
@@ -263,7 +263,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['project_id'])) {
 
 
             <div data-lang-id="013-Xsubmit-upload-button">
-                <input type='submit' value='Upload Images' aria-label='Submit Form'>
+                <button type="submit" id="upload-progress-button" aria-label="Submit Form">
+                    <div class="progress-fill"></div>
+                    <div id="loading-spinner" class="spinner"></div>
+                    <span id="button-text">⬆️ Upload Images</span>
+                </button>
             </div>
             <div style="margin-top: 15px;">
                 <a class="confirm-button" style="background:#bfc5c9;color:#1a1a1a;" href="add-project.php?id=<?php echo htmlspecialchars($_GET['project_id']); ?>">Go Back &amp; Edit Project</a>
@@ -343,8 +347,13 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     event.preventDefault();
 
     var button = document.getElementById('upload-progress-button');
-    var originalButtonText = button.value; // Save the original button text
-    button.innerHTML = '<div class="spinner-photo-loading"></div>'; // Replace button text with spinner
+    var spinner = document.getElementById('loading-spinner');
+    var buttonText = document.getElementById('button-text');
+    var progressFill = document.querySelector('.progress-fill');
+
+    var originalButtonText = buttonText.innerText.trim(); // Save the original button text
+    buttonText.innerText = 'Uploading...';
+    spinner.style.display = 'inline-block';
     button.disabled = true; // Disable button to prevent multiple submissions
 
     var messages = {
@@ -360,7 +369,8 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     var fileInput = document.getElementById('photo1_main');
     if (fileInput.files.length === 0) {
         showFormModal(chooseFileMessage);
-        button.innerHTML = originalButtonText; // Restore button text if no file chosen
+        spinner.style.display = 'none';
+        buttonText.innerText = originalButtonText;
         button.disabled = false; // Enable button
         return;
     }
@@ -372,14 +382,15 @@ document.querySelector('#photoform').addEventListener('submit', function(event) 
     xhr.upload.onprogress = function(event) {
         if (event.lengthComputable) {
             var progress = (event.loaded / event.total) * 100;
-            document.getElementById('upload-progress-button').style.backgroundSize = progress + '%';
-            document.getElementById('upload-progress-button').classList.add('progress-bar');
+            progressFill.style.width = progress + '%';
         }
     };
 
     xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
-            button.innerHTML = originalButtonText; // Restore button text after upload
+            spinner.style.display = 'none';
+            progressFill.style.width = '0%';
+            buttonText.innerText = originalButtonText; // Restore button text after upload
             button.disabled = false; // Enable button
             handleFormResponse(xhr.responseText);
         }
