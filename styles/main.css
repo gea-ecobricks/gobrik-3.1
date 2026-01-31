@@ -871,8 +871,68 @@ Overlay Curtain */
   color: var(--subdued-text);
 }
 
+.menu-page-item.menu-auth-item {
+  justify-content: space-between;
+}
+
+.menu-auth-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  padding: 12px 10px;
+}
+
+.menu-auth-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  width: auto;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.95em;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.menu-auth-login {
+  background: #2563eb;
+  color: #fff;
+  border: 1px solid #2563eb;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.menu-auth-login:hover,
+.menu-auth-login:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
+  color: #fff;
+}
+
+.menu-auth-signup {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  box-shadow: none;
+}
+
+.menu-auth-signup:hover,
+.menu-auth-signup:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+
 .menu-page-item a:hover {
   color: var(--h1);
+}
+
+.menu-auth-button:hover,
+.menu-auth-button:focus-visible {
+  color: #fff;
 }
 
 .menu-page-item:hover {
