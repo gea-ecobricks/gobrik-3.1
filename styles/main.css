@@ -871,6 +871,13 @@ Overlay Curtain */
   color: var(--subdued-text);
 }
 
+.menu-page-item .menu-page-label {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  color: var(--subdued-text);
+}
+
 .menu-page-item.menu-auth-item {
   justify-content: space-between;
 }
@@ -882,6 +889,25 @@ Overlay Curtain */
   gap: 12px;
   flex: 1;
   padding: 12px 10px;
+}
+
+.menu-auth-actions-top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.menu-auth-actions-top .menu-auth-dashboard-button {
+  box-shadow: none;
+}
+
+.menu-auth-actions-top .menu-auth-dashboard-button:hover,
+.menu-auth-actions-top .menu-auth-dashboard-button:focus-visible {
+  box-shadow: none;
+}
+
+.menu-auth-actions-top .button:hover,
+.menu-auth-actions-top .button:focus-visible {
+  box-shadow: none;
 }
 
 .menu-auth-button {
