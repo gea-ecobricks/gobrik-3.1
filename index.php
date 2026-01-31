@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <div class="subtitle" >
             <p>GoBrik is a project of the </p>
-            <p><a href="https://ecobricks.org/gobrik">Global Ecobrick Alliance</a></p>
+            <p><a href="https://ecobricks.org/en/gobrik.php">Global Ecobrick Alliance</a></p>
                         <div id="gea-icon"></div>
 
         </div>

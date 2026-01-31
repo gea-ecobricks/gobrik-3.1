@@ -80,7 +80,7 @@ $gobrik_conn->close();
 </div> <!--closing #main as opened in header-->
 
 <!--FOOTER STARTS HERE-->
-<?php require_once ("../footer-2025.php");?>
+<?php require_once ("../footer-2026.php");?>
 
 </div> <!--Closes main-->
 </body>
