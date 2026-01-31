@@ -42,7 +42,7 @@ $gobrik_conn->close();
     <div id="top-page-image" class="credentials-banner top-page-image"></div>
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
-            <div style="text-align:center;width:100%;margin:auto;">
+            <div class="courses-header">
                 <h2 data-lang-id="001-current-courses">Current Courses</h2>
                 <p style="margin-bottom: 20px;"><span data-lang-id="002-course-selection">Select from our list of ongoing trainings, workshops and community events.</span></p>
             </div>
@@ -85,4 +85,3 @@ $gobrik_conn->close();
 </div> <!--Closes main-->
 </body>
 </html>
-

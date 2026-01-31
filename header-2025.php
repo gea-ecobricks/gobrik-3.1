@@ -478,9 +478,11 @@ display: none;
   </div>
     <?php else: ?>
       <!-- If the user is not logged in, show the login/signup options -->
-      <div class="menu-page-item">
-        <a href="login.php" data-lang-id="1000-login" style="margin-right:10px; min-width: 65px;width:75px;">Log in</a> |
-        <a href="signup.php" data-lang-id="1000-sign-up" style="margin-left:10px">Sign up</a>
+      <div class="menu-page-item menu-auth-item">
+        <div class="menu-auth-actions">
+          <a href="https://buwana.ecobricks.org/en/login.php" class="menu-auth-button menu-auth-login" data-lang-id="1000-login">Log in</a>
+          <a href="https://buwana.ecobricks.org/en/signup-1.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="menu-auth-button menu-auth-signup" data-lang-id="1000-sign-up">Sign up</a>
+        </div>
         <span class="status-circle" style="background-color: LIMEGREEN;" title="Deployed. Under beta testing."></span>
       </div>
     <?php endif; ?>
