@@ -497,11 +497,11 @@ display: none;
       <!-- If the user is not logged in, show the login/signup options -->
 
               <div class="menu-auth-actions menu-auth-actions-top">
-            <a href="https://buwana.ecobricks.org/en/login.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button menu-auth-dashboard-button" data-lang-id="1000-login">
+            <a href="https://buwana.ecobricks.org/en/login.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button menu-auth-dashboard-button menu-auth-login" data-lang-id="1000-login">
               <i style="background: url(../svgs/bottle-icon.svg) no-repeat; width:20px; height:26px; display: inline-block; background-size:contain; margin-bottom:-5px; margin-right:4px;"></i>
               <span>Log in</span>
             </a>
-            <a href="https://buwana.ecobricks.org/en/signup-1.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button ghost menu-auth-dashboard-button" data-lang-id="1000-sign-up">
+            <a href="https://buwana.ecobricks.org/en/signup-1.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button ghost menu-auth-dashboard-button menu-auth-signup" data-lang-id="1000-sign-up">
               <i style="background: url(../svgs/strike-icon.svg) no-repeat; width:20px; height:26px;display: inline-block;background-size:contain;margin-bottom: -5px;margin-left:4px;"></i>
               <span>Sign up</span>
             </a>
