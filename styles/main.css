@@ -902,10 +902,10 @@ Overlay Curtain */
   .menu-auth-actions-top {
     position: absolute;
     top: 18px;
-    right: 120px;
+    left: 18px;
     z-index: 40;
     padding: 0;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
 }
 
@@ -939,27 +939,41 @@ Overlay Curtain */
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
+.menu-auth-icon {
+  width: 20px;
+  height: 26px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.menu-auth-icon-bottle {
+  background-image: url('/svgs/bottle.svg');
+}
+
+.menu-auth-icon-strike {
+  background-image: url('/svgs/strike-icon.svg');
+}
+
 .menu-auth-login {
-  background: var(--button-2-1);
+  background: #2563eb;
   color: var(--same);
-  border: 1px solid var(--button-2-1);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid #2563eb;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
   text-align: left;
 }
 
 .menu-auth-login:hover,
 .menu-auth-login:focus-visible {
   transform: translateY(-1px);
-  background: var(--button-2-1-over);
-  border-color: var(--button-2-1-over);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
   color: var(--same);
 }
 
 .menu-auth-signup {
   background: transparent;
-  color: var(--button-1-2);
-  border: 2px solid var(--button-1-2);
+  color: var(--text-color);
+  border: 1px solid var(--text-color);
   box-shadow: none;
   text-align: left;
 }
@@ -968,8 +982,7 @@ Overlay Curtain */
 .menu-auth-signup:focus-visible {
   background: rgba(255, 255, 255, 0.12);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-  color: var(--button-1-2-over);
-  border-color: var(--button-1-2-over);
+  color: var(--text-color);
 }
 
 .menu-page-item a:hover {

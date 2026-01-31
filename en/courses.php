@@ -2,7 +2,7 @@
 require_once '../earthenAuth_helper.php';
 
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '1.1';
+$version = '1.3';
 $page = 'courses';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn();
