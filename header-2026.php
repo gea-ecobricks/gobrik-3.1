@@ -495,19 +495,19 @@ display: none;
   </div>
     <?php else: ?>
       <!-- If the user is not logged in, show the login/signup options -->
-      <div class="menu-auth-actions menu-auth-actions-top">
-        <a href="https://buwana.ecobricks.org/en/login.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button menu-auth-dashboard-button" data-lang-id="1000-login">
-          <i style="background: url(../svgs/bottle-icon.svg) no-repeat; width:20px; height:26px; display: inline-block; background-size:contain; margin-bottom:-5px; margin-right:4px;"></i>
-          <span>Log in</span>
-        </a>
-        <a href="https://buwana.ecobricks.org/en/signup-1.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button ghost menu-auth-dashboard-button" data-lang-id="1000-sign-up">
-          <i style="background: url(../svgs/strike-icon.svg) no-repeat; width:20px; height:26px;display: inline-block;background-size:contain;margin-bottom: -5px;margin-left:4px;"></i>
-          <span>Sign up</span>
-        </a>
+      <div class="menu-page-item">
+              <div class="menu-auth-actions menu-auth-actions-top">
+            <a href="https://buwana.ecobricks.org/en/login.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button menu-auth-dashboard-button" data-lang-id="1000-login">
+              <i style="background: url(../svgs/bottle-icon.svg) no-repeat; width:20px; height:26px; display: inline-block; background-size:contain; margin-bottom:-5px; margin-right:4px;"></i>
+              <span>Log in</span>
+            </a>
+            <a href="https://buwana.ecobricks.org/en/signup-1.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button ghost menu-auth-dashboard-button" data-lang-id="1000-sign-up">
+              <i style="background: url(../svgs/strike-icon.svg) no-repeat; width:20px; height:26px;display: inline-block;background-size:contain;margin-bottom: -5px;margin-left:4px;"></i>
+              <span>Sign up</span>
+            </a>
+          </div>
       </div>
-      <div class="menu-page-item menu-auth-item">
-        <span class="menu-page-label">Latest project (coming soon!).</span>
-      </div>
+
     <?php endif; ?>
 
 
@@ -517,7 +517,7 @@ display: none;
   <a href="courses.php" data-lang-id="1000-courses">
     Course Listings
   </a>
-  <span class="status-circle" style="background-color: YELLOW;" title="Working.  Being tested."></span>
+  <span class="status-circle" style="background-color: GREEN;" title="Working.  Being tested."></span>
 </div>
 
 
@@ -525,14 +525,14 @@ display: none;
   <a href="newest-briks.php" data-lang-id="1000-latest-ecobricks">
     Latest Ecobricks
   </a>
-  <span class="status-circle" style="background-color: ORANGE;" title="Working well."></span>
+  <span class="status-circle" style="background-color: YELLOW;" title="Working well."></span>
 </div>
 
-<!-- Uncommented for demonstration purposes
+
 <div class="menu-page-item">
   <a href="brikchain.php" data-lang-id="1000-brikchain">
     The Brikchain
-    <span class="status-circle" style="background-color: red;" title="Under development, but active!"></span>
+    <span class="status-circle" style="background-color: ORANGE;" title="Under development, but active!"></span>
   </a>
 </div>
 
@@ -549,7 +549,7 @@ display: none;
     <span class="status-circle" style="background-color: red;" title="Not yet deployed"></span>
   </a>
 </div>
--->
+
 
   <div class="menu-page-item">
     <a href="<?php echo htmlspecialchars($bug_report_url); ?>" data-lang-id="1000-bug-report" target="_blank" rel="noopener">
@@ -558,14 +558,6 @@ display: none;
     <span class="status-circle" style="background-color: RED;" title="Working."></span>
   </div>
 
-<!--
-    <div class="menu-page-item">
-  <a href="messenger.php" data-lang-id="1000-bug-report">
-    Messenger
-
-  </a>
-  <span class="status-circle" style="background-color: yellow;" title="Under development. Only working on desktop"></span>
-</div>-->
 
     <!-- GoBrik Tour at the bottom -->
     <div class="menu-page-item">
