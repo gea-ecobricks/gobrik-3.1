@@ -839,13 +839,15 @@ Overlay Curtain */
   .overlay-content-settings {
     width: 80%;
   }
+}
 
+@media screen and (min-width: 1200px) {
   .menu-page-item {
-    font-size: 1.3em;
+    font-size: 1.32em;
   }
 }
 
-@media screen and (min-width: 700px) and (max-width: 1324px) {
+@media screen and (min-width: 700px) and (max-width: 1199px) {
   .menu-page-item {
     font-size: 1.2em;
   }
@@ -896,8 +898,21 @@ Overlay Curtain */
   padding-bottom: 8px;
 }
 
+@media screen and (min-width: 769px) {
+  .menu-auth-actions-top {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 40;
+    padding: 0;
+    justify-content: flex-start;
+  }
+}
+
 .menu-auth-actions-top .menu-auth-dashboard-button {
   box-shadow: none;
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .menu-auth-actions-top .menu-auth-dashboard-button:hover,
@@ -913,7 +928,7 @@ Overlay Curtain */
 .menu-auth-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 6px;
   padding: 8px 16px;
   width: auto;
@@ -924,32 +939,50 @@ Overlay Curtain */
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
+.menu-auth-icon {
+  width: 20px;
+  height: 26px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.menu-auth-icon-bottle {
+  background-image: url('/svgs/bottle.svg');
+}
+
+.menu-auth-icon-strike {
+  background-image: url('/svgs/strike-icon.svg');
+}
+
 .menu-auth-login {
   background: #2563eb;
-  color: #fff;
+  color: var(--same);
   border: 1px solid #2563eb;
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  text-align: left;
 }
 
 .menu-auth-login:hover,
 .menu-auth-login:focus-visible {
   transform: translateY(-1px);
   box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
-  color: #fff;
+  color: var(--same);
 }
 
 .menu-auth-signup {
   background: transparent;
-  color: #ffffff;
-  border: 1px solid #ffffff;
+  color: var(--text-color);
+  border: 1px solid var(--text-color);
   box-shadow: none;
+  text-align: left;
 }
 
 .menu-auth-signup:hover,
 .menu-auth-signup:focus-visible {
   background: rgba(255, 255, 255, 0.12);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-  color: #fff;
+  color: var(--text-color);
 }
 
 .menu-page-item a:hover {
