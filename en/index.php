@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '7';
+$version = '7.1';
 $page = 'index';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -41,15 +41,13 @@ echo '<!DOCTYPE html>
 ?>
 
 
-<title>GoBrik | 3.0</title>
-
 
 <!--
 Deploy code
 cd repositories/gobrik-3-0-2
 cp -R en/* id/
 
-GoBrik.com site version 3.0
+GoBrik.com site version 3.1
 Developed and made open source by the Global Ecobrick Alliance
 See our git hub repository for the full code and to help out:
 https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->

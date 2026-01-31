@@ -1,3 +1,4 @@
+<title>GoBrik | 2026</title>
 <meta name="keywords" content="gobrik, ecobrick app, eco brick, ecobricks, eco-bricks, plastic management, carbon sequestration, plastic offsetting, aes plastic, plastic accounting, ecological accounting, plastic solved, drop off, exchange, marketplace">
 <meta name="description" content="Manage your ecobricks, projects, and plastic transition with GoBrik. Join us in building a sustainable future by putting plastic to good use and achieving our greenest visions together.">
 <meta name="author" content="Global Ecobrick Alliance">

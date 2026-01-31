@@ -1,3 +1,5 @@
+<title>GoBrik | 2026</title>
+
 <meta name="keywords" content="gobrik, aplicación de ecoladrillos, eco ladrillo, ecoladrillos, eco-ladrillos, gestión de plásticos, secuestro de carbono, compensación de plástico, plástico aes, contabilidad de plástico, contabilidad ecológica, plástico resuelto, entrega, intercambio, mercado">
 <meta name="description" content="Gestiona tus ecoladrillos, proyectos y transición de plástico con GoBrik. Únete a nosotros para construir un futuro sostenible utilizando el plástico de manera útil y logrando juntos nuestras visiones más verdes.">
 <meta name="author" content="Alianza Global de Ecoladrillos">

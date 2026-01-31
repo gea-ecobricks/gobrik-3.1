@@ -1,3 +1,5 @@
+<title>GoBrik | 2026</title>
+
 <meta name="keywords" content="gobrik, application ecobrick, brique écologique, ecobricks, eco-briques, gestion des plastiques, séquestration du carbone, compensation plastique, plastique aes, comptabilité plastique, comptabilité écologique, plastique résolu, dépôt, échange, marché">
 <meta name="description" content="Gérez vos écobriques, projets et transition plastique avec GoBrik. Rejoignez-nous pour construire un avenir durable en utilisant le plastique de manière utile et en réalisant ensemble nos visions les plus vertes.">
 <meta name="author" content="Alliance Globale d'Écobriques">

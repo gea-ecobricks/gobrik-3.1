@@ -1,3 +1,5 @@
+<title>GoBrik | 2026</title>
+
 <meta name="keywords" content="gobrik, aplikasi ecobrick, batu bata eco, ecobricks, eco-bata, pengelolaan plastik, penyerapan karbon, penyerapan plastik, plastik aes, akuntansi plastik, akuntansi ekologis, plastik terpecahkan, drop off, pertukaran, pasar">
 <meta name="description" content="Kelola ecobrick, proyek, dan transisi plastik Anda dengan GoBrik. Bergabunglah dengan kami untuk membangun masa depan yang berkelanjutan dengan memanfaatkan plastik secara efektif dan mewujudkan visi hijau kami bersama.">
 <meta name="author" content="Aliansi Global Ecobrick">
