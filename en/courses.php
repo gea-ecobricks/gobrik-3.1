@@ -2,7 +2,7 @@
 require_once '../earthenAuth_helper.php';
 
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '1';
+$version = '1.1';
 $page = 'courses';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn();
@@ -41,7 +41,7 @@ $gobrik_conn->close();
     <!-- PAGE CONTENT -->
     <div id="top-page-image" class="credentials-banner top-page-image"></div>
     <div id="form-submission-box" class="landing-page-form">
-        <div class="form-container">
+        <div class="form-container" style="padding-top: 108px;">
             <div class="courses-header">
                 <h2 data-lang-id="001-current-courses">Current Courses</h2>
                 <p style="margin-bottom: 20px;"><span data-lang-id="002-course-selection">Select from our list of ongoing trainings, workshops and community events.</span></p>
