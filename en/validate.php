@@ -216,7 +216,7 @@ echo '<!DOCTYPE html>
 
 
 <!--FOOTER STARTS HERE-->
-<?php require_once ("../footer-2025.php");?>
+<?php require_once ("../footer-2026.php");?>
 
 
 <script>

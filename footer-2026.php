@@ -13,14 +13,14 @@
 
     <div class="footer-icons-container">
         <div class="footer-icons"><!--WIKIPEDIA-->
-            <a href="https://en.wikipedia.org/wiki/Ecobricks" target="_blank" data-lang-id="401-wikipedia-description" rel="noopener">
+            <a href="https://en.wikipedia.org/wiki/Plastic_sequestration" target="_blank" data-lang-id="401-wikipedia-description" rel="noopener">
             <img src="../icons/wikipedia.svg" style="width:100%" alt="An in-depth wikipedia article on the history, concept and methodology of the ecobrick." title="An in-depth wikipedia article on the history, concept and methodology of the ecobrick." loading="lazy"></a>
 
         </div>
 
 
         <div class="footer-icons"><!--ECOBRICKS.oRG-->
-            <a href="https://gobrik.com" target="_blank" data-lang-id="402-gobrik description">
+            <a href="https://ecobricks.org/en/gobrik.php" target="_blank" data-lang-id="402-gobrik description">
             <img src="../icons/gobrik-icon-white.svg" style="width:100%" alt="Gobrik is a platform to manage your ecobricking, building projects and plastic transition." title="Gobrik is a platform to manage your ecobricking, building projects and plastic transition." loading="lazy"></a>
 
         </div>
@@ -57,23 +57,23 @@
 
         <div class="footer-box">
             <div class="footer-header" data-lang-id="408-wikipedia-title">Ecobricks on Wikipedia</div>
-            <div class="footer-subtext" data-lang-id="409-wikipedia-text">Also known as Eco Bricks, Eco-Bricks, Ecolladrillos, briks, bottle bricks and ecobriques the Global Ecobrick Alliance and <a href="https://en.wikipedia.org/wiki/Ecobricks" target="_blank" rel="noopener">Wikipedia</a> endorse the spelling '<a href="#" onclick="showModalInfo('ecobrick', '<?php echo $lang; ?>')" class="underline-link">ecobrick</a>' to refer to the <a href="https://en.wikipedia.org/wiki/Plastic_Sequestration" target="_blank" rel="noopener">sequestration of plastic</a> in a PET bottle to make a reusable building block.
+            <div class="footer-subtext" data-lang-id="409-wikipedia-text">Also known as Eco Bricks, Eco-Bricks, Ecolladrillos, briks, bottle bricks and ecobriques the Global Ecobrick Alliance and <a href="https://en.wikipedia.org/wiki/Plastic_sequestration" target="_blank" rel="noopener">Wikipedia</a> endorse the spelling '<a href="#" onclick="showModalInfo('ecobrick', '<?php echo $lang; ?>')" class="underline-link">ecobrick</a>' to refer to the <a href="https://en.wikipedia.org/wiki/Plastic_Sequestration" target="_blank" rel="noopener">sequestration of plastic</a> in a PET bottle to make a reusable building block.
             </div>
 
         </div>
         <div class="footer-box">
             <div class="footer-header" data-lang-id="410-gobrik-title">Our Gobrik App</div>
-            <div class="footer-subtext" data-lang-id="411-gobrik-text"><a href="https://gobrik.com" target="_blank" rel="noopener">GoBrik</a> is a web app to serve the local and global plastic transition movement.  It is maintained and developed by the Global Ecobrick Alliance.  Learn more about our <a href="https://ecobricks.org/gobrik">Gobrik project</a>.</div>
+            <div class="footer-subtext" data-lang-id="411-gobrik-text"><a href="https://gobrik.com" target="_blank" rel="noopener">GoBrik</a> is a web app to serve the local and global plastic transition movement.  It is maintained and developed by the Global Ecobrick Alliance.  Learn more about our <a href="https://ecobricks.org/en/gobrik.php">Gobrik project</a>.</div>
 
         </div>
         <div class="footer-box">
             <div class="footer-header" data-lang-id="412-earthen-service-title">Earth Enterprise</div>
-            <div class="footer-subtext" data-lang-id="413-earthen-service-text">The <a href="https://ecobricks.org/about" target="_blank">Global Ecobrick alliance</a> is a for-Earth, not-for-profit, enterprise based in Indonesia.  We operate under <a href="https://ecobricks.org/principles" >regenerative principles</a>.  Consequently we have no corporate,company or government sponsorhsip. Our revenue is genearated by providing <a href="aes">ecologial service</a> and <a href="trainings">educational experiences</a></div>
+            <div class="footer-subtext" data-lang-id="413-earthen-service-text">The <a href="https://ecobricks.org/about" target="_blank" rel="noopener">Global Ecobrick alliance</a> is a for-Earth, not-for-profit, enterprise based in Indonesia. We operate according to <a href="https://ecobricks.org/principles" target="_blank" rel="noopener">Earthen principles</a>. Consequently we have no corporate,company or government sponsorhsip. Our revenue is genearated by providing ecological service and educational experiences.</div>
         </div>
 
         <div class="footer-box">
             <div class="footer-header" data-lang-id="414-tech-partners-title">Tech Partners</div>
-            <div class="footer-subtext" data-lang-id="415-tech-partners-text">Our vision of <a href="transition">Plastic and Petrocapital transition</a> is a global collaboration!  We're grateful to our partners who have given us full access to their awesome technologies.  Thank you to <a href="https://www.dewaweb.com/" target="_blank" rel="noopener">DewaWeb Hosting</a> whose servers host our sites and to <a href="https://svgator.com" target="_blank" rel="noopener">SVGator</a> whose animation platform gives life to our graphics.</div>
+            <div class="footer-subtext" data-lang-id="415-tech-partners-text">Our vision of <a href="https://ecobricks.org/transition" target="_blank" rel="noopener">Plastic and Petrocapital transition</a> is a global collaboration! We're grateful to our partners who have given us full access to their awesome technologies. Thank you to <a href="https://www.dewaweb.com/" target="_blank" rel="noopener">DewaWeb Hosting</a> whose servers host our sites.</div>
         </div>
     </div>
 
@@ -98,7 +98,7 @@
 
             <div id="wcb" class="carbonbadge wcb-d"></div>
 
-            <div class="footer-conclusion" data-lang-id="419x-conclusion-disclosure">We track and disclose our net-green ecological impact.  See our <a href="https://ecobricks.org/en/regenreports.php" target="_blank">Regen Reporting</a> for 2025.</a>
+            <div class="footer-conclusion" data-lang-id="419x-conclusion-disclosure">We track and disclose our net-green ecological impact.  See our <a href="https://ecobricks.org/en/regenreports.php" target="_blank" rel="noopener">Regen Reporting</a> for 2026.</a>
             </div>
 
             <div class="footer-conclusion" data-lang-id="420-conclusion-contribute">
@@ -118,7 +118,7 @@
             </div>
 
             <div class="footer-conclusion" data-lang-id="422-conclusion-copyright">
-                The Ecobricks.org, GEA, Earthen, AES and Gobrik logos and emblems are copyright 2010-2025 by the Global Ecobrick Alliance.
+                The Ecobricks.org, GEA, Earthen, AES and Gobrik logos and emblems are copyright 2010-2026 by the Global Ecobrick Alliance.
             </div>
 
         </div>
@@ -497,5 +497,4 @@ function showModalInfo(type, lang) {
 
 
 </script>
-
 
