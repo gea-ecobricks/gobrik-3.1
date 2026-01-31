@@ -497,7 +497,7 @@ display: none;
       <!-- If the user is not logged in, show the login/signup options -->
       <div class="menu-page-item">
         <a href="login.php" data-lang-id="1000-login" style="margin-right:10px; min-width: 65px;width:75px;">Log in</a> |
-        <a href="signup.php" data-lang-id="1000-sign-up" style="margin-left:10px">Sign up</a>
+        <a href="https://buwana.ecobricks.org/en/login.php" data-lang-id="1000-sign-up" style="margin-left:10px">Sign up</a>
         <span class="status-circle" style="background-color: LIMEGREEN;" title="Deployed. Under beta testing."></span>
       </div>
     <?php endif; ?>
@@ -710,8 +710,8 @@ display: none;
 <!-- LOGIN SELECTOR -->
 <div id="login-menu-slider" class="top-slider-menu" tabindex="-1" role="menu">
   <div class="login-selector-box">
-    <a class="login-selector" target="_blank" href="https://buwana.ecobricks.org/en/signup-1.php?gbrk_f2c61a85a4cd4b8b89a7">🌍 GoBrik</a>
-    <a class="login-selector" target="_blank" href="https://buwana.ecobricks.org/en/signup-1.php?app=ecal_7f3da821d0a54f8a9b58">🌒 EarthCal</a>
+    <a class="login-selector" target="_blank" href="https://buwana.ecobricks.org/en/login.php">🌍 GoBrik</a>
+    <a class="login-selector" target="_blank" href="https://buwana.ecobricks.org/en/login.php">🌒 EarthCal</a>
   </div>
 </div>
 
