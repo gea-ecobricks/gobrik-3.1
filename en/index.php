@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '6.1';
+$version = '7';
 $page = 'index';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function

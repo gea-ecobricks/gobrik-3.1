@@ -128,7 +128,7 @@ if ($project && !empty($project['connected_ecobricks'])) {
                 <img src="../<?php echo htmlspecialchars($project['photo1_main'], ENT_QUOTES, 'UTF-8'); ?>" alt="Project <?php echo htmlspecialchars($project['project_id'], ENT_QUOTES, 'UTF-8'); ?> was made in <?php echo htmlspecialchars($project['location_full'], ENT_QUOTES, 'UTF-8'); ?> and started on <?php echo htmlspecialchars($project['start_dt'], ENT_QUOTES, 'UTF-8'); ?>">
             </a>
         <?php else: ?>
-            <img src="../webp/empty-ecobrick-450px.webp?v2" alt="empty ecobrick">
+            <img src="../webps/empty-ecobrick-450px.webp" alt="empty ecobrick">
         <?php endif; ?>
     </div>
 </div>
