@@ -495,12 +495,18 @@ display: none;
   </div>
     <?php else: ?>
       <!-- If the user is not logged in, show the login/signup options -->
+      <div class="menu-auth-actions menu-auth-actions-top">
+        <a href="https://buwana.ecobricks.org/en/login.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button menu-auth-dashboard-button" data-lang-id="1000-login">
+          <i style="background: url(../svgs/bottle-icon.svg) no-repeat; width:20px; height:26px; display: inline-block; background-size:contain; margin-bottom:-5px; margin-right:4px;"></i>
+          <span>Log in</span>
+        </a>
+        <a href="https://buwana.ecobricks.org/en/signup-1.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="button ghost menu-auth-dashboard-button" data-lang-id="1000-sign-up">
+          <i style="background: url(../svgs/strike-icon.svg) no-repeat; width:20px; height:26px;display: inline-block;background-size:contain;margin-bottom: -5px;margin-left:4px;"></i>
+          <span>Sign up</span>
+        </a>
+      </div>
       <div class="menu-page-item menu-auth-item">
-        <div class="menu-auth-actions">
-          <a href="https://buwana.ecobricks.org/en/login.php" class="menu-auth-button menu-auth-login" data-lang-id="1000-login">Log in</a>
-          <a href="https://buwana.ecobricks.org/en/signup-1.php?app=gbrk_f2c61a85a4cd4b8b89a7" class="menu-auth-button menu-auth-signup" data-lang-id="1000-sign-up">Sign up</a>
-        </div>
-        <span class="status-circle" style="background-color: LIMEGREEN;" title="Deployed. Under beta testing."></span>
+        <span class="menu-page-label">Latest project (coming soon!).</span>
       </div>
     <?php endif; ?>
 
