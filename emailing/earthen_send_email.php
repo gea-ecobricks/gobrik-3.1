@@ -55,6 +55,38 @@ function loadNewsletterMetadata(?string $newsletterId): array
     ];
 }
 
+
+function parseNameEmail(string $input): array {
+    $input = trim($input);
+
+    // Matches: Name <email@domain>
+    if (preg_match('/^\s*([^<]+)\s*<([^>]+)>\s*$/', $input, $m)) {
+        return [trim($m[1]), trim($m[2])];
+    }
+
+    // Otherwise assume it's just an email
+    return ['', $input];
+}
+
+function addReplyToSafe(PHPMailer $mail, string $replyTo, string $fallback): void {
+    $replyTo = trim($replyTo);
+    if ($replyTo === '') $replyTo = $fallback;
+
+    [$name, $email] = parseNameEmail($replyTo);
+
+    // If what we got still isn't a valid email, fall back to the fallback email
+    if (!PHPMailer::validateAddress($email)) {
+        [$name2, $email2] = parseNameEmail($fallback);
+        $email = $email2;
+        $name  = $name2;
+    }
+
+    // Final add
+    if ($name !== '') $mail->addReplyTo($email, $name);
+    else $mail->addReplyTo($email);
+}
+
+
 $selected_newsletter = $_POST['newsletter_choice'] ?? null;
 $newsletter_meta = loadNewsletterMetadata($selected_newsletter);
 
@@ -261,7 +293,7 @@ function sendEarthenSMTP(string $to, string $htmlBody, string $email_from, strin
         $mail->addAddress($to);
 
         // Reply-To
-        $mail->addReplyTo($email_reply_to ?: $email_from);
+        addReplyToSafe($mail, $email_reply_to, $email_from);
 
         $mail->isHTML(true);
         $mail->Subject = $email_subject;
