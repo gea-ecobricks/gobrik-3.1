@@ -5,7 +5,150 @@ require_once '../gobrikconn_env.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception as PHPMailerException;
+
+// -----------------------------------------------------------------------------
+// 0. Lightweight logging destination (optional but recommended)
+// -----------------------------------------------------------------------------
+$log_file = __DIR__ . '/../logs/ecobrick-validation-email.log';
+ini_set('log_errors', 1);
+ini_set('error_log', $log_file);
+
+// -----------------------------------------------------------------------------
+// Feature flag: primary sender (Mailgun) on/off
+// -----------------------------------------------------------------------------
+if (!defined('USE_PRIMARY_EMAIL_SENDER')) {
+    define('USE_PRIMARY_EMAIL_SENDER', false); // set true only when Mailgun is stable
+}
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+function parseNameEmail(string $input): array {
+    $input = trim($input);
+    if (preg_match('/^\s*([^<]+)\s*<([^>]+)>\s*$/', $input, $m)) {
+        return [trim($m[1]), trim($m[2])];
+    }
+    return ['', $input];
+}
+
+function addReplyToSafe(PHPMailer $mail, string $replyTo, string $fallback): void {
+    $replyTo = trim($replyTo);
+    if ($replyTo === '') $replyTo = $fallback;
+
+    [$name, $email] = parseNameEmail($replyTo);
+
+    if (!PHPMailer::validateAddress($email)) {
+        [$name2, $email2] = parseNameEmail($fallback);
+        $email = $email2;
+        $name  = $name2;
+    }
+
+    if ($name !== '') $mail->addReplyTo($email, $name);
+    else $mail->addReplyTo($email);
+}
+
+function sendViaMailgun(
+    string $to,
+    string $subject,
+    string $textBody,
+    string $htmlBody,
+    string $fromName,
+    string $fromAddress,
+    float $timeoutSec = 1.0
+): array {
+    $mailgunApiKey = getenv('MAILGUN_API_KEY');
+    if (!$mailgunApiKey) {
+        return ['sent' => false, 'error' => 'MAILGUN_API_KEY missing'];
+    }
+
+    // Your existing domain pattern
+    $mailgunDomain = 'mail.gobrik.com';
+
+    $client = new Client([
+        'base_uri'        => 'https://api.eu.mailgun.net/v3/',
+        'timeout'         => $timeoutSec,
+        'connect_timeout' => $timeoutSec,
+        'http_errors'     => true,
+    ]);
+
+    try {
+        $resp = $client->post("{$mailgunDomain}/messages", [
+            'auth' => ['api', $mailgunApiKey],
+            'form_params' => [
+                'from'    => sprintf('%s <%s>', $fromName, $fromAddress),
+                'to'      => $to,
+                'subject' => $subject,
+                'text'    => $textBody,
+                'html'    => $htmlBody,
+            ]
+        ]);
+
+        return ['sent' => ($resp->getStatusCode() === 200), 'error' => ''];
+    } catch (RequestException $e) {
+        return ['sent' => false, 'error' => $e->getMessage()];
+    } catch (\Throwable $e) {
+        return ['sent' => false, 'error' => $e->getMessage()];
+    }
+}
+
+function sendViaSmtp(
+    string $toEmail,
+    string $toName,
+    string $subject,
+    string $textBody,
+    string $htmlBody,
+    string $displayFromAddress, // what you WANT users to see (we'll put it in Reply-To)
+    string $displayFromName
+): array {
+    $host   = (string)getenv('SMTP_HOST');
+    $port   = (int)getenv('SMTP_PORT');
+    $user   = (string)getenv('SMTP_USERNAME');
+    $pass   = (string)getenv('SMTP_PASSWORD');
+    $secure = strtolower((string)getenv('SMTP_SECURE')); // ssl|tls
+
+    if ($host === '' || $port === 0 || $user === '' || $pass === '') {
+        return ['sent' => false, 'error' => 'Missing SMTP env vars (host/port/user/pass)'];
+    }
+
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host = $host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $user;
+        $mail->Password = $pass;
+        $mail->Port = $port;
+
+        if ($secure === 'ssl') {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;      // 465
+        } elseif ($secure === 'tls') {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // 587
+        } else {
+            $mail->SMTPSecure = false; // not recommended
+        }
+
+        $mail->SMTPAutoTLS = true;
+
+        // IMPORTANT: Use the authenticated mailbox as the actual From to avoid Exim "forged sender" rejections.
+        // Your "display" from identity goes into Reply-To instead.
+        $mail->setFrom($user, $displayFromName);
+
+        // Preserve intended identity for replies
+        addReplyToSafe($mail, sprintf('%s <%s>', $displayFromName, $displayFromAddress), $user);
+
+        $mail->addAddress($toEmail, $toName);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $htmlBody;
+        $mail->AltBody = $textBody;
+
+        $mail->send();
+        return ['sent' => true, 'error' => ''];
+    } catch (\Throwable $e) {
+        return ['sent' => false, 'error' => $e->getMessage()];
+    }
+}
 
 // -----------------------------------------------------------------------------
 // 1. Bootstrap & Request Parsing
@@ -39,11 +182,8 @@ $starRatingRaw = $data['star_rating'] ?? null;
 $starRating = null;
 if ($starRatingRaw !== null && $starRatingRaw !== '') {
     $starRating = (int) $starRatingRaw;
-    if ($starRating < 0) {
-        $starRating = 0;
-    } elseif ($starRating > 5) {
-        $starRating = 5;
-    }
+    if ($starRating < 0) $starRating = 0;
+    if ($starRating > 5) $starRating = 5;
 }
 $existingBrkAmt = isset($data['existing_brk_amt']) ? (float) $data['existing_brk_amt'] : null;
 $ecobrickFullPhotoUrl = trim((string) ($data['ecobrick_full_photo_url'] ?? ''));
@@ -103,7 +243,7 @@ if (!$makerFound || empty($makerEmail)) {
 }
 
 // -----------------------------------------------------------------------------
-// 4. Message Composition
+// 4. Message Composition (UNCHANGED from your code below)
 // -----------------------------------------------------------------------------
 $makerFirstName = $makerFirstName ?: 'there';
 $statusNormalized = strtolower($status);
@@ -125,7 +265,6 @@ if ($starRating !== null) {
     $starRatingDisplay = implode(' ', $starSymbols);
     $commentsTextBlock .= "Their rating: {$starRatingDisplay}\n";
 }
-
 $commentsTextBlock .= "\n";
 
 $commentsHtmlBlock = '<div class="validator-comments" style="margin-bottom:1.5em;">'
@@ -138,12 +277,9 @@ if ($starRatingDisplay !== null) {
         . htmlspecialchars($starRatingDisplay, ENT_QUOTES, 'UTF-8')
         . '</span></p>';
 }
-
 $commentsHtmlBlock .= '</div>';
 
-$validationNoteDisplay = $validationNote !== ''
-    ? $validationNote
-    : 'No validation note provided.';
+$validationNoteDisplay = $validationNote !== '' ? $validationNote : 'No validation note provided.';
 $validatorDisplayName = $validatorName !== '' ? $validatorName : 'Not specified';
 $brikTranDisplay = $brkTranId !== null ? (string) $brkTranId : 'Not available';
 
@@ -166,25 +302,16 @@ $infoHtml .= '</div>';
 $infoTextBlock = implode("\n", $infoTextLines) . "\n\n";
 
 $imageHtml = '';
-
 if ($ecobrickFullPhotoUrl !== '' && $ecobrickFullPhotoUrl !== 'url missing') {
-
-    // Remove any '../' or './' segments from the stored relative path
     $normalizedPhotoUrl = preg_replace('#(\.\./|\.\/)#', '', $ecobrickFullPhotoUrl);
-
-    // Ensure the URL starts with a single forward slash
     if (strpos($normalizedPhotoUrl, '/') !== 0) {
         $normalizedPhotoUrl = '/' . $normalizedPhotoUrl;
     }
-
-    // Prepend domain if it’s not already absolute
     if (stripos($normalizedPhotoUrl, 'https://gobrik.com') !== 0) {
         $normalizedPhotoUrl = 'https://gobrik.com' . $normalizedPhotoUrl;
     }
-
     $imageHtml = '<p><img src="' . htmlspecialchars($normalizedPhotoUrl, ENT_QUOTES, 'UTF-8') . '" alt="Ecobrick photo" style="max-width:467px;width:100%;height:auto;"></p>';
 }
-
 
 $textIntro = "Hi there {$makerFirstName},\n\n" .
     "Heads up!  Your ecobrick has just been validated by a member of the GEA review team.  While we implement our new v{$authenticatorVersion} Authentication system, ecobricks are being manually reviewed.\n\n";
@@ -195,9 +322,7 @@ $htmlIntro = '<p>Hi there ' . htmlspecialchars($makerFirstName, ENT_QUOTES, 'UTF
     $commentsHtmlBlock .
     $infoHtml;
 
-$textBodyBase = $textIntro .
-    $commentsTextBlock .
-    $infoTextBlock;
+$textBodyBase = $textIntro . $commentsTextBlock . $infoTextBlock;
 
 $additionalText = '';
 $additionalHtml = '';
@@ -225,56 +350,40 @@ $textBody = $textBodyBase . $additionalText . $signOffText;
 $htmlBody = $imageHtml . $htmlIntro . $additionalHtml . $signOffHtml;
 
 // -----------------------------------------------------------------------------
-// 5. Notification Dispatch
+// 5. Notification Dispatch (Mailgun optional -> SMTP fallback)
 // -----------------------------------------------------------------------------
-$fromAddress = 'noreply@gobrik.com';
-$fromName = 'GoBrik Authentication System';
+$displayFromAddress = 'noreply@gobrik.com';
+$displayFromName = 'GoBrik Authentication System';
 
 $mailgunSent = false;
-$mailgunApiKey = getenv('MAILGUN_API_KEY');
-if ($mailgunApiKey) {
-    $mailgunClient = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
-    try {
-        $mailgunResponse = $mailgunClient->post('mail.gobrik.com/messages', [
-            'auth' => ['api', $mailgunApiKey],
-            'form_params' => [
-                'from' => sprintf('%s <%s>', $fromName, $fromAddress),
-                'to' => $makerEmail,
-                'subject' => $subject,
-                'text' => $textBody,
-                'html' => $htmlBody
-            ]
-        ]);
-        $mailgunSent = $mailgunResponse->getStatusCode() === 200;
-    } catch (RequestException $e) {
-        error_log('Mailgun notification error: ' . $e->getMessage());
-        $mailgunSent = false;
+$mailgunErr = '';
+
+if (USE_PRIMARY_EMAIL_SENDER === true) {
+    $mg = sendViaMailgun($makerEmail, $subject, $textBody, $htmlBody, $displayFromName, $displayFromAddress, 1.0);
+    $mailgunSent = (bool)$mg['sent'];
+    $mailgunErr = (string)($mg['error'] ?? '');
+    if ($mailgunSent) {
+        error_log("ecobrick-notify | sent | method=mailgun | to={$makerEmail}");
+    } else if ($mailgunErr !== '') {
+        error_log("ecobrick-notify | mailgun failed | to={$makerEmail} | err={$mailgunErr}");
     }
+} else {
+    // Mailgun disabled
+    // (no log needed unless you want it)
 }
 
 $smtpSent = false;
+$smtpErr = '';
+
 if (!$mailgunSent) {
-    $mailer = new PHPMailer(true);
-    try {
-        $mailer->isSMTP();
-        $mailer->Host = getenv('SMTP_HOST');
-        $mailer->SMTPAuth = true;
-        $mailer->Username = getenv('SMTP_USERNAME');
-        $mailer->Password = getenv('SMTP_PASSWORD');
-        $mailer->Port = getenv('SMTP_PORT');
-        $mailer->SMTPSecure = false;
-        $mailer->SMTPAutoTLS = false;
-        $mailer->setFrom($fromAddress, $fromName);
-        $mailer->addAddress($makerEmail, $makerFirstName);
-        $mailer->isHTML(true);
-        $mailer->Subject = $subject;
-        $mailer->Body = $htmlBody;
-        $mailer->AltBody = $textBody;
-        $mailer->send();
-        $smtpSent = true;
-    } catch (PHPMailerException $e) {
-        error_log('SMTP notification error: ' . $e->getMessage());
-        $smtpSent = false;
+    $smtp = sendViaSmtp($makerEmail, $makerFirstName, $subject, $textBody, $htmlBody, $displayFromAddress, $displayFromName);
+    $smtpSent = (bool)$smtp['sent'];
+    $smtpErr = (string)($smtp['error'] ?? '');
+
+    if ($smtpSent) {
+        error_log("ecobrick-notify | sent | method=smtp | to={$makerEmail}");
+    } else {
+        error_log("ecobrick-notify | smtp failed | to={$makerEmail} | err={$smtpErr}");
     }
 }
 
