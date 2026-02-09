@@ -5,6 +5,8 @@ require_once '../gobrikconn_env.php';
 require_once __DIR__ . '/earthen_helpers.php';
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use PHPMailer\PHPMailer\PHPMailer;
 
 header('Content-Type: application/json');
 
@@ -13,14 +15,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+/**
+ * Feature flag: primary sender (Mailgun) on/off.
+ * For now, you want this OFF.
+ */
+if (!defined('USE_PRIMARY_EMAIL_SENDER')) {
+    define('USE_PRIMARY_EMAIL_SENDER', false);
+}
+
 function buildSentLabel(?string $newsletterId): string
 {
     $safeId = preg_replace('/[^0-9A-Za-z_-]/', '', (string) $newsletterId);
-
-    if ($safeId === '') {
-        return 'sent-unknown';
-    }
-
+    if ($safeId === '') return 'sent-unknown';
     return 'sent-' . $safeId;
 }
 
@@ -89,45 +95,92 @@ if (empty($email_html) || empty($recipient_email) || (!$subscriber_id && !$is_te
 }
 
 try {
-    $send_ok = sendEarthenMailgun($recipient_email, $email_html, $email_from, $email_subject, $email_reply_to);
 
-    if ($subscriber_id && !$is_test_mode && $send_ok) {
+    // ------------------------------------------------------------
+    // SEND: Mailgun (optional) -> SMTP fallback (default)
+    // ------------------------------------------------------------
+    $send_ok = false;
+    $send_method = 'none';
+    $send_error = '';
+
+    if (USE_PRIMARY_EMAIL_SENDER === true) {
         try {
-            ensureMemberHasLabel($subscriber_id, $sent_label);
-        } catch (Exception $labelException) {
-            error_log('[EARTHEN] ❌ Failed to add sent label: ' . $labelException->getMessage());
+            $send_ok = sendEarthenMailgun($recipient_email, $email_html, $email_from, $email_subject, $email_reply_to);
+            $send_method = 'mailgun';
+            if (!$send_ok) $send_error = 'Mailgun send returned false';
+        } catch (Exception $mgEx) {
+            $send_ok = false;
+            $send_method = 'mailgun';
+            $send_error = $mgEx->getMessage();
         }
+    } else {
+        // Primary disabled: skip Mailgun entirely
+        $send_ok = false;
+        $send_method = 'mailgun-disabled';
+    }
+
+    if (!$send_ok) {
+        $smtp = sendEarthenSMTP($recipient_email, $email_html, $email_from, $email_subject, $email_reply_to);
+        $send_ok = $smtp['sent'];
+        $send_method = 'smtp';
+        $send_error = $smtp['error'] ?? '';
+    }
+
+    if ($send_ok) {
+        error_log("[EARTHEN] ✅ Sent | method={$send_method} | to={$recipient_email} | newsletter={$selected_newsletter}");
+
+        if ($subscriber_id && !$is_test_mode) {
+            try {
+                ensureMemberHasLabel($subscriber_id, $sent_label);
+            } catch (Exception $labelException) {
+                error_log('[EARTHEN] ❌ Failed to add sent label: ' . $labelException->getMessage());
+            }
+        }
+
+        if ($batch_row_id && !$is_test_mode) {
+            $status_stmt = $gobrik_conn->prepare(
+                'UPDATE earthen_send_batch_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 0, updated_at = NOW() WHERE id = ?'
+            );
+            if ($status_stmt) {
+                $status_stmt->bind_param('i', $batch_row_id);
+                $status_stmt->execute();
+                $status_stmt->close();
+            }
+        }
+
+        echo json_encode(['success' => true, 'message' => '']);
+        exit();
+    }
+
+    // If we got here: sending failed
+    error_log("[EARTHEN] ❌ Send failed | method={$send_method} | to={$recipient_email} | err={$send_error}");
+
+    if ($subscriber_id && !$is_test_mode) {
+        try {
+            // Keeping your existing log table function (even though it's named mailgun events)
+            logFailedEmail($recipient_email, "Send failure ({$send_method}): {$send_error}");
+        } catch (Exception $logEx) {
+            error_log('[EARTHEN] ❌ Failed to log email failure: ' . $logEx->getMessage());
+        }
+    } elseif (!$is_test_mode && !empty($recipient_email)) {
+        logFailedEmail($recipient_email, "Send failure ({$send_method}): {$send_error}");
     }
 
     if ($batch_row_id && !$is_test_mode) {
-        $status_stmt = $gobrik_conn->prepare(
-            'UPDATE earthen_send_batch_tb SET test_sent = 1, test_sent_date_time = NOW(), processing = 0, updated_at = NOW() WHERE id = ?'
+        $reason = "Send failure ({$send_method}): " . ($send_error ?: 'unknown');
+        $error_stmt = $gobrik_conn->prepare(
+            'UPDATE earthen_send_batch_tb SET processing = 2, last_error = ?, updated_at = NOW() WHERE id = ?'
         );
-
-        if ($status_stmt) {
-            $status_stmt->bind_param('i', $batch_row_id);
-            $status_stmt->execute();
-            $status_stmt->close();
+        if ($error_stmt) {
+            $error_stmt->bind_param('si', $reason, $batch_row_id);
+            $error_stmt->execute();
+            $error_stmt->close();
         }
     }
 
-    if (!$send_ok && !$is_test_mode && !empty($recipient_email)) {
-        logFailedEmail($recipient_email, 'Mailgun send failure');
+    echo json_encode(['success' => false, 'message' => 'Sending failed']);
+    exit();
 
-        if ($batch_row_id) {
-            $error_stmt = $gobrik_conn->prepare(
-                'UPDATE earthen_send_batch_tb SET processing = 2, last_error = ?, updated_at = NOW() WHERE id = ?'
-            );
-
-            if ($error_stmt) {
-                $error_stmt->bind_param('si', $reason = 'Mailgun send failure', $batch_row_id);
-                $error_stmt->execute();
-                $error_stmt->close();
-            }
-        }
-    }
-
-    echo json_encode(['success' => $send_ok, 'message' => $send_ok ? '' : 'Sending failed']);
 } catch (Exception $e) {
     if (!$is_test_mode && $subscriber_id) {
         error_log('[EARTHEN] ❌ Failed send for ' . $subscriber_id . ': ' . $e->getMessage());
@@ -136,8 +189,12 @@ try {
         logFailedEmail($recipient_email, $e->getMessage());
     }
     echo json_encode(['success' => false, 'message' => 'Server error']);
+    exit();
 }
 
+/**
+ * Primary sender (Mailgun) — kept intact, but will be skipped when flag is false.
+ */
 function sendEarthenMailgun(string $to, string $htmlBody, string $email_from, string $email_subject, string $email_reply_to): bool
 {
     $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']);
@@ -159,6 +216,76 @@ function sendEarthenMailgun(string $to, string $htmlBody, string $email_from, st
     ]);
 
     return $response->getStatusCode() == 200;
+}
+
+/**
+ * SMTP sender (PHPMailer)
+ * Uses same env keys as Buwana:
+ *   SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_SECURE (ssl|tls)
+ */
+function sendEarthenSMTP(string $to, string $htmlBody, string $email_from, string $email_subject, string $email_reply_to): array
+{
+    $host   = (string)getenv('SMTP_HOST');
+    $port   = (int)getenv('SMTP_PORT');
+    $user   = (string)getenv('SMTP_USERNAME');
+    $pass   = (string)getenv('SMTP_PASSWORD');
+    $secure = strtolower((string)getenv('SMTP_SECURE')); // ssl|tls
+
+    if ($host === '' || $port === 0 || $user === '' || $pass === '') {
+        return ['sent' => false, 'error' => 'Missing SMTP env vars (host/port/user/pass)'];
+    }
+
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host = $host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $user;
+        $mail->Password = $pass;
+        $mail->Port = $port;
+
+        if ($secure === 'ssl') {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;      // 465
+        } elseif ($secure === 'tls') {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // 587
+        } else {
+            // not recommended, but allowed
+            $mail->SMTPSecure = false;
+        }
+
+        $mail->SMTPAutoTLS = true;
+
+        // Use your chosen from header; if it causes problems, you can force From to the SMTP user instead.
+        $mail->setFrom($user, $extractName = extractDisplayName($email_from) ?: 'Earthen');
+        $mail->addAddress($to);
+
+        // Reply-To
+        $mail->addReplyTo($email_reply_to ?: $email_from);
+
+        $mail->isHTML(true);
+        $mail->Subject = $email_subject;
+        $mail->Body = $htmlBody;
+        $mail->AltBody = strip_tags($htmlBody);
+
+        $mail->send();
+        return ['sent' => true, 'error' => ''];
+
+    } catch (\Throwable $e) {
+        return ['sent' => false, 'error' => $e->getMessage()];
+    }
+}
+
+/**
+ * Extract display name from a "Name <email@domain>" string.
+ * Returns "" if not present.
+ */
+function extractDisplayName(string $from): string
+{
+    if (preg_match('/^\s*([^<]+)\s*<[^>]+>\s*$/', $from, $m)) {
+        return trim($m[1]);
+    }
+    return '';
 }
 
 function resolveMemberIdByEmail(string $email): ?int
