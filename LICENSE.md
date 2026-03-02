@@ -1,0 +1,72 @@
+# GoBrik Dual License
+
+## Software License — MIT
+
+Copyright (c) 2016–2026 Global Ecobrick Alliance
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Content & Data License — Creative Commons BY-SA 4.0
+
+All non-code content contained in this repository and on GoBrik-connected platforms — including:
+
+- Educational text
+- Documentation
+- Images
+- Media
+- Platform-generated content structures
+
+is licensed under:
+
+Creative Commons Attribution–ShareAlike 4.0 International (CC BY-SA 4.0)
+
+You are free to share and adapt this material provided that:
+
+- Attribution is given to:
+
+  The Global Ecobrick Alliance — https://ecobricks.org
+
+- Any derivative works are released under the same license.
+
+---
+
+## Trademark & Logo Notice
+
+The following names, logos, and emblems are NOT covered by either the MIT or CC BY-SA licenses:
+
+- GoBrik
+- AES
+- Ecobricks.org
+- Global Ecobrick Alliance
+
+All associated logos and emblems are copyright © 2010–2026 Global Ecobrick Alliance.
+
+They may not be used without explicit written permission.
+
+---
+
+## Commons Notice
+
+GoBrik is part of a regenerative open-source ecosystem.
+
+If you benefit commercially from this software or platform, we encourage you to contribute back to its development or to the broader ecobrick movement:
+
+https://ecobricks.org
