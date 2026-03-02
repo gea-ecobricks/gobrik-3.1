@@ -147,7 +147,8 @@ if ($editing) {
                   training_type, training_language, briks_made, avg_brik_weight, training_location,
                   training_summary, training_agenda, training_success, training_challenges, training_lessons_learned,
                   youtube_result_video, moodle_url, ready_to_show, show_report, show_signup_count, featured_description, community_id,
-                  zoom_link, zoom_link_full, earthcal_event_url, feature_photo1_main, feature_photo1_tmb, feature_photo2_main, feature_photo2_tmb, feature_photo3_main, feature_photo3_tmb, registration_scope, trainer_contact_email
+                  zoom_link, zoom_link_full, earthcal_event_url, feature_photo1_main, feature_photo1_tmb, feature_photo2_main, feature_photo2_tmb, feature_photo3_main, feature_photo3_tmb, registration_scope, trainer_contact_email,
+                  Cost, Currency, display_cost
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -157,7 +158,8 @@ if ($editing) {
                             $training_type, $training_language, $briks_made, $avg_brik_weight, $training_location,
                             $training_summary, $training_agenda, $training_success, $training_challenges,
                             $training_lessons_learned, $youtube_result_video, $moodle_url, $ready_to_show, $show_report, $show_signup_count, $featured_description, $community_id,
-                            $zoom_link, $zoom_link_full, $earthcal_event_url, $feature_photo1_main, $feature_photo1_tmb, $feature_photo2_main, $feature_photo2_tmb, $feature_photo3_main, $feature_photo3_tmb, $registration_scope, $trainer_contact_email);
+                            $zoom_link, $zoom_link_full, $earthcal_event_url, $feature_photo1_main, $feature_photo1_tmb, $feature_photo2_main, $feature_photo2_tmb, $feature_photo3_main, $feature_photo3_tmb, $registration_scope, $trainer_contact_email,
+                            $cost, $currency, $display_cost);
     $stmt_fetch->fetch();
     $stmt_fetch->close();
 }
@@ -580,24 +582,21 @@ if (!empty($community_id)) {
 
 <br><hr>
 <h4>Training Costing</h4>
-<p><span style="color:red">UNDER DEVELOPMENT</span></p>
  <p>Set the way that participants will register for your course through fiat payment, brikcoin purchase or by 'free/ by donation'.</p>
 <div class="form-item">
-    <label for="currency_display">What currency will payment for this training be in?</label><br>
-    <input type="text" id="currency_display" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>" disabled class="form-field-style">
-    <input type="hidden" id="currency" name="currency" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <label for="currency">What currency will payment for this training be in?</label><br>
+    <input type="text" id="currency" name="currency" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
     <p class="form-caption">Set the currency for receiving payments.  Leave blank for free / donations.</p>
 </div>
 <div class="form-item">
-    <label for="cost_display">What will be the cost of this course in the above currency?</label><br>
-    <input type="number" id="cost_display" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>" disabled class="form-field-style">
-    <input type="hidden" id="cost" name="cost" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <label for="cost">What will be the cost of this course in the above currency?</label><br>
+    <input type="number" id="cost" name="cost" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
     <p class="form-caption">Leave blank for free / donations.</p>
 </div>
 <div class="form-item">
     <label for="display_cost">What will the course listing display for the cost?</label><br>
     <input type="text" id="display_cost" name="display_cost" class="form-field-style" value="<?php echo htmlspecialchars($display_cost ?? 'Free / by Donation', ENT_QUOTES, 'UTF-8'); ?>">
-    <p class="form-caption" style="color:red;">Please leave as "Free / Donation" until the course payment system is set up.</p>
+    <p class="form-caption">This text is displayed on the public course listing page.</p>
 </div>
 
 
