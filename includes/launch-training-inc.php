@@ -5,185 +5,177 @@
 
 <STYLE>
 
-/* ===================================================================== */
-/* ======================== 3P SECTION STYLES =========================== */
-/* ===================================================================== */
 
-.threep-box {
-    background-color: var(--lighter);
-    padding: 20px;
-    border: 1px solid grey;
-    border-radius: 12px;
-    margin-top: 20px;
+/* ========================================================= */
+/* 3P SYSTEM */
+/* ========================================================= */
+
+.threep-box{
+background:var(--lighter);
+padding:22px;
+border-radius:12px;
+border:1px solid #ccc;
 }
 
-.threep-toggle-row {
-    display: flex;
-    flex-flow: row;
-    gap: 20px;
-    align-items: center;
+.threep-toggle-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:20px;
 }
 
-.threep-toggle-copy {
-    width: 100%;
+.threep-toggle-title{
+font-size:1.1em;
+font-weight:600;
 }
 
-.threep-toggle-title {
-    font-size: 1.1em;
-    font-weight: 500;
-    display: block;
+.threep-hr{
+margin:18px 0;
+border:0;
+border-top:1px solid rgba(0,0,0,0.2);
 }
 
-.threep-toggle-control {
-    width: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.threep-subtitle{
+font-size:1.4em;
+font-weight:600;
+margin-top:12px;
 }
 
-.threep-hr {
-    margin: 18px 0 22px 0;
-    border: 0;
-    border-top: 1px solid rgba(0,0,0,0.18);
+.threep-section-divider{
+border-top:2px dotted rgba(0,0,0,0.25);
+margin:10px 0 16px 0;
 }
 
-.threep-subtitle {
-    font-size: 1.55em;
-    font-weight: 500;
-    margin-bottom: 10px;
-    color: var(--text);
+.threep-field-card{
+background:rgba(255,255,255,0.25);
+padding:14px;
+border-radius:8px;
+margin-bottom:12px;
 }
 
-.threep-section-divider {
-    border-top: 2px dotted rgba(0,0,0,0.2);
-    margin: 12px 0 18px 0;
+.currency-input-wrap{
+display:grid;
+grid-template-columns:1fr 50px;
+align-items:center;
+gap:10px;
 }
 
-.threep-field-card {
-    background: rgba(255,255,255,0.22);
-    padding: 14px 16px;
-    border-radius: 8px;
-    margin-bottom: 12px;
+.currency-display-input{
+text-align:left;
 }
 
-.currency-input-wrap {
-    display: grid;
-    grid-template-columns: 70px 1fr 70px;
-    align-items: center;
-    gap: 8px;
+.currency-suffix{
+font-weight:500;
+opacity:.7;
 }
 
-.currency-prefix,
-.currency-suffix {
-    font-size: 0.95em;
-    font-weight: 500;
-    color: var(--subdued-text, #555);
-    text-align: center;
+.currency-locked{
+padding:10px;
+background:#eee;
+border-radius:6px;
+display:inline-block;
+font-weight:500;
 }
 
-.currency-display-input {
-    text-align: right;
-    letter-spacing: 0.02em;
-    font-variant-numeric: tabular-nums;
+/* ========================================================= */
+/* CALCULATOR */
+/* ========================================================= */
+
+.threep-calculator{
+margin-top:20px;
+background:rgba(0,0,0,0.04);
+padding:16px;
+border-radius:10px;
 }
 
-.threep-status-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 22px;
-    align-items: start;
-    margin-top: 10px;
+.threep-calculator-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+margin-top:10px;
 }
 
-.threep-status-textbox {
-    background: rgba(255,255,255,0.22);
-    padding: 16px;
-    border-radius: 8px;
-    border: 1px solid rgba(0,0,0,0.08);
-    line-height: 1.9;
+.calc-card{
+background:white;
+padding:14px;
+border-radius:8px;
+border:1px solid rgba(0,0,0,0.1);
 }
 
-.threep-progress-block {
-    background: rgba(255,255,255,0.22);
-    padding: 14px 16px;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    border: 1px solid rgba(0,0,0,0.08);
+.calc-title{
+font-size:.9em;
+opacity:.7;
+margin-bottom:6px;
 }
 
-.threep-progress-label {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    font-weight: 500;
-    margin-bottom: 10px;
-    font-size: 0.98em;
+.calc-value{
+font-size:1.6em;
+font-weight:600;
 }
 
-.threep-progress-label span {
-    font-weight: 400;
-    opacity: 0.8;
-    font-variant-numeric: tabular-nums;
+/* ========================================================= */
+/* STATUS */
+/* ========================================================= */
+
+.threep-status-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
 }
 
-.threep-progress-bar {
-    position: relative;
-    width: 100%;
-    height: 18px;
-    border-radius: 999px;
-    background: rgba(0,0,0,0.08);
-    overflow: hidden;
+.threep-status-textbox{
+background:rgba(255,255,255,0.25);
+padding:14px;
+border-radius:8px;
+line-height:1.8;
 }
 
-.threep-progress-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    border-radius: 999px;
+/* ========================================================= */
+/* PROGRESS BARS */
+/* ========================================================= */
+
+.threep-progress-bar{
+position:relative;
+height:18px;
+background:#e6e6e6;
+border-radius:999px;
+overflow:hidden;
 }
 
-.threep-progress-fill.is-red {
-    background: linear-gradient(90deg, #d9534f 0%, #e56b67 100%);
+.threep-progress-zone-before{
+position:absolute;
+left:0;
+top:0;
+bottom:0;
+width:60%;
+background:#cfcfcf;
 }
 
-.threep-progress-threshold {
-    position: absolute;
-    top: -2px;
-    bottom: -2px;
-    width: 0;
-    border-left: 2px dotted rgba(0,0,0,0.65);
-    z-index: 3;
+.threep-progress-zone-after{
+position:absolute;
+right:0;
+top:0;
+bottom:0;
+width:40%;
+background:rgba(60,170,90,0.25);
 }
 
-.threep-progress-meta {
-    margin-top: 8px;
-    font-size: 0.92em;
-    opacity: 0.8;
-    font-variant-numeric: tabular-nums;
+.threep-progress-fill{
+position:absolute;
+left:0;
+top:0;
+bottom:0;
+width:2%;
+background:#d9534f;
 }
 
-@media (max-width: 900px) {
-    .threep-status-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .threep-toggle-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .threep-toggle-control {
-        width: auto;
-        justify-content: flex-start;
-    }
-
-    .currency-input-wrap {
-        grid-template-columns: 58px 1fr 58px;
-    }
+.threep-progress-threshold{
+position:absolute;
+left:60%;
+top:-3px;
+bottom:-3px;
+border-left:3px solid #222;
 }
-
-
 
 .form-item input {
   background: var(--input-background) !important;
