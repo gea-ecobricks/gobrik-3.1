@@ -613,292 +613,309 @@ if (!empty($community_id)) {
     <input type="hidden" id="currency" name="currency" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     <input type="hidden" id="cost" name="cost" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
-      <!-- ====================================================================== -->
-      <!-- ===================== 3P SECTION START: TRAINING 3P =================== -->
-      <!-- ====================================================================== -->
+   <!-- ====================================================================== -->
+   <!-- ===================== 3P SECTION START: TRAINING 3P =================== -->
+   <!-- ====================================================================== -->
+   <!--
+       This block controls the Pledge, Proceed and Pay (3P) configuration
+       for a training.
+
+       Includes:
+       1. 3P activation toggle
+       2. Pricing section
+       3. Live pledge calculator
+       4. Timeline section
+       5. Current training status section with text + progress bars
+
+       Keep this block isolated so it can be revised independently in future.
+   -->
+
+   <br><hr>
+   <h4>Training Registration & Payment</h4>
+   <p>By default, trainings are free. You can optionally activate the new 3P threshold registration system below.</p>
+
+   <!-- Hidden values kept for compatibility -->
+   <input type="hidden" id="payment_mode" name="payment_mode" value="<?php echo htmlspecialchars($payment_mode ?? 'free', ENT_QUOTES, 'UTF-8'); ?>">
+   <input type="hidden" id="currency" name="currency" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+   <input type="hidden" id="cost" name="cost" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+
+   <?php
+   // Fallback values for status visuals when no live data exists yet
+   $status_participants_current = (int)$total_registrations_count;
+   $status_participants_threshold = (!empty($min_participants_required) && (int)$min_participants_required > 0) ? (int)$min_participants_required : 12;
+   $status_participants_max = max(25, $status_participants_threshold);
+
+   $status_pledged_current = (int)$total_amount_pledged;
+   $status_pledged_threshold = (!empty($funding_goal_idr) && (int)$funding_goal_idr > 0) ? (int)$funding_goal_idr : 700000;
+   $status_pledged_max = max(1500000, $status_pledged_threshold);
+
+   $participants_fill_pct = max(2, round(($status_participants_current / max(1, $status_participants_max)) * 100, 2));
+   $participants_threshold_pct = min(100, round(($status_participants_threshold / max(1, $status_participants_max)) * 100, 2));
+
+   $pledges_fill_pct = max(2, round(($status_pledged_current / max(1, $status_pledged_max)) * 100, 2));
+   $pledges_threshold_pct = min(100, round(($status_pledged_threshold / max(1, $status_pledged_max)) * 100, 2));
+   ?>
+
+   <div class="form-row threep-box" style="display:flex;flex-flow:column;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
+
+       <div class="threep-toggle-shell" style="display:flex;flex-flow:row;">
+           <div id="left-colum" style="width: 100%;">
+               <label>💸 Activate Pledge, Proceed and Pay for this course</label>
+               <p class="form-caption" style="margin-top:10px;">
+                   By default trainings are free access to users. However, Russell and Paula are developing an awesome new collaborative training registration system. Its still in beta, but you can turn it on for your course here and give it a shot!
+               </p>
+           </div>
+
+           <div id="right-column" style="width:100px; justify-content:center;">
+               <label class="toggle-switch">
+                   <input type="checkbox" id="enable_3p" name="enable_3p" value="1"
+                       <?php echo (($payment_mode ?? 'free') === 'pledge_threshold') ? 'checked' : ''; ?>>
+                   <span class="slider"></span>
+               </label>
+           </div>
+       </div>
+
+       <div id="threep-settings-box" style="display:none; width:100%;">
+           <hr class="threep-hr">
+
+           <!-- ===================== Pricing ===================== -->
+           <div class="threep-subtitle">Pricing</div>
+           <p class="form-caption">
+               Set the registration and threshold values for this course.
+           </p>
+
+           <div class="threep-section-divider"></div>
+
+           <div class="form-item threep-field-card">
+               <label>Base Currency</label><br>
+
+               <div class="currency-locked">
+                   Indonesian Rupiah (IDR)
+               </div>
+
+               <input type="hidden" id="base_currency" name="base_currency" value="IDR">
+
+               <p class="form-caption">
+                   All pledges and thresholds for this course are calculated in Indonesian Rupiah.
+               </p>
+           </div>
+
+           <div class="form-item threep-field-card">
+               <label for="default_price_idr_display">Suggested Base Price</label><br>
+
+               <div class="currency-input-wrap">
+                   <input
+                       type="text"
+                       id="default_price_idr_display"
+                       class="form-field-style currency-display-input"
+                       value="<?php echo !empty($default_price_idr) ? number_format((int)$default_price_idr, 0, '.', ',') : ''; ?>"
+                       inputmode="numeric"
+                       autocomplete="off"
+                       placeholder="150,000"
+                   >
+                   <span class="currency-suffix">IDR</span>
+               </div>
+
+               <input
+                   type="hidden"
+                   id="default_price_idr"
+                   name="default_price_idr"
+                   value="<?php echo htmlspecialchars($default_price_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+               >
+
+               <p class="form-caption">
+                   This is the suggested course contribution and the default amount the public pledge slider will start from.
+               </p>
+           </div>
+
+           <div class="form-item threep-field-card">
+               <label for="min_participants_required">Minimum Registrants Required</label><br>
+               <input
+                   type="number"
+                   id="min_participants_required"
+                   name="min_participants_required"
+                   min="1"
+                   max="5000"
+                   value="<?php echo htmlspecialchars($min_participants_required ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                   class="form-field-style"
+               >
+               <p class="form-caption">
+                   The minimum number of participants required before the course can proceed.
+               </p>
+           </div>
+
+           <div class="form-item threep-field-card">
+               <label for="funding_goal_idr_display">Funding Goal</label><br>
+
+               <div class="currency-input-wrap">
+                   <input
+                       type="text"
+                       id="funding_goal_idr_display"
+                       class="form-field-style currency-display-input"
+                       value="<?php echo !empty($funding_goal_idr) ? number_format((int)$funding_goal_idr, 0, '.', ',') : ''; ?>"
+                       inputmode="numeric"
+                       autocomplete="off"
+                       placeholder="700,000"
+                   >
+                   <span class="currency-suffix">IDR</span>
+               </div>
+
+               <input
+                   type="hidden"
+                   id="funding_goal_idr"
+                   name="funding_goal_idr"
+                   value="<?php echo htmlspecialchars($funding_goal_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+               >
+
+               <p class="form-caption">
+                   The total amount that must be pledged before payments are requested.
+               </p>
+           </div>
+
+           <?php /* Public Cost Display intentionally disabled for now.
+           <div class="form-item threep-field-card">
+               <label for="display_cost">Public Cost Display Text</label><br>
+               <input type="text" id="display_cost" name="display_cost" class="form-field-style"
+                      value="<?php echo htmlspecialchars($display_cost ?? 'Free / Donation', ENT_QUOTES, 'UTF-8'); ?>">
+           </div>
+           */ ?>
+
+           <!-- ===================== Live Calculator ===================== -->
+           <div class="threep-calculator">
+               <div class="threep-subtitle">Live Pledge Calculator</div>
+
+               <div class="threep-calculator-grid">
+                   <div class="calc-card">
+                       <div class="calc-title">
+                           Minimum viable pledge per participant
+                       </div>
+                       <div class="calc-value is-green" id="calc_min_pledge">
+                           —
+                       </div>
+                   </div>
+
+                   <div class="calc-card">
+                       <div class="calc-title">
+                           Funding gap remaining
+                       </div>
+                       <div class="calc-value is-earth" id="calc_funding_gap">
+                           —
+                       </div>
+                   </div>
+               </div>
+
+               <p class="form-caption">
+                   This helps estimate the minimum average pledge needed per participant to meet the funding goal.
+               </p>
+           </div>
+
+           <!-- ===================== Timeline ===================== -->
+           <div class="threep-subtitle" style="margin-top:28px;">Timeline</div>
+           <div class="threep-section-divider"></div>
+
+           <div class="form-item threep-field-card">
+               <label for="pledge_deadline">Pledge Deadline</label><br>
+               <input
+                   type="datetime-local"
+                   id="pledge_deadline"
+                   name="pledge_deadline"
+                   class="form-field-style"
+                   value="<?php echo !empty($pledge_deadline) ? date('Y-m-d\TH:i', strtotime($pledge_deadline)) : ''; ?>"
+               >
+               <p class="form-caption">
+                   The deadline for users to pledge toward this course.
+               </p>
+           </div>
+
+           <div class="form-item threep-field-card">
+               <label for="payment_deadline">Payment Deadline</label><br>
+               <input
+                   type="datetime-local"
+                   id="payment_deadline"
+                   name="payment_deadline"
+                   class="form-field-style"
+                   value="<?php echo !empty($payment_deadline) ? date('Y-m-d\TH:i', strtotime($payment_deadline)) : ''; ?>"
+               >
+               <p class="form-caption">
+                   Once the threshold is reached, this is the deadline for participants to complete their payment.
+               </p>
+           </div>
+
+           <!-- Hidden system fields -->
+           <input type="hidden" id="threshold_status" name="threshold_status" value="<?php echo htmlspecialchars($threshold_status ?? 'open', ENT_QUOTES, 'UTF-8'); ?>">
+           <input type="hidden" id="auto_confirm_threshold" name="auto_confirm_threshold" value="<?php echo !empty($auto_confirm_threshold) ? '1' : '0'; ?>">
+           <input type="hidden" id="allow_overpledge" name="allow_overpledge" value="<?php echo !empty($allow_overpledge) ? '1' : '0'; ?>">
+           <input type="hidden" id="min_pledge_idr" name="min_pledge_idr" value="<?php echo htmlspecialchars($min_pledge_idr ?? 0, ENT_QUOTES, 'UTF-8'); ?>">
+           <input type="hidden" id="max_pledge_idr" name="max_pledge_idr" value="<?php echo htmlspecialchars($max_pledge_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+
+           <!-- ===================== Current Status ===================== -->
+           <div class="threep-subtitle" style="margin-top:28px;">Current Training Status</div>
+           <div class="threep-section-divider"></div>
+
+           <div class="threep-status-grid">
+               <div class="threep-status-left">
+                   <div class="threep-status-textbox">
+                       <strong>Current status:</strong> <?php echo htmlspecialchars($current_status_label, ENT_QUOTES, 'UTF-8'); ?><br>
+                       <strong>Pledge phase status:</strong> <?php echo htmlspecialchars($threshold_status ?? 'open', ENT_QUOTES, 'UTF-8'); ?><br>
+                       <strong>Total registrations / pledges thus far:</strong> <?php echo (int)$total_registrations_count; ?> / <?php echo (int)$total_pledges_count; ?><br>
+                       <strong>Total amount pledged:</strong> <?php echo number_format((int)$total_amount_pledged); ?> IDR<br>
+                       <strong>Percentage pledged of total required amount:</strong> <?php echo htmlspecialchars((string)$pledged_percent, ENT_QUOTES, 'UTF-8'); ?>%<br>
+                       <strong>Confirmed at:</strong> <?php echo htmlspecialchars($confirmed_at_display, ENT_QUOTES, 'UTF-8'); ?>
+                   </div>
+               </div>
+
+               <div class="threep-status-right">
+                   <div class="threep-progress-block">
+                       <div class="threep-progress-label">
+                           Participant Threshold
+                           <span><?php echo (int)$status_participants_current; ?> / <?php echo (int)$status_participants_max; ?></span>
+                       </div>
+
+                       <div class="threep-progress-bar">
+                           <div class="threep-progress-zone-before" style="width: <?php echo $participants_threshold_pct; ?>%;"></div>
+                           <div class="threep-progress-zone-after" style="left: <?php echo $participants_threshold_pct; ?>%; width: <?php echo max(0, 100 - $participants_threshold_pct); ?>%;"></div>
+                           <div class="threep-progress-fill" style="width: <?php echo $participants_fill_pct; ?>%;"></div>
+                           <div class="threep-progress-threshold" style="left: <?php echo $participants_threshold_pct; ?>%;"></div>
+                       </div>
+
+                       <div class="threep-progress-meta">
+                           <strong>Current:</strong> <?php echo (int)$status_participants_current; ?> participants
+                           &nbsp; | &nbsp;
+                           <strong>Threshold:</strong> <?php echo (int)$status_participants_threshold; ?> participants
+                       </div>
+                   </div>
+
+                   <div class="threep-progress-block">
+                       <div class="threep-progress-label">
+                           Funding Threshold
+                           <span><?php echo number_format((int)$status_pledged_current); ?> / <?php echo number_format((int)$status_pledged_max); ?> IDR</span>
+                       </div>
+
+                       <div class="threep-progress-bar">
+                           <div class="threep-progress-zone-before" style="width: <?php echo $pledges_threshold_pct; ?>%;"></div>
+                           <div class="threep-progress-zone-after" style="left: <?php echo $pledges_threshold_pct; ?>%; width: <?php echo max(0, 100 - $pledges_threshold_pct); ?>%;"></div>
+                           <div class="threep-progress-fill" style="width: <?php echo $pledges_fill_pct; ?>%;"></div>
+                           <div class="threep-progress-threshold" style="left: <?php echo $pledges_threshold_pct; ?>%;"></div>
+                       </div>
+
+                       <div class="threep-progress-meta">
+                           <strong>Current:</strong> <?php echo number_format((int)$status_pledged_current); ?> IDR
+                           &nbsp; | &nbsp;
+                           <strong>Threshold:</strong> <?php echo number_format((int)$status_pledged_threshold); ?> IDR
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <!-- ====================================================================== -->
+   <!-- ====================== 3P SECTION END: TRAINING 3P ==================== -->
+   <!-- ====================================================================== -->
 
-      <div class="form-row threep-box" style="display:flex;flex-flow:column;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
 
-          <div class="threep-toggle-shell" style="display:flex;flex-flow:row;">
-              <div id="left-colum" style="width: 100%;">
-                  <label>💸 Activate Pledge, Proceed and Pay for this course</label>
-                  <p class="form-caption" style="margin-top:10px;">
-                      By default trainings are free access to users. However, Russell and Paula are developing an awesome new collaborative training registration system. Its still in beta, but you can turn it on for your course here and give it a shot!
-                  </p>
-              </div>
 
-              <div id="right-column" style="width:100px; justify-content:center;">
-                  <label class="toggle-switch">
-                      <input type="checkbox" id="enable_3p" name="enable_3p" value="1"
-                          <?php echo (($payment_mode ?? 'free') === 'pledge_threshold') ? 'checked' : ''; ?>>
-                      <span class="slider"></span>
-                  </label>
-              </div>
-          </div>
 
-          <div id="threep-settings-box" style="display:none; width:100%;">
-              <hr class="threep-hr">
-
-      <!-- ===================== Pricing ===================== -->
-
-      <div class="threep-subtitle">Pricing</div>
-
-      <p class="form-caption">
-      Set the registration and threshold values for this course.
-      </p>
-
-      <div class="threep-section-divider"></div>
-
-
-      <!-- Base Currency -->
-
-      <div class="form-item threep-field-card">
-
-      <label>Base Currency</label>
-
-      <div class="currency-locked">
-      Indonesian Rupiah (IDR)
-      </div>
-
-      <input type="hidden" name="base_currency" value="IDR">
-
-      <p class="form-caption">
-      All pledges and thresholds are calculated in Indonesian Rupiah.
-      </p>
-
-      </div>
-
-
-      <!-- Base Price -->
-
-      <div class="form-item threep-field-card">
-
-      <label>Suggested Base Price</label>
-
-      <div class="currency-input-wrap">
-
-      <input
-      type="text"
-      id="default_price_idr_display"
-      class="form-field-style currency-display-input"
-      placeholder="150,000"
-      >
-
-      <span class="currency-suffix">IDR</span>
-
-      </div>
-
-      <input type="hidden" id="default_price_idr" name="default_price_idr">
-
-      </div>
-
-
-      <!-- Min Participants -->
-
-      <div class="form-item threep-field-card">
-
-      <label>Minimum Registrants Required</label>
-
-      <input
-      type="number"
-      id="min_participants_required"
-      name="min_participants_required"
-      class="form-field-style"
-      min="1"
-      >
-
-      </div>
-
-
-      <!-- Funding Goal -->
-
-      <div class="form-item threep-field-card">
-
-      <label>Funding Goal</label>
-
-      <div class="currency-input-wrap">
-
-      <input
-      type="text"
-      id="funding_goal_idr_display"
-      class="form-field-style currency-display-input"
-      placeholder="700,000"
-      >
-
-      <span class="currency-suffix">IDR</span>
-
-      </div>
-
-      <input type="hidden" id="funding_goal_idr" name="funding_goal_idr">
-
-      </div>
-
-
-      <!-- ===================== Live Calculator ===================== -->
-
-      <div class="threep-calculator">
-
-      <div class="threep-subtitle">Live Pledge Calculator</div>
-
-      <div class="threep-calculator-grid">
-
-      <div class="calc-card">
-
-      <div class="calc-title">
-      Minimum viable pledge per participant
-      </div>
-
-      <div class="calc-value" id="calc_min_pledge">
-      —
-      </div>
-
-      </div>
-
-      <div class="calc-card">
-
-      <div class="calc-title">
-      Funding gap remaining
-      </div>
-
-      <div class="calc-value" id="calc_funding_gap">
-      —
-      </div>
-
-      </div>
-
-      </div>
-
-      <p class="form-caption">
-      This helps estimate the minimum average pledge needed per participant to meet the funding goal.
-      </p>
-
-      </div>
-
-
-      <!-- ===================== Timeline ===================== -->
-
-      <div class="threep-subtitle">Timeline</div>
-
-      <div class="threep-section-divider"></div>
-
-
-      <div class="form-item threep-field-card">
-
-      <label>Pledge Deadline</label>
-
-      <input
-      type="datetime-local"
-      id="pledge_deadline"
-      name="pledge_deadline"
-      class="form-field-style"
-      >
-
-      </div>
-
-
-      <div class="form-item threep-field-card">
-
-      <label>Payment Deadline</label>
-
-      <input
-      type="datetime-local"
-      id="payment_deadline"
-      name="payment_deadline"
-      class="form-field-style"
-      >
-
-      </div>
-
-
-
-      <!-- ===================== Status ===================== -->
-
-      <div class="threep-subtitle">Current Training Status</div>
-
-      <div class="threep-section-divider"></div>
-
-      <div class="threep-status-grid">
-
-
-      <div class="threep-status-left">
-
-      <div class="threep-status-textbox">
-
-      <strong>Current status:</strong> Scheduled<br>
-
-      <strong>Pledge phase status:</strong>
-      <?php echo htmlspecialchars($threshold_status ?? 'open'); ?><br>
-
-      <strong>Total registrations / pledges:</strong>
-      <?php echo (int)$total_registrations_count; ?><br>
-
-      <strong>Total pledged:</strong>
-      <?php echo number_format((int)$total_amount_pledged); ?> IDR<br>
-
-      </div>
-
-      </div>
-
-
-      <div class="threep-status-right">
-
-
-      <!-- Participants Progress -->
-
-      <div class="threep-progress-block">
-
-      <div class="threep-progress-label">
-      Participant Threshold
-      </div>
-
-      <div class="threep-progress-bar">
-
-      <div class="threep-progress-zone-before"></div>
-
-      <div class="threep-progress-zone-after"></div>
-
-      <div class="threep-progress-fill"></div>
-
-      <div class="threep-progress-threshold"></div>
-
-      </div>
-
-      </div>
-
-
-
-      <!-- Funding Progress -->
-
-      <div class="threep-progress-block">
-
-      <div class="threep-progress-label">
-      Funding Threshold
-      </div>
-
-      <div class="threep-progress-bar">
-
-      <div class="threep-progress-zone-before"></div>
-
-      <div class="threep-progress-zone-after"></div>
-
-      <div class="threep-progress-fill"></div>
-
-      <div class="threep-progress-threshold"></div>
-
-      </div>
-
-      </div>
-
-
-      </div>
-
-      </div>
-
-
-      </div>
-      </div>
-
-      <!-- ====================== 3P SECTION END ====================== -->
 
     <!-- Launch Training Toggle -->
     <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">

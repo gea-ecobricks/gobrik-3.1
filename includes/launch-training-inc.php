@@ -5,176 +5,282 @@
 
 <STYLE>
 
-/* ========================================================= */
-/* 3P SYSTEM */
-/* ========================================================= */
+
+
+/* ===================================================================== */
+/* ======================== 3P SECTION STYLES =========================== */
+/* ===================================================================== */
 
 .threep-box{
-background:var(--lighter);
-padding:22px;
-border-radius:12px;
-border:1px solid #ccc;
-}
-
-.threep-toggle-row{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:20px;
-}
-
-.threep-toggle-title{
-font-size:1.1em;
-font-weight:600;
+    margin-top:20px;
 }
 
 .threep-hr{
-margin:18px 0;
-border:0;
-border-top:1px solid rgba(0,0,0,0.2);
+    margin:18px 0 22px 0;
+    border:0;
+    border-top:1px solid rgba(0,0,0,0.18);
 }
 
 .threep-subtitle{
-font-size:1.4em;
-font-weight:600;
-margin-top:12px;
+    font-size:1.55em;
+    font-weight:600;
+    margin-bottom:10px;
+    color:var(--text);
+    letter-spacing:0.01em;
 }
 
 .threep-section-divider{
-border-top:2px dotted rgba(0,0,0,0.25);
-margin:10px 0 16px 0;
+    border-top:2px dotted rgba(0,0,0,0.22);
+    margin:12px 0 18px 0;
 }
 
 .threep-field-card{
-background:rgba(255,255,255,0.25);
-padding:14px;
-border-radius:8px;
-margin-bottom:12px;
-}
-
-.currency-input-wrap{
-display:grid;
-grid-template-columns:1fr 50px;
-align-items:center;
-gap:10px;
-}
-
-.currency-display-input{
-text-align:left;
-}
-
-.currency-suffix{
-font-weight:500;
-opacity:.7;
+    background:rgba(255,255,255,0.20);
+    padding:16px 16px 14px 16px;
+    border-radius:10px;
+    margin-bottom:14px;
+    border:1px solid rgba(0,0,0,0.04);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
 .currency-locked{
-padding:10px;
-background:#eee;
-border-radius:6px;
-display:inline-block;
-font-weight:500;
+    padding:10px 14px;
+    background:rgba(0,0,0,0.06);
+    border-radius:8px;
+    font-weight:500;
+    display:inline-block;
+    border:1px solid rgba(0,0,0,0.06);
 }
 
-/* ========================================================= */
-/* CALCULATOR */
-/* ========================================================= */
+.currency-input-wrap{
+    display:grid;
+    grid-template-columns:1fr 56px;
+    align-items:center;
+    gap:10px;
+}
+
+.currency-display-input{
+    text-align:left;
+    letter-spacing:0.01em;
+    font-variant-numeric:tabular-nums;
+}
+
+.currency-suffix{
+    text-align:left;
+    font-weight:600;
+    opacity:0.72;
+    font-size:0.96em;
+}
+
+/* ===================================================================== */
+/* ========================== LIVE CALCULATOR =========================== */
+/* ===================================================================== */
 
 .threep-calculator{
-margin-top:20px;
-background:rgba(0,0,0,0.04);
-padding:16px;
-border-radius:10px;
+    margin-top:24px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.08) 100%);
+    padding:22px 18px 20px 18px;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,0.07);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 1px 2px rgba(0,0,0,0.04);
 }
 
 .threep-calculator-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:14px;
-margin-top:10px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:14px;
 }
 
 .calc-card{
-background:white;
-padding:14px;
-border-radius:8px;
-border:1px solid rgba(0,0,0,0.1);
+    background:rgba(255,255,255,0.92);
+    padding:18px 16px 16px 16px;
+    border-radius:10px;
+    border:1px solid rgba(0,0,0,0.08);
+    min-height:104px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    box-shadow:
+        0 1px 1px rgba(0,0,0,0.03),
+        inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .calc-title{
-font-size:.9em;
-opacity:.7;
-margin-bottom:6px;
+    font-size:0.95em;
+    opacity:0.78;
+    margin-bottom:10px;
+    line-height:1.35;
 }
 
 .calc-value{
-font-size:1.6em;
-font-weight:600;
+    font-size:2.05em;
+    font-weight:700;
+    line-height:1.1;
+    letter-spacing:0.01em;
+    font-variant-numeric:tabular-nums;
 }
 
-/* ========================================================= */
-/* STATUS */
-/* ========================================================= */
+.calc-value.is-green{
+    color:#2f7d32;
+}
+
+.calc-value.is-earth{
+    color:#8a4b32;
+}
+
+.threep-calculator .form-caption{
+    margin-top:16px;
+}
+
+/* ===================================================================== */
+/* ======================= STATUS + PROGRESS AREA ======================= */
+/* ===================================================================== */
 
 .threep-status-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
+    display:grid;
+    grid-template-columns:1fr 1.1fr;
+    gap:22px;
+    align-items:start;
+    margin-top:10px;
 }
 
 .threep-status-textbox{
-background:rgba(255,255,255,0.25);
-padding:14px;
-border-radius:8px;
-line-height:1.8;
+    background:rgba(255,255,255,0.22);
+    padding:16px;
+    border-radius:10px;
+    border:1px solid rgba(0,0,0,0.06);
+    line-height:1.95;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
-/* ========================================================= */
-/* PROGRESS BARS */
-/* ========================================================= */
+/* ===================================================================== */
+/* =========================== PROGRESS BARS ============================ */
+/* ===================================================================== */
+
+.threep-progress-block{
+    background:rgba(255,255,255,0.22);
+    padding:16px 16px 14px 16px;
+    border-radius:10px;
+    margin-bottom:16px;
+    border:1px solid rgba(0,0,0,0.06);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.threep-progress-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:10px;
+    font-weight:600;
+    margin-bottom:12px;
+    font-size:1em;
+    line-height:1.2;
+}
+
+.threep-progress-label span{
+    font-weight:500;
+    opacity:0.78;
+    font-size:0.93em;
+    font-variant-numeric:tabular-nums;
+}
 
 .threep-progress-bar{
-position:relative;
-height:18px;
-background:#e6e6e6;
-border-radius:999px;
-overflow:hidden;
+    position:relative;
+    width:100%;
+    height:24px;
+    border-radius:999px;
+    overflow:hidden;
+    background:#e4e4e4;
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.10),
+        inset 0 -1px 0 rgba(255,255,255,0.16);
 }
 
 .threep-progress-zone-before{
-position:absolute;
-left:0;
-top:0;
-bottom:0;
-width:60%;
-background:#cfcfcf;
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    background:linear-gradient(180deg, #c7c7c7 0%, #bbbbbb 100%);
 }
 
 .threep-progress-zone-after{
-position:absolute;
-right:0;
-top:0;
-bottom:0;
-width:40%;
-background:rgba(60,170,90,0.25);
+    position:absolute;
+    top:0;
+    bottom:0;
+    right:0;
+    background:linear-gradient(180deg, rgba(112,176,120,0.34) 0%, rgba(89,155,96,0.28) 100%);
 }
 
 .threep-progress-fill{
-position:absolute;
-left:0;
-top:0;
-bottom:0;
-width:2%;
-background:#d9534f;
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    min-width:8px;
+    background:linear-gradient(90deg, #d85050 0%, #e56868 100%);
+    border-radius:999px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.20),
+        0 0 0 1px rgba(0,0,0,0.03);
 }
 
 .threep-progress-threshold{
-position:absolute;
-left:60%;
-top:-3px;
-bottom:-3px;
-border-left:3px solid #222;
+    position:absolute;
+    top:-2px;
+    bottom:-2px;
+    width:0;
+    border-left:3px solid rgba(24,24,24,0.88);
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.20);
+    z-index:5;
 }
+
+.threep-progress-meta{
+    margin-top:10px;
+    font-size:0.94em;
+    line-height:1.55;
+    opacity:0.84;
+    font-variant-numeric:tabular-nums;
+}
+
+.threep-progress-meta strong{
+    font-weight:600;
+    opacity:1;
+}
+
+/* ===================================================================== */
+/* ========================== RESPONSIVENESS ============================ */
+/* ===================================================================== */
+
+@media (max-width: 900px) {
+    .threep-status-grid{
+        grid-template-columns:1fr;
+    }
+
+    .threep-calculator-grid{
+        grid-template-columns:1fr;
+    }
+
+    .currency-input-wrap{
+        grid-template-columns:1fr 52px;
+    }
+
+    .calc-value{
+        font-size:1.8em;
+    }
+
+    .threep-progress-bar{
+        height:22px;
+    }
+}
+
+
+
+
 
 
 
