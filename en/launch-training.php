@@ -1,16 +1,16 @@
 <?php
 
-require_once '../earthenAuth_helper.php'; // Authentication helper
+require_once '../earthenAuth_helper.php';
 require_once '../auth/session_start.php';
 
 // PART 1: Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $current_lang_dir = $lang;
-$version = '0.64';
+$version = '0.65';
 $page = 'launch-training';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-ob_start(); // Prevent output before headers
+ob_start();
 
 // ✅ Determine training ID from URL
 $training_id = 0;
@@ -153,9 +153,9 @@ $currency = '';
 $display_cost = 'Free / Donation';
 
 // New 3P defaults
-$default_price_idr = '';
-$base_currency = 'IDR';
 $payment_mode = 'free';
+$base_currency = 'IDR';
+$default_price_idr = '';
 $min_participants_required = '';
 $funding_goal_idr = '';
 $pledge_deadline = '';
@@ -165,6 +165,17 @@ $auto_confirm_threshold = 1;
 $allow_overpledge = 1;
 $min_pledge_idr = 0;
 $max_pledge_idr = '';
+$course_confirmed_at = '';
+$threshold_reached_at = '';
+$course_failed_at = '';
+
+// Live stats defaults
+$current_status_label = 'Free';
+$total_registrations_count = 0;
+$total_pledges_count = 0;
+$total_amount_pledged = 0;
+$pledged_percent = 0;
+$confirmed_at_display = '—';
 
 // ✅ If editing, fetch existing training details
 if ($editing) {
@@ -176,8 +187,8 @@ if ($editing) {
                   registration_scope, trainer_contact_email,
                   Cost, Currency, display_cost,
                   default_price_idr, base_currency, payment_mode, min_participants_required, funding_goal_idr,
-                  pledge_deadline, payment_deadline, threshold_status, auto_confirm_threshold, allow_overpledge,
-                  min_pledge_idr, max_pledge_idr
+                  pledge_deadline, payment_deadline, threshold_status, threshold_reached_at, course_confirmed_at, course_failed_at,
+                  auto_confirm_threshold, allow_overpledge, min_pledge_idr, max_pledge_idr
                   FROM tb_trainings WHERE training_id = ?";
 
     $stmt_fetch = $gobrik_conn->prepare($sql_fetch);
@@ -192,11 +203,49 @@ if ($editing) {
         $registration_scope, $trainer_contact_email,
         $cost, $currency, $display_cost,
         $default_price_idr, $base_currency, $payment_mode, $min_participants_required, $funding_goal_idr,
-        $pledge_deadline, $payment_deadline, $threshold_status, $auto_confirm_threshold, $allow_overpledge,
-        $min_pledge_idr, $max_pledge_idr
+        $pledge_deadline, $payment_deadline, $threshold_status, $threshold_reached_at, $course_confirmed_at, $course_failed_at,
+        $auto_confirm_threshold, $allow_overpledge, $min_pledge_idr, $max_pledge_idr
     );
     $stmt_fetch->fetch();
     $stmt_fetch->close();
+
+    // 3P Live Stats
+    $stmt_stats = $gobrik_conn->prepare("
+        SELECT
+            (SELECT COUNT(*) FROM training_registrations_tb WHERE training_id = ?) AS total_regs,
+            (SELECT COUNT(*) FROM training_pledges_tb WHERE training_id = ? AND pledge_status IN ('active','invited','paid')) AS total_pledges,
+            (SELECT COALESCE(SUM(pledged_amount_idr),0) FROM training_pledges_tb WHERE training_id = ? AND pledge_status IN ('active','invited','paid')) AS total_amount
+    ");
+    if ($stmt_stats) {
+        $stmt_stats->bind_param("iii", $training_id, $training_id, $training_id);
+        $stmt_stats->execute();
+        $stmt_stats->bind_result($total_registrations_count, $total_pledges_count, $total_amount_pledged);
+        $stmt_stats->fetch();
+        $stmt_stats->close();
+    }
+
+    if (!empty($funding_goal_idr) && (int)$funding_goal_idr > 0) {
+        $pledged_percent = round(((int)$total_amount_pledged / (int)$funding_goal_idr) * 100, 1);
+        if ($pledged_percent > 100) {
+            $pledged_percent = 100;
+        }
+    } else {
+        $pledged_percent = 0;
+    }
+
+    if ($payment_mode === 'pledge_threshold') {
+        $current_status_label = ucfirst(str_replace('_', ' ', $threshold_status ?? 'open'));
+    } else {
+        $current_status_label = 'Free';
+    }
+
+    if (!empty($course_confirmed_at)) {
+        $confirmed_at_display = date('Y-m-d H:i', strtotime($course_confirmed_at));
+    } elseif (!empty($threshold_reached_at)) {
+        $confirmed_at_display = date('Y-m-d H:i', strtotime($threshold_reached_at));
+    } else {
+        $confirmed_at_display = '—';
+    }
 }
 
 // ✅ Fetch Unique Training Types
@@ -234,7 +283,6 @@ if ($editing) {
     $stmt_tr->close();
 }
 
-// Build array with selected trainer details for pre-population
 $selected_trainers_data = [];
 foreach ($trainers_list as $trainer) {
     if (in_array($trainer['ecobricker_id'], $selected_trainers)) {
@@ -555,45 +603,97 @@ if (!empty($community_id)) {
         <p class="form-caption">This image will also be visible on the training registration page.</p>
     </div>
 
+    <?php endif; ?>
+
     <br><hr>
     <h4>Training Registration & Payment</h4>
-    <p>Configure how participants will register for this course: free, fixed-price, or as a 3P threshold course where people pledge first and only pay once the course reaches viability.</p>
+    <p>By default, trainings are free. You can optionally activate the new 3P threshold registration system below.</p>
 
-    <div class="form-item">
-        <label for="payment_mode">How will participants register for this training?</label><br>
-        <select id="payment_mode" name="payment_mode" class="form-field-style">
-            <option value="free" <?php echo ($payment_mode === 'free') ? 'selected' : ''; ?>>Free / By Donation</option>
-            <option value="fixed_paid" <?php echo ($payment_mode === 'fixed_paid') ? 'selected' : ''; ?>>Fixed Paid Course</option>
-            <option value="pledge_threshold" <?php echo ($payment_mode === 'pledge_threshold') ? 'selected' : ''; ?>>3P Course (Pledge, Proceed & Pay)</option>
-        </select>
-        <p class="form-caption">
-            Choose the registration model. For 3P courses, participants pledge first, and actual payment is only requested once the course reaches the required threshold.
-        </p>
+    <!-- Hidden values kept for compatibility -->
+    <input type="hidden" id="payment_mode" name="payment_mode" value="<?php echo htmlspecialchars($payment_mode ?? 'free', ENT_QUOTES, 'UTF-8'); ?>">
+    <input type="hidden" id="currency" name="currency" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <input type="hidden" id="cost" name="cost" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+
+    <!-- 3P TOGGLE BOX -->
+    <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
+        <div id="left-colum" style="width: 100%;">
+            <label>💸 Activate Pledge, Proceed and Pay for this course</label>
+            <p class="form-caption" style="margin-top:10px;">
+                By default trainings are free access to users. However, Russell and Paula are developing an awesome new collaborative training registration system. Its still in beta, but you can turn it on for your course here and give it a shot!
+            </p>
+        </div>
+
+        <div id="right-column" style="width:100px; justify-content:center;">
+            <label class="toggle-switch">
+                <input type="checkbox" id="enable_3p" name="enable_3p" value="1"
+                    <?php echo (($payment_mode ?? 'free') === 'pledge_threshold') ? 'checked' : ''; ?>>
+                <span class="slider"></span>
+            </label>
+        </div>
     </div>
 
-    <div id="payment-config-box" style="background:var(--lighter); padding:20px; border:1px solid #ccc; border-radius:12px; margin-top:20px;">
+    <!-- 3P SETTINGS -->
+    <div id="threep-settings-box" style="display:none; background-color:var(--lighter); padding:20px; border:grey 1px solid; border-radius:12px; margin-top:20px;">
+        <h4 style="margin-top:0;">3P Course Parameters</h4>
+        <p class="form-caption">
+            Set the registration and threshold values for this course. These are course-level settings. Individual pledge amounts and display values will be recorded later when users actually register.
+        </p>
 
         <div class="form-item">
             <label for="base_currency">Base Currency</label><br>
             <select id="base_currency" name="base_currency" class="form-field-style">
-                <?php
-                $currencyOptions = ['IDR', 'USD', 'EUR', 'GBP', 'CAD', 'AUD'];
-                foreach ($currencyOptions as $opt):
-                ?>
-                    <option value="<?php echo $opt; ?>" <?php echo (($base_currency ?? 'IDR') === $opt) ? 'selected' : ''; ?>><?php echo $opt; ?></option>
-                <?php endforeach; ?>
+                <option value="IDR" <?php echo (($base_currency ?? 'IDR') === 'IDR') ? 'selected' : ''; ?>>IDR</option>
+                <option value="USD" <?php echo (($base_currency ?? 'IDR') === 'USD') ? 'selected' : ''; ?>>USD</option>
+                <option value="EUR" <?php echo (($base_currency ?? 'IDR') === 'EUR') ? 'selected' : ''; ?>>EUR</option>
+                <option value="GBP" <?php echo (($base_currency ?? 'IDR') === 'GBP') ? 'selected' : ''; ?>>GBP</option>
+                <option value="CAD" <?php echo (($base_currency ?? 'IDR') === 'CAD') ? 'selected' : ''; ?>>CAD</option>
+                <option value="AUD" <?php echo (($base_currency ?? 'IDR') === 'AUD') ? 'selected' : ''; ?>>AUD</option>
             </select>
+            <p class="form-caption">IDR is the default canonical currency for 3P courses.</p>
+        </div>
+
+        <div class="form-item">
+            <label for="default_price_idr">Base Price / Suggested Amount (IDR)</label><br>
+            <input type="number" id="default_price_idr" name="default_price_idr" min="0" step="1000"
+                   value="<?php echo htmlspecialchars($default_price_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
             <p class="form-caption">
-                Use IDR as the canonical pricing and threshold currency for 3P courses. Display conversions can be handled later on the public registration page.
+                This is the suggested course contribution and the default amount the public pledge slider will start from.
             </p>
         </div>
 
         <div class="form-item">
-            <label for="default_price_idr">Suggested Registration Price (IDR)</label><br>
-            <input type="number" id="default_price_idr" name="default_price_idr" min="0" step="1000"
-                   value="<?php echo htmlspecialchars($default_price_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
+            <label for="min_participants_required">Minimum Registrants Required</label><br>
+            <input type="number" id="min_participants_required" name="min_participants_required" min="1" max="5000"
+                   value="<?php echo htmlspecialchars($min_participants_required ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
             <p class="form-caption">
-                This is the suggested amount and the default starting point for the slider on 3P courses. For fixed-price courses, this is the set fee.
+                The minimum number of participants required before the course can proceed.
+            </p>
+        </div>
+
+        <div class="form-item">
+            <label for="funding_goal_idr">Funding Goal Required (IDR)</label><br>
+            <input type="number" id="funding_goal_idr" name="funding_goal_idr" min="0" step="1000"
+                   value="<?php echo htmlspecialchars($funding_goal_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
+            <p class="form-caption">
+                The total amount that must be pledged before payments are requested.
+            </p>
+        </div>
+
+        <div class="form-item">
+            <label for="pledge_deadline">Pledge Deadline</label><br>
+            <input type="datetime-local" id="pledge_deadline" name="pledge_deadline" class="form-field-style"
+                   value="<?php echo !empty($pledge_deadline) ? date('Y-m-d\TH:i', strtotime($pledge_deadline)) : ''; ?>">
+            <p class="form-caption">
+                The deadline for users to pledge toward this course.
+            </p>
+        </div>
+
+        <div class="form-item">
+            <label for="payment_deadline">Payment Deadline</label><br>
+            <input type="datetime-local" id="payment_deadline" name="payment_deadline" class="form-field-style"
+                   value="<?php echo !empty($payment_deadline) ? date('Y-m-d\TH:i', strtotime($payment_deadline)) : ''; ?>">
+            <p class="form-caption">
+                Once the threshold is reached, this is the deadline for participants to complete their payment.
             </p>
         </div>
 
@@ -602,134 +702,29 @@ if (!empty($community_id)) {
             <input type="text" id="display_cost" name="display_cost" class="form-field-style"
                    value="<?php echo htmlspecialchars($display_cost ?? 'Free / Donation', ENT_QUOTES, 'UTF-8'); ?>">
             <p class="form-caption">
-                This text is shown publicly on the course listing, for example: “Free / Donation”, “150,000 IDR”, or “Pledge-based / from 50,000 IDR”.
+                This is shown on the public listing, for example: “Free / Donation” or “Pledge-based / from 50,000 IDR”.
             </p>
         </div>
 
-        <div id="fixed-paid-settings" style="display:none;">
-            <div class="form-item">
-                <label for="fixed_price_note">Fixed Paid Course</label><br>
-                <div class="form-caption" style="background:#fff; padding:14px; border-radius:8px; border:1px solid #ddd;">
-                    Participants will register and then proceed directly into payment. The amount charged will use the suggested registration price above.
-                </div>
-            </div>
-        </div>
+        <input type="hidden" id="threshold_status" name="threshold_status" value="<?php echo htmlspecialchars($threshold_status ?? 'open', ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="hidden" id="auto_confirm_threshold" name="auto_confirm_threshold" value="<?php echo !empty($auto_confirm_threshold) ? '1' : '0'; ?>">
+        <input type="hidden" id="allow_overpledge" name="allow_overpledge" value="<?php echo !empty($allow_overpledge) ? '1' : '0'; ?>">
+        <input type="hidden" id="min_pledge_idr" name="min_pledge_idr" value="<?php echo htmlspecialchars($min_pledge_idr ?? 0, ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="hidden" id="max_pledge_idr" name="max_pledge_idr" value="<?php echo htmlspecialchars($max_pledge_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
-        <div id="threep-settings" style="display:none; border-top:1px dashed #bbb; margin-top:20px; padding-top:20px;">
-            <h5 style="margin-top:0;">3P Threshold Settings</h5>
-            <p class="form-caption">
-                These settings determine when the course becomes viable. Participants will pledge first. Once both the minimum participation and funding threshold are reached, they can be invited to complete payment.
-            </p>
-
-            <div class="form-item">
-                <label for="min_participants_required">Minimum Participants Required</label><br>
-                <input type="number" id="min_participants_required" name="min_participants_required" min="1" max="5000"
-                       value="<?php echo htmlspecialchars($min_participants_required ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
-                <p class="form-caption">
-                    The course will not proceed unless at least this many participants have pledged / registered.
-                </p>
-            </div>
-
-            <div class="form-item">
-                <label for="funding_goal_idr">Funding Goal Required (IDR)</label><br>
-                <input type="number" id="funding_goal_idr" name="funding_goal_idr" min="0" step="1000"
-                       value="<?php echo htmlspecialchars($funding_goal_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
-                <p class="form-caption">
-                    The minimum total amount pledged before the course can proceed to payment collection.
-                </p>
-            </div>
-
-            <div class="form-item">
-                <label for="min_pledge_idr">Minimum Allowed Pledge (IDR)</label><br>
-                <input type="number" id="min_pledge_idr" name="min_pledge_idr" min="0" step="1000"
-                       value="<?php echo htmlspecialchars($min_pledge_idr ?? 0, ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
-                <p class="form-caption">
-                    The lowest amount a participant may choose on the pledge slider. Set to 0 to allow free support pledges / registrations.
-                </p>
-            </div>
-
-            <div class="form-item">
-                <label for="max_pledge_idr">Maximum Allowed Pledge (IDR)</label><br>
-                <input type="number" id="max_pledge_idr" name="max_pledge_idr" min="0" step="1000"
-                       value="<?php echo htmlspecialchars($max_pledge_idr ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="form-field-style">
-                <p class="form-caption">
-                    Optional cap for the slider. Leave blank to allow open-ended over-pledging.
-                </p>
-            </div>
-
-            <div class="form-item">
-                <label for="pledge_deadline">Pledge Deadline</label><br>
-                <input type="datetime-local" id="pledge_deadline" name="pledge_deadline" class="form-field-style"
-                       value="<?php echo !empty($pledge_deadline) ? date('Y-m-d\TH:i', strtotime($pledge_deadline)) : ''; ?>">
-                <p class="form-caption">
-                    The deadline for people to make pledges toward the course threshold.
-                </p>
-            </div>
-
-            <div class="form-item">
-                <label for="payment_deadline">Payment Deadline</label><br>
-                <input type="datetime-local" id="payment_deadline" name="payment_deadline" class="form-field-style"
-                       value="<?php echo !empty($payment_deadline) ? date('Y-m-d\TH:i', strtotime($payment_deadline)) : ''; ?>">
-                <p class="form-caption">
-                    Once the threshold is reached and payment invitations are sent, this is the deadline by which participants must complete payment.
-                </p>
-            </div>
-
-            <div class="form-item">
-                <label for="threshold_status">Threshold Status</label><br>
-                <select id="threshold_status" name="threshold_status" class="form-field-style">
-                    <?php
-                    $thresholdStatuses = ['open', 'threshold_met', 'confirmed', 'failed', 'cancelled', 'completed'];
-                    foreach ($thresholdStatuses as $statusOpt):
-                    ?>
-                        <option value="<?php echo $statusOpt; ?>" <?php echo (($threshold_status ?? 'open') === $statusOpt) ? 'selected' : ''; ?>>
-                            <?php echo ucfirst(str_replace('_', ' ', $statusOpt)); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <p class="form-caption">
-                    Usually this should remain “open” when the course is first launched.
-                </p>
-            </div>
-
-            <div class="form-row" style="display:flex;flex-flow:row;background-color:#fff;padding:20px;border:#ddd 1px solid;border-radius:12px;margin-top:20px;">
-                <div style="width:100%;">
-                    <label>✅ Automatically confirm when threshold is reached</label>
-                    <p class="form-caption" style="margin-top:10px;">
-                        If enabled, the course can automatically move forward once both thresholds are met. If disabled, you can review it manually first.
-                    </p>
-                </div>
-                <div style="width:100px; justify-content:center;">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="auto_confirm_threshold" name="auto_confirm_threshold" value="1"
-                            <?php echo (!empty($auto_confirm_threshold)) ? 'checked' : ''; ?>>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-row" style="display:flex;flex-flow:row;background-color:#fff;padding:20px;border:#ddd 1px solid;border-radius:12px;margin-top:20px;">
-                <div style="width:100%;">
-                    <label>💚 Allow over-pledging</label>
-                    <p class="form-caption" style="margin-top:10px;">
-                        If enabled, participants may pledge above the suggested price to further support the training.
-                    </p>
-                </div>
-                <div style="width:100px; justify-content:center;">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="allow_overpledge" name="allow_overpledge" value="1"
-                            <?php echo (!empty($allow_overpledge)) ? 'checked' : ''; ?>>
-                        <span class="slider"></span>
-                    </label>
-                </div>
+        <div style="margin-top:25px; padding-top:20px; border-top:1px dashed #bbb;">
+            <h5 style="margin-top:0;">Current Live Stats for this Training</h5>
+            <div class="form-caption" style="background:#fff; padding:16px; border-radius:8px; border:1px solid #ddd; line-height:1.8;">
+                <strong>Current status:</strong> <?php echo htmlspecialchars($current_status_label, ENT_QUOTES, 'UTF-8'); ?><br>
+                <strong>Total registrations / pledges thus far:</strong> <?php echo (int)$total_registrations_count; ?> / <?php echo (int)$total_pledges_count; ?><br>
+                <strong>Total amount pledged:</strong> <?php echo number_format((int)$total_amount_pledged); ?> IDR<br>
+                <strong>Percentage pledged of total required amount:</strong> <?php echo htmlspecialchars((string)$pledged_percent, ENT_QUOTES, 'UTF-8'); ?>%<br>
+                <strong>Confirmed at:</strong> <?php echo htmlspecialchars($confirmed_at_display, ENT_QUOTES, 'UTF-8'); ?>
             </div>
         </div>
     </div>
 
-    <!-- Legacy compatibility fields during refactor -->
-    <input type="hidden" id="currency" name="currency" value="<?php echo htmlspecialchars($currency ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-    <input type="hidden" id="cost" name="cost" value="<?php echo htmlspecialchars($cost ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-
+    <!-- Launch Training Toggle -->
     <div class="form-row" style="display:flex;flex-flow:row;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
         <div id="left-colum" style="width: 100%;">
             <label>🚀 Launch Training</label>
@@ -776,7 +771,6 @@ if (!empty($community_id)) {
             </label>
         </div>
     </div>
-    <?php endif; ?>
 
     <input type="hidden" id="training_id" name="training_id" value="<?php echo htmlspecialchars($training_id ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
@@ -908,61 +902,45 @@ document.addEventListener("DOMContentLoaded", function() {
         preselectedTrainers.forEach(tr => addTrainer(tr.ecobricker_id, tr.full_name));
     }
 
-    initPaymentModeUI();
-    syncLegacyPricingFields();
+    init3PToggle();
+    sync3PMode();
 });
 
-// 3P UI helpers
-function initPaymentModeUI() {
+function init3PToggle() {
+    const toggle = document.getElementById('enable_3p');
+    const box = document.getElementById('threep-settings-box');
+
+    function refresh() {
+        const enabled = !!toggle.checked;
+        box.style.display = enabled ? 'block' : 'none';
+        sync3PMode();
+    }
+
+    toggle.addEventListener('change', refresh);
+    refresh();
+}
+
+function sync3PMode() {
+    const enabled = document.getElementById('enable_3p')?.checked;
     const paymentMode = document.getElementById('payment_mode');
-    const paymentConfigBox = document.getElementById('payment-config-box');
-    const fixedPaidSettings = document.getElementById('fixed-paid-settings');
-    const threepSettings = document.getElementById('threep-settings');
-
-    function refreshPaymentSections() {
-        const mode = paymentMode ? paymentMode.value : 'free';
-
-        if (paymentConfigBox) {
-            paymentConfigBox.style.display = 'block';
-        }
-
-        if (fixedPaidSettings) {
-            fixedPaidSettings.style.display = (mode === 'fixed_paid') ? 'block' : 'none';
-        }
-
-        if (threepSettings) {
-            threepSettings.style.display = (mode === 'pledge_threshold') ? 'block' : 'none';
-        }
-
-        syncLegacyPricingFields();
-    }
-
-    if (paymentMode) {
-        paymentMode.addEventListener('change', refreshPaymentSections);
-        refreshPaymentSections();
-    }
-}
-
-function syncLegacyPricingFields() {
-    const paymentMode = document.getElementById('payment_mode')?.value || 'free';
-    const defaultPrice = document.getElementById('default_price_idr')?.value || '';
-    const baseCurrency = document.getElementById('base_currency')?.value || 'IDR';
-    const legacyCost = document.getElementById('cost');
     const legacyCurrency = document.getElementById('currency');
+    const legacyCost = document.getElementById('cost');
+    const baseCurrency = document.getElementById('base_currency')?.value || 'IDR';
+    const defaultPrice = document.getElementById('default_price_idr')?.value || '';
 
-    if (!legacyCost || !legacyCurrency) return;
-
-    if (paymentMode === 'free') {
-        legacyCost.value = '';
-        legacyCurrency.value = '';
-    } else {
-        legacyCost.value = defaultPrice;
+    if (enabled) {
+        paymentMode.value = 'pledge_threshold';
         legacyCurrency.value = baseCurrency;
+        legacyCost.value = defaultPrice;
+    } else {
+        paymentMode.value = 'free';
+        legacyCurrency.value = '';
+        legacyCost.value = '';
     }
 }
 
-document.getElementById('default_price_idr')?.addEventListener('input', syncLegacyPricingFields);
-document.getElementById('base_currency')?.addEventListener('change', syncLegacyPricingFields);
+document.getElementById('base_currency')?.addEventListener('change', sync3PMode);
+document.getElementById('default_price_idr')?.addEventListener('input', sync3PMode);
 
 document.getElementById('submit-form').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -999,37 +977,21 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     var featuredDescription = document.getElementById('featured_description').value.trim();
     displayError('featured-error-long', featuredDescription.length > 2000);
 
-    const paymentMode = document.getElementById('payment_mode')?.value || 'free';
+    const enable3P = document.getElementById('enable_3p')?.checked;
     const defaultPrice = parseInt(document.getElementById('default_price_idr')?.value || '0', 10);
     const fundingGoal = parseInt(document.getElementById('funding_goal_idr')?.value || '0', 10);
-    const minParticipantsRequired = parseInt(document.getElementById('min_participants_required')?.value || '0', 10);
-    const minPledge = parseInt(document.getElementById('min_pledge_idr')?.value || '0', 10);
-    const maxPledgeRaw = document.getElementById('max_pledge_idr')?.value || '';
-    const maxPledge = maxPledgeRaw === '' ? null : parseInt(maxPledgeRaw, 10);
+    const minRegistrants = parseInt(document.getElementById('min_participants_required')?.value || '0', 10);
 
-    if (paymentMode === 'fixed_paid') {
+    if (enable3P) {
         if (isNaN(defaultPrice) || defaultPrice < 0) {
             isValid = false;
-            alert('Please set a valid suggested registration price for this paid course.');
-        }
-    }
-
-    if (paymentMode === 'pledge_threshold') {
-        if (isNaN(defaultPrice) || defaultPrice < 0) {
+            alert('Please set a valid base price / suggested amount for this 3P course.');
+        } else if (isNaN(minRegistrants) || minRegistrants <= 0) {
             isValid = false;
-            alert('Please set a valid suggested registration price for this 3P course.');
+            alert('Please set the minimum registrants required for this 3P course.');
         } else if (isNaN(fundingGoal) || fundingGoal <= 0) {
             isValid = false;
-            alert('Please set a funding goal for this 3P course.');
-        } else if (isNaN(minParticipantsRequired) || minParticipantsRequired <= 0) {
-            isValid = false;
-            alert('Please set the minimum participants required for this 3P course.');
-        } else if (isNaN(minPledge) || minPledge < 0) {
-            isValid = false;
-            alert('Please set a valid minimum pledge.');
-        } else if (maxPledge !== null && maxPledge < minPledge) {
-            isValid = false;
-            alert('Maximum pledge cannot be less than minimum pledge.');
+            alert('Please set the funding goal for this 3P course.');
         }
     }
 
@@ -1043,7 +1005,7 @@ document.getElementById('submit-form').addEventListener('submit', function(event
         return;
     }
 
-    syncLegacyPricingFields();
+    sync3PMode();
 
     var formData = new FormData(this);
     var submitButton = document.querySelector('input[type="submit"]');
@@ -1138,63 +1100,25 @@ function presetForStarterWorkshop() {
         }
     }
 
-    const countrySelect = document.getElementById('country_id');
-    if (countrySelect) {
-        for (let opt of countrySelect.options) {
-            if (opt.text.trim() === 'Earth' || opt.value === 'Earth') {
-                countrySelect.value = opt.value;
-                break;
-            }
-        }
-    }
-
-    document.getElementById('featured_description').value = `Just getting started ecobricking? Curious what it ecobricking is all about?  Want to be sure you are on the right track?  This basic, 1.5 our course will get you started right.  You’ll learn a lot more than just how to pack a bottle!`;
+    document.getElementById('featured_description').value = `Just getting started ecobricking? Curious what it ecobricking is all about? Want to be sure you are on the right track? This basic, 1.5 hour course will get you started right. You’ll learn a lot more than just how to pack a bottle!`;
 
     document.getElementById('training_agenda').value = `In this introduction to ecobricking we will cover not just how to make an ecobrick, but <i>why</i>.
-We’ll go over the both the primordial and modern story of our everyday plastic, as well as the illusions and dangers of it. We'll take a look at industrial plastic solutions and why ecobricking remains as relevant as ever. Finally, we'll go over correct ecobrick technique, best practices, and building possibilities.
-
-<b>What you will learn...</b>
-
-\t1. The primordial Earthen origins of plastic
-\t2. How we can follow Earth’s example with our plastic
-\t3. The modern petro-capital context of plastic
-\t4. The shortcomings of industrial recycling
-\t5. The dangers of plastic when it gets into the environment
-\t6. The spiral green principle behind ecobricking
-\t7. How to Ecobrick
-\t8. Using the GoBrik app
-\t9. Using ecobricks for Modules and Earth Building
-
-<b>Schedule...</b>
-
-\t• 40 minutes of science and theory
-\t• 20 minutes of ecobrick technique and best practices
-\t• 10 minutes on ecobrick applications
-\t• 20 minutes of questions and discussion.
-
-<b>Payment...</b>
-
-Course registration is free / by donation so no payment is required to register.  Ater the course, donations are welcome (suggested donation is 20$ / 20 GBP / 200k IDR).  20% of course proceeds go to the Global Ecobrick Alliance`;
+We’ll go over both the primordial and modern story of our everyday plastic, as well as the illusions and dangers of it. We'll take a look at industrial plastic solutions and why ecobricking remains as relevant as ever. Finally, we'll go over correct ecobrick technique, best practices, and building possibilities.`;
 
     const regScope = document.getElementById('registration_scope');
     if (regScope) regScope.value = 'anyone';
 
-    const paymentMode = document.getElementById('payment_mode');
-    if (paymentMode) paymentMode.value = 'free';
+    document.getElementById('enable_3p').checked = false;
+    document.getElementById('display_cost').value = 'Free / Donation';
+    document.getElementById('base_currency').value = 'IDR';
+    document.getElementById('default_price_idr').value = '';
+    document.getElementById('min_participants_required').value = '';
+    document.getElementById('funding_goal_idr').value = '';
+    document.getElementById('pledge_deadline').value = '';
+    document.getElementById('payment_deadline').value = '';
 
-    const baseCurrency = document.getElementById('base_currency');
-    if (baseCurrency) baseCurrency.value = 'IDR';
-
-    const defaultPrice = document.getElementById('default_price_idr');
-    if (defaultPrice) defaultPrice.value = '';
-
-    const displayCost = document.getElementById('display_cost');
-    if (displayCost) displayCost.value = 'Free / Donation';
-
-    const minPledge = document.getElementById('min_pledge_idr');
-    if (minPledge) minPledge.value = 0;
-
-    initPaymentModeUI();
+    init3PToggle();
+    sync3PMode();
 
     setFileInputFromUrl('feature_photo1_main', 'https://gobrik.com/webps/starter-workshop-feature-1-en.webp');
     setFileInputFromUrl('feature_photo2_main', 'https://gobrik.com/webps/starter-workshop-feature-2-en.webp');
