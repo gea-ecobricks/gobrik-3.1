@@ -1,12 +1,12 @@
 <?php
-require_once '../earthenAuth_helper.php'; // Include authentication helper functions
+require_once '../earthenAuth_helper.php';
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.2';
+$version = '0.3';
 $page = 'register';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
-$is_logged_in = isLoggedIn(); // Check if the user is logged in
+$is_logged_in = isLoggedIn();
 
 // Get training ID from the URL
 $training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -28,20 +28,49 @@ $cost = '';
 $currency = '';
 $ecobricker_id = null;
 $users_email_address = '';
-$is_registered = false; // Default: user is not registered
+$is_registered = false;
 
+// 3P defaults
+$payment_mode = 'free';
+$base_currency = 'IDR';
+$default_price_idr = 0;
+$funding_goal_idr = 0;
+$min_participants_required = 0;
+$pledge_deadline = '';
+$payment_deadline = '';
+$threshold_status = 'open';
+$display_cost = 'Free / Donation';
+
+$total_registrations_count = 0;
+$total_pledges_count = 0;
+$total_amount_pledged = 0;
+$pledged_percent = 0;
+
+$feature_photo1_main = '';
+$feature_photo2_main = '';
+$feature_photo3_main = '';
+$feature_photo1_tmb = '';
+
+$first_name = '';
+$earthling_emoji = '🌏';
+$training_name = '';
+$featured_description = '';
+$training_agenda = '';
+$registration_scope = '';
+$ready_to_show = 0;
+$show_signup_count = 0;
+$no_participants = 0;
 
 // Check if the user is logged in
 if ($is_logged_in) {
     $buwana_id = $_SESSION['buwana_id'];
 
-    // Include database connection
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-     // Fetch the user's location data
+    // Fetch the user's location data
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-$earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
+    $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
     $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
     $gea_status = getGEA_status($buwana_id);
@@ -58,24 +87,36 @@ $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $stmt->fetch();
     $stmt->close();
 
-    // Check if the user is already registered for the training
-    if ($ecobricker_id) {
-        $sql_check = "SELECT id FROM tb_training_trainees WHERE training_id = ? AND ecobricker_id = ?";
-        $stmt_check = $gobrik_conn->prepare($sql_check);
-        $stmt_check->bind_param("ii", $training_id, $ecobricker_id);
-        $stmt_check->execute();
-        $stmt_check->store_result();
-
-        // If a row exists, the user is registered
-        if ($stmt_check->num_rows > 0) {
+    // Check if user is already registered in new table first
+    $sql_check_new = "SELECT registration_id, status FROM training_registrations_tb WHERE training_id = ? AND buwana_id = ? AND status IN ('reserved','pledged','awaiting_payment','confirmed')";
+    $stmt_check_new = $gobrik_conn->prepare($sql_check_new);
+    if ($stmt_check_new) {
+        $stmt_check_new->bind_param("ii", $training_id, $buwana_id);
+        $stmt_check_new->execute();
+        $stmt_check_new->store_result();
+        if ($stmt_check_new->num_rows > 0) {
             $is_registered = true;
         }
-
-        $stmt_check->close();
+        $stmt_check_new->close();
     }
-}
 
+    // Fallback to legacy table if needed
+    if (!$is_registered && $ecobricker_id) {
+        $sql_check = "SELECT id FROM tb_training_trainees WHERE training_id = ? AND ecobricker_id = ?";
+        $stmt_check = $gobrik_conn->prepare($sql_check);
+        if ($stmt_check) {
+            $stmt_check->bind_param("ii", $training_id, $ecobricker_id);
+            $stmt_check->execute();
+            $stmt_check->store_result();
+            if ($stmt_check->num_rows > 0) {
+                $is_registered = true;
+            }
+            $stmt_check->close();
+        }
+    }
+} else {
     require_once '../gobrikconn_env.php';
+}
 
 // Fetch training details
 $sql = "SELECT * FROM `tb_trainings` WHERE `training_id` = ?";
@@ -87,11 +128,12 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $allowed_tags = '<b><i><u><strong><em><p><br><ul><li><ol>';
+
     $featured_description = strip_tags($row['featured_description'] ?? '', $allowed_tags);
     $training_agenda = strip_tags($row['training_agenda'] ?? '', $allowed_tags);
-    // Pre-escape to display characters like '&' correctly without double encoding
+
     $training_title = htmlspecialchars($row['training_title'] ?? '', ENT_QUOTES, 'UTF-8', false);
-    $training_name = $training_title; // alias for modal text
+    $training_name = $training_title;
     $training_subtitle = htmlspecialchars($row['training_subtitle'] ?? '', ENT_QUOTES, 'UTF-8', false);
     $training_date = htmlspecialchars($row['training_date'] ?? '', ENT_QUOTES, 'UTF-8');
     $training_time_txt = htmlspecialchars($row['training_time_txt'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -104,41 +146,59 @@ if ($result->num_rows > 0) {
     $language_id = trim($row['training_language'] ?? '');
 
     $display_cost = htmlspecialchars($row['display_cost'] ?? '', ENT_QUOTES, 'UTF-8');
-    $cost = htmlspecialchars($row['cost'] ?? '', ENT_QUOTES, 'UTF-8');
-    $currency = htmlspecialchars($row['currency'] ?? '', ENT_QUOTES, 'UTF-8');
+    $cost = htmlspecialchars($row['Cost'] ?? ($row['cost'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $currency = htmlspecialchars($row['Currency'] ?? ($row['currency'] ?? ''), ENT_QUOTES, 'UTF-8');
+
+    // 3P fields
+    $payment_mode = htmlspecialchars($row['payment_mode'] ?? 'free', ENT_QUOTES, 'UTF-8');
+    $base_currency = htmlspecialchars($row['base_currency'] ?? 'IDR', ENT_QUOTES, 'UTF-8');
+    $default_price_idr = intval($row['default_price_idr'] ?? 0);
+    $funding_goal_idr = intval($row['funding_goal_idr'] ?? 0);
+    $min_participants_required = intval($row['min_participants_required'] ?? 0);
+    $pledge_deadline = htmlspecialchars($row['pledge_deadline'] ?? '', ENT_QUOTES, 'UTF-8');
+    $payment_deadline = htmlspecialchars($row['payment_deadline'] ?? '', ENT_QUOTES, 'UTF-8');
+    $threshold_status = htmlspecialchars($row['threshold_status'] ?? 'open', ENT_QUOTES, 'UTF-8');
 
     // Signup count settings
     $show_signup_count = intval($row['show_signup_count'] ?? 0);
     $no_participants = intval($row['no_participants'] ?? 0);
-    $registration_count = 0;
-    if ($show_signup_count === 1) {
-        $count_stmt = $gobrik_conn->prepare("SELECT COUNT(*) FROM tb_training_trainees WHERE training_id = ?");
-        if ($count_stmt) {
-            $count_stmt->bind_param("i", $training_id);
-            $count_stmt->execute();
-            $count_stmt->bind_result($registration_count);
-            $count_stmt->fetch();
-            $count_stmt->close();
+
+    // Current live stats
+    $count_stmt = $gobrik_conn->prepare("
+        SELECT
+            (SELECT COUNT(*) FROM training_registrations_tb WHERE training_id = ?) AS total_regs,
+            (SELECT COUNT(*) FROM training_pledges_tb WHERE training_id = ? AND pledge_status IN ('active','invited','paid')) AS total_pledges,
+            (SELECT COALESCE(SUM(pledged_amount_idr),0) FROM training_pledges_tb WHERE training_id = ? AND pledge_status IN ('active','invited','paid')) AS total_amount
+    ");
+    if ($count_stmt) {
+        $count_stmt->bind_param("iii", $training_id, $training_id, $training_id);
+        $count_stmt->execute();
+        $count_stmt->bind_result($total_registrations_count, $total_pledges_count, $total_amount_pledged);
+        $count_stmt->fetch();
+        $count_stmt->close();
+    }
+
+    if ($funding_goal_idr > 0) {
+        $pledged_percent = round(($total_amount_pledged / $funding_goal_idr) * 100, 1);
+        if ($pledged_percent > 100) {
+            $pledged_percent = 100;
         }
     }
 
-
-
     $training_url = htmlspecialchars($row['training_url'] ?? '', ENT_QUOTES, 'UTF-8');
-    $ready_to_show = $row['ready_to_show'];
+    $ready_to_show = $row['ready_to_show'] ?? 0;
 
-    // ✅ Fetch feature photos
     $feature_photo1_main = htmlspecialchars($row['feature_photo1_main'] ?? '', ENT_QUOTES, 'UTF-8');
     $feature_photo2_main = htmlspecialchars($row['feature_photo2_main'] ?? '', ENT_QUOTES, 'UTF-8');
     $feature_photo3_main = htmlspecialchars($row['feature_photo3_main'] ?? '', ENT_QUOTES, 'UTF-8');
     $feature_photo1_tmb = htmlspecialchars($row['feature_photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
 
-    if ($ready_to_show == 0) {
-        echo "<script>alert('Sorry this training isn\'t yet listed for public registration.'); window.location.href='trainings.php';</script>";
+    if ((int)$ready_to_show === 0) {
+        echo "<script>alert('Sorry this training isn\\'t yet listed for public registration.'); window.location.href='courses.php';</script>";
         exit;
     }
 
-    // Look up the language and country names using the IDs
+    // Look up language and country names
     require_once '../buwanaconn_env.php';
 
     $training_country = '';
@@ -164,103 +224,141 @@ if ($result->num_rows > 0) {
     }
 }
 
-
-
 $stmt->close();
+
+// Status/progress helpers for bars
+$status_participants_current = (int)$total_registrations_count;
+$status_participants_threshold = ($min_participants_required > 0) ? $min_participants_required : 12;
+$status_participants_max = max(25, $status_participants_threshold);
+
+$status_pledged_current = (int)$total_amount_pledged;
+$status_pledged_threshold = ($funding_goal_idr > 0) ? $funding_goal_idr : 700000;
+$status_pledged_max = max(1500000, $status_pledged_threshold);
+
+$participants_fill_pct = max(2, round(($status_participants_current / max(1, $status_participants_max)) * 100, 2));
+$participants_threshold_pct = min(100, round(($status_participants_threshold / max(1, $status_participants_max)) * 100, 2));
+
+$pledges_fill_pct = max(2, round(($status_pledged_current / max(1, $status_pledged_max)) * 100, 2));
+$pledges_threshold_pct = min(100, round(($status_pledged_threshold / max(1, $status_pledged_max)) * 100, 2));
+
+// Currency conversion rates from IDR (hardcoded approximate)
+$currency_options = [
+    'IDR' => 1,
+    'USD' => 0.000064,
+    'EUR' => 0.000059,
+    'CAD' => 0.000087,
+    'GBP' => 0.000050,
+    'MYR' => 0.00030
+];
+
 $gobrik_conn->close();
 
 echo '<!DOCTYPE html>
 <html lang="' . $lang . '">
 <head>
 <meta charset="UTF-8">
-
 ';
 ?>
 
-
-
-<!-- Page CSS & JS Initialization -->
 <?php require_once("../includes/register-inc.php"); ?>
 
+<div class="splash-title-block"></div>
+<div id="splash-bar"></div>
 
-    <div class="splash-title-block"></div>
-    <div id="splash-bar"></div>
+<div id="form-submission-box" style="margin-top: 108px;">
+    <div class="form-container" style="padding-top:0px;">
 
-    <!-- PAGE CONTENT
+        <div style="width:100%;margin:auto;margin-top:5px;">
 
-    <div id="top-page-image" class="gea-logo top-page-image"></div>
--->
-
-
-   <div id="form-submission-box" style="margin-top: 108px;">
-        <div class="form-container" style="padding-top:0px;">
-
-            <div style="width:100%;margin:auto;margin-top:5px;">
-
-                <?php if ($is_registered): ?>
-        <div id="registered-notice" class="top-container-notice">
-            <span style="margin-right:10px;">👍</span>
-            <span> You're registered for this <?php echo $training_type; ?>!  See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
-            <button class="notice-close" aria-label="Close">&times;</button>
-        </div>
-    <?php endif; ?>
-
-        <div class="intro-to-training-wrapper" style="width: 100$; background: var(--course-module); border-radius:15px; padding:10px;">
-
-            <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
-
-
-            <div class="training-title-box">
-                <div class="the-titles">
-                    <h3><?php echo $training_title; ?></h3>
-                    <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
-                    <p style="font-size:1em"><?php echo date("F j, Y", strtotime($training_date)); ?> | <?php echo $training_time_txt; ?></p>
-                    <p style="font-size:1em;"><?php echo $training_type; ?></p>
-                    <p style="font-size:1em;"><span data-lang-id="000-open-to">Open to:</span> <?php echo $registration_scope; ?></p>
-                    <p style="font-size:1em;"><?php echo $display_cost; ?></p>
-                    <button id="rsvp-register-button-desktop" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
-                                                                <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
-                                </button>
-
+            <?php if ($is_registered): ?>
+                <div id="registered-notice" class="top-container-notice">
+                    <span style="margin-right:10px;">👍</span>
+                    <span> You're registered for this <?php echo $training_type; ?>! See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
+                    <button class="notice-close" aria-label="Close">&times;</button>
                 </div>
-                <div class="profile-images">
-                    <img src="<?php echo $feature_photo3_main; ?>">
-                    <p class="profile-names" style="margin-bottom: 10px;">Led by <?php echo $lead_trainer; ?></p>
-                    <p class="profile-names" style="margin-bottom: 10px;font-size:1em;">Language: <?php echo $training_language; ?></p>
-                    <?php if ($show_signup_count === 1): ?>
-                    <div class="profile-names">
-                        <span class="signup-count-text">Registrations:</span>
-                        <span class="signup-count-number"><?php echo $registration_count; ?></span>
-                        <span class="signup-count-text">of <?php echo $no_participants; ?></span>
+            <?php endif; ?>
+
+            <div class="intro-to-training-wrapper" style="width: 100%; background: var(--course-module); border-radius:15px; padding:10px;">
+
+                <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
+
+                <div class="training-title-box">
+                    <div class="the-titles">
+                        <h3><?php echo $training_title; ?></h3>
+                        <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
+                        <p style="font-size:1em"><?php echo date("F j, Y", strtotime($training_date)); ?> | <?php echo $training_time_txt; ?></p>
+                        <p style="font-size:1em;"><?php echo $training_type; ?></p>
+                        <p style="font-size:1em;"><span data-lang-id="000-open-to">Open to:</span> <?php echo $registration_scope; ?></p>
+                        <p style="font-size:1em;"><?php echo $display_cost; ?></p>
+
+                        <button id="rsvp-register-button-desktop" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
+                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
+                        </button>
                     </div>
-                    <?php endif; ?>
+
+                    <div class="profile-images">
+                        <img src="<?php echo $feature_photo3_main; ?>">
+                        <p class="profile-names" style="margin-bottom: 10px;">Led by <?php echo $lead_trainer; ?></p>
+                        <p class="profile-names" style="margin-bottom: 10px;font-size:1em;">Language: <?php echo $training_language; ?></p>
+
+                        <?php if ($show_signup_count === 1): ?>
+                            <div class="profile-names">
+                                <span class="signup-count-text">Registrations:</span>
+                                <span class="signup-count-number"><?php echo $total_registrations_count; ?></span>
+                                <span class="signup-count-text">of <?php echo max($no_participants, $status_participants_threshold); ?></span>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($payment_mode === 'pledge_threshold'): ?>
+                            <div class="register-status-panel">
+                                <div class="register-status-title">Course Progress</div>
+
+                                <div class="register-progress-block">
+                                    <div class="register-progress-label">
+                                        Participant Threshold
+                                        <span><?php echo (int)$status_participants_current; ?> / <?php echo (int)$status_participants_max; ?></span>
+                                    </div>
+                                    <div class="register-progress-bar">
+                                        <div class="register-progress-zone-before" style="width: <?php echo $participants_threshold_pct; ?>%;"></div>
+                                        <div class="register-progress-zone-after" style="left: <?php echo $participants_threshold_pct; ?>%; width: <?php echo max(0, 100 - $participants_threshold_pct); ?>%;"></div>
+                                        <div class="register-progress-fill is-red" style="width: <?php echo $participants_fill_pct; ?>%;"></div>
+                                        <div class="register-progress-threshold" style="left: <?php echo $participants_threshold_pct; ?>%;"></div>
+                                    </div>
+                                    <div class="register-progress-meta">
+                                        <strong>Current:</strong> <?php echo (int)$status_participants_current; ?> &nbsp;|&nbsp;
+                                        <strong>Threshold:</strong> <?php echo (int)$status_participants_threshold; ?>
+                                    </div>
+                                </div>
+
+                                <div class="register-progress-block">
+                                    <div class="register-progress-label">
+                                        Pledge Threshold
+                                        <span><?php echo number_format((int)$status_pledged_current); ?> / <?php echo number_format((int)$status_pledged_max); ?> IDR</span>
+                                    </div>
+                                    <div class="register-progress-bar">
+                                        <div class="register-progress-zone-before" style="width: <?php echo $pledges_threshold_pct; ?>%;"></div>
+                                        <div class="register-progress-zone-after" style="left: <?php echo $pledges_threshold_pct; ?>%; width: <?php echo max(0, 100 - $pledges_threshold_pct); ?>%;"></div>
+                                        <div class="register-progress-fill is-red" style="width: <?php echo $pledges_fill_pct; ?>%;"></div>
+                                        <div class="register-progress-threshold" style="left: <?php echo $pledges_threshold_pct; ?>%;"></div>
+                                    </div>
+                                    <div class="register-progress-meta">
+                                        <strong>Current:</strong> <?php echo number_format((int)$status_pledged_current); ?> IDR &nbsp;|&nbsp;
+                                        <strong>Threshold:</strong> <?php echo number_format((int)$status_pledged_threshold); ?> IDR
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
+
+                <button id="rsvp-register-button-mobile" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
+                    <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
+                </button>
             </div>
 
-            <button id="rsvp-register-button-mobile" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
-                                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
-            </button>
+            <p style="margin-top:20px;font-size:1.5em; padding: 15px;"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
+            <p style="font-size:1.23em; padding: 15px;margin-top: 0px;"><?php echo nl2br($training_agenda); ?></p>
         </div>
-
-
-
-
-               <p style="margin-top:20px;font-size:1.5em; padding: 15px;"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
-
-
-
-               <p style="font-size:1.23em; padding: 15px;margin-top: 0px;"><?php echo nl2br($training_agenda); ?></p>
-
-
-
-
-
-</div>
-
-
-
-
-
 
         <div id="event-details" class="dashboard-panel" style="margin-top:20px;font-size:small;">
             <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo">
@@ -277,41 +375,61 @@ echo '<!DOCTYPE html>
             <p><strong>Country:</strong> <?php echo $training_country; ?></p>
             <p><strong>Location:</strong> <?php echo $training_location; ?></p>
             <p><strong>Language:</strong> <?php echo $training_language; ?></p>
-
-
             <p><strong>Training Logged:</strong> <?php echo $training_logged; ?></p>
             <p><strong>Scope:</strong> <?php echo $registration_scope; ?></p>
-            <p><strong>Cost:</strong> <?php echo $cost; ?></p>
-            <p><strong>Currency:</strong> <?php echo $currency; ?></p>
             <p><strong>Display Cost:</strong> <?php echo $display_cost; ?></p>
+            <p><strong>Payment Mode:</strong> <?php echo $payment_mode; ?></p>
+            <?php if ($payment_mode === 'pledge_threshold'): ?>
+                <p><strong>Suggested Price:</strong> <?php echo number_format($default_price_idr); ?> IDR</p>
+                <p><strong>Funding Goal:</strong> <?php echo number_format($funding_goal_idr); ?> IDR</p>
+                <p><strong>Minimum Registrants:</strong> <?php echo $min_participants_required; ?></p>
+                <p><strong>Pledge Status:</strong> <?php echo $threshold_status; ?></p>
+            <?php endif; ?>
         </div>
 
         <button id="rsvp-bottom-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: pointer; width:100%;">
-            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑Register"); ?>
+            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
         </button>
 
-</div>
-
-
-
     </div>
-
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- JavaScript to handle RSVP click -->
 <script>
+const TRAINING_PAYMENT_MODE = <?php echo json_encode($payment_mode); ?>;
+const SUGGESTED_AMOUNT_IDR = <?php echo (int)$default_price_idr; ?>;
+const TRAINING_ID = <?php echo (int)$training_id; ?>;
+const ECOBRICKER_ID = <?php echo json_encode($ecobricker_id); ?>;
+
+const CURRENCY_RATES = {
+    IDR: 1,
+    USD: 0.000064,
+    EUR: 0.000059,
+    CAD: 0.000087,
+    GBP: 0.000050,
+    MYR: 0.00030
+};
+
+function formatCurrencyFromIdr(idrAmount, currency) {
+    const safeIdr = Number(idrAmount || 0);
+    if (currency === 'IDR') {
+        return new Intl.NumberFormat('en-US', {
+            maximumFractionDigits: 0
+        }).format(safeIdr) + ' IDR';
+    }
+
+    const converted = safeIdr * (CURRENCY_RATES[currency] || 1);
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    }).format(converted) + ' ' + currency;
+}
+
+function getConvertedAmount(idrAmount, currency) {
+    const safeIdr = Number(idrAmount || 0);
+    if (currency === 'IDR') return Math.round(safeIdr);
+    return Number((safeIdr * (CURRENCY_RATES[currency] || 1)).toFixed(2));
+}
+
 document.getElementById("rsvp-bottom-button").addEventListener("click", handleRegistrationClick);
 var rsvpDesk = document.getElementById("rsvp-register-button-desktop");
 if (rsvpDesk) rsvpDesk.addEventListener("click", handleRegistrationClick);
@@ -323,23 +441,34 @@ function handleRegistrationClick() {
         <?php if ($is_registered): ?>
             openCancelRegistrationModal();
         <?php else: ?>
-            openConfirmRegistrationModal(
-                <?php echo json_encode($training_name); ?>,
-                <?php echo json_encode($training_type); ?>,
-                <?php echo json_encode($training_date); ?>,
-                <?php echo json_encode($training_time_txt); ?>,
-                <?php echo json_encode($training_location); ?>,
-                <?php echo json_encode($display_cost); ?>,
-                <?php echo json_encode($users_email_address); ?>,
-                <?php echo json_encode($first_name); ?>
-            );
+            if (TRAINING_PAYMENT_MODE === 'pledge_threshold') {
+                open3PRegistrationModal(
+                    <?php echo json_encode($training_name); ?>,
+                    <?php echo json_encode($training_type); ?>,
+                    <?php echo json_encode($training_date); ?>,
+                    <?php echo json_encode($training_time_txt); ?>,
+                    <?php echo json_encode($training_location); ?>,
+                    <?php echo json_encode($users_email_address); ?>,
+                    <?php echo json_encode($first_name); ?>
+                );
+            } else {
+                openConfirmRegistrationModal(
+                    <?php echo json_encode($training_name); ?>,
+                    <?php echo json_encode($training_type); ?>,
+                    <?php echo json_encode($training_date); ?>,
+                    <?php echo json_encode($training_time_txt); ?>,
+                    <?php echo json_encode($training_location); ?>,
+                    <?php echo json_encode($display_cost); ?>,
+                    <?php echo json_encode($users_email_address); ?>,
+                    <?php echo json_encode($first_name); ?>
+                );
+            }
         <?php endif; ?>
     <?php else: ?>
         openInfoModal();
     <?php endif; ?>
 }
 </script>
-
 
 <script>
 function openInfoModal() {
@@ -367,7 +496,6 @@ function openInfoModal() {
     document.body.classList.add('modal-open');
 }
 
-// Function to close the modal
 function closeInfoModal() {
     const modal = document.getElementById('form-modal-message');
     modal.style.display = 'none';
@@ -392,13 +520,112 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
                 <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled" style="flex:1;width:80%;">✅ Confirm Registration</a>
                 <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button" style="background:grey;flex:1;width:80%;">Back to Course</a>
             </div>
-            <p style="font-size:1em; color: grey;" >Upon confirmation we will send you the access links and information to your Buwana account e-mail: <b>${userEmail}</b></p>
+            <p style="font-size:1em; color: grey;">Upon confirmation we will send you the access links and information to your Buwana account e-mail: <b>${userEmail}</b></p>
         </div>
     `;
 
     messageContainer.innerHTML = content;
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
+}
+
+function open3PRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, userEmail, firstName) {
+    const modal = document.getElementById('form-modal-message');
+    const messageContainer = modal.querySelector('.modal-message');
+    const photobox = document.getElementById('modal-photo-box');
+    photobox.style.display = 'none';
+
+    const suggested = Math.max(0, Number(SUGGESTED_AMOUNT_IDR || 0));
+    const min = 0;
+    const max = Math.max(suggested * 2, 1000);
+    const initial = suggested;
+
+    const content = `
+        <div class="threep-modal-wrap">
+            <div class="threep-modal-head">
+                <div>
+                    <h1 style="margin-bottom:6px;">🤝</h1>
+                    <h2 style="margin-top:0;">Pledge for ${trainingName}</h2>
+                </div>
+                <div class="threep-modal-currency">
+                    <label for="pledge_currency_select" style="font-size:.92em;opacity:.8;">Currency</label>
+                    <select id="pledge_currency_select" class="form-field-style">
+                        <option value="IDR">IDR</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="CAD">CAD</option>
+                        <option value="GBP">GBP</option>
+                        <option value="MYR">MYR</option>
+                    </select>
+                </div>
+            </div>
+
+            <p class="threep-modal-copy">
+                ${firstName}, this course uses Pledge, Proceed and Pay. Your chosen amount is a pledge that helps the course reach the minimum participation and funding threshold needed to happen. You will only be asked to complete payment if the course successfully reaches that threshold.
+            </p>
+
+            <div class="threep-modal-slider-block">
+                <div class="threep-amount-readout" id="threep_amount_readout">${formatCurrencyFromIdr(initial, 'IDR')}</div>
+
+                <div class="threep-slider-row">
+                    <span class="threep-slider-edge">${formatCurrencyFromIdr(min, 'IDR')}</span>
+                    <input type="range" id="threep_pledge_slider" min="${min}" max="${max}" value="${initial}" step="1000">
+                    <span class="threep-slider-edge">${formatCurrencyFromIdr(max, 'IDR')}</span>
+                </div>
+
+                <div class="threep-slider-caption">
+                    Suggested amount: <strong id="threep_suggested_amount">${formatCurrencyFromIdr(suggested, 'IDR')}</strong>
+                </div>
+            </div>
+
+            <div style="display:flex;width:100%;margin-top:20px;flex-flow:column;align-items:center;">
+                <a href="#" id="threep_confirm_button" class="confirm-button enabled" style="flex:1;width:80%;">✅ Confirm Pledge</a>
+                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button" style="background:grey;flex:1;width:80%;">Back to Course</a>
+            </div>
+
+            <p style="font-size:1em; color: grey; margin-top:12px;">
+                Upon confirmation we will record your pledge and send updates to your Buwana account e-mail: <b>${userEmail}</b>
+            </p>
+        </div>
+    `;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+
+    const slider = document.getElementById('threep_pledge_slider');
+    const currencySelect = document.getElementById('pledge_currency_select');
+    const amountReadout = document.getElementById('threep_amount_readout');
+    const suggestedReadout = document.getElementById('threep_suggested_amount');
+    const confirmBtn = document.getElementById('threep_confirm_button');
+    const edgeLabels = document.querySelectorAll('.threep-slider-edge');
+
+    function update3PReadout() {
+        const currency = currencySelect.value;
+        const idrAmount = Number(slider.value || 0);
+
+        amountReadout.textContent = formatCurrencyFromIdr(idrAmount, currency);
+        suggestedReadout.textContent = formatCurrencyFromIdr(suggested, currency);
+
+        if (edgeLabels.length >= 2) {
+            edgeLabels[0].textContent = formatCurrencyFromIdr(min, currency);
+            edgeLabels[1].textContent = formatCurrencyFromIdr(max, currency);
+        }
+
+        const convertedDisplayAmount = getConvertedAmount(idrAmount, currency);
+
+        confirmBtn.href =
+            "registration_confirmation.php?id=<?php echo $training_id; ?>" +
+            "&ecobricker_id=<?php echo $ecobricker_id; ?>" +
+            "&mode=pledge_threshold" +
+            "&pledged_amount_idr=" + encodeURIComponent(idrAmount) +
+            "&display_currency=" + encodeURIComponent(currency) +
+            "&display_amount=" + encodeURIComponent(convertedDisplayAmount);
+    }
+
+    slider.addEventListener('input', update3PReadout);
+    currencySelect.addEventListener('change', update3PReadout);
+    update3PReadout();
 }
 
 <?php if ($is_registered): ?>
@@ -453,7 +680,7 @@ function openUnregisterSuccessModal() {
         <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
             <h1>😿</h1>
             <h2>You're un-enrolled.</h2>
-            <p>We're sorry to see you go!  We hope you can find another course that suits your interests and availability from our course listings</p>
+            <p>We're sorry to see you go! We hope you can find another course that suits your interests and availability from our course listings</p>
             <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
                 <a href="courses.php" class="confirm-button enabled" style="font-size: 1.2em; padding: 10px 20px; cursor: pointer;flex:1;max-width:344px">OK</a>
             </div>
@@ -485,7 +712,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
 <?php endif; ?>
 </script>
 
@@ -501,16 +727,28 @@ if (isset($_GET['status']) && $_GET['status'] == 'relanding') {
 if ($relanding): ?>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    openConfirmRegistrationModal(
-        <?php echo json_encode($training_name); ?>,
-        <?php echo json_encode($training_type); ?>,
-        <?php echo json_encode($training_date); ?>,
-        <?php echo json_encode($training_time_txt); ?>,
-        <?php echo json_encode($training_location); ?>,
-        <?php echo json_encode($display_cost); ?>,
-        <?php echo json_encode($users_email_address); ?>,
-        <?php echo json_encode($first_name); ?>
-    );
+    if (TRAINING_PAYMENT_MODE === 'pledge_threshold') {
+        open3PRegistrationModal(
+            <?php echo json_encode($training_name); ?>,
+            <?php echo json_encode($training_type); ?>,
+            <?php echo json_encode($training_date); ?>,
+            <?php echo json_encode($training_time_txt); ?>,
+            <?php echo json_encode($training_location); ?>,
+            <?php echo json_encode($users_email_address); ?>,
+            <?php echo json_encode($first_name); ?>
+        );
+    } else {
+        openConfirmRegistrationModal(
+            <?php echo json_encode($training_name); ?>,
+            <?php echo json_encode($training_type); ?>,
+            <?php echo json_encode($training_date); ?>,
+            <?php echo json_encode($training_time_txt); ?>,
+            <?php echo json_encode($training_location); ?>,
+            <?php echo json_encode($display_cost); ?>,
+            <?php echo json_encode($users_email_address); ?>,
+            <?php echo json_encode($first_name); ?>
+        );
+    }
 });
 </script>
 <?php endif; ?>
@@ -531,8 +769,7 @@ function openRegistrationSuccessModal(trainingTitle) {
     let content = `
         <div class="preview-title">Registered!</div>
         <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <img src="../webps/registration-confirmed.webp" style="width: 50%;
-  max-width: 400px;">
+            <img src="../webps/registration-confirmed.webp" style="width: 50%; max-width: 400px;">
             <h1>You're registered!</h1>
             <h4>See you at <i>${trainingTitle}</i></h4>
             <p>Check your email for your registration confirmation and Zoom invitation link.</p>
@@ -549,10 +786,7 @@ function openRegistrationSuccessModal(trainingTitle) {
 </script>
 <?php endif; ?>
 
-
-    <!-- FOOTER -->
-
-    <?php require_once("../footer-2026.php"); ?>
+<?php require_once("../footer-2026.php"); ?>
 
 </body>
 </html>
