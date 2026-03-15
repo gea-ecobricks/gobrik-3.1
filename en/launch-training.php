@@ -617,37 +617,27 @@ if (!empty($community_id)) {
       <!-- ===================== 3P SECTION START: TRAINING 3P =================== -->
       <!-- ====================================================================== -->
 
-      <div class="threep-box">
+      <div class="form-row threep-box" style="display:flex;flex-flow:column;background-color:var(--lighter);padding:20px;border:grey 1px solid;border-radius:12px;margin-top:20px;">
 
-      <div class="threep-toggle-row">
+          <div class="threep-toggle-shell" style="display:flex;flex-flow:row;">
+              <div id="left-colum" style="width: 100%;">
+                  <label>💸 Activate Pledge, Proceed and Pay for this course</label>
+                  <p class="form-caption" style="margin-top:10px;">
+                      By default trainings are free access to users. However, Russell and Paula are developing an awesome new collaborative training registration system. Its still in beta, but you can turn it on for your course here and give it a shot!
+                  </p>
+              </div>
 
-      <div class="threep-toggle-copy">
+              <div id="right-column" style="width:100px; justify-content:center;">
+                  <label class="toggle-switch">
+                      <input type="checkbox" id="enable_3p" name="enable_3p" value="1"
+                          <?php echo (($payment_mode ?? 'free') === 'pledge_threshold') ? 'checked' : ''; ?>>
+                      <span class="slider"></span>
+                  </label>
+              </div>
+          </div>
 
-      <label class="threep-toggle-title">
-      💸 Activate Pledge, Proceed and Pay for this course
-      </label>
-
-      <p class="form-caption">
-      By default trainings are free access to users. However, Russell and Paula are developing an awesome new collaborative training registration system. Its still in beta, but you can turn it on for your course here and give it a shot!
-      </p>
-
-      </div>
-
-      <div class="threep-toggle-control">
-
-      <label class="toggle-switch">
-      <input type="checkbox" id="enable_3p" name="enable_3p" value="1"
-      <?php echo (($payment_mode ?? 'free') === 'pledge_threshold') ? 'checked' : ''; ?>>
-      <span class="slider"></span>
-      </label>
-
-      </div>
-      </div>
-
-
-      <div id="threep-settings-box" style="display:none;">
-
-      <hr class="threep-hr">
+          <div id="threep-settings-box" style="display:none; width:100%;">
+              <hr class="threep-hr">
 
       <!-- ===================== Pricing ===================== -->
 
