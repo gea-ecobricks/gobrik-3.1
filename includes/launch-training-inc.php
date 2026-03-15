@@ -5,6 +5,184 @@
 
 <STYLE>
 
+/* ===================================================================== */
+/* ======================== 3P SECTION STYLES =========================== */
+/* ===================================================================== */
+
+.threep-box {
+    background-color: var(--lighter);
+    padding: 20px;
+    border: 1px solid grey;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.threep-toggle-row {
+    display: flex;
+    flex-flow: row;
+    gap: 20px;
+    align-items: center;
+}
+
+.threep-toggle-copy {
+    width: 100%;
+}
+
+.threep-toggle-title {
+    font-size: 1.1em;
+    font-weight: 500;
+    display: block;
+}
+
+.threep-toggle-control {
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.threep-hr {
+    margin: 18px 0 22px 0;
+    border: 0;
+    border-top: 1px solid rgba(0,0,0,0.18);
+}
+
+.threep-subtitle {
+    font-size: 1.55em;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: var(--text);
+}
+
+.threep-section-divider {
+    border-top: 2px dotted rgba(0,0,0,0.2);
+    margin: 12px 0 18px 0;
+}
+
+.threep-field-card {
+    background: rgba(255,255,255,0.22);
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.currency-input-wrap {
+    display: grid;
+    grid-template-columns: 70px 1fr 70px;
+    align-items: center;
+    gap: 8px;
+}
+
+.currency-prefix,
+.currency-suffix {
+    font-size: 0.95em;
+    font-weight: 500;
+    color: var(--subdued-text, #555);
+    text-align: center;
+}
+
+.currency-display-input {
+    text-align: right;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 22px;
+    align-items: start;
+    margin-top: 10px;
+}
+
+.threep-status-textbox {
+    background: rgba(255,255,255,0.22);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.08);
+    line-height: 1.9;
+}
+
+.threep-progress-block {
+    background: rgba(255,255,255,0.22);
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.threep-progress-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    font-size: 0.98em;
+}
+
+.threep-progress-label span {
+    font-weight: 400;
+    opacity: 0.8;
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.threep-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 999px;
+}
+
+.threep-progress-fill.is-red {
+    background: linear-gradient(90deg, #d9534f 0%, #e56b67 100%);
+}
+
+.threep-progress-threshold {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 0;
+    border-left: 2px dotted rgba(0,0,0,0.65);
+    z-index: 3;
+}
+
+.threep-progress-meta {
+    margin-top: 8px;
+    font-size: 0.92em;
+    opacity: 0.8;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+    .threep-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .threep-toggle-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .threep-toggle-control {
+        width: auto;
+        justify-content: flex-start;
+    }
+
+    .currency-input-wrap {
+        grid-template-columns: 58px 1fr 58px;
+    }
+}
+
 
 
 .form-item input {
