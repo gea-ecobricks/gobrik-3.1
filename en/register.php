@@ -336,7 +336,11 @@ echo '<!DOCTYPE html>
                         <p class="register-meta-line"><span data-lang-id="000-open-to">Open to:</span> <?php echo $registration_scope; ?></p>
                         <p class="register-meta-line"><?php echo $display_cost; ?></p>
 
-                        <button id="rsvp-register-button-desktop" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
+                        <button
+                            type="button"
+                            id="rsvp-register-button-desktop"
+                            onclick="handleRegistrationClick(event)"
+                            class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                             <?php echo $primary_button_text; ?>
                         </button>
                     </div>
