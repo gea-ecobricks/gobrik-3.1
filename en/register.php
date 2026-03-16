@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php';
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.31';
+$version = '0.32';
 $page = 'register';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn();
@@ -61,6 +61,9 @@ $ready_to_show = 0;
 $show_signup_count = 0;
 $no_participants = 0;
 $pledge_deadline_display = 'the pledge deadline';
+$pledged_amount_from_query = 0;
+$pledged_display_currency_from_query = 'IDR';
+$pledged_display_amount_from_query = '';
 
 // Check if the user is logged in
 if ($is_logged_in) {
@@ -256,6 +259,17 @@ $currency_options = [
     'MYR' => 0.00030
 ];
 
+// Values for pledged success modal from redirect query
+if (isset($_GET['pledged_amount_idr'])) {
+    $pledged_amount_from_query = intval($_GET['pledged_amount_idr']);
+}
+if (isset($_GET['display_currency']) && $_GET['display_currency'] !== '') {
+    $pledged_display_currency_from_query = preg_replace('/[^A-Z]/', '', strtoupper($_GET['display_currency']));
+}
+if (isset($_GET['display_amount']) && $_GET['display_amount'] !== '') {
+    $pledged_display_amount_from_query = (string)$_GET['display_amount'];
+}
+
 $gobrik_conn->close();
 
 echo '<!DOCTYPE html>
@@ -270,52 +284,52 @@ echo '<!DOCTYPE html>
 <div class="splash-title-block"></div>
 <div id="splash-bar"></div>
 
-<div id="form-submission-box" style="margin-top: 108px;">
-    <div class="form-container" style="padding-top:0px;">
+<div id="form-submission-box" class="register-page-shell">
+    <div class="form-container register-page-container">
 
-        <div style="width:100%;margin:auto;margin-top:5px;">
+        <div class="register-content-wrap">
 
             <?php if ($is_registered): ?>
                 <div id="registered-notice" class="top-container-notice">
-                    <span style="margin-right:10px;">👍</span>
-                    <span> You're registered for this <?php echo $training_type; ?>! See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
+                    <span class="notice-icon">👍</span>
+                    <span>You're registered for this <?php echo $training_type; ?>! See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
                     <button class="notice-close" aria-label="Close">&times;</button>
                 </div>
             <?php endif; ?>
 
             <?php if (isset($_GET['pledged']) && $_GET['pledged'] == 1): ?>
                 <div id="pledged-notice" class="top-container-notice">
-                    <span style="margin-right:10px;">🤝</span>
-                    <span>Your pledge to participate has been made! Trainers notified and public stats updated.</span>
+                    <span class="notice-icon">🤝</span>
+                    <span>Your pledge to participate has been made! Trainers notified and public stats updated 👇.</span>
                     <button class="notice-close" aria-label="Close">&times;</button>
                 </div>
             <?php endif; ?>
 
-            <div class="intro-to-training-wrapper" style="width: 100%; background: var(--course-module); border-radius:15px; padding:10px;">
+            <div class="intro-to-training-wrapper register-intro-card">
 
-                <img src="<?php echo $feature_photo1_main; ?>" style="width:100%;border-radius: 10px;" id="event-lead-photo">
+                <img src="<?php echo $feature_photo1_main; ?>" class="register-lead-photo" id="event-lead-photo">
 
                 <div class="training-title-box">
                     <div class="the-titles">
                         <h3><?php echo $training_title; ?></h3>
-                        <h4 style="margin: 10px 0px 10px 0px;"><?php echo $training_subtitle; ?></h4>
-                        <p style="font-size:1em"><?php echo date("F j, Y", strtotime($training_date)); ?> | <?php echo $training_time_txt; ?></p>
-                        <p style="font-size:1em;"><?php echo $training_type; ?></p>
-                        <p style="font-size:1em;"><span data-lang-id="000-open-to">Open to:</span> <?php echo $registration_scope; ?></p>
-                        <p style="font-size:1em;"><?php echo $display_cost; ?></p>
+                        <h4 class="register-subtitle"><?php echo $training_subtitle; ?></h4>
+                        <p class="register-meta-line"><?php echo date("F j, Y", strtotime($training_date)); ?> | <?php echo $training_time_txt; ?></p>
+                        <p class="register-meta-line"><?php echo $training_type; ?></p>
+                        <p class="register-meta-line"><span data-lang-id="000-open-to">Open to:</span> <?php echo $registration_scope; ?></p>
+                        <p class="register-meta-line"><?php echo $display_cost; ?></p>
 
-                        <button id="rsvp-register-button-desktop" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
+                        <button id="rsvp-register-button-desktop" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                             <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                         </button>
                     </div>
 
                     <div class="profile-images">
                         <img src="<?php echo $feature_photo3_main; ?>">
-                        <p class="profile-names" style="margin-bottom: 10px;">Led by <?php echo $lead_trainer; ?></p>
-                        <p class="profile-names" style="margin-bottom: 10px;font-size:1em;">Language: <?php echo $training_language; ?></p>
+                        <p class="profile-names register-profile-line">Led by <?php echo $lead_trainer; ?></p>
+                        <p class="profile-names register-profile-line register-profile-line-small">Language: <?php echo $training_language; ?></p>
 
                         <?php if ($show_signup_count === 1): ?>
-                            <div class="profile-names">
+                            <div class="profile-names register-signup-line">
                                 <span class="signup-count-text">Registrations:</span>
                                 <span class="signup-count-number"><?php echo $total_registrations_count; ?></span>
                                 <span class="signup-count-text">of <?php echo max($no_participants, $status_participants_threshold); ?></span>
@@ -364,17 +378,17 @@ echo '<!DOCTYPE html>
                     </div>
                 </div>
 
-                <button id="rsvp-register-button-mobile" class="<?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;font-size: 1.3em; padding: 10px 20px; cursor: pointer;">
+                <button id="rsvp-register-button-mobile" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                     <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                 </button>
             </div>
 
-            <p style="margin-top:20px;font-size:1.5em; padding: 15px;"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
-            <p style="font-size:1.23em; padding: 15px;margin-top: 0px;"><?php echo nl2br($training_agenda); ?></p>
+            <p class="register-featured-description"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
+            <p class="register-agenda"><?php echo nl2br($training_agenda); ?></p>
         </div>
 
-        <div id="event-details" class="dashboard-panel" style="margin-top:20px;font-size:small;">
-            <img src="<?php echo $feature_photo2_main; ?>" style="width:100%;padding:10px;" id="event-lead-photo">
+        <div id="event-details" class="dashboard-panel register-details-panel">
+            <img src="<?php echo $feature_photo2_main; ?>" class="register-details-photo" id="event-lead-photo">
 
             <h2><?php echo $training_type; ?></h2>
 
@@ -400,7 +414,7 @@ echo '<!DOCTYPE html>
             <?php endif; ?>
         </div>
 
-        <button id="rsvp-bottom-button" class="confirm-button <?php echo $is_registered ? '' : 'enabled'; ?>" style="margin-top: 20px;margin-bottom:75px; font-size: 1.3em; padding: 10px 20px; cursor: pointer; width:100%;">
+        <button id="rsvp-bottom-button" class="confirm-button register-bottom-button <?php echo $is_registered ? '' : 'enabled'; ?>">
             <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
         </button>
 
@@ -413,6 +427,9 @@ const SUGGESTED_AMOUNT_IDR = <?php echo (int)$default_price_idr; ?>;
 const TRAINING_ID = <?php echo (int)$training_id; ?>;
 const ECOBRICKER_ID = <?php echo json_encode($ecobricker_id); ?>;
 const PLEDGE_DEADLINE_DISPLAY = <?php echo json_encode($pledge_deadline_display); ?>;
+const PLEDGED_AMOUNT_QUERY = <?php echo (int)$pledged_amount_from_query; ?>;
+const PLEDGED_DISPLAY_CURRENCY_QUERY = <?php echo json_encode($pledged_display_currency_from_query); ?>;
+const PLEDGED_DISPLAY_AMOUNT_QUERY = <?php echo json_encode($pledged_display_amount_from_query); ?>;
 
 const CURRENCY_RATES = {
     IDR: 1,
@@ -442,6 +459,15 @@ function getConvertedAmount(idrAmount, currency) {
     const safeIdr = Number(idrAmount || 0);
     if (currency === 'IDR') return Math.round(safeIdr);
     return Number((safeIdr * (CURRENCY_RATES[currency] || 1)).toFixed(2));
+}
+
+function escapeHtml(str) {
+    return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
 }
 
 document.getElementById("rsvp-bottom-button").addEventListener("click", handleRegistrationClick);
@@ -482,6 +508,64 @@ function handleRegistrationClick() {
         openInfoModal();
     <?php endif; ?>
 }
+
+function activateCustomTooltips(scope = document) {
+    const nodes = scope.querySelectorAll('[data-tooltip]');
+    nodes.forEach(node => {
+        if (node.dataset.tooltipBound === '1') return;
+        node.dataset.tooltipBound = '1';
+
+        let tooltipEl = null;
+
+        function showTooltip() {
+            tooltipEl = document.createElement('div');
+            tooltipEl.className = 'custom-tooltip-bubble';
+            tooltipEl.textContent = node.getAttribute('data-tooltip');
+            document.body.appendChild(tooltipEl);
+
+            const rect = node.getBoundingClientRect();
+            const tipRect = tooltipEl.getBoundingClientRect();
+
+            let top = window.scrollY + rect.top - tipRect.height - 10;
+            let left = window.scrollX + rect.left + (rect.width / 2) - (tipRect.width / 2);
+
+            if (left < 8) left = 8;
+            if (left + tipRect.width > window.innerWidth - 8) {
+                left = window.innerWidth - tipRect.width - 8;
+            }
+            if (top < window.scrollY + 8) {
+                top = window.scrollY + rect.bottom + 10;
+            }
+
+            tooltipEl.style.top = `${top}px`;
+            tooltipEl.style.left = `${left}px`;
+            requestAnimationFrame(() => tooltipEl.classList.add('visible'));
+        }
+
+        function hideTooltip() {
+            if (tooltipEl) {
+                tooltipEl.remove();
+                tooltipEl = null;
+            }
+        }
+
+        node.addEventListener('mouseenter', showTooltip);
+        node.addEventListener('mouseleave', hideTooltip);
+        node.addEventListener('focus', showTooltip);
+        node.addEventListener('blur', hideTooltip);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    activateCustomTooltips(document);
+
+    document.querySelectorAll('.notice-close').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const notice = this.closest('.top-container-notice');
+            if (notice) notice.style.display = 'none';
+        });
+    });
+});
 </script>
 
 <script>
@@ -493,21 +577,22 @@ function openInfoModal() {
     photobox.style.display = 'none';
 
     const content = `
-        <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
+        <div class="register-modal-stack register-modal-centered">
             <h1>🔑</h1>
             <h2>Login to Register</h2>
             <p>To register for this course you must use your GoBrik account.</p>
-            <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>?status=relanding" class="confirm-button enabled" style="width:77%;">Login</a>
-                <a href="signup.php" class="confirm-button enabled" style="width:77%;">Sign Up</a>
+            <div class="register-modal-actions register-modal-actions-column">
+                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>?status=relanding" class="confirm-button enabled register-modal-action-wide">Login</a>
+                <a href="signup.php" class="confirm-button enabled register-modal-action-wide">Sign Up</a>
             </div>
-            <p style="font-size: 1em; color: grey;">GoBrik authentication is powered by Buwana SSO for regenerative apps</p>
+            <p class="register-modal-footnote">GoBrik authentication is powered by Buwana SSO for regenerative apps</p>
         </div>
     `;
 
     messageContainer.innerHTML = content;
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
+    activateCustomTooltips(messageContainer);
 }
 
 function closeInfoModal() {
@@ -524,23 +609,24 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
     photobox.style.display = 'none';
 
     const content = `
-        <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
+        <div class="register-modal-stack register-modal-centered">
             <div>
                 <h1>🗓️</h1>
-                <h2>${trainingName}</h2>
-                <p>${firstName}, please confirm your registration to this ${trainingType} taking place at ${trainingDate} (${trainingTime}) on ${trainingLocation}. The training is ${displayCost} so there is no need to make any initial payments.</p>
+                <h2>${escapeHtml(trainingName)}</h2>
+                <p>${escapeHtml(firstName)}, please confirm your registration to this ${escapeHtml(trainingType)} taking place at ${escapeHtml(trainingDate)} (${escapeHtml(trainingTime)}) on ${escapeHtml(trainingLocation)}. The training is ${escapeHtml(displayCost)} so there is no need to make any initial payments.</p>
             </div>
-            <div style="display:flex;width:100%;margin-top:20px;flex-flow:column">
-                <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled" style="flex:1;width:80%;">✅ Confirm Registration</a>
-                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button" style="background:grey;flex:1;width:80%;">Back to Course</a>
+            <div class="register-modal-actions register-modal-actions-column">
+                <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled register-modal-action-wide">✅ Confirm Registration</a>
+                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button register-modal-action-wide register-button-muted">Back to Course</a>
             </div>
-            <p style="font-size:1em; color: grey;">Upon confirmation we will send you the access links and information to your Buwana account e-mail: <b>${userEmail}</b></p>
+            <p class="register-modal-footnote">Upon confirmation we will send you the access links and information to your Buwana account e-mail: <b>${escapeHtml(userEmail)}</b></p>
         </div>
     `;
 
     messageContainer.innerHTML = content;
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
+    activateCustomTooltips(messageContainer);
 }
 
 function open3PRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, userEmail, firstName) {
@@ -557,20 +643,20 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const content = `
         <div class="threep-modal-wrap">
 
-            <div style="font-size:.95em;color:#888;margin-bottom:8px;">${trainingName}</div>
+            <div class="threep-training-kicker">${escapeHtml(trainingName)}</div>
 
             <div class="threep-modal-head">
-                <div style="width:100%;">
-                    <h1 style="margin-bottom:6px;">🤝</h1>
-                    <h2 style="margin-top:0;">Pledge your Participation</h2>
+                <div class="threep-modal-head-main">
+                    <h2 class="threep-modal-title">Pledge your Participation</h2>
                 </div>
             </div>
 
             <p class="threep-modal-copy">
-                ${firstName}, this course uses
+                ${escapeHtml(firstName)}, this course uses
                 <span
-                    style="text-decoration:underline dotted; cursor:help;"
-                    title="This is new collaborative funding course, webinar and training funding system developed by the Gobal Ecobrick Alliance. It allows you and your community to take part in making courses happen-- or not (and that's ok too!)."
+                    class="threep-help-underline"
+                    data-tooltip="This is new collaborative funding course, webinar and training funding system developed by the Gobal Ecobrick Alliance. It allows you and your community to take part in making courses happen-- or not (and that's ok too!)."
+                    tabindex="0"
                 >Pledge, Proceed and Pay</span>.
                 Your chosen amount is a pledge that helps the course reach the minimum participation and funding threshold needed to happen. You will only be asked to complete payment if the course successfully reaches that threshold.
             </p>
@@ -584,19 +670,20 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
                     <span class="threep-slider-edge">${formatCurrencyFromIdr(max, 'IDR')}</span>
                 </div>
 
-                <div class="threep-suggested-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap;">
-                    <div style="font-size:.95em;">
+                <div class="threep-suggested-row">
+                    <div class="threep-suggested-copy">
                         Trainer
                         <span
-                            style="text-decoration:underline dotted; cursor:help;"
-                            title="This is the amount the leaders of this course have set as a requested exchange for their time and expertise. However, by using the 3P system, they are happily open to you selecting what you can afford to pay"
+                            class="threep-help-underline"
+                            data-tooltip="This is the amount the leaders of this course have set as a requested exchange for their time and expertise. However, by using the 3P system, they are happily open to you selecting what you can afford to pay"
+                            tabindex="0"
                         >suggested amount</span>:
                         <strong id="threep_suggested_amount">${formatCurrencyFromIdr(suggested, 'IDR')}</strong>
                     </div>
 
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="font-size:.9em;opacity:.8;">Switch currency</span>
-                        <select id="pledge_currency_select" class="form-field-style" style="padding:5px 8px;font-size:.9em;min-width:76px;max-width:90px;">
+                    <div class="threep-currency-switcher">
+                        <span class="threep-currency-switch-label">Switch currency</span>
+                        <select id="pledge_currency_select" class="form-field-style threep-currency-select">
                             <option value="IDR">IDR</option>
                             <option value="USD">USD</option>
                             <option value="EUR">EUR</option>
@@ -608,22 +695,21 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
                 </div>
             </div>
 
-            <div style="display:flex;width:100%;margin-top:20px;flex-flow:column;align-items:center;">
-                <a href="#" id="threep_confirm_button" class="confirm-button enabled" style="flex:1;width:80%;">✅ Confirm Course Pledge</a>
-                <p style="font-size:.95em; color: grey; margin-top:12px; max-width:80%;">
-                    You will not be asked to pay for this course until it has passed its participation and funding threshold by ${PLEDGE_DEADLINE_DISPLAY}. When it does (or doesn't!) we'll drop you a line to let you complete your payment.
+            <div class="register-modal-actions register-modal-actions-column register-modal-actions-centered">
+                <a href="#" id="threep_confirm_button" class="confirm-button enabled register-modal-action-wide">🤝 Confirm Course Pledge</a>
+                <p class="threep-confirm-footnote">
+                    You will not be asked to pay for this course until it has passed its participation and funding threshold by ${escapeHtml(PLEDGE_DEADLINE_DISPLAY)}. When it does (or doesn't!) we'll drop you a line to let you complete your payment.
                 </p>
             </div>
 
-            <p style="font-size:1em; color: grey; margin-top:12px;">
-                Upon confirmation we will record your pledge and send updates to your Buwana account e-mail: <b>${userEmail}</b>
-            </p>
+            <p class="register-modal-footnote">Upon confirmation we will record your pledge and send updates to your Buwana account e-mail: <b>${escapeHtml(userEmail)}</b></p>
         </div>
     `;
 
     messageContainer.innerHTML = content;
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
+    activateCustomTooltips(messageContainer);
 
     const slider = document.getElementById('threep_pledge_slider');
     const currencySelect = document.getElementById('pledge_currency_select');
@@ -669,15 +755,15 @@ function openCancelRegistrationModal() {
     photobox.style.display = 'none';
 
     const content = `
-        <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
+        <div class="register-modal-stack register-modal-centered">
             <div>
                 <h1>💔</h1>
                 <h2>Cancel Registration?</h2>
                 <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
             </div>
-            <div style="display:flex;gap:10px;width:100%;margin-top:20px;">
-                <a href="#" id="confirm-unregister" class="confirm-button" style="background:red;color:white;flex:1;">Cancel Registration</a>
-                <a href="courses.php" class="confirm-button" style="background:grey;flex:1;">↩️ Back to Courses</a>
+            <div class="register-modal-actions">
+                <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">Cancel Registration</a>
+                <a href="courses.php" class="confirm-button register-button-muted register-modal-action-half">↩️ Back to Courses</a>
             </div>
         </div>
     `;
@@ -700,6 +786,7 @@ function openCancelRegistrationModal() {
             .catch(() => alert('Unable to cancel registration.'));
     });
 }
+<?php endif; ?>
 
 function openUnregisterSuccessModal() {
     const modal = document.getElementById('form-modal-message');
@@ -709,12 +796,12 @@ function openUnregisterSuccessModal() {
     photobox.style.display = 'none';
 
     const content = `
-        <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between;text-align:center;">
+        <div class="register-modal-stack register-modal-centered">
             <h1>😿</h1>
             <h2>You're un-enrolled.</h2>
             <p>We're sorry to see you go! We hope you can find another course that suits your interests and availability from our course listings</p>
-            <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="courses.php" class="confirm-button enabled" style="font-size: 1.2em; padding: 10px 20px; cursor: pointer;flex:1;max-width:344px">OK</a>
+            <div class="register-modal-actions register-modal-actions-column">
+                <a href="courses.php" class="confirm-button enabled register-modal-action-wide">OK</a>
             </div>
         </div>
     `;
@@ -744,7 +831,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-<?php endif; ?>
 </script>
 
 <?php
@@ -800,13 +886,13 @@ function openRegistrationSuccessModal(trainingTitle) {
 
     let content = `
         <div class="preview-title">Registered!</div>
-        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <img src="../webps/registration-confirmed.webp" style="width: 50%; max-width: 400px;">
+        <div class="register-success-modal">
+            <img src="../webps/registration-confirmed.webp" class="register-success-image">
             <h1>You're registered!</h1>
-            <h4>See you at <i>${trainingTitle}</i></h4>
+            <h4>See you at <i>${escapeHtml(trainingTitle)}</i></h4>
             <p>Check your email for your registration confirmation and Zoom invitation link.</p>
-            <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">Got it!</a>
+            <div class="register-modal-actions register-modal-actions-column">
+                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled register-modal-action-wide">Got it!</a>
             </div>
         </div>
     `;
@@ -821,25 +907,38 @@ function openRegistrationSuccessModal(trainingTitle) {
 <?php if (isset($_GET['pledged']) && $_GET['pledged'] == 1): ?>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    openPledgeSuccessModal("<?php echo htmlspecialchars($training_title, ENT_QUOTES, 'UTF-8'); ?>");
+    openPledgeSuccessModal(
+        <?php echo json_encode($training_title); ?>,
+        <?php echo json_encode($pledge_deadline_display); ?>,
+        <?php echo (int)$pledged_amount_from_query; ?>,
+        <?php echo json_encode($pledged_display_currency_from_query); ?>,
+        <?php echo json_encode($pledged_display_amount_from_query); ?>
+    );
 });
 
-function openPledgeSuccessModal(trainingTitle) {
+function openPledgeSuccessModal(trainingTitle, pledgeDeadlineText, pledgedAmountIdr, pledgedDisplayCurrency, pledgedDisplayAmount) {
     const modal = document.getElementById('form-modal-message');
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
 
     photobox.style.display = 'none';
 
+    let amountLine = '';
+    if (pledgedDisplayAmount && pledgedDisplayCurrency) {
+        amountLine = `${pledgedDisplayAmount} ${pledgedDisplayCurrency}`;
+    } else {
+        amountLine = formatCurrencyFromIdr(pledgedAmountIdr || 0, 'IDR');
+    }
+
     let content = `
         <div class="preview-title">Pledge Recorded!</div>
-        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-            <img src="../webps/registration-confirmed.webp" style="width: 50%; max-width: 400px;">
+        <div class="register-success-modal">
+            <img src="../webps/registration-confirmed.webp" class="register-success-image">
             <h1>Your pledge has been made!</h1>
-            <h4>You are now pledged to participate in <i>${trainingTitle}</i></h4>
-            <p>We’ve notified the trainers and updated the public course statistics. If the course reaches its threshold, we’ll email you with the next step to complete your payment.</p>
-            <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
-                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">Got it!</a>
+            <h4>You have pledged <i>${escapeHtml(amountLine)}</i> to participate in <i>${escapeHtml(trainingTitle)}</i></h4>
+            <p>We’ve notified the trainers and updated the public course statistics. Before <b>${escapeHtml(pledgeDeadlineText)}</b>, we’ll get back to you to confirm whether the course is going ahead and provide the way to pay.</p>
+            <div class="register-modal-actions register-modal-actions-column">
+                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled register-modal-action-wide">Got it!</a>
             </div>
         </div>
     `;

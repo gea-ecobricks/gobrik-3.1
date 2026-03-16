@@ -20,6 +20,91 @@
 /* ======================== REGISTER PAGE: 3P UI ======================== */
 /* ===================================================================== */
 
+/* page wrappers */
+.register-page-shell {
+    margin-top: 108px;
+}
+
+.register-page-container {
+    padding-top: 0;
+}
+
+.register-content-wrap {
+    width: 100%;
+    margin: auto;
+    margin-top: 5px;
+}
+
+.register-intro-card {
+    width: 100%;
+    background: var(--course-module);
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.register-lead-photo {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.register-subtitle {
+    margin: 10px 0;
+}
+
+.register-meta-line {
+    font-size: 1em;
+}
+
+.register-profile-line {
+    margin-bottom: 10px;
+}
+
+.register-profile-line-small {
+    font-size: 1em;
+}
+
+.register-signup-line {
+    margin-bottom: 10px;
+}
+
+.register-main-button {
+    margin-top: 20px;
+    font-size: 1.3em;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.register-bottom-button {
+    margin-top: 20px;
+    margin-bottom: 75px;
+    font-size: 1.3em;
+    padding: 10px 20px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.register-featured-description {
+    margin-top: 20px;
+    font-size: 1.5em;
+    padding: 15px;
+}
+
+.register-agenda {
+    font-size: 1.23em;
+    padding: 15px;
+    margin-top: 0;
+}
+
+.register-details-panel {
+    margin-top: 20px;
+    font-size: small;
+}
+
+.register-details-photo {
+    width: 100%;
+    padding: 10px;
+}
+
 /* Top notices */
 .top-container-notice {
     display: flex;
@@ -39,6 +124,11 @@
 #pledged-notice {
     background: #f6f3ea;
     border-left-color: #9a6a3a;
+}
+
+.notice-icon {
+    margin-right: 10px;
+    flex-shrink: 0;
 }
 
 .notice-close {
@@ -161,6 +251,81 @@
 }
 
 /* ===================================================================== */
+/* ======================== SHARED MODAL STYLING ======================== */
+/* ===================================================================== */
+
+.register-modal-stack {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.register-modal-centered {
+    text-align: center;
+}
+
+.register-modal-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.register-modal-actions-column {
+    flex-flow: column;
+    align-items: center;
+}
+
+.register-modal-actions-centered {
+    align-items: center;
+}
+
+.register-modal-action-wide {
+    width: 80%;
+}
+
+.register-modal-action-half {
+    flex: 1;
+}
+
+.register-modal-footnote {
+    font-size: 1em;
+    color: grey;
+    margin-top: 12px;
+}
+
+.register-button-muted {
+    background: grey !important;
+}
+
+.register-button-danger {
+    background: red !important;
+    color: white !important;
+}
+
+.register-success-modal {
+    text-align: center;
+    width: 100%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.register-success-image {
+    width: 50%;
+    max-width: 400px;
+}
+
+.preview-title {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+/* ===================================================================== */
 /* ======================== 3P MODAL STYLING ============================ */
 /* ===================================================================== */
 
@@ -170,12 +335,27 @@
     text-align: center;
 }
 
+.threep-training-kicker {
+    font-size: 0.95em;
+    color: #888;
+    margin-bottom: 8px;
+}
+
 .threep-modal-head {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 16px;
     margin-bottom: 8px;
+}
+
+.threep-modal-head-main {
+    width: 100%;
+}
+
+.threep-modal-title {
+    margin-top: 0;
+    margin-bottom: 6px;
 }
 
 .threep-modal-copy {
@@ -233,23 +413,41 @@
     border-top: 1px dotted rgba(0,0,0,0.14);
 }
 
+.threep-suggested-copy {
+    font-size: 0.95em;
+}
+
 .threep-suggested-row strong {
     font-variant-numeric: tabular-nums;
 }
 
-.threep-suggested-row select {
+.threep-currency-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.threep-currency-switch-label {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.threep-currency-select {
     padding: 5px 8px;
     font-size: 0.9em;
     min-width: 76px;
     max-width: 90px;
 }
 
-.threep-modal-wrap .confirm-button {
-    margin-top: 4px;
+.threep-confirm-footnote {
+    font-size: 0.95em;
+    color: grey;
+    margin-top: 12px;
+    max-width: 80%;
 }
 
 /* ===================================================================== */
-/* ======================== TOOLTIP / HELP TEXT ========================= */
+/* ======================== CUSTOM TOOLTIP UI =========================== */
 /* ===================================================================== */
 
 .threep-help-underline {
@@ -258,21 +456,27 @@
     cursor: help;
 }
 
-/* also support your current inline usage naturally */
-[title] {
-    text-underline-offset: 3px;
+.custom-tooltip-bubble {
+    position: absolute;
+    z-index: 99999;
+    max-width: 320px;
+    background: #2b2b2b;
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
-/* ===================================================================== */
-/* ========================= SUCCESS MODAL TWEAKS ======================= */
-/* ===================================================================== */
-
-.preview-title {
-    font-size: 1rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #777;
-    margin-bottom: 6px;
+.custom-tooltip-bubble.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ===================================================================== */
@@ -298,7 +502,7 @@
         align-items: flex-start;
     }
 
-    .threep-suggested-row > div:last-child {
+    .threep-currency-switcher {
         width: 100%;
         justify-content: space-between;
     }
@@ -307,7 +511,22 @@
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .register-modal-actions {
+        flex-direction: column;
+    }
+
+    .register-modal-action-half,
+    .register-modal-action-wide {
+        width: 100%;
+    }
+
+    .threep-confirm-footnote {
+        max-width: 100%;
+    }
 }
+
+
 
 
 
