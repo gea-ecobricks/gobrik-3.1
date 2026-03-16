@@ -20,7 +20,6 @@
 /* ======================== REGISTER PAGE: 3P UI ======================== */
 /* ===================================================================== */
 
-/* page wrappers */
 .register-page-shell {
     margin-top: 108px;
 }
@@ -105,7 +104,7 @@
     padding: 10px;
 }
 
-/* Top notices */
+/* Notices */
 .top-container-notice {
     display: flex;
     align-items: center;
@@ -144,10 +143,7 @@
     opacity: 1;
 }
 
-/* ===================================================================== */
-/* ===================== REGISTRATION STATUS PANEL ====================== */
-/* ===================================================================== */
-
+/* Status panel */
 .register-status-panel {
     margin-top: 16px;
     width: 100%;
@@ -250,10 +246,7 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* ===================================================================== */
-/* ======================== SHARED MODAL STYLING ======================== */
-/* ===================================================================== */
-
+/* Shared modals */
 .register-modal-stack {
     display: flex;
     flex-direction: column;
@@ -325,20 +318,24 @@
     margin-bottom: 6px;
 }
 
-/* ===================================================================== */
-/* ======================== 3P MODAL STYLING ============================ */
-/* ===================================================================== */
-
+/* 3P modal */
 .threep-modal-wrap {
     display: flex;
     flex-direction: column;
     text-align: center;
 }
 
-.threep-training-kicker {
+.threep-training-kicker-pill {
+    display: inline-block;
+    align-self: center;
+    background: #4ea05a;
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 16px;
     font-size: 0.95em;
-    color: #888;
-    margin-bottom: 8px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
 }
 
 .threep-modal-head {
@@ -384,22 +381,73 @@
 
 .threep-slider-row {
     display: grid;
-    grid-template-columns: minmax(58px,auto) 1fr minmax(58px,auto);
+    grid-template-columns: minmax(72px,auto) 1fr minmax(72px,auto);
     gap: 12px;
     align-items: center;
 }
 
 .threep-slider-edge {
-    font-size: 0.9em;
-    opacity: 0.75;
+    font-size: 0.88em;
     font-variant-numeric: tabular-nums;
     line-height: 1.3;
 }
 
+.threep-edge-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 7px 10px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.threep-edge-pill-zero {
+    background: #e89134;
+}
+
+.threep-edge-pill-max {
+    background: #2d7a34;
+}
+
 #threep_pledge_slider {
+    -webkit-appearance: none;
+    appearance: none;
     width: 100%;
-    accent-color: #5c8f5c;
+    height: 14px;
+    border-radius: 999px;
+    outline: none;
+    background: linear-gradient(90deg, #93d86c 0%, #93d86c 50%, #d9e6d6 50%, #d9e6d6 100%);
     cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+#threep_pledge_slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--pledge-color, #7ccf7a);
+    box-shadow: 0 2px 7px rgba(0,0,0,0.18);
+    cursor: pointer;
+}
+
+#threep_pledge_slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--pledge-color, #7ccf7a);
+    box-shadow: 0 2px 7px rgba(0,0,0,0.18);
+    cursor: pointer;
+}
+
+#threep_pledge_slider::-moz-range-track {
+    height: 14px;
+    border-radius: 999px;
+    background: transparent;
 }
 
 .threep-suggested-row {
@@ -428,28 +476,30 @@
 }
 
 .threep-currency-switch-label {
-    font-size: 0.9em;
+    font-size: 0.84em;
     opacity: 0.8;
 }
 
 .threep-currency-select {
-    padding: 5px 8px;
-    font-size: 0.9em;
-    min-width: 76px;
-    max-width: 90px;
+    padding: 4px 8px;
+    font-size: 0.84em;
+    min-width: 88px;
+    max-width: 96px;
+    line-height: 1.2;
+}
+
+.threep-confirm-button {
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .threep-confirm-footnote {
     font-size: 0.95em;
-    color: grey;
+    color: var(--subdued-text);
     margin-top: 12px;
     max-width: 80%;
 }
 
-/* ===================================================================== */
-/* ======================== CUSTOM TOOLTIP UI =========================== */
-/* ===================================================================== */
-
+/* tooltips */
 .threep-help-underline {
     text-decoration: underline dotted;
     text-underline-offset: 3px;
@@ -479,10 +529,7 @@
     transform: translateY(0);
 }
 
-/* ===================================================================== */
-/* ============================ RESPONSIVE ============================== */
-/* ===================================================================== */
-
+/* responsive */
 @media (max-width: 900px) {
     .threep-modal-head {
         flex-direction: column;
@@ -494,7 +541,7 @@
     }
 
     .threep-slider-edge {
-        display: none;
+        justify-self: center;
     }
 
     .threep-suggested-row {
@@ -525,6 +572,8 @@
         max-width: 100%;
     }
 }
+
+
 
 
 
