@@ -845,22 +845,15 @@ function openCancelRegistrationModal() {
 
     photobox.style.display = 'none';
 
-    const title = IS_PLEDGED ? 'Cancel Pledge?' : 'Cancel Registration?';
-    const copy = IS_PLEDGED
-        ? 'Are you sure you want to cancel your pledge for this course?<br>This will remove your participation pledge and update the public stats.'
-        : 'Are you sure you want to un-enroll from this course?<br>If you\\'ve made a payment it cannot be refunded.';
-
-    const actionText = IS_PLEDGED ? 'Cancel Pledge' : 'Cancel Registration';
-
     const content = `
         <div class="register-modal-stack register-modal-centered">
             <div>
                 <h1>💔</h1>
-                <h2>${title}</h2>
-                <p>${copy}</p>
+                <h2>Cancel Registration?</h2>
+                <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
             </div>
             <div class="register-modal-actions">
-                <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">${actionText}</a>
+                <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">Cancel Registration</a>
                 <a href="courses.php" class="confirm-button register-button-muted register-modal-action-half">↩️ Back to Courses</a>
             </div>
         </div>
@@ -870,19 +863,24 @@ function openCancelRegistrationModal() {
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 
-    document.getElementById('confirm-unregister').addEventListener('click', function(e) {
-        e.preventDefault();
-        fetch('../api/unregister_training.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>')
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    openUnregisterSuccessModal();
-                } else {
-                    alert('Unable to cancel registration.');
-                }
-            })
-            .catch(() => alert('Unable to cancel registration.'));
-    });
+    const confirmBtn = document.getElementById('confirm-unregister');
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            fetch('../api/unregister_training.php?id=' + TRAINING_ID + '&ecobricker_id=' + ECOBRICKER_ID)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        openUnregisterSuccessModal();
+                    } else {
+                        alert('Unable to cancel registration.');
+                    }
+                })
+                .catch(() => alert('Unable to cancel registration.'));
+        });
+    }
 }
 
 function openUnregisterSuccessModal() {
