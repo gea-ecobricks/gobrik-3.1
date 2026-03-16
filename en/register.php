@@ -934,9 +934,8 @@ function openPledgeSuccessModal(trainingTitle, pledgeDeadlineText, pledgedAmount
         <div class="preview-title">Pledge Recorded!</div>
         <div class="register-success-modal">
             <img src="../webps/registration-confirmed.webp" class="register-success-image">
-            <h1>Your pledge has been made!</h1>
-            <h4>You have pledged <i>${escapeHtml(amountLine)}</i> to participate in <i>${escapeHtml(trainingTitle)}</i></h4>
-            <p>We’ve notified the trainers and updated the public course statistics. Before <b>${escapeHtml(pledgeDeadlineText)}</b>, we’ll get back to you to confirm whether the course is going ahead and provide the way to pay.</p>
+            <h3>Your pledge has been made!</h3>
+            <p>You have pledged <b>${escapeHtml(amountLine)}</b> to participate in <b>${escapeHtml(trainingTitle)}</b>.  We’ve notified the trainers and updated the public course statistics. Before <b>${escapeHtml(pledgeDeadlineText)}</b>, we’ll get back to you to confirm whether the course is going ahead and provide the way to pay.</p>
             <div class="register-modal-actions register-modal-actions-column">
                 <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled register-modal-action-wide">Got it!</a>
             </div>
