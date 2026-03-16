@@ -442,7 +442,6 @@ echo '<!DOCTYPE html>
 
 
 
-
 <script>
 const TRAINING_PAYMENT_MODE = <?php echo json_encode($payment_mode); ?>;
 const SUGGESTED_AMOUNT_IDR = <?php echo (int)$default_price_idr; ?>;
@@ -579,7 +578,9 @@ function activateCustomTooltips(scope = document) {
     });
 }
 
-function handleRegistrationClick() {
+function handleRegistrationClick(e) {
+    if (e) e.preventDefault();
+
     <?php if ($is_logged_in && $ecobricker_id !== null): ?>
         <?php if ($is_registered): ?>
             openCancelRegistrationModal();
@@ -612,12 +613,56 @@ function handleRegistrationClick() {
     <?php endif; ?>
 }
 
+function bindRegisterButtons() {
+    const btns = [
+        document.getElementById('rsvp-bottom-button'),
+        document.getElementById('rsvp-register-button-desktop'),
+        document.getElementById('rsvp-register-button-mobile')
+    ];
+
+    btns.forEach(btn => {
+        if (!btn) return;
+        if (btn.dataset.registerBound === '1') return;
+
+        btn.dataset.registerBound = '1';
+        btn.style.pointerEvents = 'auto';
+        btn.style.cursor = 'pointer';
+
+        btn.addEventListener('click', handleRegistrationClick);
+    });
+
+    if (IS_PLEDGED || IS_CONFIRMED_REGISTRATION) {
+        const hoverText = IS_PLEDGED ? '💔 Cancel Pledge' : '💔 Cancel Registration';
+
+        btns.forEach(btn => {
+            if (!btn) return;
+            if (btn.dataset.hoverBound === '1') return;
+
+            btn.dataset.hoverBound = '1';
+
+            btn.addEventListener('mouseenter', function() {
+                this.dataset.originalText = this.innerHTML;
+                this.style.background = '#777';
+                this.innerHTML = hoverText;
+            });
+
+            btn.addEventListener('mouseleave', function() {
+                this.innerHTML = this.dataset.originalText || this.innerHTML;
+                this.style.background = '';
+            });
+        });
+    }
+}
+
 function openInfoModal() {
     const modal = document.getElementById('form-modal-message');
+    if (!modal) return;
+
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
+    if (!messageContainer) return;
 
-    photobox.style.display = 'none';
+    if (photobox) photobox.style.display = 'none';
 
     const content = `
         <div class="register-modal-stack register-modal-centered">
@@ -640,16 +685,20 @@ function openInfoModal() {
 
 function closeInfoModal() {
     const modal = document.getElementById('form-modal-message');
+    if (!modal) return;
     modal.style.display = 'none';
     document.body.classList.remove('modal-open');
 }
 
 function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, displayCost, userEmail, firstName) {
     const modal = document.getElementById('form-modal-message');
+    if (!modal) return;
+
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
+    if (!messageContainer) return;
 
-    photobox.style.display = 'none';
+    if (photobox) photobox.style.display = 'none';
 
     const content = `
         <div class="register-modal-stack register-modal-centered">
@@ -674,10 +723,13 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
 
 function open3PRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, userEmail, firstName) {
     const modal = document.getElementById('form-modal-message');
+    if (!modal) return;
+
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
+    if (!messageContainer) return;
 
-    photobox.style.display = 'none';
+    if (photobox) photobox.style.display = 'none';
 
     const suggested = Math.max(0, Number(SUGGESTED_AMOUNT_IDR || 0));
     const min = 0;
@@ -763,6 +815,8 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const edgeZero = document.getElementById('threep_edge_zero');
     const edgeMax = document.getElementById('threep_edge_max');
 
+    if (!slider || !currencySelect || !amountReadout || !suggestedReadout || !confirmBtn || !edgeZero || !edgeMax) return;
+
     function update3PReadout() {
         const currency = currencySelect.value;
         const idrAmount = Number(slider.value || 0);
@@ -798,10 +852,13 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
 function openCancelRegistrationModal() {
     const modal = document.getElementById('form-modal-message');
+    if (!modal) return;
+
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
+    if (!messageContainer) return;
 
-    photobox.style.display = 'none';
+    if (photobox) photobox.style.display = 'none';
 
     const modalTitle = IS_PLEDGED ? 'Cancel Pledge?' : 'Cancel Registration?';
     const modalBody = IS_PLEDGED
@@ -849,10 +906,13 @@ function openCancelRegistrationModal() {
 
 function openUnregisterSuccessModal() {
     const modal = document.getElementById('form-modal-message');
+    if (!modal) return;
+
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
+    if (!messageContainer) return;
 
-    photobox.style.display = 'none';
+    if (photobox) photobox.style.display = 'none';
 
     const title = IS_PLEDGED ? 'Your pledge has been cancelled.' : 'You\\'re un-enrolled.';
     const body = IS_PLEDGED
@@ -877,14 +937,7 @@ function openUnregisterSuccessModal() {
 
 document.addEventListener('DOMContentLoaded', function() {
     activateCustomTooltips(document);
-
-    const rsvpBottom = document.getElementById('rsvp-bottom-button');
-    const rsvpDesk = document.getElementById('rsvp-register-button-desktop');
-    const rsvpMob = document.getElementById('rsvp-register-button-mobile');
-
-    if (rsvpBottom) rsvpBottom.addEventListener('click', handleRegistrationClick);
-    if (rsvpDesk) rsvpDesk.addEventListener('click', handleRegistrationClick);
-    if (rsvpMob) rsvpMob.addEventListener('click', handleRegistrationClick);
+    bindRegisterButtons();
 
     document.querySelectorAll('.notice-close').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -892,27 +945,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (notice) notice.style.display = 'none';
         });
     });
-
-    if (IS_PLEDGED || IS_CONFIRMED_REGISTRATION) {
-        const btns = [rsvpBottom, rsvpDesk, rsvpMob];
-        const hoverText = IS_PLEDGED ? '💔 Cancel Pledge' : '💔 Cancel Registration';
-
-        btns.forEach(btn => {
-            if (!btn) return;
-
-            btn.addEventListener('mouseenter', function() {
-                this.dataset.originalText = this.innerHTML;
-                this.style.background = '#777';
-                this.innerHTML = hoverText;
-            });
-
-            btn.addEventListener('mouseleave', function() {
-                this.innerHTML = this.dataset.originalText || this.innerHTML;
-                this.style.background = '';
-            });
-        });
-    }
 });
+
+// immediate fallback binding too
+bindRegisterButtons();
 </script>
 
 <?php

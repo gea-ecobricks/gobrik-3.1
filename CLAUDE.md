@@ -197,6 +197,69 @@ When adding new UI strings, add translations to **all four language files**.
 
 ---
 
+## Training Registration & the 3P System
+
+### `en/register.php` — Course Registration Page
+
+`/en/register.php` is the public-facing course registration page for a specific training. It is accessed via `register.php?id={training_id}` and handles all registration flows — free, and paid via the **3P system**.
+
+The page supports three auth states:
+- **Not logged in** — shows training details and a button that opens a login prompt modal
+- **Logged in, not yet registered** — opens a registration confirmation modal (free) or the 3P pledge modal (paid)
+- **Logged in, already registered/pledged** — button shows current status and opens a cancel/unregister modal
+
+The page does **not** include `auth/session_start.php` (intentional — it is semi-public). Auth state is determined via `isLoggedIn()` from `earthenAuth_helper.php`. The button handler `handleRegistrationClick()` is PHP-rendered at page load and branches based on `$is_logged_in` and `$ecobricker_id !== null`.
+
+Page styles live in `/includes/register-inc.php` (alongside all modal CSS for this page).
+
+---
+
+### 3P — Pledge, Proceed and Pay
+
+**3P** (Pledge, Proceed and Pay) is GoBrik's collaborative course-funding system. Instead of requiring upfront payment, 3P allows learners to pledge a chosen amount toward a course. The course only proceeds — and payment is collected — if it reaches both a **participant threshold** and a **funding threshold** by a pledge deadline.
+
+**How it works:**
+1. Trainer creates a course with `payment_mode = 'pledge_threshold'` in `tb_trainings`
+2. Learner visits `register.php?id={training_id}` and clicks Register
+3. A slider modal lets the learner choose their pledge amount (in IDR, with currency conversion display)
+4. On confirm, the learner is redirected to `registration_confirmation.php` with pledge parameters
+5. The pledge is recorded in `training_pledges_tb` and the registration in `training_registrations_tb`
+6. Progress bars on `register.php` show live participant and funding progress toward thresholds
+7. If the course reaches threshold by the pledge deadline, learners are notified and asked to pay
+8. If it doesn't reach threshold, pledges are voided and no payment is collected
+
+**Key 3P fields in `tb_trainings`:**
+
+| Field | Purpose |
+|---|---|
+| `payment_mode` | `'free'` or `'pledge_threshold'` |
+| `base_currency` | Base currency for pricing (default: `IDR`) |
+| `default_price_idr` | Trainer's suggested pledge amount in IDR |
+| `funding_goal_idr` | Total funding threshold required |
+| `min_participants_required` | Minimum registrant count required |
+| `pledge_deadline` | Deadline for pledges to count |
+| `payment_deadline` | Deadline for payment after threshold is reached |
+| `threshold_status` | `'open'`, `'reached'`, or `'cancelled'` |
+
+**Key 3P database tables** — see full schema at [`docs/3p_payments_schema.sql`](docs/3p_payments_schema.sql):
+
+| Table | Purpose |
+|---|---|
+| `training_registrations_tb` | Tracks each learner's registration and status (`reserved`, `pledged`, `awaiting_payment`, `confirmed`) |
+| `training_pledges_tb` | Records each pledge amount, currency, and status (`active`, `invited`, `paid`, `cancelled`) |
+
+**Key files for 3P:**
+
+| File | Purpose |
+|---|---|
+| `/en/register.php` | Public registration page — renders 3P pledge modal and progress bars |
+| `/includes/register-inc.php` | Page styles and CSS for all register page modals including 3P slider UI |
+| `registration_confirmation.php` | Handles pledge/registration confirmation and DB writes |
+| `/api/unregister_training.php` | Cancels a registration or pledge |
+| [`docs/3p_payments_schema.sql`](docs/3p_payments_schema.sql) | Full SQL schema for all 3P tables |
+
+---
+
 ## Key Files Reference
 
 | File | Purpose |
