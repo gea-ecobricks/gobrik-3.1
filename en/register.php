@@ -447,16 +447,25 @@ echo '<!DOCTYPE html>
 
 
 <script>
-const TRAINING_PAYMENT_MODE = <?php echo json_encode($payment_mode); ?>;
+const TRAINING_PAYMENT_MODE = <?php echo json_encode($payment_mode, JSON_HEX_TAG) ?: '""'; ?>;
 const SUGGESTED_AMOUNT_IDR = <?php echo (int)$default_price_idr; ?>;
 const TRAINING_ID = <?php echo (int)$training_id; ?>;
 const ECOBRICKER_ID = <?php echo json_encode($ecobricker_id); ?>;
-const PLEDGE_DEADLINE_DISPLAY = <?php echo json_encode($pledge_deadline_display); ?>;
+const PLEDGE_DEADLINE_DISPLAY = <?php echo json_encode($pledge_deadline_display, JSON_HEX_TAG) ?: '""'; ?>;
 const PLEDGED_AMOUNT_QUERY = <?php echo (int)$pledged_amount_from_query; ?>;
-const PLEDGED_DISPLAY_CURRENCY_QUERY = <?php echo json_encode($pledged_display_currency_from_query); ?>;
-const PLEDGED_DISPLAY_AMOUNT_QUERY = <?php echo json_encode($pledged_display_amount_from_query); ?>;
+const PLEDGED_DISPLAY_CURRENCY_QUERY = <?php echo json_encode($pledged_display_currency_from_query, JSON_HEX_TAG) ?: '""'; ?>;
+const PLEDGED_DISPLAY_AMOUNT_QUERY = <?php echo json_encode($pledged_display_amount_from_query, JSON_HEX_TAG) ?: '""'; ?>;
 const IS_PLEDGED = <?php echo $is_pledged ? 'true' : 'false'; ?>;
 const IS_CONFIRMED_REGISTRATION = <?php echo $is_confirmed_registration ? 'true' : 'false'; ?>;
+
+const TRAINING_NAME = <?php echo json_encode($training_name, JSON_HEX_TAG) ?: '""'; ?>;
+const TRAINING_TYPE_STR = <?php echo json_encode($training_type, JSON_HEX_TAG) ?: '""'; ?>;
+const TRAINING_DATE_STR = <?php echo json_encode($training_date, JSON_HEX_TAG) ?: '""'; ?>;
+const TRAINING_TIME_STR = <?php echo json_encode($training_time_txt, JSON_HEX_TAG) ?: '""'; ?>;
+const TRAINING_LOCATION_STR = <?php echo json_encode($training_location, JSON_HEX_TAG) ?: '""'; ?>;
+const USER_EMAIL = <?php echo json_encode($users_email_address, JSON_HEX_TAG) ?: '""'; ?>;
+const USER_FIRST_NAME = <?php echo json_encode($first_name, JSON_HEX_TAG) ?: '""'; ?>;
+const DISPLAY_COST_STR = <?php echo json_encode($display_cost, JSON_HEX_TAG) ?: '""'; ?>;
 
 const CURRENCY_RATES = {
     IDR: 1,
@@ -591,24 +600,24 @@ function handleRegistrationClick(e) {
         <?php else: ?>
             if (TRAINING_PAYMENT_MODE === 'pledge_threshold') {
                 open3PRegistrationModal(
-                    <?php echo json_encode($training_name); ?>,
-                    <?php echo json_encode($training_type); ?>,
-                    <?php echo json_encode($training_date); ?>,
-                    <?php echo json_encode($training_time_txt); ?>,
-                    <?php echo json_encode($training_location); ?>,
-                    <?php echo json_encode($users_email_address); ?>,
-                    <?php echo json_encode($first_name); ?>
+                    TRAINING_NAME,
+                    TRAINING_TYPE_STR,
+                    TRAINING_DATE_STR,
+                    TRAINING_TIME_STR,
+                    TRAINING_LOCATION_STR,
+                    USER_EMAIL,
+                    USER_FIRST_NAME
                 );
             } else {
                 openConfirmRegistrationModal(
-                    <?php echo json_encode($training_name); ?>,
-                    <?php echo json_encode($training_type); ?>,
-                    <?php echo json_encode($training_date); ?>,
-                    <?php echo json_encode($training_time_txt); ?>,
-                    <?php echo json_encode($training_location); ?>,
-                    <?php echo json_encode($display_cost); ?>,
-                    <?php echo json_encode($users_email_address); ?>,
-                    <?php echo json_encode($first_name); ?>
+                    TRAINING_NAME,
+                    TRAINING_TYPE_STR,
+                    TRAINING_DATE_STR,
+                    TRAINING_TIME_STR,
+                    TRAINING_LOCATION_STR,
+                    DISPLAY_COST_STR,
+                    USER_EMAIL,
+                    USER_FIRST_NAME
                 );
             }
         <?php endif; ?>
@@ -616,6 +625,7 @@ function handleRegistrationClick(e) {
         openInfoModal();
     <?php endif; ?>
 }
+window.handleRegistrationClick = handleRegistrationClick;
 
 function bindRegisterButtons() {
     const btns = [
