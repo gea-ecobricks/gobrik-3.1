@@ -121,8 +121,8 @@
 }
 
 #pledged-notice {
-    background: #f6f3ea;
-    border-left-color: #9a6a3a;
+    background: green;
+    border-left-color: yellow;
 }
 
 .notice-icon {
