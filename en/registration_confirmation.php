@@ -327,7 +327,7 @@ try {
     }
 
     $stmt_insert_pledge->bind_param(
-        "iiisis",
+        "iiissis",
         $training_id,
         $buwana_id,
         $pledged_amount_idr,
