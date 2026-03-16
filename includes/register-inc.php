@@ -121,8 +121,13 @@
 }
 
 #pledged-notice {
-    background: green;
-    border-left-color: yellow;
+    background: linear-gradient(90deg, rgba(46, 130, 50, 0.94) 0%, rgba(56, 151, 61, 0.96) 100%);
+    color: #fff;
+    border-left-color: #f0d85c;
+}
+
+#pledged-notice a {
+    color: #fff;
 }
 
 .notice-icon {
@@ -137,6 +142,7 @@
     line-height: 1;
     cursor: pointer;
     opacity: 0.7;
+    color: inherit;
 }
 
 .notice-close:hover {
@@ -328,14 +334,16 @@
 .threep-training-kicker-pill {
     display: inline-block;
     align-self: center;
-    background: #4ea05a;
+    background: linear-gradient(180deg, #5bb567 0%, #3f9850 100%);
     color: #fff;
     border-radius: 999px;
     padding: 8px 16px;
     font-size: 0.95em;
     font-weight: 600;
     margin-bottom: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+    box-shadow:
+        0 2px 6px rgba(0,0,0,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.18);
 }
 
 .threep-modal-head {
@@ -363,11 +371,14 @@
 }
 
 .threep-modal-slider-block {
-    background: rgba(0,0,0,0.035);
+    background: linear-gradient(180deg, rgba(0,0,0,0.038) 0%, rgba(0,0,0,0.028) 100%);
     border: 1px solid rgba(0,0,0,0.07);
     border-radius: 14px;
     padding: 18px 16px 16px 16px;
     margin-top: 6px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 2px 8px rgba(0,0,0,0.04);
 }
 
 .threep-amount-readout {
@@ -400,26 +411,61 @@
     padding: 7px 10px;
     color: #fff;
     font-weight: 600;
+    box-shadow:
+        0 2px 5px rgba(0,0,0,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.14);
 }
 
 .threep-edge-pill-zero {
-    background: #e89134;
+    background: linear-gradient(180deg, #f0a343 0%, #de7f1e 100%);
 }
 
 .threep-edge-pill-max {
-    background: #2d7a34;
+    background: linear-gradient(180deg, #2f8c3b 0%, #21672a 100%);
 }
 
 #threep_pledge_slider {
+    --pledge-color: #7ed957;
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
     height: 14px;
     border-radius: 999px;
     outline: none;
-    background: linear-gradient(90deg, #93d86c 0%, #93d86c 50%, #d9e6d6 50%, #d9e6d6 100%);
     cursor: pointer;
-    transition: background 0.15s ease;
+    background: linear-gradient(90deg, #7ed957 0%, #7ed957 50%, #e4efe3 50%, #e4efe3 100%);
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.16),
+        inset 0 -1px 0 rgba(255,255,255,0.16),
+        0 0 0 rgba(126, 217, 87, 0);
+    transition:
+        background 180ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: background, box-shadow, transform;
+    transform: translateZ(0);
+}
+
+#threep_pledge_slider:hover,
+#threep_pledge_slider:focus {
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.16),
+        inset 0 -1px 0 rgba(255,255,255,0.16),
+        0 0 16px color-mix(in srgb, var(--pledge-color) 28%, transparent);
+}
+
+#threep_pledge_slider:active {
+    transform: scaleY(1.06) translateZ(0);
+    transition:
+        background 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#threep_pledge_slider::-webkit-slider-runnable-track {
+    height: 14px;
+    border-radius: 999px;
+    background: transparent;
 }
 
 #threep_pledge_slider::-webkit-slider-thumb {
@@ -427,27 +473,74 @@
     appearance: none;
     width: 26px;
     height: 26px;
+    margin-top: -6px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 3px solid var(--pledge-color, #7ccf7a);
-    box-shadow: 0 2px 7px rgba(0,0,0,0.18);
+    background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 42%, rgba(247,247,247,0.96) 100%);
+    border: 3px solid var(--pledge-color, #7ed957);
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.18),
+        0 0 0 6px color-mix(in srgb, var(--pledge-color) 20%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.82);
     cursor: pointer;
+    transition:
+        border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, box-shadow, border-color;
+    transform: translateZ(0);
 }
 
-#threep_pledge_slider::-moz-range-thumb {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 3px solid var(--pledge-color, #7ccf7a);
-    box-shadow: 0 2px 7px rgba(0,0,0,0.18);
-    cursor: pointer;
+#threep_pledge_slider:hover::-webkit-slider-thumb,
+#threep_pledge_slider:focus::-webkit-slider-thumb {
+    transform: scale(1.06) translateZ(0);
+    box-shadow:
+        0 3px 10px rgba(0,0,0,0.22),
+        0 0 0 8px color-mix(in srgb, var(--pledge-color) 26%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.88);
+}
+
+#threep_pledge_slider:active::-webkit-slider-thumb {
+    transform: scale(1.1) translateZ(0);
 }
 
 #threep_pledge_slider::-moz-range-track {
     height: 14px;
     border-radius: 999px;
     background: transparent;
+}
+
+#threep_pledge_slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 42%, rgba(247,247,247,0.96) 100%);
+    border: 3px solid var(--pledge-color, #7ed957);
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.18),
+        0 0 0 6px color-mix(in srgb, var(--pledge-color) 20%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.82);
+    cursor: pointer;
+    transition:
+        border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, box-shadow, border-color;
+    transform: translateZ(0);
+}
+
+#threep_pledge_slider:hover::-moz-range-thumb,
+#threep_pledge_slider:focus::-moz-range-thumb {
+    transform: scale(1.06) translateZ(0);
+    box-shadow:
+        0 3px 10px rgba(0,0,0,0.22),
+        0 0 0 8px color-mix(in srgb, var(--pledge-color) 26%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.88);
+}
+
+#threep_pledge_slider:active::-moz-range-thumb {
+    transform: scale(1.1) translateZ(0);
 }
 
 .threep-suggested-row {
@@ -489,7 +582,38 @@
 }
 
 .threep-confirm-button {
-    transition: background 0.15s ease, border-color 0.15s ease;
+    position: relative;
+    overflow: hidden;
+    transition:
+        background 180ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: background, border-color, box-shadow, transform;
+    animation: threep-confirm-soft-pulse 2.8s ease-in-out infinite;
+    transform: translateZ(0);
+}
+
+.threep-confirm-button:hover,
+.threep-confirm-button:focus {
+    transform: translateY(-1px) scale(1.01) translateZ(0);
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.14),
+        0 0 0 8px color-mix(in srgb, var(--pledge-color) 18%, transparent);
+}
+
+.threep-confirm-button::after {
+    content: "";
+    position: absolute;
+    top: -60%;
+    left: -25%;
+    width: 22%;
+    height: 220%;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(18deg);
+    pointer-events: none;
+    opacity: 0.66;
+    animation: threep-button-shimmer 3.6s ease-in-out infinite;
 }
 
 .threep-confirm-footnote {
@@ -527,6 +651,38 @@
 .custom-tooltip-bubble.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* animations */
+@keyframes threep-confirm-soft-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 0 0 rgba(126, 217, 87, 0.00),
+            0 2px 6px rgba(0,0,0,0.10);
+    }
+    50% {
+        box-shadow:
+            0 0 0 6px rgba(126, 217, 87, 0.10),
+            0 6px 16px rgba(0,0,0,0.14);
+    }
+}
+
+@keyframes threep-button-shimmer {
+    0% {
+        left: -30%;
+        opacity: 0;
+    }
+    12% {
+        opacity: 0.48;
+    }
+    28% {
+        left: 108%;
+        opacity: 0.18;
+    }
+    100% {
+        left: 108%;
+        opacity: 0;
+    }
 }
 
 /* responsive */
@@ -572,7 +728,6 @@
         max-width: 100%;
     }
 }
-
 
 
 
