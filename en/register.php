@@ -580,7 +580,7 @@ function activateCustomTooltips(scope = document) {
 }
 
 function handleRegistrationClick() {
-    <?php if ($is_logged_in && isset($ecobricker_id)): ?>
+    <?php if ($is_logged_in && $ecobricker_id !== null): ?>
         <?php if ($is_registered): ?>
             openCancelRegistrationModal();
         <?php else: ?>
@@ -625,7 +625,7 @@ function openInfoModal() {
             <h2>Login to Register</h2>
             <p>To register for this course you must use your GoBrik account.</p>
             <div class="register-modal-actions register-modal-actions-column">
-                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>?status=relanding" class="confirm-button enabled register-modal-action-wide">Login</a>
+                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>&status=relanding" class="confirm-button enabled register-modal-action-wide">Login</a>
                 <a href="signup.php" class="confirm-button enabled register-modal-action-wide">Sign Up</a>
             </div>
             <p class="register-modal-footnote">GoBrik authentication is powered by Buwana SSO for regenerative apps</p>
