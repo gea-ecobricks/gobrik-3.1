@@ -400,7 +400,7 @@ echo '<!DOCTYPE html>
                     </div>
                 </div>
 
-                <button id="rsvp-register-button-mobile" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
+                <button type="button" id="rsvp-register-button-mobile" onclick="handleRegistrationClick(event)" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                     <?php echo $primary_button_text; ?>
                 </button>
             </div>
@@ -436,7 +436,7 @@ echo '<!DOCTYPE html>
             <?php endif; ?>
         </div>
 
-        <button id="rsvp-bottom-button" class="confirm-button register-bottom-button <?php echo $is_registered ? '' : 'enabled'; ?>">
+        <button type="button" id="rsvp-bottom-button" onclick="handleRegistrationClick(event)" class="confirm-button register-bottom-button <?php echo $is_registered ? '' : 'enabled'; ?>">
             <?php echo $primary_button_text; ?>
         </button>
 
@@ -682,6 +682,7 @@ function openInfoModal() {
     `;
 
     messageContainer.innerHTML = content;
+    modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     activateCustomTooltips(messageContainer);
@@ -720,6 +721,7 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
     `;
 
     messageContainer.innerHTML = content;
+    modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     activateCustomTooltips(messageContainer);
@@ -807,6 +809,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     `;
 
     messageContainer.innerHTML = content;
+    modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     activateCustomTooltips(messageContainer);
@@ -885,6 +888,7 @@ function openCancelRegistrationModal() {
     `;
 
     messageContainer.innerHTML = content;
+    modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 
@@ -935,6 +939,7 @@ function openUnregisterSuccessModal() {
     `;
 
     messageContainer.innerHTML = content;
+    modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 }
