@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php';
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.33';
+$version = '0.34';
 $page = 'register';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn();
@@ -74,7 +74,6 @@ if ($is_logged_in) {
     require_once '../gobrikconn_env.php';
     require_once '../buwanaconn_env.php';
 
-    // Fetch the user's location data
     $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
     $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
     $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
@@ -182,7 +181,6 @@ if ($result->num_rows > 0) {
         $pledge_deadline_display = date("F j, Y", strtotime($pledge_deadline));
     }
 
-    // Signup count settings
     $show_signup_count = intval($row['show_signup_count'] ?? 0);
     $no_participants = intval($row['no_participants'] ?? 0);
 
@@ -221,7 +219,6 @@ if ($result->num_rows > 0) {
         exit;
     }
 
-    // Look up language and country names
     require_once '../buwanaconn_env.php';
 
     $training_country = '';
@@ -277,7 +274,6 @@ if (isset($_GET['display_amount']) && $_GET['display_amount'] !== '') {
 
 $gobrik_conn->close();
 
-// Button state labels
 $primary_button_text = '';
 if ($is_pledged) {
     $primary_button_text = "🤝 You're pledged";
@@ -339,8 +335,7 @@ echo '<!DOCTYPE html>
                         <button
                             type="button"
                             id="rsvp-register-button-desktop"
-                            onclick="handleRegistrationClick(event)"
-                            class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
+                            class="register-main-button register-trigger-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                             <?php echo $primary_button_text; ?>
                         </button>
                     </div>
@@ -400,7 +395,10 @@ echo '<!DOCTYPE html>
                     </div>
                 </div>
 
-                <button type="button" id="rsvp-register-button-mobile" onclick="handleRegistrationClick(event)" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
+                <button
+                    type="button"
+                    id="rsvp-register-button-mobile"
+                    class="register-main-button register-trigger-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                     <?php echo $primary_button_text; ?>
                 </button>
             </div>
@@ -436,15 +434,15 @@ echo '<!DOCTYPE html>
             <?php endif; ?>
         </div>
 
-        <button type="button" id="rsvp-bottom-button" onclick="handleRegistrationClick(event)" class="confirm-button register-bottom-button <?php echo $is_registered ? '' : 'enabled'; ?>">
+        <button
+            type="button"
+            id="rsvp-bottom-button"
+            class="confirm-button register-bottom-button register-trigger-button <?php echo $is_registered ? '' : 'enabled'; ?>">
             <?php echo $primary_button_text; ?>
         </button>
 
     </div>
 </div>
-
-
-
 
 <script>
 const TRAINING_PAYMENT_MODE = <?php echo json_encode($payment_mode, JSON_HEX_TAG) ?: '""'; ?>;
@@ -487,15 +485,10 @@ const CURRENCY_LABELS = {
 
 function formatCurrencyFromIdr(idrAmount, currency) {
     const safeIdr = Number(idrAmount || 0);
-
     if (currency === 'IDR') {
-        return new Intl.NumberFormat('en-US', {
-            maximumFractionDigits: 0
-        }).format(safeIdr) + ' IDR';
+        return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(safeIdr) + ' IDR';
     }
-
     const converted = safeIdr * (CURRENCY_RATES[currency] || 1);
-
     return new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2
@@ -520,17 +513,14 @@ function escapeHtml(str) {
 function mixColors(hex1, hex2, t) {
     const c1 = hex1.replace('#', '');
     const c2 = hex2.replace('#', '');
-
     const r = Math.round(parseInt(c1.substring(0, 2), 16) * (1 - t) + parseInt(c2.substring(0, 2), 16) * t);
     const g = Math.round(parseInt(c1.substring(2, 4), 16) * (1 - t) + parseInt(c2.substring(2, 4), 16) * t);
     const b = Math.round(parseInt(c1.substring(4, 6), 16) * (1 - t) + parseInt(c2.substring(4, 6), 16) * t);
-
     return `rgb(${r}, ${g}, ${b})`;
 }
 
 function getPledgeColor(value, min, max, suggested) {
     if (max <= min) return '#7ccf7a';
-
     const safeValue = Math.max(min, Math.min(max, value));
 
     if (safeValue <= suggested) {
@@ -544,7 +534,6 @@ function getPledgeColor(value, min, max, suggested) {
 
 function activateCustomTooltips(scope = document) {
     const nodes = scope.querySelectorAll('[data-tooltip]');
-
     nodes.forEach(node => {
         if (node.dataset.tooltipBound === '1') return;
         node.dataset.tooltipBound = '1';
@@ -564,12 +553,8 @@ function activateCustomTooltips(scope = document) {
             let left = window.scrollX + rect.left + (rect.width / 2) - (tipRect.width / 2);
 
             if (left < 8) left = 8;
-            if (left + tipRect.width > window.innerWidth - 8) {
-                left = window.innerWidth - tipRect.width - 8;
-            }
-            if (top < window.scrollY + 8) {
-                top = window.scrollY + rect.bottom + 10;
-            }
+            if (left + tipRect.width > window.innerWidth - 8) left = window.innerWidth - tipRect.width - 8;
+            if (top < window.scrollY + 8) top = window.scrollY + rect.bottom + 10;
 
             tooltipEl.style.top = `${top}px`;
             tooltipEl.style.left = `${left}px`;
@@ -591,7 +576,7 @@ function activateCustomTooltips(scope = document) {
     });
 }
 
-window.handleRegistrationClick = function(e) {
+function handleRegistrationClick(e) {
     if (e) e.preventDefault();
 
     <?php if ($is_logged_in && $ecobricker_id !== null): ?>
@@ -624,32 +609,23 @@ window.handleRegistrationClick = function(e) {
     <?php else: ?>
         openInfoModal();
     <?php endif; ?>
-};
+}
 
 function bindRegisterButtons() {
-    const btns = [
-        document.getElementById('rsvp-bottom-button'),
-        document.getElementById('rsvp-register-button-desktop'),
-        document.getElementById('rsvp-register-button-mobile')
-    ];
-
+    const btns = document.querySelectorAll('.register-trigger-button');
     btns.forEach(btn => {
-        if (!btn) return;
         if (btn.dataset.registerBound === '1') return;
-
         btn.dataset.registerBound = '1';
         btn.style.pointerEvents = 'auto';
         btn.style.cursor = 'pointer';
-
+        btn.addEventListener('click', handleRegistrationClick);
     });
 
     if (IS_PLEDGED || IS_CONFIRMED_REGISTRATION) {
         const hoverText = IS_PLEDGED ? '💔 Cancel Pledge' : '💔 Cancel Registration';
 
         btns.forEach(btn => {
-            if (!btn) return;
             if (btn.dataset.hoverBound === '1') return;
-
             btn.dataset.hoverBound = '1';
 
             btn.addEventListener('mouseenter', function() {
@@ -666,17 +642,30 @@ function bindRegisterButtons() {
     }
 }
 
-function openInfoModal() {
+function getModalParts() {
     const modal = document.getElementById('form-modal-message');
-    if (!modal) return;
+    if (!modal) {
+        console.error('Missing #form-modal-message');
+        return null;
+    }
 
     const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
-    if (!messageContainer) return;
+    if (!messageContainer) {
+        console.error('Missing .modal-message inside #form-modal-message');
+        return null;
+    }
 
+    const photobox = document.getElementById('modal-photo-box');
+    return { modal, messageContainer, photobox };
+}
+
+function openInfoModal() {
+    const parts = getModalParts();
+    if (!parts) return;
+    const { modal, messageContainer, photobox } = parts;
     if (photobox) photobox.style.display = 'none';
 
-    const content = `
+    messageContainer.innerHTML = `
         <div class="register-modal-stack register-modal-centered">
             <h1>🔑</h1>
             <h2>Login to Register</h2>
@@ -689,7 +678,6 @@ function openInfoModal() {
         </div>
     `;
 
-    messageContainer.innerHTML = content;
     modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
@@ -697,23 +685,19 @@ function openInfoModal() {
 }
 
 function closeInfoModal() {
-    const modal = document.getElementById('form-modal-message');
-    if (!modal) return;
-    modal.style.display = 'none';
+    const parts = getModalParts();
+    if (!parts) return;
+    parts.modal.style.display = 'none';
     document.body.classList.remove('modal-open');
 }
 
 function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, displayCost, userEmail, firstName) {
-    const modal = document.getElementById('form-modal-message');
-    if (!modal) return;
-
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
-    if (!messageContainer) return;
-
+    const parts = getModalParts();
+    if (!parts) return;
+    const { modal, messageContainer, photobox } = parts;
     if (photobox) photobox.style.display = 'none';
 
-    const content = `
+    messageContainer.innerHTML = `
         <div class="register-modal-stack register-modal-centered">
             <div>
                 <h1>🗓️</h1>
@@ -728,7 +712,6 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
         </div>
     `;
 
-    messageContainer.innerHTML = content;
     modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
@@ -736,13 +719,9 @@ function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, 
 }
 
 function open3PRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, userEmail, firstName) {
-    const modal = document.getElementById('form-modal-message');
-    if (!modal) return;
-
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
-    if (!messageContainer) return;
-
+    const parts = getModalParts();
+    if (!parts) return;
+    const { modal, messageContainer, photobox } = parts;
     if (photobox) photobox.style.display = 'none';
 
     const suggested = Math.max(0, Number(SUGGESTED_AMOUNT_IDR || 0));
@@ -750,9 +729,8 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const max = Math.max(suggested * 2, 1000);
     const initial = suggested;
 
-    const content = `
+    messageContainer.innerHTML = `
         <div class="threep-modal-wrap">
-
             <div class="threep-training-kicker-pill">${escapeHtml(trainingName)}</div>
 
             <div class="threep-modal-head">
@@ -816,7 +794,6 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
         </div>
     `;
 
-    messageContainer.innerHTML = content;
     modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
@@ -866,13 +843,9 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 }
 
 function openCancelRegistrationModal() {
-    const modal = document.getElementById('form-modal-message');
-    if (!modal) return;
-
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
-    if (!messageContainer) return;
-
+    const parts = getModalParts();
+    if (!parts) return;
+    const { modal, messageContainer, photobox } = parts;
     if (photobox) photobox.style.display = 'none';
 
     const modalTitle = IS_PLEDGED ? 'Cancel Pledge?' : 'Cancel Registration?';
@@ -881,7 +854,7 @@ function openCancelRegistrationModal() {
         : 'Are you sure you want to un-enroll from this course?<br>If you\\'ve made a payment it cannot be refunded.';
     const actionLabel = IS_PLEDGED ? 'Cancel Pledge' : 'Cancel Registration';
 
-    const content = `
+    messageContainer.innerHTML = `
         <div class="register-modal-stack register-modal-centered">
             <div>
                 <h1>💔</h1>
@@ -895,13 +868,11 @@ function openCancelRegistrationModal() {
         </div>
     `;
 
-    messageContainer.innerHTML = content;
     modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 
     const confirmBtn = document.getElementById('confirm-unregister');
-
     if (confirmBtn) {
         confirmBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -921,13 +892,9 @@ function openCancelRegistrationModal() {
 }
 
 function openUnregisterSuccessModal() {
-    const modal = document.getElementById('form-modal-message');
-    if (!modal) return;
-
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
-    if (!messageContainer) return;
-
+    const parts = getModalParts();
+    if (!parts) return;
+    const { modal, messageContainer, photobox } = parts;
     if (photobox) photobox.style.display = 'none';
 
     const title = IS_PLEDGED ? 'Your pledge has been cancelled.' : 'You\\'re un-enrolled.';
@@ -935,7 +902,7 @@ function openUnregisterSuccessModal() {
         ? 'Your pledge has been removed and the course statistics have been updated.'
         : 'We\\'re sorry to see you go! We hope you can find another course that suits your interests and availability from our course listings';
 
-    const content = `
+    messageContainer.innerHTML = `
         <div class="register-modal-stack register-modal-centered">
             <h1>😿</h1>
             <h2>${title}</h2>
@@ -946,8 +913,59 @@ function openUnregisterSuccessModal() {
         </div>
     `;
 
-    messageContainer.innerHTML = content;
     modal.classList.remove('modal-hidden');
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+}
+
+function openRegistrationSuccessModal(trainingTitle) {
+    const parts = getModalParts();
+    if (!parts) return;
+    const { modal, messageContainer, photobox } = parts;
+    if (photobox) photobox.style.display = 'none';
+
+    messageContainer.innerHTML = `
+        <div class="preview-title">Registered!</div>
+        <div class="register-success-modal">
+            <img src="../webps/registration-confirmed.webp" class="register-success-image">
+            <h1>You're registered!</h1>
+            <h4>See you at <i>${escapeHtml(trainingTitle)}</i></h4>
+            <p>Check your email for your registration confirmation and Zoom invitation link.</p>
+            <div class="register-modal-actions register-modal-actions-column">
+                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled register-modal-action-wide">Got it!</a>
+            </div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+}
+
+function openPledgeSuccessModal(trainingTitle, pledgeDeadlineText, pledgedAmountIdr, pledgedDisplayCurrency, pledgedDisplayAmount) {
+    const parts = getModalParts();
+    if (!parts) return;
+    const { modal, messageContainer, photobox } = parts;
+    if (photobox) photobox.style.display = 'none';
+
+    let amountLine = '';
+    if (pledgedDisplayAmount && pledgedDisplayCurrency) {
+        amountLine = `${pledgedDisplayAmount} ${pledgedDisplayCurrency}`;
+    } else {
+        amountLine = formatCurrencyFromIdr(pledgedAmountIdr || 0, 'IDR');
+    }
+
+    messageContainer.innerHTML = `
+        <div class="preview-title">Pledge Recorded!</div>
+        <div class="register-success-modal">
+            <img src="../webps/registration-confirmed.webp" class="register-success-image">
+            <h3>Your pledge has been made!</h3>
+            <p>You have pledged <b>${escapeHtml(amountLine)}</b> to participate in <b>${escapeHtml(trainingTitle)}</b>. We’ve notified the trainers and updated the public course statistics. Before <b>${escapeHtml(pledgeDeadlineText)}</b>, we’ll get back to you to confirm whether the course is going ahead and provide the way to pay.</p>
+            <div class="register-modal-actions register-modal-actions-column">
+                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled register-modal-action-wide">Got it!</a>
+            </div>
+        </div>
+    `;
+
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 }
@@ -962,86 +980,37 @@ document.addEventListener('DOMContentLoaded', function() {
             if (notice) notice.style.display = 'none';
         });
     });
-});
 
-// immediate fallback binding too
-bindRegisterButtons();
-</script>
-
-<?php
-$relanding = false;
-if (isset($_GET['status']) && $_GET['status'] == 'relanding') {
-    $relanding = true;
-} elseif (isset($_GET['id']) && strpos($_GET['id'], 'status=relanding') !== false) {
-    $relanding = true;
-} elseif (strpos($_SERVER['REQUEST_URI'], 'status=relanding') !== false) {
-    $relanding = true;
-}
-if ($relanding): ?>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
+    <?php if ($relanding ?? false): ?>
     if (TRAINING_PAYMENT_MODE === 'pledge_threshold') {
         open3PRegistrationModal(
-            <?php echo json_encode($training_name); ?>,
-            <?php echo json_encode($training_type); ?>,
-            <?php echo json_encode($training_date); ?>,
-            <?php echo json_encode($training_time_txt); ?>,
-            <?php echo json_encode($training_location); ?>,
-            <?php echo json_encode($users_email_address); ?>,
-            <?php echo json_encode($first_name); ?>
+            TRAINING_NAME,
+            TRAINING_TYPE_STR,
+            TRAINING_DATE_STR,
+            TRAINING_TIME_STR,
+            TRAINING_LOCATION_STR,
+            USER_EMAIL,
+            USER_FIRST_NAME
         );
     } else {
         openConfirmRegistrationModal(
-            <?php echo json_encode($training_name); ?>,
-            <?php echo json_encode($training_type); ?>,
-            <?php echo json_encode($training_date); ?>,
-            <?php echo json_encode($training_time_txt); ?>,
-            <?php echo json_encode($training_location); ?>,
-            <?php echo json_encode($display_cost); ?>,
-            <?php echo json_encode($users_email_address); ?>,
-            <?php echo json_encode($first_name); ?>
+            TRAINING_NAME,
+            TRAINING_TYPE_STR,
+            TRAINING_DATE_STR,
+            TRAINING_TIME_STR,
+            TRAINING_LOCATION_STR,
+            DISPLAY_COST_STR,
+            USER_EMAIL,
+            USER_FIRST_NAME
         );
     }
-});
-</script>
-<?php endif; ?>
+    <?php endif; ?>
 
-<?php if (isset($_GET['registered']) && $_GET['registered'] == 1): ?>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    openRegistrationSuccessModal("<?php echo htmlspecialchars($training_title, ENT_QUOTES, 'UTF-8'); ?>");
-});
+    <?php if (isset($_GET['registered']) && $_GET['registered'] == 1): ?>
+    openRegistrationSuccessModal(<?php echo json_encode($training_title); ?>);
+    <?php endif; ?>
 
-function openRegistrationSuccessModal(trainingTitle) {
-    const modal = document.getElementById('form-modal-message');
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
-
-    photobox.style.display = 'none';
-
-    let content = `
-        <div class="preview-title">Registered!</div>
-        <div class="register-success-modal">
-            <img src="../webps/registration-confirmed.webp" class="register-success-image">
-            <h1>You're registered!</h1>
-            <h4>See you at <i>${escapeHtml(trainingTitle)}</i></h4>
-            <p>Check your email for your registration confirmation and Zoom invitation link.</p>
-            <div class="register-modal-actions register-modal-actions-column">
-                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled register-modal-action-wide">Got it!</a>
-            </div>
-        </div>
-    `;
-
-    messageContainer.innerHTML = content;
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
-}
-</script>
-<?php endif; ?>
-
-<?php if (isset($_GET['pledged']) && $_GET['pledged'] == 1): ?>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
+    <?php if (isset($_GET['pledged']) && $_GET['pledged'] == 1): ?>
     openPledgeSuccessModal(
         <?php echo json_encode($training_title); ?>,
         <?php echo json_encode($pledge_deadline_display); ?>,
@@ -1049,45 +1018,9 @@ document.addEventListener("DOMContentLoaded", function() {
         <?php echo json_encode($pledged_display_currency_from_query); ?>,
         <?php echo json_encode($pledged_display_amount_from_query); ?>
     );
+    <?php endif; ?>
 });
-
-function openPledgeSuccessModal(trainingTitle, pledgeDeadlineText, pledgedAmountIdr, pledgedDisplayCurrency, pledgedDisplayAmount) {
-    const modal = document.getElementById('form-modal-message');
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
-
-    photobox.style.display = 'none';
-
-    let amountLine = '';
-    if (pledgedDisplayAmount && pledgedDisplayCurrency) {
-        amountLine = `${pledgedDisplayAmount} ${pledgedDisplayCurrency}`;
-    } else {
-        amountLine = formatCurrencyFromIdr(pledgedAmountIdr || 0, 'IDR');
-    }
-
-    let content = `
-        <div class="preview-title">Pledge Recorded!</div>
-        <div class="register-success-modal">
-            <img src="../webps/registration-confirmed.webp" class="register-success-image">
-            <h3>Your pledge has been made!</h3>
-            <p>You have pledged <b>${escapeHtml(amountLine)}</b> to participate in <b>${escapeHtml(trainingTitle)}</b>. We’ve notified the trainers and updated the public course statistics. Before <b>${escapeHtml(pledgeDeadlineText)}</b>, we’ll get back to you to confirm whether the course is going ahead and provide the way to pay.</p>
-            <div class="register-modal-actions register-modal-actions-column">
-                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled register-modal-action-wide">Got it!</a>
-            </div>
-        </div>
-    `;
-
-    messageContainer.innerHTML = content;
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
-}
 </script>
-<?php endif; ?>
-
-
-
-
-
 
 <?php require_once("../footer-2026.php"); ?>
 
