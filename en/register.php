@@ -439,472 +439,284 @@ echo '<!DOCTYPE html>
     </div>
 </div>
 
+
+
 <script>
+
+/* =========================================================
+GLOBAL CONSTANTS
+========================================================= */
+
 const TRAINING_PAYMENT_MODE = <?php echo json_encode($payment_mode); ?>;
 const SUGGESTED_AMOUNT_IDR = <?php echo (int)$default_price_idr; ?>;
 const TRAINING_ID = <?php echo (int)$training_id; ?>;
 const ECOBRICKER_ID = <?php echo json_encode($ecobricker_id); ?>;
-const PLEDGE_DEADLINE_DISPLAY = <?php echo json_encode($pledge_deadline_display); ?>;
-const PLEDGED_AMOUNT_QUERY = <?php echo (int)$pledged_amount_from_query; ?>;
-const PLEDGED_DISPLAY_CURRENCY_QUERY = <?php echo json_encode($pledged_display_currency_from_query); ?>;
-const PLEDGED_DISPLAY_AMOUNT_QUERY = <?php echo json_encode($pledged_display_amount_from_query); ?>;
+
 const IS_PLEDGED = <?php echo $is_pledged ? 'true' : 'false'; ?>;
 const IS_CONFIRMED_REGISTRATION = <?php echo $is_confirmed_registration ? 'true' : 'false'; ?>;
 
-const CURRENCY_RATES = {
-    IDR: 1,
-    USD: 0.000064,
-    EUR: 0.000059,
-    CAD: 0.000087,
-    GBP: 0.000050,
-    MYR: 0.00030
+/* =========================================================
+CURRENCY
+========================================================= */
+
+const CURRENCY_RATES={
+IDR:1,
+USD:0.000064,
+EUR:0.000059,
+CAD:0.000087,
+GBP:0.000050,
+MYR:0.00030
 };
 
-const CURRENCY_LABELS = {
-    IDR: '🇮🇩 IDR',
-    USD: '🇺🇸 USD',
-    EUR: '🇪🇺 EUR',
-    CAD: '🇨🇦 CAD',
-    GBP: '🇬🇧 GBP',
-    MYR: '🇲🇾 MYR'
-};
+/* =========================================================
+UTILITIES
+========================================================= */
 
-function formatCurrencyFromIdr(idrAmount, currency) {
-    const safeIdr = Number(idrAmount || 0);
-    if (currency === 'IDR') {
-        return new Intl.NumberFormat('en-US', {
-            maximumFractionDigits: 0
-        }).format(safeIdr) + ' IDR';
-    }
-
-    const converted = safeIdr * (CURRENCY_RATES[currency] || 1);
-    return new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-    }).format(converted) + ' ' + currency;
+function escapeHtml(str){
+return String(str)
+.replaceAll('&','&amp;')
+.replaceAll('<','&lt;')
+.replaceAll('>','&gt;')
+.replaceAll('"','&quot;')
+.replaceAll("'","&#039;");
 }
 
-function getConvertedAmount(idrAmount, currency) {
-    const safeIdr = Number(idrAmount || 0);
-    if (currency === 'IDR') return Math.round(safeIdr);
-    return Number((safeIdr * (CURRENCY_RATES[currency] || 1)).toFixed(2));
+function formatCurrencyFromIdr(idr,currency){
+
+const safe=Number(idr||0);
+
+if(currency==="IDR"){
+return new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(safe)+' IDR';
 }
 
-function escapeHtml(str) {
-    return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+const converted=safe*(CURRENCY_RATES[currency]||1);
+
+return new Intl.NumberFormat('en-US',{
+minimumFractionDigits:0,
+maximumFractionDigits:2
+}).format(converted)+' '+currency;
+
 }
 
-function mixColors(hex1, hex2, t) {
-    const c1 = hex1.replace('#', '');
-    const c2 = hex2.replace('#', '');
+/* =========================================================
+COLOR SYSTEM
+========================================================= */
 
-    const r1 = parseInt(c1.substring(0, 2), 16);
-    const g1 = parseInt(c1.substring(2, 4), 16);
-    const b1 = parseInt(c1.substring(4, 6), 16);
+function mixColors(c1,c2,t){
 
-    const r2 = parseInt(c2.substring(0, 2), 16);
-    const g2 = parseInt(c2.substring(2, 4), 16);
-    const b2 = parseInt(c2.substring(4, 6), 16);
+const r=Math.round(parseInt(c1.substr(1,2),16)*(1-t)+parseInt(c2.substr(1,2),16)*t);
+const g=Math.round(parseInt(c1.substr(3,2),16)*(1-t)+parseInt(c2.substr(3,2),16)*t);
+const b=Math.round(parseInt(c1.substr(5,2),16)*(1-t)+parseInt(c2.substr(5,2),16)*t);
 
-    const r = Math.round(r1 + (r2 - r1) * t);
-    const g = Math.round(g1 + (g2 - g1) * t);
-    const b = Math.round(b1 + (b2 - b1) * t);
+return `rgb(${r},${g},${b})`;
 
-    return `rgb(${r}, ${g}, ${b})`;
 }
 
-function getPledgeColor(value, min, max, suggested) {
-    if (max <= min) return '#7ccf7a';
+function getPledgeColor(v,min,max,suggested){
 
-    const safeValue = Math.max(min, Math.min(max, value));
+if(max<=min)return'#7ccf7a';
 
-    if (safeValue <= suggested) {
-        const t = suggested > min ? (safeValue - min) / (suggested - min) : 1;
-        return mixColors('#e89134', '#93d86c', t);
-    }
+if(v<=suggested){
 
-    const t = max > suggested ? (safeValue - suggested) / (max - suggested) : 1;
-    return mixColors('#93d86c', '#2d7a34', t);
+const t=(v-min)/(suggested-min||1);
+
+return mixColors('#e8902f','#7ed957',t);
+
 }
 
-document.getElementById("rsvp-bottom-button").addEventListener("click", handleRegistrationClick);
-var rsvpDesk = document.getElementById("rsvp-register-button-desktop");
-if (rsvpDesk) rsvpDesk.addEventListener("click", handleRegistrationClick);
-var rsvpMob = document.getElementById("rsvp-register-button-mobile");
-if (rsvpMob) rsvpMob.addEventListener("click", handleRegistrationClick);
+const t=(v-suggested)/(max-suggested||1);
 
-function handleRegistrationClick() {
-    <?php if ($is_logged_in && isset($ecobricker_id)): ?>
-        <?php if ($is_registered): ?>
-            openCancelRegistrationModal();
-        <?php else: ?>
-            if (TRAINING_PAYMENT_MODE === 'pledge_threshold') {
-                open3PRegistrationModal(
-                    <?php echo json_encode($training_name); ?>,
-                    <?php echo json_encode($training_type); ?>,
-                    <?php echo json_encode($training_date); ?>,
-                    <?php echo json_encode($training_time_txt); ?>,
-                    <?php echo json_encode($training_location); ?>,
-                    <?php echo json_encode($users_email_address); ?>,
-                    <?php echo json_encode($first_name); ?>
-                );
-            } else {
-                openConfirmRegistrationModal(
-                    <?php echo json_encode($training_name); ?>,
-                    <?php echo json_encode($training_type); ?>,
-                    <?php echo json_encode($training_date); ?>,
-                    <?php echo json_encode($training_time_txt); ?>,
-                    <?php echo json_encode($training_location); ?>,
-                    <?php echo json_encode($display_cost); ?>,
-                    <?php echo json_encode($users_email_address); ?>,
-                    <?php echo json_encode($first_name); ?>
-                );
-            }
-        <?php endif; ?>
-    <?php else: ?>
-        openInfoModal();
-    <?php endif; ?>
+return mixColors('#7ed957','#1e6a2b',t);
+
 }
 
-function activateCustomTooltips(scope = document) {
-    const nodes = scope.querySelectorAll('[data-tooltip]');
-    nodes.forEach(node => {
-        if (node.dataset.tooltipBound === '1') return;
-        node.dataset.tooltipBound = '1';
+/* =========================================================
+REGISTRATION BUTTON
+========================================================= */
 
-        let tooltipEl = null;
-
-        function showTooltip() {
-            tooltipEl = document.createElement('div');
-            tooltipEl.className = 'custom-tooltip-bubble';
-            tooltipEl.textContent = node.getAttribute('data-tooltip');
-            document.body.appendChild(tooltipEl);
-
-            const rect = node.getBoundingClientRect();
-            const tipRect = tooltipEl.getBoundingClientRect();
-
-            let top = window.scrollY + rect.top - tipRect.height - 10;
-            let left = window.scrollX + rect.left + (rect.width / 2) - (tipRect.width / 2);
-
-            if (left < 8) left = 8;
-            if (left + tipRect.width > window.innerWidth - 8) {
-                left = window.innerWidth - tipRect.width - 8;
-            }
-            if (top < window.scrollY + 8) {
-                top = window.scrollY + rect.bottom + 10;
-            }
-
-            tooltipEl.style.top = `${top}px`;
-            tooltipEl.style.left = `${left}px`;
-            requestAnimationFrame(() => tooltipEl.classList.add('visible'));
-        }
-
-        function hideTooltip() {
-            if (tooltipEl) {
-                tooltipEl.remove();
-                tooltipEl = null;
-            }
-        }
-
-        node.addEventListener('mouseenter', showTooltip);
-        node.addEventListener('mouseleave', hideTooltip);
-        node.addEventListener('focus', showTooltip);
-        node.addEventListener('blur', hideTooltip);
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    activateCustomTooltips(document);
-
-    document.querySelectorAll('.notice-close').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const notice = this.closest('.top-container-notice');
-            if (notice) notice.style.display = 'none';
-        });
-    });
-
-    // Hover state only if the user actually has a current registration/pledge
-    if (IS_PLEDGED || IS_CONFIRMED_REGISTRATION) {
-        const btns = [
-            document.getElementById('rsvp-bottom-button'),
-            document.getElementById('rsvp-register-button-desktop'),
-            document.getElementById('rsvp-register-button-mobile')
-        ];
-
-        const hoverText = IS_PLEDGED ? '💔 Cancel Pledge' : '💔 Cancel Registration';
-
-        btns.forEach(btn => {
-            if (!btn) return;
-            btn.addEventListener('mouseover', function() {
-                this.dataset.originalText = this.innerHTML;
-                this.dataset.originalBg = this.style.background;
-                this.style.background = 'grey';
-                this.innerHTML = hoverText;
-            });
-            btn.addEventListener('mouseout', function() {
-                this.style.background = this.dataset.originalBg || '';
-                this.innerHTML = this.dataset.originalText;
-            });
-        });
-    }
+document.querySelectorAll(
+'#rsvp-bottom-button,#rsvp-register-button-desktop,#rsvp-register-button-mobile'
+).forEach(btn=>{
+if(btn)btn.addEventListener('click',handleRegistrationClick);
 });
-</script>
 
-<script>
-function openInfoModal() {
-    const modal = document.getElementById('form-modal-message');
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
+function handleRegistrationClick(){
 
-    photobox.style.display = 'none';
+<?php if ($is_logged_in && isset($ecobricker_id)): ?>
 
-    const content = `
-        <div class="register-modal-stack register-modal-centered">
-            <h1>🔑</h1>
-            <h2>Login to Register</h2>
-            <p>To register for this course you must use your GoBrik account.</p>
-            <div class="register-modal-actions register-modal-actions-column">
-                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>?status=relanding" class="confirm-button enabled register-modal-action-wide">Login</a>
-                <a href="signup.php" class="confirm-button enabled register-modal-action-wide">Sign Up</a>
-            </div>
-            <p class="register-modal-footnote">GoBrik authentication is powered by Buwana SSO for regenerative apps</p>
-        </div>
-    `;
+<?php if ($is_registered): ?>
 
-    messageContainer.innerHTML = content;
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
-    activateCustomTooltips(messageContainer);
+openCancelRegistrationModal();
+
+<?php else: ?>
+
+if(TRAINING_PAYMENT_MODE==='pledge_threshold'){
+open3PRegistrationModal();
+}else{
+openConfirmRegistrationModal();
 }
 
-function closeInfoModal() {
-    const modal = document.getElementById('form-modal-message');
-    modal.style.display = 'none';
-    document.body.classList.remove('modal-open');
+<?php endif; ?>
+
+<?php else: ?>
+
+openInfoModal();
+
+<?php endif; ?>
+
 }
 
-function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, displayCost, userEmail, firstName) {
-    const modal = document.getElementById('form-modal-message');
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
+/* =========================================================
+3P MODAL
+========================================================= */
 
-    photobox.style.display = 'none';
+function open3PRegistrationModal(){
 
-    const content = `
-        <div class="register-modal-stack register-modal-centered">
-            <div>
-                <h1>🗓️</h1>
-                <h2>${escapeHtml(trainingName)}</h2>
-                <p>${escapeHtml(firstName)}, please confirm your registration to this ${escapeHtml(trainingType)} taking place at ${escapeHtml(trainingDate)} (${escapeHtml(trainingTime)}) on ${escapeHtml(trainingLocation)}. The training is ${escapeHtml(displayCost)} so there is no need to make any initial payments.</p>
-            </div>
-            <div class="register-modal-actions register-modal-actions-column">
-                <a href="registration_confirmation.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>" class="confirm-button enabled register-modal-action-wide">✅ Confirm Registration</a>
-                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button register-modal-action-wide register-button-muted">Back to Course</a>
-            </div>
-            <p class="register-modal-footnote">Upon confirmation we will send you the access links and information to your Buwana account e-mail: <b>${escapeHtml(userEmail)}</b></p>
-        </div>
-    `;
+const modal=document.getElementById('form-modal-message');
+const box=modal.querySelector('.modal-message');
 
-    messageContainer.innerHTML = content;
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
-    activateCustomTooltips(messageContainer);
+const suggested=Math.max(0,Number(SUGGESTED_AMOUNT_IDR||0));
+const min=0;
+const max=Math.max(suggested*2,1000);
+
+box.innerHTML=`
+<div class="threep-modal-wrap">
+
+<h2>Pledge your Participation</h2>
+
+<div class="threep-amount-readout" id="threep_amount_readout"></div>
+
+<input type="range" id="threep_pledge_slider" min="${min}" max="${max}" step="1000">
+
+<a id="threep_confirm_button"
+class="confirm-button enabled threep-confirm-button">
+🤝 Confirm Course Pledge
+</a>
+
+</div>
+`;
+
+modal.style.display='flex';
+
+const slider=document.getElementById('threep_pledge_slider');
+const readout=document.getElementById('threep_amount_readout');
+const btn=document.getElementById('threep_confirm_button');
+
+slider.value=suggested;
+
+function update(){
+
+const v=Number(slider.value||0);
+
+readout.textContent=formatCurrencyFromIdr(v,'IDR');
+
+const pct=(v-min)/(max-min);
+
+const color=getPledgeColor(v,min,max,suggested);
+
+slider.style.setProperty('--pledge-color',color);
+
+slider.style.background=
+`linear-gradient(90deg,
+${color} 0%,
+${color} ${pct*100}%,
+#d9e6d6 ${pct*100}%,
+#d9e6d6 100%)`;
+
+btn.style.background=color;
+btn.style.borderColor=color;
+
+btn.href=
+"registration_confirmation.php?id="+TRAINING_ID+
+"&ecobricker_id="+ECOBRICKER_ID+
+"&mode=pledge_threshold"+
+"&pledged_amount_idr="+encodeURIComponent(v);
+
 }
 
-function open3PRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, userEmail, firstName) {
-    const modal = document.getElementById('form-modal-message');
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
-    photobox.style.display = 'none';
+slider.addEventListener('input',update);
 
-    const suggested = Math.max(0, Number(SUGGESTED_AMOUNT_IDR || 0));
-    const min = 0;
-    const max = Math.max(suggested * 2, 1000);
-    const initial = suggested;
+update();
 
-    const content = `
-        <div class="threep-modal-wrap">
-
-            <div class="threep-training-kicker-pill">${escapeHtml(trainingName)}</div>
-
-            <div class="threep-modal-head">
-                <div class="threep-modal-head-main">
-                    <h2 class="threep-modal-title">Pledge your Participation</h2>
-                </div>
-            </div>
-
-            <p class="threep-modal-copy">
-                ${escapeHtml(firstName)}, this course uses
-                <span
-                    class="threep-help-underline"
-                    data-tooltip="This is new collaborative funding course, webinar and training funding system developed by the Gobal Ecobrick Alliance. It allows you and your community to take part in making courses happen-- or not (and that's ok too!)."
-                    tabindex="0"
-                >Pledge, Proceed and Pay</span>.
-                Your chosen amount is a pledge that helps the course reach the minimum participation and funding threshold needed to happen. You will only be asked to complete payment if the course successfully reaches that threshold.
-            </p>
-
-            <div class="threep-modal-slider-block">
-                <div class="threep-amount-readout" id="threep_amount_readout">${formatCurrencyFromIdr(initial, 'IDR')}</div>
-
-                <div class="threep-slider-row">
-                    <span class="threep-slider-edge threep-edge-pill threep-edge-pill-zero" id="threep_edge_zero">${formatCurrencyFromIdr(min, 'IDR')}</span>
-                    <input type="range" id="threep_pledge_slider" min="${min}" max="${max}" value="${initial}" step="1000">
-                    <span class="threep-slider-edge threep-edge-pill threep-edge-pill-max" id="threep_edge_max">${formatCurrencyFromIdr(max, 'IDR')}</span>
-                </div>
-
-                <div class="threep-suggested-row">
-                    <div class="threep-suggested-copy">
-                        Trainer
-                        <span
-                            class="threep-help-underline"
-                            data-tooltip="This is the amount the leaders of this course have set as a requested exchange for their time and expertise. However, by using the 3P system, they are happily open to you selecting what you can afford to pay"
-                            tabindex="0"
-                        >suggested amount</span>:
-                        <strong id="threep_suggested_amount">${formatCurrencyFromIdr(suggested, 'IDR')}</strong>
-                    </div>
-
-                    <div class="threep-currency-switcher">
-                        <span class="threep-currency-switch-label">Switch currency</span>
-                        <select id="pledge_currency_select" class="form-field-style threep-currency-select">
-                            <option value="IDR">${CURRENCY_LABELS.IDR}</option>
-                            <option value="USD">${CURRENCY_LABELS.USD}</option>
-                            <option value="EUR">${CURRENCY_LABELS.EUR}</option>
-                            <option value="CAD">${CURRENCY_LABELS.CAD}</option>
-                            <option value="GBP">${CURRENCY_LABELS.GBP}</option>
-                            <option value="MYR">${CURRENCY_LABELS.MYR}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="register-modal-actions register-modal-actions-column register-modal-actions-centered">
-                <a href="#" id="threep_confirm_button" class="confirm-button enabled register-modal-action-wide threep-confirm-button">🤝 Confirm Course Pledge</a>
-                <p class="threep-confirm-footnote">
-                    You will not be asked to pay for this course until it has passed its participation and funding threshold by ${escapeHtml(PLEDGE_DEADLINE_DISPLAY)}. When it does (or doesn't!) we'll drop you a line to let you complete your payment.
-                </p>
-            </div>
-
-            <p class="register-modal-footnote">Upon confirmation we will record your pledge and send updates to your Buwana account e-mail: <b>${escapeHtml(userEmail)}</b></p>
-        </div>
-    `;
-
-    messageContainer.innerHTML = content;
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
-    activateCustomTooltips(messageContainer);
-
-    const slider = document.getElementById('threep_pledge_slider');
-    const currencySelect = document.getElementById('pledge_currency_select');
-    const amountReadout = document.getElementById('threep_amount_readout');
-    const suggestedReadout = document.getElementById('threep_suggested_amount');
-    const confirmBtn = document.getElementById('threep_confirm_button');
-    const edgeZero = document.getElementById('threep_edge_zero');
-    const edgeMax = document.getElementById('threep_edge_max');
-
-    function update3PReadout() {
-        const currency = currencySelect.value;
-        const idrAmount = Number(slider.value || 0);
-
-        amountReadout.textContent = formatCurrencyFromIdr(idrAmount, currency);
-        suggestedReadout.textContent = formatCurrencyFromIdr(suggested, currency);
-        edgeZero.textContent = formatCurrencyFromIdr(min, currency);
-        edgeMax.textContent = formatCurrencyFromIdr(max, currency);
-
-        const convertedDisplayAmount = getConvertedAmount(idrAmount, currency);
-        const t = max > min ? (idrAmount - min) / (max - min) : 0;
-        const activeColor = getPledgeColor(idrAmount, min, max, suggested);
-
-        slider.style.setProperty('--pledge-color', activeColor);
-        slider.style.background = `linear-gradient(90deg, ${activeColor} 0%, ${activeColor} ${t * 100}%, #d9e6d6 ${t * 100}%, #d9e6d6 100%)`;
-        confirmBtn.style.background = activeColor;
-        confirmBtn.style.borderColor = activeColor;
-
-        confirmBtn.href =
-            "registration_confirmation.php?id=<?php echo $training_id; ?>" +
-            "&ecobricker_id=<?php echo $ecobricker_id; ?>" +
-            "&mode=pledge_threshold" +
-            "&pledged_amount_idr=" + encodeURIComponent(idrAmount) +
-            "&display_currency=" + encodeURIComponent(currency) +
-            "&display_amount=" + encodeURIComponent(convertedDisplayAmount);
-    }
-
-    slider.addEventListener('input', update3PReadout);
-    currencySelect.addEventListener('change', update3PReadout);
-    update3PReadout();
 }
 
-function openCancelRegistrationModal() {
-    const modal = document.getElementById('form-modal-message');
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
+/* =========================================================
+CANCEL MODAL
+========================================================= */
 
-    photobox.style.display = 'none';
+function openCancelRegistrationModal(){
 
-    const content = `
-        <div class="register-modal-stack register-modal-centered">
-            <div>
-                <h1>💔</h1>
-                <h2>Cancel Registration?</h2>
-                <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
-            </div>
-            <div class="register-modal-actions">
-                <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">Cancel Registration</a>
-                <a href="courses.php" class="confirm-button register-button-muted register-modal-action-half">↩️ Back to Courses</a>
-            </div>
-        </div>
-    `;
+const modal=document.getElementById('form-modal-message');
+const box=modal.querySelector('.modal-message');
 
-    messageContainer.innerHTML = content;
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
+box.innerHTML=`
+<div class="register-modal-stack register-modal-centered">
 
-    const confirmBtn = document.getElementById('confirm-unregister');
+<h1>💔</h1>
 
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+<h2>Cancel Registration?</h2>
 
-            fetch('../api/unregister_training.php?id=' + TRAINING_ID + '&ecobricker_id=' + ECOBRICKER_ID)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        openUnregisterSuccessModal();
-                    } else {
-                        alert('Unable to cancel registration.');
-                    }
-                })
-                .catch(() => alert('Unable to cancel registration.'));
-        });
-    }
+<a href="#" id="confirm-unregister"
+class="confirm-button register-button-danger">
+Cancel Registration
+</a>
+
+</div>
+`;
+
+modal.style.display='flex';
+
+document
+.getElementById('confirm-unregister')
+.addEventListener('click',e=>{
+
+e.preventDefault();
+
+fetch('../api/unregister_training.php?id='+TRAINING_ID+'&ecobricker_id='+ECOBRICKER_ID)
+.then(r=>r.json())
+.then(d=>{
+if(d.success)location.reload();
+else alert('Unable to cancel registration.');
+});
+
+});
+
 }
 
-function openUnregisterSuccessModal() {
-    const modal = document.getElementById('form-modal-message');
-    const messageContainer = modal.querySelector('.modal-message');
-    const photobox = document.getElementById('modal-photo-box');
+/* =========================================================
+HOVER CANCEL STATE
+========================================================= */
 
-    photobox.style.display = 'none';
+document.addEventListener('DOMContentLoaded',()=>{
 
-    const content = `
-        <div class="register-modal-stack register-modal-centered">
-            <h1>😿</h1>
-            <h2>${IS_PLEDGED ? 'Your pledge has been cancelled.' : 'You\\'re un-enrolled.'}</h2>
-            <p>${IS_PLEDGED ? 'Your pledge has been removed and the course statistics have been updated.' : 'We\\'re sorry to see you go! We hope you can find another course that suits your interests and availability from our course listings'}</p>
-            <div class="register-modal-actions register-modal-actions-column">
-                <a href="courses.php" class="confirm-button enabled register-modal-action-wide">OK</a>
-            </div>
-        </div>
-    `;
+if(!(IS_PLEDGED||IS_CONFIRMED_REGISTRATION))return;
 
-    messageContainer.innerHTML = content;
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
-}
+const buttons=[
+document.getElementById('rsvp-bottom-button'),
+document.getElementById('rsvp-register-button-desktop'),
+document.getElementById('rsvp-register-button-mobile')
+];
+
+const text=IS_PLEDGED?'💔 Cancel Pledge':'💔 Cancel Registration';
+
+buttons.forEach(btn=>{
+if(!btn)return;
+
+btn.addEventListener('mouseenter',()=>{
+btn.dataset.originalText=btn.innerHTML;
+btn.innerHTML=text;
+btn.style.background='#777';
+});
+
+btn.addEventListener('mouseleave',()=>{
+btn.innerHTML=btn.dataset.originalText;
+btn.style.background='';
+});
+
+});
+
+});
+
 </script>
 
 <?php
