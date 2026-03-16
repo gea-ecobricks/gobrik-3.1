@@ -591,7 +591,7 @@ function activateCustomTooltips(scope = document) {
     });
 }
 
-function handleRegistrationClick(e) {
+window.handleRegistrationClick = function(e) {
     if (e) e.preventDefault();
 
     <?php if ($is_logged_in && $ecobricker_id !== null): ?>
@@ -624,8 +624,7 @@ function handleRegistrationClick(e) {
     <?php else: ?>
         openInfoModal();
     <?php endif; ?>
-}
-window.handleRegistrationClick = handleRegistrationClick;
+};
 
 function bindRegisterButtons() {
     const btns = [
@@ -642,7 +641,6 @@ function bindRegisterButtons() {
         btn.style.pointerEvents = 'auto';
         btn.style.cursor = 'pointer';
 
-        btn.addEventListener('click', handleRegistrationClick);
     });
 
     if (IS_PLEDGED || IS_CONFIRMED_REGISTRATION) {
