@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php';
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.3';
+$version = '0.31';
 $page = 'register';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn();
@@ -60,6 +60,7 @@ $registration_scope = '';
 $ready_to_show = 0;
 $show_signup_count = 0;
 $no_participants = 0;
+$pledge_deadline_display = 'the pledge deadline';
 
 // Check if the user is logged in
 if ($is_logged_in) {
@@ -158,6 +159,10 @@ if ($result->num_rows > 0) {
     $pledge_deadline = htmlspecialchars($row['pledge_deadline'] ?? '', ENT_QUOTES, 'UTF-8');
     $payment_deadline = htmlspecialchars($row['payment_deadline'] ?? '', ENT_QUOTES, 'UTF-8');
     $threshold_status = htmlspecialchars($row['threshold_status'] ?? 'open', ENT_QUOTES, 'UTF-8');
+
+    if (!empty($pledge_deadline)) {
+        $pledge_deadline_display = date("F j, Y", strtotime($pledge_deadline));
+    }
 
     // Signup count settings
     $show_signup_count = intval($row['show_signup_count'] ?? 0);
@@ -274,6 +279,14 @@ echo '<!DOCTYPE html>
                 <div id="registered-notice" class="top-container-notice">
                     <span style="margin-right:10px;">👍</span>
                     <span> You're registered for this <?php echo $training_type; ?>! See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
+                    <button class="notice-close" aria-label="Close">&times;</button>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['pledged']) && $_GET['pledged'] == 1): ?>
+                <div id="pledged-notice" class="top-container-notice">
+                    <span style="margin-right:10px;">🤝</span>
+                    <span>Your pledge to participate has been made! Trainers notified and public stats updated.</span>
                     <button class="notice-close" aria-label="Close">&times;</button>
                 </div>
             <?php endif; ?>
@@ -399,6 +412,7 @@ const TRAINING_PAYMENT_MODE = <?php echo json_encode($payment_mode); ?>;
 const SUGGESTED_AMOUNT_IDR = <?php echo (int)$default_price_idr; ?>;
 const TRAINING_ID = <?php echo (int)$training_id; ?>;
 const ECOBRICKER_ID = <?php echo json_encode($ecobricker_id); ?>;
+const PLEDGE_DEADLINE_DISPLAY = <?php echo json_encode($pledge_deadline_display); ?>;
 
 const CURRENCY_RATES = {
     IDR: 1,
@@ -542,26 +556,23 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
     const content = `
         <div class="threep-modal-wrap">
+
+            <div style="font-size:.95em;color:#888;margin-bottom:8px;">${trainingName}</div>
+
             <div class="threep-modal-head">
-                <div>
+                <div style="width:100%;">
                     <h1 style="margin-bottom:6px;">🤝</h1>
-                    <h2 style="margin-top:0;">Pledge for ${trainingName}</h2>
-                </div>
-                <div class="threep-modal-currency">
-                    <label for="pledge_currency_select" style="font-size:.92em;opacity:.8;">Currency</label>
-                    <select id="pledge_currency_select" class="form-field-style">
-                        <option value="IDR">IDR</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="CAD">CAD</option>
-                        <option value="GBP">GBP</option>
-                        <option value="MYR">MYR</option>
-                    </select>
+                    <h2 style="margin-top:0;">Pledge your Participation</h2>
                 </div>
             </div>
 
             <p class="threep-modal-copy">
-                ${firstName}, this course uses Pledge, Proceed and Pay. Your chosen amount is a pledge that helps the course reach the minimum participation and funding threshold needed to happen. You will only be asked to complete payment if the course successfully reaches that threshold.
+                ${firstName}, this course uses
+                <span
+                    style="text-decoration:underline dotted; cursor:help;"
+                    title="This is new collaborative funding course, webinar and training funding system developed by the Gobal Ecobrick Alliance. It allows you and your community to take part in making courses happen-- or not (and that's ok too!)."
+                >Pledge, Proceed and Pay</span>.
+                Your chosen amount is a pledge that helps the course reach the minimum participation and funding threshold needed to happen. You will only be asked to complete payment if the course successfully reaches that threshold.
             </p>
 
             <div class="threep-modal-slider-block">
@@ -573,14 +584,35 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
                     <span class="threep-slider-edge">${formatCurrencyFromIdr(max, 'IDR')}</span>
                 </div>
 
-                <div class="threep-slider-caption">
-                    Suggested amount: <strong id="threep_suggested_amount">${formatCurrencyFromIdr(suggested, 'IDR')}</strong>
+                <div class="threep-suggested-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap;">
+                    <div style="font-size:.95em;">
+                        Trainer
+                        <span
+                            style="text-decoration:underline dotted; cursor:help;"
+                            title="This is the amount the leaders of this course have set as a requested exchange for their time and expertise. However, by using the 3P system, they are happily open to you selecting what you can afford to pay"
+                        >suggested amount</span>:
+                        <strong id="threep_suggested_amount">${formatCurrencyFromIdr(suggested, 'IDR')}</strong>
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:.9em;opacity:.8;">Switch currency</span>
+                        <select id="pledge_currency_select" class="form-field-style" style="padding:5px 8px;font-size:.9em;min-width:76px;max-width:90px;">
+                            <option value="IDR">IDR</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="CAD">CAD</option>
+                            <option value="GBP">GBP</option>
+                            <option value="MYR">MYR</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div style="display:flex;width:100%;margin-top:20px;flex-flow:column;align-items:center;">
-                <a href="#" id="threep_confirm_button" class="confirm-button enabled" style="flex:1;width:80%;">✅ Confirm Pledge</a>
-                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button" style="background:grey;flex:1;width:80%;">Back to Course</a>
+                <a href="#" id="threep_confirm_button" class="confirm-button enabled" style="flex:1;width:80%;">✅ Confirm Course Pledge</a>
+                <p style="font-size:.95em; color: grey; margin-top:12px; max-width:80%;">
+                    You will not be asked to pay for this course until it has passed its participation and funding threshold by ${PLEDGE_DEADLINE_DISPLAY}. When it does (or doesn't!) we'll drop you a line to let you complete your payment.
+                </p>
             </div>
 
             <p style="font-size:1em; color: grey; margin-top:12px;">
@@ -773,6 +805,39 @@ function openRegistrationSuccessModal(trainingTitle) {
             <h1>You're registered!</h1>
             <h4>See you at <i>${trainingTitle}</i></h4>
             <p>Check your email for your registration confirmation and Zoom invitation link.</p>
+            <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+                <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">Got it!</a>
+            </div>
+        </div>
+    `;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+}
+</script>
+<?php endif; ?>
+
+<?php if (isset($_GET['pledged']) && $_GET['pledged'] == 1): ?>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    openPledgeSuccessModal("<?php echo htmlspecialchars($training_title, ENT_QUOTES, 'UTF-8'); ?>");
+});
+
+function openPledgeSuccessModal(trainingTitle) {
+    const modal = document.getElementById('form-modal-message');
+    const messageContainer = modal.querySelector('.modal-message');
+    const photobox = document.getElementById('modal-photo-box');
+
+    photobox.style.display = 'none';
+
+    let content = `
+        <div class="preview-title">Pledge Recorded!</div>
+        <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
+            <img src="../webps/registration-confirmed.webp" style="width: 50%; max-width: 400px;">
+            <h1>Your pledge has been made!</h1>
+            <h4>You are now pledged to participate in <i>${trainingTitle}</i></h4>
+            <p>We’ve notified the trainers and updated the public course statistics. If the course reaches its threshold, we’ll email you with the next step to complete your payment.</p>
             <div style="text-align:center;width:100%;margin:auto;margin-top:10px;margin-bottom:10px;">
                 <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled" style="margin-top: 20px; font-size: 1.2em; padding: 10px 20px; cursor: pointer;">Got it!</a>
             </div>

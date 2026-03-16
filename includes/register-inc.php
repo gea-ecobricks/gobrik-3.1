@@ -16,189 +16,296 @@
 
 <STYLE>
 
-
 /* ===================================================================== */
-/* ======================= REGISTER 3P STATUS PANEL ===================== */
+/* ======================== REGISTER PAGE: 3P UI ======================== */
 /* ===================================================================== */
 
-.register-status-panel{
-    margin-top:16px;
-    width:100%;
-    background:rgba(255,255,255,0.14);
-    border:1px solid rgba(0,0,0,0.08);
-    border-radius:12px;
-    padding:14px;
+/* Top notices */
+.top-container-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #f3f8f2;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-left: 6px solid #6aa56a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    line-height: 1.45;
 }
 
-.register-status-title{
-    font-size:1.02em;
-    font-weight:600;
-    margin-bottom:12px;
+#pledged-notice {
+    background: #f6f3ea;
+    border-left-color: #9a6a3a;
 }
 
-.register-progress-block{
-    margin-bottom:14px;
+.notice-close {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
 }
 
-.register-progress-block:last-child{
-    margin-bottom:0;
-}
-
-.register-progress-label{
-    display:flex;
-    justify-content:space-between;
-    gap:8px;
-    font-size:0.92em;
-    font-weight:600;
-    margin-bottom:8px;
-    line-height:1.3;
-}
-
-.register-progress-label span{
-    font-weight:500;
-    opacity:0.8;
-    font-variant-numeric:tabular-nums;
-}
-
-.register-progress-bar{
-    position:relative;
-    width:100%;
-    height:18px;
-    border-radius:999px;
-    overflow:hidden;
-    background:#e4e4e4;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.10);
-}
-
-.register-progress-zone-before{
-    position:absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    background:linear-gradient(180deg, #c7c7c7 0%, #bbbbbb 100%);
-}
-
-.register-progress-zone-after{
-    position:absolute;
-    top:0;
-    bottom:0;
-    background:linear-gradient(180deg, rgba(112,176,120,0.34) 0%, rgba(89,155,96,0.28) 100%);
-}
-
-.register-progress-fill{
-    position:absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    min-width:8px;
-    border-radius:999px;
-}
-
-.register-progress-fill.is-red{
-    background:linear-gradient(90deg, #d85050 0%, #e56868 100%);
-}
-
-.register-progress-threshold{
-    position:absolute;
-    top:-2px;
-    bottom:-2px;
-    width:0;
-    border-left:3px solid rgba(24,24,24,0.88);
-    z-index:5;
-}
-
-.register-progress-meta{
-    margin-top:8px;
-    font-size:0.86em;
-    line-height:1.45;
-    opacity:0.84;
-    font-variant-numeric:tabular-nums;
+.notice-close:hover {
+    opacity: 1;
 }
 
 /* ===================================================================== */
-/* ========================= REGISTER 3P MODAL ========================== */
+/* ===================== REGISTRATION STATUS PANEL ====================== */
 /* ===================================================================== */
 
-.threep-modal-wrap{
-    display:flex;
-    flex-direction:column;
-    text-align:center;
+.register-status-panel {
+    margin-top: 16px;
+    width: 100%;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
 }
 
-.threep-modal-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
-    margin-bottom:10px;
+.register-status-title {
+    font-size: 1.04em;
+    font-weight: 600;
+    margin-bottom: 14px;
 }
 
-.threep-modal-currency{
-    min-width:120px;
-    text-align:left;
+.register-progress-block {
+    margin-bottom: 16px;
 }
 
-.threep-modal-copy{
-    font-size:1.02em;
-    line-height:1.55;
-    margin:8px 0 18px 0;
+.register-progress-block:last-child {
+    margin-bottom: 0;
 }
 
-.threep-modal-slider-block{
-    background:rgba(0,0,0,0.04);
-    border:1px solid rgba(0,0,0,0.06);
-    border-radius:12px;
-    padding:18px 16px;
-    margin-top:6px;
+.register-progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
 }
 
-.threep-amount-readout{
-    font-size:2.1em;
-    font-weight:700;
-    margin-bottom:14px;
-    line-height:1.15;
+.register-progress-label span {
+    font-weight: 500;
+    opacity: 0.78;
+    font-variant-numeric: tabular-nums;
 }
 
-.threep-slider-row{
-    display:grid;
-    grid-template-columns:minmax(50px,auto) 1fr minmax(50px,auto);
-    gap:12px;
-    align-items:center;
+.register-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 22px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e3e3e3;
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.10),
+        inset 0 -1px 0 rgba(255,255,255,0.16);
 }
 
-.threep-slider-edge{
-    font-size:0.9em;
-    opacity:0.75;
-    font-variant-numeric:tabular-nums;
+.register-progress-zone-before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(180deg, #c6c6c6 0%, #b8b8b8 100%);
 }
 
-#threep_pledge_slider{
-    width:100%;
+.register-progress-zone-after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(105,176,115,0.35) 0%, rgba(88,153,96,0.28) 100%);
 }
 
-.threep-slider-caption{
-    margin-top:12px;
-    font-size:0.95em;
-    opacity:0.88;
+.register-progress-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    min-width: 8px;
+    border-radius: 999px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 0 0 1px rgba(0,0,0,0.03);
 }
 
-@media (max-width: 900px){
-    .threep-modal-head{
-        flex-direction:column;
-        align-items:center;
+.register-progress-fill.is-red {
+    background: linear-gradient(90deg, #d65050 0%, #e46d6d 100%);
+}
+
+.register-progress-threshold {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 0;
+    border-left: 3px solid rgba(20,20,20,0.9);
+    z-index: 4;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.16);
+}
+
+.register-progress-meta {
+    margin-top: 8px;
+    font-size: 0.87em;
+    line-height: 1.45;
+    opacity: 0.86;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ===================================================================== */
+/* ======================== 3P MODAL STYLING ============================ */
+/* ===================================================================== */
+
+.threep-modal-wrap {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.threep-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.threep-modal-copy {
+    font-size: 1rem;
+    line-height: 1.58;
+    margin: 10px 0 18px 0;
+    color: #333;
+}
+
+.threep-modal-slider-block {
+    background: rgba(0,0,0,0.035);
+    border: 1px solid rgba(0,0,0,0.07);
+    border-radius: 14px;
+    padding: 18px 16px 16px 16px;
+    margin-top: 6px;
+}
+
+.threep-amount-readout {
+    font-size: 2.15em;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-slider-row {
+    display: grid;
+    grid-template-columns: minmax(58px,auto) 1fr minmax(58px,auto);
+    gap: 12px;
+    align-items: center;
+}
+
+.threep-slider-edge {
+    font-size: 0.9em;
+    opacity: 0.75;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+}
+
+#threep_pledge_slider {
+    width: 100%;
+    accent-color: #5c8f5c;
+    cursor: pointer;
+}
+
+.threep-suggested-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px dotted rgba(0,0,0,0.14);
+}
+
+.threep-suggested-row strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-suggested-row select {
+    padding: 5px 8px;
+    font-size: 0.9em;
+    min-width: 76px;
+    max-width: 90px;
+}
+
+.threep-modal-wrap .confirm-button {
+    margin-top: 4px;
+}
+
+/* ===================================================================== */
+/* ======================== TOOLTIP / HELP TEXT ========================= */
+/* ===================================================================== */
+
+.threep-help-underline {
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    cursor: help;
+}
+
+/* also support your current inline usage naturally */
+[title] {
+    text-underline-offset: 3px;
+}
+
+/* ===================================================================== */
+/* ========================= SUCCESS MODAL TWEAKS ======================= */
+/* ===================================================================== */
+
+.preview-title {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+/* ===================================================================== */
+/* ============================ RESPONSIVE ============================== */
+/* ===================================================================== */
+
+@media (max-width: 900px) {
+    .threep-modal-head {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .threep-modal-currency{
-        width:100%;
-        text-align:center;
+    .threep-slider-row {
+        grid-template-columns: 1fr;
     }
 
-    .threep-slider-row{
-        grid-template-columns:1fr;
+    .threep-slider-edge {
+        display: none;
     }
 
-    .threep-slider-edge{
-        display:none;
+    .threep-suggested-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .threep-suggested-row > div:last-child {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .register-progress-label {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 
