@@ -15,267 +15,567 @@
 
 
 <STYLE>
+
 /* ===================================================================== */
 /* ======================== REGISTER PAGE: 3P UI ======================== */
 /* ===================================================================== */
 
 .register-page-shell {
-    margin-top:108px;
+    margin-top: 108px;
 }
 
-.register-page-container{
-    padding-top:0;
+.register-page-container {
+    padding-top: 0;
 }
 
-.register-content-wrap{
-    width:100%;
-    margin:auto;
-    margin-top:5px;
+.register-content-wrap {
+    width: 100%;
+    margin: auto;
+    margin-top: 5px;
 }
 
-.register-intro-card{
-    width:100%;
-    background:var(--course-module);
-    border-radius:15px;
-    padding:10px;
+.register-intro-card {
+    width: 100%;
+    background: var(--course-module);
+    border-radius: 15px;
+    padding: 10px;
 }
 
-.register-lead-photo{
-    width:100%;
-    border-radius:10px;
+.register-lead-photo {
+    width: 100%;
+    border-radius: 10px;
 }
 
-.register-subtitle{
-    margin:10px 0;
+.register-subtitle {
+    margin: 10px 0;
 }
 
-.register-meta-line{
-    font-size:1em;
+.register-meta-line {
+    font-size: 1em;
 }
 
-.register-main-button{
-    margin-top:20px;
-    font-size:1.3em;
-    padding:10px 20px;
-    cursor:pointer;
+.register-profile-line {
+    margin-bottom: 10px;
 }
 
-.register-bottom-button{
-    margin-top:20px;
-    margin-bottom:75px;
-    font-size:1.3em;
-    padding:10px 20px;
-    cursor:pointer;
-    width:100%;
+.register-profile-line-small {
+    font-size: 1em;
 }
 
-.register-featured-description{
-    margin-top:20px;
-    font-size:1.5em;
-    padding:15px;
+.register-signup-line {
+    margin-bottom: 10px;
 }
 
-.register-agenda{
-    font-size:1.23em;
-    padding:15px;
-    margin-top:0;
+.register-main-button {
+    margin-top: 20px;
+    font-size: 1.3em;
+    padding: 10px 20px;
+    cursor: pointer;
 }
 
-/* ===================================================================== */
-/* STATUS PANEL */
-/* ===================================================================== */
-
-.register-status-panel{
-    margin-top:16px;
-    width:100%;
-    background:rgba(255,255,255,0.16);
-    border:1px solid rgba(0,0,0,0.08);
-    border-radius:14px;
-    padding:14px;
+.register-bottom-button {
+    margin-top: 20px;
+    margin-bottom: 75px;
+    font-size: 1.3em;
+    padding: 10px 20px;
+    cursor: pointer;
+    width: 100%;
 }
 
-.register-progress-bar{
-    position:relative;
-    width:100%;
-    height:22px;
-    border-radius:999px;
-    overflow:hidden;
-    background:#e3e3e3;
+.register-featured-description {
+    margin-top: 20px;
+    font-size: 1.5em;
+    padding: 15px;
 }
 
-.register-progress-fill{
-    position:absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    min-width:8px;
-    border-radius:999px;
+.register-agenda {
+    font-size: 1.23em;
+    padding: 15px;
+    margin-top: 0;
 }
 
-/* ===================================================================== */
-/* 3P MODAL */
-/* ===================================================================== */
-
-.threep-modal-wrap{
-    display:flex;
-    flex-direction:column;
-    text-align:center;
+.register-details-panel {
+    margin-top: 20px;
+    font-size: small;
 }
 
-.threep-training-kicker-pill{
-    display:inline-block;
-    align-self:center;
-    background:#4ea05a;
-    color:#fff;
-    border-radius:999px;
-    padding:8px 16px;
-    font-size:0.95em;
-    font-weight:600;
-    margin-bottom:12px;
+.register-details-photo {
+    width: 100%;
+    padding: 10px;
 }
 
-/* ===================================================================== */
-/* SLIDER */
-/* ===================================================================== */
-
-#threep_pledge_slider{
-    -webkit-appearance:none;
-    appearance:none;
-    width:100%;
-    height:14px;
-    border-radius:999px;
-    outline:none;
-    cursor:pointer;
-
-    background:linear-gradient(
-        90deg,
-        #93d86c 0%,
-        #93d86c 50%,
-        #d9e6d6 50%,
-        #d9e6d6 100%
-    );
-
-    transition:
-        background 120ms linear,
-        transform 140ms cubic-bezier(.34,1.56,.64,1);
+/* Notices */
+.top-container-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #f3f8f2;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-left: 6px solid #6aa56a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    line-height: 1.45;
 }
 
-/* elastic easing */
-
-#threep_pledge_slider:active{
-    transform:scaleY(1.12);
+#pledged-notice {
+    background: green;
+    border-left-color: yellow;
 }
 
-/* thumb */
-
-#threep_pledge_slider::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    appearance:none;
-    width:26px;
-    height:26px;
-    border-radius:50%;
-    background:#fff;
-    border:3px solid var(--pledge-color,#7ccf7a);
-    box-shadow:0 2px 7px rgba(0,0,0,0.18);
-    cursor:pointer;
-
-    transition:
-        border-color .12s ease,
-        transform .12s ease;
+.notice-icon {
+    margin-right: 10px;
+    flex-shrink: 0;
 }
 
-#threep_pledge_slider::-webkit-slider-thumb:hover{
-    transform:scale(1.08);
+.notice-close {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
 }
 
-#threep_pledge_slider::-moz-range-thumb{
-    width:26px;
-    height:26px;
-    border-radius:50%;
-    background:#fff;
-    border:3px solid var(--pledge-color,#7ccf7a);
+.notice-close:hover {
+    opacity: 1;
 }
 
-/* glow animation */
-
-@keyframes pledgeGlow{
-    0%{ box-shadow:0 0 0 rgba(80,200,120,0);}
-    50%{ box-shadow:0 0 12px rgba(80,200,120,.45);}
-    100%{ box-shadow:0 0 0 rgba(80,200,120,0);}
+/* Status panel */
+.register-status-panel {
+    margin-top: 16px;
+    width: 100%;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
 }
 
-#threep_pledge_slider{
-    animation:pledgeGlow 3s infinite;
+.register-status-title {
+    font-size: 1.04em;
+    font-weight: 600;
+    margin-bottom: 14px;
 }
 
-/* ===================================================================== */
-/* CONFIRM BUTTON */
-/* ===================================================================== */
-
-.threep-confirm-button{
-    transition:
-        background .18s ease,
-        border-color .18s ease,
-        transform .12s ease;
+.register-progress-block {
+    margin-bottom: 16px;
 }
 
-/* soft pulse */
-
-@keyframes pledgePulse{
-    0%{transform:scale(1)}
-    50%{transform:scale(1.04)}
-    100%{transform:scale(1)}
+.register-progress-block:last-child {
+    margin-bottom: 0;
 }
 
-.threep-confirm-button.enabled{
-    animation:pledgePulse 2.6s infinite;
+.register-progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
 }
 
-.threep-confirm-button:hover{
-    transform:scale(1.04);
+.register-progress-label span {
+    font-weight: 500;
+    opacity: 0.78;
+    font-variant-numeric: tabular-nums;
 }
 
-/* ===================================================================== */
-/* TOOLTIP */
-/* ===================================================================== */
-
-.custom-tooltip-bubble{
-    position:absolute;
-    z-index:99999;
-    max-width:320px;
-    background:#2b2b2b;
-    color:#fff;
-    padding:10px 12px;
-    border-radius:10px;
-    font-size:.92rem;
-    line-height:1.45;
-    box-shadow:0 10px 26px rgba(0,0,0,0.22);
-    opacity:0;
-    transform:translateY(3px);
-    transition:opacity .12s ease,transform .12s ease;
+.register-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 22px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e3e3e3;
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.10),
+        inset 0 -1px 0 rgba(255,255,255,0.16);
 }
 
-.custom-tooltip-bubble.visible{
-    opacity:1;
-    transform:translateY(0);
+.register-progress-zone-before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(180deg, #c6c6c6 0%, #b8b8b8 100%);
 }
 
-/* ===================================================================== */
-/* RESPONSIVE */
-/* ===================================================================== */
+.register-progress-zone-after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(105,176,115,0.35) 0%, rgba(88,153,96,0.28) 100%);
+}
 
-@media (max-width:900px){
+.register-progress-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    min-width: 8px;
+    border-radius: 999px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 0 0 1px rgba(0,0,0,0.03);
+}
 
-    .threep-modal-head{
-        flex-direction:column;
-        align-items:center;
+.register-progress-fill.is-red {
+    background: linear-gradient(90deg, #d65050 0%, #e46d6d 100%);
+}
+
+.register-progress-threshold {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 0;
+    border-left: 3px solid rgba(20,20,20,0.9);
+    z-index: 4;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.16);
+}
+
+.register-progress-meta {
+    margin-top: 8px;
+    font-size: 0.87em;
+    line-height: 1.45;
+    opacity: 0.86;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Shared modals */
+.register-modal-stack {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.register-modal-centered {
+    text-align: center;
+}
+
+.register-modal-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.register-modal-actions-column {
+    flex-flow: column;
+    align-items: center;
+}
+
+.register-modal-actions-centered {
+    align-items: center;
+}
+
+.register-modal-action-wide {
+    width: 80%;
+}
+
+.register-modal-action-half {
+    flex: 1;
+}
+
+.register-modal-footnote {
+    font-size: 1em;
+    color: grey;
+    margin-top: 12px;
+}
+
+.register-button-muted {
+    background: grey !important;
+}
+
+.register-button-danger {
+    background: red !important;
+    color: white !important;
+}
+
+.register-success-modal {
+    text-align: center;
+    width: 100%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.register-success-image {
+    width: 50%;
+    max-width: 400px;
+}
+
+.preview-title {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+/* 3P modal */
+.threep-modal-wrap {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.threep-training-kicker-pill {
+    display: inline-block;
+    align-self: center;
+    background: #4ea05a;
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+}
+
+.threep-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.threep-modal-head-main {
+    width: 100%;
+}
+
+.threep-modal-title {
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+.threep-modal-copy {
+    font-size: 1rem;
+    line-height: 1.58;
+    margin: 10px 0 18px 0;
+    color: #333;
+}
+
+.threep-modal-slider-block {
+    background: rgba(0,0,0,0.035);
+    border: 1px solid rgba(0,0,0,0.07);
+    border-radius: 14px;
+    padding: 18px 16px 16px 16px;
+    margin-top: 6px;
+}
+
+.threep-amount-readout {
+    font-size: 2.15em;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-slider-row {
+    display: grid;
+    grid-template-columns: minmax(72px,auto) 1fr minmax(72px,auto);
+    gap: 12px;
+    align-items: center;
+}
+
+.threep-slider-edge {
+    font-size: 0.88em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+}
+
+.threep-edge-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 7px 10px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.threep-edge-pill-zero {
+    background: #e89134;
+}
+
+.threep-edge-pill-max {
+    background: #2d7a34;
+}
+
+#threep_pledge_slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 14px;
+    border-radius: 999px;
+    outline: none;
+    background: linear-gradient(90deg, #93d86c 0%, #93d86c 50%, #d9e6d6 50%, #d9e6d6 100%);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+#threep_pledge_slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--pledge-color, #7ccf7a);
+    box-shadow: 0 2px 7px rgba(0,0,0,0.18);
+    cursor: pointer;
+}
+
+#threep_pledge_slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--pledge-color, #7ccf7a);
+    box-shadow: 0 2px 7px rgba(0,0,0,0.18);
+    cursor: pointer;
+}
+
+#threep_pledge_slider::-moz-range-track {
+    height: 14px;
+    border-radius: 999px;
+    background: transparent;
+}
+
+.threep-suggested-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px dotted rgba(0,0,0,0.14);
+}
+
+.threep-suggested-copy {
+    font-size: 0.95em;
+}
+
+.threep-suggested-row strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-currency-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.threep-currency-switch-label {
+    font-size: 0.84em;
+    opacity: 0.8;
+}
+
+.threep-currency-select {
+    padding: 4px 8px;
+    font-size: 0.84em;
+    min-width: 88px;
+    max-width: 96px;
+    line-height: 1.2;
+}
+
+.threep-confirm-button {
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.threep-confirm-footnote {
+    font-size: 0.95em;
+    color: var(--subdued-text);
+    margin-top: 12px;
+    max-width: 80%;
+}
+
+/* tooltips */
+.threep-help-underline {
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    cursor: help;
+}
+
+.custom-tooltip-bubble {
+    position: absolute;
+    z-index: 99999;
+    max-width: 320px;
+    background: #2b2b2b;
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.custom-tooltip-bubble.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* responsive */
+@media (max-width: 900px) {
+    .threep-modal-head {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .register-modal-actions{
-        flex-direction:column;
+    .threep-slider-row {
+        grid-template-columns: 1fr;
     }
 
+    .threep-slider-edge {
+        justify-self: center;
+    }
+
+    .threep-suggested-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .threep-currency-switcher {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .register-progress-label {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .register-modal-actions {
+        flex-direction: column;
+    }
+
+    .register-modal-action-half,
+    .register-modal-action-wide {
+        width: 100%;
+    }
+
+    .threep-confirm-footnote {
+        max-width: 100%;
+    }
 }
+
+
+
+
 
 
 
