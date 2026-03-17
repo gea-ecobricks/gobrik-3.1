@@ -695,6 +695,17 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
             <div class="threep-modal-slider-block">
                 <div class="threep-amount-readout" id="threep_amount_readout">${formatCurrencyFromIdr(initial, 'IDR')}</div>
+                <div class="threep-currency-switcher">
+                    <span class="threep-currency-switch-label">Switch currency</span>
+                    <select id="pledge_currency_select" class="threep-currency-select">
+                        <option value="IDR">🇮🇩 IDR</option>
+                        <option value="USD">🇺🇸 USD</option>
+                        <option value="EUR">🇪🇺 EUR</option>
+                        <option value="CAD">🇨🇦 CAD</option>
+                        <option value="GBP">🇬🇧 GBP</option>
+                        <option value="MYR">🇲🇾 MYR</option>
+                    </select>
+                </div>
 
                 <div class="threep-slider-row">
 
@@ -723,17 +734,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
                         <strong id="threep_suggested_amount">${formatCurrencyFromIdr(suggested, 'IDR')}</strong>
                     </div>
 
-                    <div class="threep-currency-switcher">
-                        <span class="threep-currency-switch-label">Switch currency</span>
-                        <select id="pledge_currency_select" class="threep-currency-select">
-                            <option value="IDR">🇮🇩 IDR</option>
-                            <option value="USD">🇺🇸 USD</option>
-                            <option value="EUR">🇪🇺 EUR</option>
-                            <option value="CAD">🇨🇦 CAD</option>
-                            <option value="GBP">🇬🇧 GBP</option>
-                            <option value="MYR">🇲🇾 MYR</option>
-                        </select>
-                    </div>
+
                 </div>
             </div>
 
