@@ -639,6 +639,23 @@ function closeInfoModal() {
     document.body.classList.remove('modal-open');
 }
 
+
+function formatCurrencyNumberOnly(idrAmount, currency) {
+    const safeIdr = Number(idrAmount || 0);
+
+    if (currency === 'IDR') {
+        return new Intl.NumberFormat('en-US', {
+            maximumFractionDigits: 0
+        }).format(safeIdr);
+    }
+
+    const converted = safeIdr * (CURRENCY_RATES[currency] || 1);
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    }).format(converted);
+}
+
 function openConfirmRegistrationModal(trainingName, trainingType, trainingDate, trainingTime, trainingLocation, displayCost, userEmail, firstName) {
     const modal = document.getElementById('form-modal-message');
     const messageContainer = modal.querySelector('.modal-message');
@@ -690,27 +707,29 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
             </div>
 
             <p class="threep-modal-copy">
-                ${escapeHtml(firstName)}, this course uses Pledge, Proceed and Pay. By confirming your participation for an amount of your choosing, you help the course reach its minimum threshold and happen! Only when enough participants have pledged will the course go-end and will your payment be due.
+                ${escapeHtml(firstName)}, this course uses Pledge, Proceed and Pay. By confirming your participation for an amount of your choosing, you help the course reach its minimum threshold and happen! Only when enough participants have pledged will the course go-ahead and will your payment be due.
             </p>
 
             <div class="threep-modal-slider-block">
-                <div class="threep-amount-readout" id="threep_amount_readout">${formatCurrencyFromIdr(initial, 'IDR')}</div>
-                <div class="threep-currency-switcher">
-                    <span class="threep-currency-switch-label">Switch currency</span>
-                    <select id="pledge_currency_select" class="threep-currency-select">
-                        <option value="IDR">🇮🇩 IDR</option>
-                        <option value="USD">🇺🇸 USD</option>
-                        <option value="EUR">🇪🇺 EUR</option>
-                        <option value="CAD">🇨🇦 CAD</option>
-                        <option value="GBP">🇬🇧 GBP</option>
-                        <option value="MYR">🇲🇾 MYR</option>
-                    </select>
-                </div>
+               <div class="threep-readout-row">
+                   <div class="threep-amount-readout" id="threep_amount_readout">${formatCurrencyNumberOnly(initial, 'IDR')}</div>
+                   <div class="threep-currency-switcher">
+                       <span class="threep-currency-switch-label">Switch currency</span>
+                       <select id="pledge_currency_select" class="threep-currency-select">
+                           <option value="IDR">🇮🇩 IDR</option>
+                           <option value="USD">🇺🇸 USD</option>
+                           <option value="EUR">🇪🇺 EUR</option>
+                           <option value="CAD">🇨🇦 CAD</option>
+                           <option value="GBP">🇬🇧 GBP</option>
+                           <option value="MYR">🇲🇾 MYR</option>
+                       </select>
+                   </div>
+               </div>
 
                 <div class="threep-slider-row">
 
                     <span class="threep-slider-pill pill-zero" id="threep_zero_label">
-                        ${formatCurrencyFromIdr(min,'IDR')}
+                       ${formatCurrencyNumberOnly(initial, 'IDR')}
                     </span>
 
                     <input
@@ -731,7 +750,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
                 <div class="threep-suggested-row">
                     <div class="threep-suggested-copy">
                         Trainer suggested amount:
-                        <strong id="threep_suggested_amount">${formatCurrencyFromIdr(suggested, 'IDR')}</strong>
+                        <strong id="threep_suggested_amount">${formatCurrencyNumberOnly(suggested, 'IDR')} IDR</strong>
                     </div>
 
 
@@ -779,8 +798,8 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
         const idrAmount = Number(slider.value || 0);
         const pct = max > 0 ? (idrAmount / max) : 0;
 
-        amountReadout.textContent = formatCurrencyFromIdr(idrAmount, currency);
-        suggestedReadout.textContent = formatCurrencyFromIdr(suggested, currency);
+        amountReadout.textContent = formatCurrencyNumberOnly(idrAmount, currency);
+        suggestedReadout.textContent = formatCurrencyNumberOnly(suggested, currency) + ' ' + currency;
 
         document.getElementById("threep_zero_label").textContent =
             formatCurrencyFromIdr(min, currency);

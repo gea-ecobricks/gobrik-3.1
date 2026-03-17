@@ -712,6 +712,7 @@
     z-index: 5;
 }
 
+
 .threep-modal-slider-block {
     background:
         linear-gradient(180deg, rgba(246,246,246,0.98) 0%, rgba(234,234,234,0.94) 48%, rgba(228,228,228,0.92) 100%);
@@ -722,16 +723,22 @@
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.72),
         0 2px 8px rgba(0,0,0,0.04);
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 .threep-amount-readout {
     font-size: 2.15em;
     font-weight: 700;
     line-height: 1.1;
-    margin-bottom: 14px;
     letter-spacing: 0.01em;
     font-variant-numeric: tabular-nums;
+    margin: 0;
 }
+
+
 
 
 .threep-slider-row {
@@ -901,6 +908,7 @@
     text-align: center;
 }
 
+
 .threep-suggested-copy {
     display: inline-flex;
     align-items: center;
@@ -911,36 +919,44 @@
     flex-wrap: nowrap;
 }
 
-
-.threep-suggested-row strong {
-    font-variant-numeric: tabular-nums;
-}
-
 .threep-suggested-copy strong {
     font-variant-numeric: tabular-nums;
     font-weight: 700;
 }
 
+
+.threep-suggested-row strong {
+    font-variant-numeric: tabular-nums;
+}
+
+
+
 .threep-currency-switcher {
     display: inline-flex;
     align-items: center;
     gap: 0;
-    width: auto;
+    flex-shrink: 0;
 }
-
 
 .threep-currency-switch-label {
     display: none;
 }
 
-
 .threep-currency-select {
     padding: 4px 10px;
     font-size: 0.78em;
-    min-width: 84px;
-    max-width: 96px;
+    min-width: 92px;
+    max-width: 110px;
     line-height: 1.1;
-    margin-left: 2px;
+}
+
+.threep-readout-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: nowrap;
 }
 
 .threep-confirm-button {
@@ -1099,15 +1115,26 @@
         align-items: center;
     }
 
-    .threep-suggested-row {
-        justify-content: center;
-        align-items: center;
-        flex-wrap: nowrap;
-    }
+.threep-readout-row {
+    gap: 8px;
+}
 
-    .threep-suggested-copy {
-        font-size: 0.95em;
-    }
+.threep-currency-select {
+    min-width: 88px;
+    max-width: 98px;
+    font-size: 0.74em;
+    padding: 3px 8px;
+}
+
+.threep-suggested-row {
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.threep-suggested-copy {
+    font-size: 0.95em;
+}
 
     .threep-currency-switcher {
         width: auto;
@@ -1147,12 +1174,7 @@
         margin-right: 20px;
     }
 
-    .threep-currency-select {
-        min-width: 88px;
-        max-width: 98px;
-        font-size: 0.74em;
-        padding: 3px 8px;
-    }
+
 
     .threep-slider-row {
         padding-top: 2px;
