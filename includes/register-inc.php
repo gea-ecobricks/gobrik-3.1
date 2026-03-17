@@ -139,7 +139,7 @@
     font-size: 1.02em;
     line-height: 1.35;
     margin: 10px 0 0 0;
-    text-align: center;
+    text-align: right;
 }
 
 .register-profile-line {
@@ -1124,7 +1124,8 @@
 
     .register-trainer-photo {
         width: 118px;
-        height: 118px;
+        margin-right:20px;
+
     }
 
     .threep-currency-select {
