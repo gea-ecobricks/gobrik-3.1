@@ -342,21 +342,8 @@ echo '<!DOCTYPE html>
                 <div class="training-title-box">
 
                     <div class="the-titles">
-
-                        <div class="register-title-row">
-                            <div class="register-title-group">
-                                <h3><?php echo $training_title; ?></h3>
-                                <h4 class="register-subtitle"><?php echo $training_subtitle; ?></h4>
-                            </div>
-
-                            <div class="register-trainer-inline">
-                                <div class="register-trainer-headshots">
-                                    <img src="<?php echo $feature_photo2_main; ?>" alt="Trainer photo 1">
-                                    <img src="<?php echo $feature_photo3_main; ?>" alt="Trainer photo 2">
-                                </div>
-                                <p class="register-trainer-names">Led by <?php echo $lead_trainer; ?></p>
-                            </div>
-                        </div>
+                        <h3><?php echo $training_title; ?></h3>
+                        <h4 class="register-subtitle"><?php echo $training_subtitle; ?></h4>
 
                         <p class="register-meta-line"><?php echo date("F j, Y", strtotime($training_date)); ?> | <?php echo $training_time_txt; ?></p>
                         <p class="register-meta-line"><?php echo $training_type; ?></p>
@@ -370,6 +357,12 @@ echo '<!DOCTYPE html>
                     </div>
 
                     <div class="profile-images">
+
+                        <div class="register-trainer-card">
+                            <img src="<?php echo $feature_photo3_main; ?>" class="register-trainer-photo" alt="Trainer photo">
+                            <p class="register-trainer-names">Led by <?php echo $lead_trainer; ?></p>
+                        </div>
+
                         <?php if ($show_signup_count === 1): ?>
                             <div class="profile-names register-signup-line">
                                 <span class="signup-count-text">Registrations:</span>
@@ -417,7 +410,9 @@ echo '<!DOCTYPE html>
                                 </div>
                             </div>
                         <?php endif; ?>
+
                     </div>
+
                 </div>
 
                 <button id="rsvp-register-button-mobile" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
@@ -695,13 +690,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
             </div>
 
             <p class="threep-modal-copy">
-                ${escapeHtml(firstName)}, this course uses
-                <span
-                    class="threep-help-underline"
-                    data-tooltip="This is new collaborative funding course, webinar and training funding system developed by the Gobal Ecobrick Alliance. It allows you and your community to take part in making courses happen-- or not (and that's ok too!)."
-                    tabindex="0"
-                >Pledge, Proceed and Pay</span>.
-                Your chosen amount is a pledge that helps the course reach the minimum participation and funding threshold needed to happen. You will only be asked to complete payment if the course successfully reaches that threshold.
+                ${escapeHtml(firstName)}, this course uses Pledge, Proceed and Pay. By confirming your participation for an amount of your choosing, you help the course reach its minimum threshold and happen! Only when enough participants have pledged will the course go-end and will your payment be due.
             </p>
 
             <div class="threep-modal-slider-block">
@@ -730,35 +719,28 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
                 <div class="threep-suggested-row">
                     <div class="threep-suggested-copy">
-                        Trainer
-                        <span
-                            class="threep-help-underline"
-                            data-tooltip="This is the amount the leaders of this course have set as a requested exchange for their time and expertise. However, by using the 3P system, they are happily open to you selecting what you can afford to pay"
-                            tabindex="0"
-                        >suggested amount</span>:
+                        Trainer suggested amount:
                         <strong id="threep_suggested_amount">${formatCurrencyFromIdr(suggested, 'IDR')}</strong>
                     </div>
 
                     <div class="threep-currency-switcher">
                         <span class="threep-currency-switch-label">Switch currency</span>
                         <select id="pledge_currency_select" class="threep-currency-select">
-
-                        <option value="IDR">🇮🇩 IDR</option>
-                        <option value="USD">🇺🇸 USD</option>
-                        <option value="EUR">🇪🇺 EUR</option>
-                        <option value="CAD">🇨🇦 CAD</option>
-                        <option value="GBP">🇬🇧 GBP</option>
-                        <option value="MYR">🇲🇾 MYR</option>
-
+                            <option value="IDR">🇮🇩 IDR</option>
+                            <option value="USD">🇺🇸 USD</option>
+                            <option value="EUR">🇪🇺 EUR</option>
+                            <option value="CAD">🇨🇦 CAD</option>
+                            <option value="GBP">🇬🇧 GBP</option>
+                            <option value="MYR">🇲🇾 MYR</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <div class="register-modal-actions register-modal-actions-column register-modal-actions-centered">
-                <a href="#" id="threep_confirm_button" class="confirm-button enabled register-modal-action-wide">🤝 Confirm Course Pledge</a>
+                <a href="#" id="threep_confirm_button" class="confirm-button enabled register-modal-action-wide threep-confirm-button">🤝 Confirm Course Pledge</a>
                 <p class="threep-confirm-footnote subdued">
-                    Upon confirmation we will record your pledge and send updates to your Buwana account e-mail: <b>${escapeHtml(userEmail)}</b> and notify you by ${escapeHtml(PLEDGE_DEADLINE_DISPLAY)}
+                    Confirmation will be sent to your Buwana account e-mail: <b>${escapeHtml(userEmail)}</b>
                 </p>
             </div>
 
@@ -777,52 +759,47 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const confirmBtn = document.getElementById('threep_confirm_button');
     const edgeLabels = document.querySelectorAll('.threep-slider-edge');
 
-    function formatSliderColor(pct) {
-        let hue
-        if (pct < 0.5) {
-            hue = 30 + (pct * 2) * 110
-        } else {
-            hue = 140 + ((pct - 0.5) * 2) * 80
-        }
-        return `hsl(${hue}, 70%, 46%)`
-    }
+   function formatSliderColor(pct) {
+       let hue;
+
+       if (pct <= 0.5) {
+           hue = 30 + (pct / 0.5) * 110;   // 30 -> 140
+       } else {
+           hue = 140 + ((pct - 0.5) / 0.5) * 80; // 140 -> 220
+       }
+
+       return `hsl(${hue}, 72%, 46%)`;
+   }
+
+
     function update3PReadout() {
 
-        const currency = currencySelect.value
-        const idrAmount = Number(slider.value || 0)
+        const currency = currencySelect.value;
+        const idrAmount = Number(slider.value || 0);
+        const pct = max > 0 ? (idrAmount / max) : 0;
 
-        amountReadout.textContent = formatCurrencyFromIdr(idrAmount, currency)
-        suggestedReadout.textContent = formatCurrencyFromIdr(suggested, currency)
+        amountReadout.textContent = formatCurrencyFromIdr(idrAmount, currency);
+        suggestedReadout.textContent = formatCurrencyFromIdr(suggested, currency);
 
         document.getElementById("threep_zero_label").textContent =
-            formatCurrencyFromIdr(min, currency)
+            formatCurrencyFromIdr(min, currency);
 
         document.getElementById("threep_max_label").textContent =
-            formatCurrencyFromIdr(max, currency)
+            formatCurrencyFromIdr(max, currency);
 
-        const pct = idrAmount / max
+        const sliderColor = formatSliderColor(pct);
 
-        let hue
-        if (pct < 0.5) {
-            hue = 30 + (pct * 2) * 110
-        } else {
-            hue = 140 + ((pct - 0.5) * 2) * 80
-        }
-
-    slider.style.setProperty('--pledge-color', sliderColor)
-    confirmBtn.style.setProperty('--pledge-color', sliderColor)
-    confirmBtn.classList.add('threep-confirm-button')
-    document.getElementById("threep_zero_label").style.color = formatSliderColor(min / max)
-    document.getElementById("threep_max_label").style.color = formatSliderColor(1)
-
-        const sliderColor = formatSliderColor(pct)
-
+        slider.style.setProperty('--pledge-color', sliderColor);
         slider.style.background =
-            `linear-gradient(90deg, ${sliderColor} 0%, ${sliderColor} ${pct*100}%, #e0e0e0 ${pct*100}%)`
+            `linear-gradient(90deg, ${sliderColor} 0%, ${sliderColor} ${pct * 100}%, #d9dee3 ${pct * 100}%, #d9dee3 100%)`;
 
-        confirmBtn.style.background = sliderColor
+        confirmBtn.style.background = sliderColor;
+        confirmBtn.style.setProperty('--pledge-color', sliderColor);
 
-        const convertedDisplayAmount = getConvertedAmount(idrAmount, currency)
+        document.getElementById("threep_zero_label").style.color = formatSliderColor(0);
+        document.getElementById("threep_max_label").style.color = formatSliderColor(1);
+
+        const convertedDisplayAmount = getConvertedAmount(idrAmount, currency);
 
         confirmBtn.href =
             "registration_confirmation.php?id=<?php echo $training_id; ?>" +
@@ -830,7 +807,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
             "&mode=pledge_threshold" +
             "&pledged_amount_idr=" + encodeURIComponent(idrAmount) +
             "&display_currency=" + encodeURIComponent(currency) +
-            "&display_amount=" + encodeURIComponent(convertedDisplayAmount)
+            "&display_amount=" + encodeURIComponent(convertedDisplayAmount);
     }
 
     slider.addEventListener('input', update3PReadout);
