@@ -128,13 +128,10 @@
 }
 
 .register-trainer-photo {
-    width: 168px;
-    height: 168px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 4px solid var(--course-module);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.14);
-    background: #ddd;
+    width: 225px;
+
+/*     box-shadow: 0 6px 18px rgba(0,0,0,0.14); */
+
     display: inline-block;
 }
 
@@ -401,6 +398,7 @@
 .register-success-image {
     width: 50%;
     max-width: 400px;
+    margin-top: -90px
 }
 
 .preview-title {
