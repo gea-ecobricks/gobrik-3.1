@@ -643,7 +643,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const content = `
         <div class="threep-modal-wrap">
 
-            <div class="threep-training-kicker">${escapeHtml(trainingName)}</div>
+            <div class="threep-training-pill">${escapeHtml(trainingName)}</div>
 
             <div class="threep-modal-head">
                 <div class="threep-modal-head-main">
@@ -665,9 +665,24 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
                 <div class="threep-amount-readout" id="threep_amount_readout">${formatCurrencyFromIdr(initial, 'IDR')}</div>
 
                 <div class="threep-slider-row">
-                    <span class="threep-slider-edge">${formatCurrencyFromIdr(min, 'IDR')}</span>
-                    <input type="range" id="threep_pledge_slider" min="${min}" max="${max}" value="${initial}" step="1000">
-                    <span class="threep-slider-edge">${formatCurrencyFromIdr(max, 'IDR')}</span>
+
+                    <span class="threep-slider-pill pill-zero" id="threep_zero_label">
+                        ${formatCurrencyFromIdr(min,'IDR')}
+                    </span>
+
+                    <input
+                        type="range"
+                        id="threep_pledge_slider"
+                        min="${min}"
+                        max="${max}"
+                        value="${initial}"
+                        step="1000"
+                    >
+
+                    <span class="threep-slider-pill pill-max" id="threep_max_label">
+                        ${formatCurrencyFromIdr(max,'IDR')}
+                    </span>
+
                 </div>
 
                 <div class="threep-suggested-row">
@@ -683,13 +698,15 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
                     <div class="threep-currency-switcher">
                         <span class="threep-currency-switch-label">Switch currency</span>
-                        <select id="pledge_currency_select" class="form-field-style threep-currency-select">
-                            <option value="IDR">IDR</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="CAD">CAD</option>
-                            <option value="GBP">GBP</option>
-                            <option value="MYR">MYR</option>
+                        <select id="pledge_currency_select" class="threep-currency-select">
+
+                        <option value="IDR">🇮🇩 IDR</option>
+                        <option value="USD">🇺🇸 USD</option>
+                        <option value="EUR">🇪🇺 EUR</option>
+                        <option value="CAD">🇨🇦 CAD</option>
+                        <option value="GBP">🇬🇧 GBP</option>
+                        <option value="MYR">🇲🇾 MYR</option>
+
                         </select>
                     </div>
                 </div>
@@ -697,7 +714,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
             <div class="register-modal-actions register-modal-actions-column register-modal-actions-centered">
                 <a href="#" id="threep_confirm_button" class="confirm-button enabled register-modal-action-wide">🤝 Confirm Course Pledge</a>
-                <p class="threep-confirm-footnote">
+                <p class="threep-confirm-footnote subdued">
                     You will not be asked to pay for this course until it has passed its participation and funding threshold by ${escapeHtml(PLEDGE_DEADLINE_DISPLAY)}. When it does (or doesn't!) we'll drop you a line to let you complete your payment.
                 </p>
             </div>
@@ -719,18 +736,36 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const edgeLabels = document.querySelectorAll('.threep-slider-edge');
 
     function update3PReadout() {
-        const currency = currencySelect.value;
-        const idrAmount = Number(slider.value || 0);
 
-        amountReadout.textContent = formatCurrencyFromIdr(idrAmount, currency);
-        suggestedReadout.textContent = formatCurrencyFromIdr(suggested, currency);
+        const currency = currencySelect.value
+        const idrAmount = Number(slider.value || 0)
 
-        if (edgeLabels.length >= 2) {
-            edgeLabels[0].textContent = formatCurrencyFromIdr(min, currency);
-            edgeLabels[1].textContent = formatCurrencyFromIdr(max, currency);
+        amountReadout.textContent = formatCurrencyFromIdr(idrAmount, currency)
+        suggestedReadout.textContent = formatCurrencyFromIdr(suggested, currency)
+
+        document.getElementById("threep_zero_label").textContent =
+            formatCurrencyFromIdr(min, currency)
+
+        document.getElementById("threep_max_label").textContent =
+            formatCurrencyFromIdr(max, currency)
+
+        const pct = idrAmount / max
+
+        let hue
+        if (pct < 0.5) {
+            hue = 30 + (pct * 2) * 60
+        } else {
+            hue = 90 + (pct - 0.5) * 2 * 40
         }
 
-        const convertedDisplayAmount = getConvertedAmount(idrAmount, currency);
+        const sliderColor = `hsl(${hue},65%,45%)`
+
+        slider.style.background =
+            `linear-gradient(90deg, ${sliderColor} 0%, ${sliderColor} ${pct*100}%, #e0e0e0 ${pct*100}%)`
+
+        confirmBtn.style.background = sliderColor
+
+        const convertedDisplayAmount = getConvertedAmount(idrAmount, currency)
 
         confirmBtn.href =
             "registration_confirmation.php?id=<?php echo $training_id; ?>" +
@@ -738,7 +773,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
             "&mode=pledge_threshold" +
             "&pledged_amount_idr=" + encodeURIComponent(idrAmount) +
             "&display_currency=" + encodeURIComponent(currency) +
-            "&display_amount=" + encodeURIComponent(convertedDisplayAmount);
+            "&display_amount=" + encodeURIComponent(convertedDisplayAmount)
     }
 
     slider.addEventListener('input', update3PReadout);
