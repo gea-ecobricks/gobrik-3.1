@@ -17,6 +17,720 @@
 <STYLE>
 
 /* ===================================================================== */
+/* ======================== REGISTER PAGE: 3P UI ======================== */
+/* ===================================================================== */
+
+.register-page-shell {
+    margin-top: 108px;
+}
+
+.register-page-container {
+    padding-top: 0;
+}
+
+.register-content-wrap {
+    width: 100%;
+    margin: auto;
+    margin-top: 5px;
+}
+
+.register-intro-card {
+    width: 100%;
+    background: var(--course-module);
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.register-lead-photo {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.register-subtitle {
+    margin: 10px 0;
+}
+
+.register-meta-line {
+    font-size: 1em;
+}
+
+.register-profile-line {
+    margin-bottom: 10px;
+}
+
+.register-profile-line-small {
+    font-size: 1em;
+}
+
+.register-signup-line {
+    margin-bottom: 10px;
+}
+
+.register-main-button {
+    margin-top: 20px;
+    font-size: 1.3em;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.register-bottom-button {
+    margin-top: 20px;
+    margin-bottom: 75px;
+    font-size: 1.3em;
+    padding: 10px 20px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.register-featured-description {
+    margin-top: 20px;
+    font-size: 1.5em;
+    padding: 15px;
+}
+
+.register-agenda {
+    font-size: 1.23em;
+    padding: 15px;
+    margin-top: 0;
+}
+
+.register-details-panel {
+    margin-top: 20px;
+    font-size: small;
+}
+
+.register-details-photo {
+    width: 100%;
+    padding: 10px;
+}
+
+/* Notices */
+.top-container-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #f3f8f2;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-left: 6px solid #6aa56a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    line-height: 1.45;
+}
+
+#pledged-notice {
+    background: linear-gradient(90deg, rgba(46, 130, 50, 0.94) 0%, rgba(56, 151, 61, 0.96) 100%);
+    color: #fff;
+    border-left-color: #f0d85c;
+}
+
+#pledged-notice a {
+    color: #fff;
+}
+
+.notice-icon {
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.notice-close {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
+    color: inherit;
+}
+
+.notice-close:hover {
+    opacity: 1;
+}
+
+/* Status panel */
+.register-status-panel {
+    margin-top: 16px;
+    width: 100%;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+}
+
+.register-status-title {
+    font-size: 1.04em;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.register-progress-block {
+    margin-bottom: 16px;
+}
+
+.register-progress-block:last-child {
+    margin-bottom: 0;
+}
+
+.register-progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.register-progress-label span {
+    font-weight: 500;
+    opacity: 0.78;
+    font-variant-numeric: tabular-nums;
+}
+
+.register-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 22px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e3e3e3;
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.10),
+        inset 0 -1px 0 rgba(255,255,255,0.16);
+}
+
+.register-progress-zone-before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(180deg, #c6c6c6 0%, #b8b8b8 100%);
+}
+
+.register-progress-zone-after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(105,176,115,0.35) 0%, rgba(88,153,96,0.28) 100%);
+}
+
+.register-progress-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    min-width: 8px;
+    border-radius: 999px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 0 0 1px rgba(0,0,0,0.03);
+}
+
+.register-progress-fill.is-red {
+    background: linear-gradient(90deg, #d65050 0%, #e46d6d 100%);
+}
+
+.register-progress-threshold {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 0;
+    border-left: 3px solid rgba(20,20,20,0.9);
+    z-index: 4;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.16);
+}
+
+.register-progress-meta {
+    margin-top: 8px;
+    font-size: 0.87em;
+    line-height: 1.45;
+    opacity: 0.86;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Shared modals */
+.register-modal-stack {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.register-modal-centered {
+    text-align: center;
+}
+
+.register-modal-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.register-modal-actions-column {
+    flex-flow: column;
+    align-items: center;
+}
+
+.register-modal-actions-centered {
+    align-items: center;
+}
+
+.register-modal-action-wide {
+    width: 80%;
+}
+
+.register-modal-action-half {
+    flex: 1;
+}
+
+.register-modal-footnote {
+    font-size: 1em;
+    color: grey;
+    margin-top: 12px;
+}
+
+.register-button-muted {
+    background: grey !important;
+}
+
+.register-button-danger {
+    background: red !important;
+    color: white !important;
+}
+
+.register-success-modal {
+    text-align: center;
+    width: 100%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.register-success-image {
+    width: 50%;
+    max-width: 400px;
+}
+
+.preview-title {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+/* 3P modal */
+.threep-modal-wrap {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.threep-training-kicker-pill {
+    display: inline-block;
+    align-self: center;
+    background: linear-gradient(180deg, #5bb567 0%, #3f9850 100%);
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-bottom: 12px;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+.threep-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.threep-modal-head-main {
+    width: 100%;
+}
+
+.threep-modal-title {
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+.threep-modal-copy {
+    font-size: 1rem;
+    line-height: 1.58;
+    margin: 10px 0 18px 0;
+    color: #333;
+}
+
+.threep-modal-slider-block {
+    background: linear-gradient(180deg, rgba(0,0,0,0.038) 0%, rgba(0,0,0,0.028) 100%);
+    border: 1px solid rgba(0,0,0,0.07);
+    border-radius: 14px;
+    padding: 18px 16px 16px 16px;
+    margin-top: 6px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 2px 8px rgba(0,0,0,0.04);
+}
+
+.threep-amount-readout {
+    font-size: 2.15em;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-slider-row {
+    display: grid;
+    grid-template-columns: minmax(72px,auto) 1fr minmax(72px,auto);
+    gap: 12px;
+    align-items: center;
+}
+
+.threep-slider-edge {
+    font-size: 0.88em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+}
+
+.threep-edge-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 7px 10px;
+    color: #fff;
+    font-weight: 600;
+    box-shadow:
+        0 2px 5px rgba(0,0,0,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.14);
+}
+
+.threep-edge-pill-zero {
+    background: linear-gradient(180deg, #f0a343 0%, #de7f1e 100%);
+}
+
+.threep-edge-pill-max {
+    background: linear-gradient(180deg, #2f8c3b 0%, #21672a 100%);
+}
+
+#threep_pledge_slider {
+    --pledge-color: #7ed957;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 14px;
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(90deg, #7ed957 0%, #7ed957 50%, #e4efe3 50%, #e4efe3 100%);
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.16),
+        inset 0 -1px 0 rgba(255,255,255,0.16),
+        0 0 0 rgba(126, 217, 87, 0);
+    transition:
+        background 180ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: background, box-shadow, transform;
+    transform: translateZ(0);
+}
+
+#threep_pledge_slider:hover,
+#threep_pledge_slider:focus {
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.16),
+        inset 0 -1px 0 rgba(255,255,255,0.16),
+        0 0 16px color-mix(in srgb, var(--pledge-color) 28%, transparent);
+}
+
+#threep_pledge_slider:active {
+    transform: scaleY(1.06) translateZ(0);
+    transition:
+        background 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#threep_pledge_slider::-webkit-slider-runnable-track {
+    height: 14px;
+    border-radius: 999px;
+    background: transparent;
+}
+
+#threep_pledge_slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 42%, rgba(247,247,247,0.96) 100%);
+    border: 3px solid var(--pledge-color, #7ed957);
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.18),
+        0 0 0 6px color-mix(in srgb, var(--pledge-color) 20%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.82);
+    cursor: pointer;
+    transition:
+        border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, box-shadow, border-color;
+    transform: translateZ(0);
+}
+
+#threep_pledge_slider:hover::-webkit-slider-thumb,
+#threep_pledge_slider:focus::-webkit-slider-thumb {
+    transform: scale(1.06) translateZ(0);
+    box-shadow:
+        0 3px 10px rgba(0,0,0,0.22),
+        0 0 0 8px color-mix(in srgb, var(--pledge-color) 26%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.88);
+}
+
+#threep_pledge_slider:active::-webkit-slider-thumb {
+    transform: scale(1.1) translateZ(0);
+}
+
+#threep_pledge_slider::-moz-range-track {
+    height: 14px;
+    border-radius: 999px;
+    background: transparent;
+}
+
+#threep_pledge_slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 42%, rgba(247,247,247,0.96) 100%);
+    border: 3px solid var(--pledge-color, #7ed957);
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.18),
+        0 0 0 6px color-mix(in srgb, var(--pledge-color) 20%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.82);
+    cursor: pointer;
+    transition:
+        border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, box-shadow, border-color;
+    transform: translateZ(0);
+}
+
+#threep_pledge_slider:hover::-moz-range-thumb,
+#threep_pledge_slider:focus::-moz-range-thumb {
+    transform: scale(1.06) translateZ(0);
+    box-shadow:
+        0 3px 10px rgba(0,0,0,0.22),
+        0 0 0 8px color-mix(in srgb, var(--pledge-color) 26%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.88);
+}
+
+#threep_pledge_slider:active::-moz-range-thumb {
+    transform: scale(1.1) translateZ(0);
+}
+
+.threep-suggested-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px dotted rgba(0,0,0,0.14);
+}
+
+.threep-suggested-copy {
+    font-size: 0.95em;
+}
+
+.threep-suggested-row strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-currency-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.threep-currency-switch-label {
+    font-size: 0.84em;
+    opacity: 0.8;
+}
+
+.threep-currency-select {
+    padding: 4px 8px;
+    font-size: 0.84em;
+    min-width: 88px;
+    max-width: 96px;
+    line-height: 1.2;
+}
+
+.threep-confirm-button {
+    position: relative;
+    overflow: hidden;
+    transition:
+        background 180ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: background, border-color, box-shadow, transform;
+    animation: threep-confirm-soft-pulse 2.8s ease-in-out infinite;
+    transform: translateZ(0);
+}
+
+.threep-confirm-button:hover,
+.threep-confirm-button:focus {
+    transform: translateY(-1px) scale(1.01) translateZ(0);
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.14),
+        0 0 0 8px color-mix(in srgb, var(--pledge-color) 18%, transparent);
+}
+
+.threep-confirm-button::after {
+    content: "";
+    position: absolute;
+    top: -60%;
+    left: -25%;
+    width: 22%;
+    height: 220%;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(18deg);
+    pointer-events: none;
+    opacity: 0.66;
+    animation: threep-button-shimmer 3.6s ease-in-out infinite;
+}
+
+.threep-confirm-footnote {
+    font-size: 0.95em;
+    color: var(--subdued-text);
+    margin-top: 12px;
+    max-width: 80%;
+}
+
+/* tooltips */
+.threep-help-underline {
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    cursor: help;
+}
+
+.custom-tooltip-bubble {
+    position: absolute;
+    z-index: 99999;
+    max-width: 320px;
+    background: #2b2b2b;
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.custom-tooltip-bubble.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* animations */
+@keyframes threep-confirm-soft-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 0 0 rgba(126, 217, 87, 0.00),
+            0 2px 6px rgba(0,0,0,0.10);
+    }
+    50% {
+        box-shadow:
+            0 0 0 6px rgba(126, 217, 87, 0.10),
+            0 6px 16px rgba(0,0,0,0.14);
+    }
+}
+
+@keyframes threep-button-shimmer {
+    0% {
+        left: -30%;
+        opacity: 0;
+    }
+    12% {
+        opacity: 0.48;
+    }
+    28% {
+        left: 108%;
+        opacity: 0.18;
+    }
+    100% {
+        left: 108%;
+        opacity: 0;
+    }
+}
+
+/* responsive */
+@media (max-width: 900px) {
+    .threep-modal-head {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .threep-slider-row {
+        grid-template-columns: 1fr;
+    }
+
+    .threep-slider-edge {
+        justify-self: center;
+    }
+
+    .threep-suggested-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .threep-currency-switcher {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .register-progress-label {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .register-modal-actions {
+        flex-direction: column;
+    }
+
+    .register-modal-action-half,
+    .register-modal-action-wide {
+        width: 100%;
+    }
+
+    .threep-confirm-footnote {
+        max-width: 100%;
+    }
+}
+
+
+/* ===================================================================== */
 /* ======================== 3P SECTION STYLES =========================== */
 /* ===================================================================== */
 
@@ -388,7 +1102,6 @@
     }
 
 }
-
 
 
 
