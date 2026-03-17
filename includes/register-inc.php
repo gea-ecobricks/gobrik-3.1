@@ -15,11 +15,11 @@
 
 
 <STYLE>
-
 /* ===================================================================== */
 /* ======================== REGISTER PAGE: 3P UI ======================== */
 /* ===================================================================== */
 
+/* page wrappers */
 .register-page-shell {
     margin-top: 108px;
 }
@@ -104,7 +104,10 @@
     padding: 10px;
 }
 
-/* Notices */
+/* ===================================================================== */
+/* ============================== NOTICES =============================== */
+/* ===================================================================== */
+
 .top-container-notice {
     display: flex;
     align-items: center;
@@ -149,7 +152,10 @@
     opacity: 1;
 }
 
-/* Status panel */
+/* ===================================================================== */
+/* ============================ STATUS PANEL ============================ */
+/* ===================================================================== */
+
 .register-status-panel {
     margin-top: 16px;
     width: 100%;
@@ -252,7 +258,10 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* Shared modals */
+/* ===================================================================== */
+/* ============================ SHARED MODALS =========================== */
+/* ===================================================================== */
+
 .register-modal-stack {
     display: flex;
     flex-direction: column;
@@ -324,26 +333,257 @@
     margin-bottom: 6px;
 }
 
-/* 3P modal */
+/* ===================================================================== */
+/* ============================ 3P CORE UI ============================== */
+/* ===================================================================== */
+
+.threep-box {
+    margin-top: 20px;
+}
+
+.threep-hr {
+    margin: 18px 0 22px 0;
+    border: 0;
+    border-top: 1px solid rgba(0,0,0,0.18);
+}
+
+.threep-subtitle {
+    font-size: 1.55em;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text);
+    letter-spacing: 0.01em;
+}
+
+.threep-section-divider {
+    border-top: 2px dotted rgba(0,0,0,0.22);
+    margin: 12px 0 18px 0;
+}
+
+.threep-field-card {
+    background: rgba(255,255,255,0.20);
+    padding: 16px 16px 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.currency-locked {
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 8px;
+    font-weight: 500;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.currency-input-wrap {
+    display: grid;
+    grid-template-columns: 1fr 56px;
+    align-items: center;
+    gap: 10px;
+}
+
+.currency-display-input {
+    text-align: left;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+.currency-suffix {
+    text-align: left;
+    font-weight: 600;
+    opacity: 0.72;
+    font-size: 0.96em;
+}
+
+/* ===================================================================== */
+/* ========================== LIVE CALCULATOR =========================== */
+/* ===================================================================== */
+
+.threep-calculator {
+    margin-top: 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.08) 100%);
+    padding: 22px 18px 20px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.07);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 1px 2px rgba(0,0,0,0.04);
+}
+
+.threep-calculator-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.calc-card {
+    background: rgba(255,255,255,0.92);
+    padding: 18px 16px 16px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+    min-height: 104px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-shadow:
+        0 1px 1px rgba(0,0,0,0.03),
+        inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.calc-title {
+    font-size: 0.95em;
+    opacity: 0.78;
+    margin-bottom: 10px;
+    line-height: 1.35;
+}
+
+.calc-value {
+    font-size: 2.05em;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+.calc-value.is-green {
+    color: #2f7d32;
+}
+
+.calc-value.is-earth {
+    color: #8a4b32;
+}
+
+.threep-calculator .form-caption {
+    margin-top: 16px;
+}
+
+/* ===================================================================== */
+/* ======================= STATUS + PROGRESS AREA ======================= */
+/* ===================================================================== */
+
+.threep-status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 22px;
+    align-items: start;
+    margin-top: 10px;
+}
+
+.threep-status-textbox {
+    background: rgba(255,255,255,0.22);
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.06);
+    line-height: 1.95;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+/* ===================================================================== */
+/* =========================== 3P PROGRESS BARS ========================= */
+/* ===================================================================== */
+
+.threep-progress-block {
+    background: rgba(255,255,255,0.22);
+    padding: 16px 16px 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.threep-progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 1em;
+    line-height: 1.2;
+}
+
+.threep-progress-label span {
+    font-weight: 500;
+    opacity: 0.78;
+    font-size: 0.93em;
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e4e4e4;
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.10),
+        inset 0 -1px 0 rgba(255,255,255,0.16);
+}
+
+.threep-progress-zone-before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(180deg, #c7c7c7 0%, #bbbbbb 100%);
+}
+
+.threep-progress-zone-after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(112,176,120,0.34) 0%, rgba(89,155,96,0.28) 100%);
+}
+
+.threep-progress-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    min-width: 8px;
+    background: linear-gradient(90deg, #d85050 0%, #e56868 100%);
+    border-radius: 999px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.20),
+        0 0 0 1px rgba(0,0,0,0.03);
+}
+
+.threep-progress-threshold {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 0;
+    border-left: 3px solid rgba(24,24,24,0.88);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.20);
+    z-index: 5;
+}
+
+.threep-progress-meta {
+    margin-top: 10px;
+    font-size: 0.94em;
+    line-height: 1.55;
+    opacity: 0.84;
+    font-variant-numeric: tabular-nums;
+}
+
+.threep-progress-meta strong {
+    font-weight: 600;
+}
+
+/* ===================================================================== */
+/* ============================ 3P MODAL UI ============================= */
+/* ===================================================================== */
+
 .threep-modal-wrap {
     display: flex;
     flex-direction: column;
     text-align: center;
-}
-
-.threep-training-kicker-pill {
-    display: inline-block;
-    align-self: center;
-    background: linear-gradient(180deg, #5bb567 0%, #3f9850 100%);
-    color: #fff;
-    border-radius: 999px;
-    padding: 8px 16px;
-    font-size: 0.95em;
-    font-weight: 600;
-    margin-bottom: 12px;
-    box-shadow:
-        0 2px 6px rgba(0,0,0,0.10),
-        inset 0 1px 0 rgba(255,255,255,0.18);
 }
 
 .threep-modal-head {
@@ -368,6 +608,31 @@
     line-height: 1.58;
     margin: 10px 0 18px 0;
     color: #333;
+}
+
+/* training title pill: supports all prior class names */
+.threep-training-pill,
+.threep-training-kicker,
+.threep-training-kicker-pill {
+    display: inline-flex;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+    background: var(--subdued-text);
+    color: var(--h1);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin: 0 auto 12px auto;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
 }
 
 .threep-modal-slider-block {
@@ -403,6 +668,7 @@
     line-height: 1.3;
 }
 
+.threep-slider-pill,
 .threep-edge-pill {
     display: inline-flex;
     align-items: center;
@@ -414,12 +680,15 @@
     box-shadow:
         0 2px 5px rgba(0,0,0,0.12),
         inset 0 1px 0 rgba(255,255,255,0.14);
+    white-space: nowrap;
 }
 
+.pill-zero,
 .threep-edge-pill-zero {
     background: linear-gradient(180deg, #f0a343 0%, #de7f1e 100%);
 }
 
+.pill-max,
 .threep-edge-pill-max {
     background: linear-gradient(180deg, #2f8c3b 0%, #21672a 100%);
 }
@@ -616,14 +885,18 @@
     animation: threep-button-shimmer 3.6s ease-in-out infinite;
 }
 
-.threep-confirm-footnote {
-    font-size: 0.95em;
+.threep-confirm-footnote,
+.subdued {
     color: var(--subdued-text);
+    font-size: 0.95em;
     margin-top: 12px;
     max-width: 80%;
 }
 
-/* tooltips */
+/* ===================================================================== */
+/* ============================== TOOLTIPS ============================== */
+/* ===================================================================== */
+
 .threep-help-underline {
     text-decoration: underline dotted;
     text-underline-offset: 3px;
@@ -653,7 +926,10 @@
     transform: translateY(0);
 }
 
-/* animations */
+/* ===================================================================== */
+/* ============================= ANIMATIONS ============================= */
+/* ===================================================================== */
+
 @keyframes threep-confirm-soft-pulse {
     0%, 100% {
         box-shadow:
@@ -685,8 +961,31 @@
     }
 }
 
-/* responsive */
+/* ===================================================================== */
+/* ============================ RESPONSIVE ============================== */
+/* ===================================================================== */
+
 @media (max-width: 900px) {
+    .threep-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .threep-calculator-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .currency-input-wrap {
+        grid-template-columns: 1fr 52px;
+    }
+
+    .calc-value {
+        font-size: 1.8em;
+    }
+
+    .threep-progress-bar {
+        height: 22px;
+    }
+
     .threep-modal-head {
         flex-direction: column;
         align-items: center;
@@ -724,383 +1023,16 @@
         width: 100%;
     }
 
-    .threep-confirm-footnote {
+    .threep-confirm-footnote,
+    .subdued {
         max-width: 100%;
     }
-}
 
-
-/* ===================================================================== */
-/* ======================== 3P SECTION STYLES =========================== */
-/* ===================================================================== */
-
-.threep-box{
-    margin-top:20px;
-}
-
-.threep-hr{
-    margin:18px 0 22px 0;
-    border:0;
-    border-top:1px solid rgba(0,0,0,0.18);
-}
-
-.threep-subtitle{
-    font-size:1.55em;
-    font-weight:600;
-    margin-bottom:10px;
-    color:var(--text);
-    letter-spacing:0.01em;
-}
-
-.threep-section-divider{
-    border-top:2px dotted rgba(0,0,0,0.22);
-    margin:12px 0 18px 0;
-}
-
-.threep-field-card{
-    background:rgba(255,255,255,0.20);
-    padding:16px 16px 14px 16px;
-    border-radius:10px;
-    margin-bottom:14px;
-    border:1px solid rgba(0,0,0,0.04);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
-}
-
-.currency-locked{
-    padding:10px 14px;
-    background:rgba(0,0,0,0.06);
-    border-radius:8px;
-    font-weight:500;
-    display:inline-block;
-    border:1px solid rgba(0,0,0,0.06);
-}
-
-.currency-input-wrap{
-    display:grid;
-    grid-template-columns:1fr 56px;
-    align-items:center;
-    gap:10px;
-}
-
-.currency-display-input{
-    text-align:left;
-    letter-spacing:0.01em;
-    font-variant-numeric:tabular-nums;
-}
-
-.currency-suffix{
-    text-align:left;
-    font-weight:600;
-    opacity:0.72;
-    font-size:0.96em;
-}
-
-/* ===================================================================== */
-/* ========================== LIVE CALCULATOR =========================== */
-/* ===================================================================== */
-
-.threep-calculator{
-    margin-top:24px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.08) 100%);
-    padding:22px 18px 20px 18px;
-    border-radius:14px;
-    border:1px solid rgba(0,0,0,0.07);
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.18),
-        0 1px 2px rgba(0,0,0,0.04);
-}
-
-.threep-calculator-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
-    margin-top:14px;
-}
-
-.calc-card{
-    background:rgba(255,255,255,0.92);
-    padding:18px 16px 16px 16px;
-    border-radius:10px;
-    border:1px solid rgba(0,0,0,0.08);
-    min-height:104px;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    box-shadow:
-        0 1px 1px rgba(0,0,0,0.03),
-        inset 0 1px 0 rgba(255,255,255,0.5);
-}
-
-.calc-title{
-    font-size:0.95em;
-    opacity:0.78;
-    margin-bottom:10px;
-    line-height:1.35;
-}
-
-.calc-value{
-    font-size:2.05em;
-    font-weight:700;
-    line-height:1.1;
-    letter-spacing:0.01em;
-    font-variant-numeric:tabular-nums;
-}
-
-.calc-value.is-green{
-    color:#2f7d32;
-}
-
-.calc-value.is-earth{
-    color:#8a4b32;
-}
-
-.threep-calculator .form-caption{
-    margin-top:16px;
-}
-
-/* ===================================================================== */
-/* ======================= STATUS + PROGRESS AREA ======================= */
-/* ===================================================================== */
-
-.threep-status-grid{
-    display:grid;
-    grid-template-columns:1fr 1.1fr;
-    gap:22px;
-    align-items:start;
-    margin-top:10px;
-}
-
-.threep-status-textbox{
-    background:rgba(255,255,255,0.22);
-    padding:16px;
-    border-radius:10px;
-    border:1px solid rgba(0,0,0,0.06);
-    line-height:1.95;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
-}
-
-/* ===================================================================== */
-/* =========================== PROGRESS BARS ============================ */
-/* ===================================================================== */
-
-.threep-progress-block{
-    background:rgba(255,255,255,0.22);
-    padding:16px 16px 14px 16px;
-    border-radius:10px;
-    margin-bottom:16px;
-    border:1px solid rgba(0,0,0,0.06);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
-}
-
-.threep-progress-label{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    gap:10px;
-    font-weight:600;
-    margin-bottom:12px;
-    font-size:1em;
-    line-height:1.2;
-}
-
-.threep-progress-label span{
-    font-weight:500;
-    opacity:0.78;
-    font-size:0.93em;
-    font-variant-numeric:tabular-nums;
-}
-
-.threep-progress-bar{
-    position:relative;
-    width:100%;
-    height:24px;
-    border-radius:999px;
-    overflow:hidden;
-    background:#e4e4e4;
-    box-shadow:
-        inset 0 1px 3px rgba(0,0,0,0.10),
-        inset 0 -1px 0 rgba(255,255,255,0.16);
-}
-
-.threep-progress-zone-before{
-    position:absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    background:linear-gradient(180deg, #c7c7c7 0%, #bbbbbb 100%);
-}
-
-.threep-progress-zone-after{
-    position:absolute;
-    top:0;
-    bottom:0;
-    right:0;
-    background:linear-gradient(180deg, rgba(112,176,120,0.34) 0%, rgba(89,155,96,0.28) 100%);
-}
-
-.threep-progress-fill{
-    position:absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    min-width:8px;
-    background:linear-gradient(90deg, #d85050 0%, #e56868 100%);
-    border-radius:999px;
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.20),
-        0 0 0 1px rgba(0,0,0,0.03);
-}
-
-.threep-progress-threshold{
-    position:absolute;
-    top:-2px;
-    bottom:-2px;
-    width:0;
-    border-left:3px solid rgba(24,24,24,0.88);
-    box-shadow:
-        0 0 0 1px rgba(255,255,255,0.20);
-    z-index:5;
-}
-
-.threep-progress-meta{
-    margin-top:10px;
-    font-size:0.94em;
-    line-height:1.55;
-    opacity:0.84;
-    font-variant-numeric:tabular-nums;
-}
-
-.threep-progress-meta strong{
-    font-weight:600;
-}
-
-/* ===================================================================== */
-/* =========================== MODAL UI ================================= */
-/* ===================================================================== */
-
-.threep-training-pill{
-    display:inline-block;
-    background:#2e7d32;
-    color:white;
-    padding:6px 14px;
-    border-radius:999px;
-    font-weight:600;
-    font-size:.95em;
-    margin-bottom:14px;
-}
-
-/* slider row */
-
-.threep-slider-row{
-    display:grid;
-    grid-template-columns:auto 1fr auto;
-    align-items:center;
-    gap:12px;
-    margin-top:10px;
-}
-
-/* slider track */
-
-#threep_pledge_slider{
-    width:100%;
-    appearance:none;
-    height:10px;
-    border-radius:999px;
-    background:#b9e4b9;
-    outline:none;
-    transition:background .15s ease;
-}
-
-/* slider thumb */
-
-#threep_pledge_slider::-webkit-slider-thumb{
-    appearance:none;
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    background:white;
-    border:2px solid #666;
-    cursor:pointer;
-}
-
-#threep_pledge_slider::-moz-range-thumb{
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    background:white;
-    border:2px solid #666;
-}
-
-/* pills */
-
-.threep-slider-pill{
-    padding:4px 10px;
-    border-radius:999px;
-    font-size:.8em;
-    font-weight:600;
-    white-space:nowrap;
-}
-
-.pill-zero{
-    background:#f28c28;
-    color:white;
-}
-
-.pill-max{
-    background:#1b5e20;
-    color:white;
-}
-
-/* readout */
-
-.threep-amount-readout{
-    font-size:1.8em;
-    font-weight:700;
-    margin-bottom:8px;
-}
-
-/* currency selector */
-
-.threep-currency-select{
-    font-size:.85em;
-    padding:6px 10px;
-    border-radius:6px;
-}
-
-/* subdued explanatory text */
-
-.subdued{
-    color:var(--subdued-text);
-    font-size:.9em;
-    margin-top:6px;
-}
-
-/* ===================================================================== */
-/* ========================== RESPONSIVENESS ============================ */
-/* ===================================================================== */
-
-@media (max-width:900px){
-
-    .threep-status-grid{
-        grid-template-columns:1fr;
+    .threep-training-pill,
+    .threep-training-kicker,
+    .threep-training-kicker-pill {
+        max-width: 92%;
     }
-
-    .threep-calculator-grid{
-        grid-template-columns:1fr;
-    }
-
-    .currency-input-wrap{
-        grid-template-columns:1fr 52px;
-    }
-
-    .calc-value{
-        font-size:1.8em;
-    }
-
-    .threep-progress-bar{
-        height:22px;
-    }
-
 }
 
 

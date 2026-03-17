@@ -715,11 +715,10 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
             <div class="register-modal-actions register-modal-actions-column register-modal-actions-centered">
                 <a href="#" id="threep_confirm_button" class="confirm-button enabled register-modal-action-wide">🤝 Confirm Course Pledge</a>
                 <p class="threep-confirm-footnote subdued">
-                    You will not be asked to pay for this course until it has passed its participation and funding threshold by ${escapeHtml(PLEDGE_DEADLINE_DISPLAY)}. When it does (or doesn't!) we'll drop you a line to let you complete your payment.
+                    Upon confirmation we will record your pledge and send updates to your Buwana account e-mail: <b>${escapeHtml(userEmail)}</b> and notify you by ${escapeHtml(PLEDGE_DEADLINE_DISPLAY)}
                 </p>
             </div>
 
-            <p class="register-modal-footnote">Upon confirmation we will record your pledge and send updates to your Buwana account e-mail: <b>${escapeHtml(userEmail)}</b></p>
         </div>
     `;
 
