@@ -1213,6 +1213,7 @@
         max-width: 600px;
         position: relative;
         margin-top: 80px;
+        padding-top: 0px !important;
     }
 }
 
@@ -1222,7 +1223,7 @@
         margin-bottom: auto;
         padding: 30px;
 
-        padding-top: 0px !important;
+
     }
 }
 
