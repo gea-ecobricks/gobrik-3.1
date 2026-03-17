@@ -65,6 +65,11 @@ $pledged_amount_from_query = 0;
 $pledged_display_currency_from_query = 'IDR';
 $pledged_display_amount_from_query = '';
 
+
+$registration_status_current = null;
+$show_free_registered_notice = false;
+$show_pledged_notice = false;
+
 // Check if the user is logged in
 if ($is_logged_in) {
     $buwana_id = $_SESSION['buwana_id'];
@@ -91,33 +96,43 @@ if ($is_logged_in) {
     $stmt->fetch();
     $stmt->close();
 
-    // Check if user is already registered in new table first
-    $sql_check_new = "SELECT registration_id, status FROM training_registrations_tb WHERE training_id = ? AND buwana_id = ? AND status IN ('reserved','pledged','awaiting_payment','confirmed')";
-    $stmt_check_new = $gobrik_conn->prepare($sql_check_new);
-    if ($stmt_check_new) {
-        $stmt_check_new->bind_param("ii", $training_id, $buwana_id);
-        $stmt_check_new->execute();
-        $stmt_check_new->store_result();
-        if ($stmt_check_new->num_rows > 0) {
-            $is_registered = true;
-        }
-        $stmt_check_new->close();
-    }
+        // Check if user is already registered in new table first
+        $sql_check_new = "SELECT registration_id, status
+                          FROM training_registrations_tb
+                          WHERE training_id = ? AND buwana_id = ?
+                          AND status IN ('reserved','pledged','awaiting_payment','confirmed')
+                          LIMIT 1";
+        $stmt_check_new = $gobrik_conn->prepare($sql_check_new);
+        if ($stmt_check_new) {
+            $stmt_check_new->bind_param("ii", $training_id, $buwana_id);
+            $stmt_check_new->execute();
+            $stmt_check_new->bind_result($existing_registration_id, $existing_registration_status);
 
-    // Fallback to legacy table if needed
-    if (!$is_registered && $ecobricker_id) {
-        $sql_check = "SELECT id FROM tb_training_trainees WHERE training_id = ? AND ecobricker_id = ?";
-        $stmt_check = $gobrik_conn->prepare($sql_check);
-        if ($stmt_check) {
-            $stmt_check->bind_param("ii", $training_id, $ecobricker_id);
-            $stmt_check->execute();
-            $stmt_check->store_result();
-            if ($stmt_check->num_rows > 0) {
+            if ($stmt_check_new->fetch()) {
                 $is_registered = true;
+                $registration_status_current = $existing_registration_status;
             }
-            $stmt_check->close();
+            $stmt_check_new->close();
         }
-    }
+
+        // Fallback to legacy table only if no new-style registration exists
+        if (!$is_registered && $ecobricker_id) {
+            $sql_check = "SELECT id
+                          FROM tb_training_trainees
+                          WHERE training_id = ? AND ecobricker_id = ?
+                          LIMIT 1";
+            $stmt_check = $gobrik_conn->prepare($sql_check);
+            if ($stmt_check) {
+                $stmt_check->bind_param("ii", $training_id, $ecobricker_id);
+                $stmt_check->execute();
+                $stmt_check->store_result();
+                if ($stmt_check->num_rows > 0) {
+                    $is_registered = true;
+                    $registration_status_current = 'confirmed_legacy';
+                }
+                $stmt_check->close();
+            }
+        }
 } else {
     require_once '../gobrikconn_env.php';
 }
@@ -270,6 +285,19 @@ if (isset($_GET['display_amount']) && $_GET['display_amount'] !== '') {
     $pledged_display_amount_from_query = (string)$_GET['display_amount'];
 }
 
+// Decide which top confirmation banner to show
+if (isset($_GET['pledged']) && $_GET['pledged'] == 1) {
+    $show_pledged_notice = true;
+} elseif ($payment_mode === 'pledge_threshold' && in_array($registration_status_current, ['pledged', 'reserved', 'awaiting_payment'], true)) {
+    $show_pledged_notice = true;
+} elseif ($is_registered && (
+    $registration_status_current === 'confirmed' ||
+    $registration_status_current === 'confirmed_legacy' ||
+    $payment_mode !== 'pledge_threshold'
+)) {
+    $show_free_registered_notice = true;
+}
+
 $gobrik_conn->close();
 
 echo '<!DOCTYPE html>
@@ -289,7 +317,7 @@ echo '<!DOCTYPE html>
 
         <div class="register-content-wrap">
 
-            <?php if ($is_registered): ?>
+            <?php if ($show_free_registered_notice): ?>
                 <div id="registered-notice" class="top-container-notice">
                     <span class="notice-icon">👍</span>
                     <span>You're registered for this <?php echo $training_type; ?>! See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
@@ -297,7 +325,7 @@ echo '<!DOCTYPE html>
                 </div>
             <?php endif; ?>
 
-            <?php if (isset($_GET['pledged']) && $_GET['pledged'] == 1): ?>
+            <?php if ($show_pledged_notice): ?>
                 <div id="pledged-notice" class="top-container-notice">
                     <span class="notice-icon">🤝</span>
                     <span>Your pledge to participate has been made! Trainers notified and public stats updated 👇.</span>

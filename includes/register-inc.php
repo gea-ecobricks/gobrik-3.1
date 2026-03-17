@@ -611,9 +611,7 @@
 }
 
 /* training title pill: supports all prior class names */
-.threep-training-pill,
-.threep-training-kicker,
-.threep-training-kicker-pill {
+.threep-training-pill {
     display: inline-flex;
     align-self: center;
     justify-content: center;
@@ -1028,11 +1026,9 @@
         max-width: 100%;
     }
 
-    .threep-training-pill,
-    .threep-training-kicker,
-    .threep-training-kicker-pill {
-        max-width: 92%;
-    }
+.threep-training-pill {
+    max-width: 90%;
+}
 }
 
 
