@@ -14,9 +14,6 @@
 <?php require_once ("../meta/register-$lang.php");?>
 
 
-
-
-<STYLE>
 <style>
 
 /* ===================================================================== */
@@ -685,8 +682,8 @@
 
 .threep-modal-copy {
     font-size: 1.26em;
-    line-height: 1.58;
-    margin: 10px 0 18px 0;
+    line-height: 1.42;
+    margin: 10px 0 16px 0;
     color: #333;
 }
 
@@ -736,17 +733,17 @@
     font-variant-numeric: tabular-nums;
 }
 
+
 .threep-slider-row {
-    display: grid;
-    grid-template-columns: minmax(90px,auto) 1fr minmax(110px,auto);
-    gap: 12px;
-    align-items: center;
+    position: relative;
+    display: block;
+    margin-top: 8px;
+    padding-top: 6px;
 }
 
 .threep-slider-pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    top: -12px;
     padding: 0;
     background: transparent;
     border-radius: 0;
@@ -754,15 +751,23 @@
     font-weight: 700;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
-    font-size: 0.95em;
+    font-size: 0.82em;
+    line-height: 1;
+    pointer-events: none;
 }
 
 .pill-zero {
+    left: 0;
     color: #d57d12;
+    text-align: left;
+    transform: translateY(-100%);
 }
 
 .pill-max {
+    right: 0;
     color: #1d65c1;
+    text-align: right;
+    transform: translateY(-100%);
 }
 
 #threep_pledge_slider {
@@ -886,40 +891,56 @@
 
 .threep-suggested-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    gap: 12px;
-    margin-top: 14px;
-    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 16px;
+    flex-wrap: nowrap;
     padding-top: 12px;
     border-top: 1px dotted rgba(0,0,0,0.14);
+    text-align: center;
 }
 
 .threep-suggested-copy {
-    font-size: 0.95em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 1em;
+    line-height: 1.2;
+    flex-wrap: nowrap;
 }
+
 
 .threep-suggested-row strong {
     font-variant-numeric: tabular-nums;
 }
 
-.threep-currency-switcher {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.threep-suggested-copy strong {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
 }
+
+.threep-currency-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    width: auto;
+}
+
 
 .threep-currency-switch-label {
-    font-size: 0.78em;
-    opacity: 0.8;
+    display: none;
 }
 
+
 .threep-currency-select {
-    padding: 4px 8px;
-    font-size: 0.75em;
-    min-width: 102px;
-    max-width: 118px;
-    line-height: 1.15;
+    padding: 4px 10px;
+    font-size: 0.78em;
+    min-width: 84px;
+    max-width: 96px;
+    line-height: 1.1;
+    margin-left: 2px;
 }
 
 .threep-confirm-button {
@@ -1078,22 +1099,19 @@
         align-items: center;
     }
 
-    .threep-slider-row {
-        grid-template-columns: 1fr;
-    }
-
-    .threep-slider-pill {
-        justify-self: center;
-    }
-
     .threep-suggested-row {
-        flex-direction: column;
-        align-items: flex-start;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .threep-suggested-copy {
+        font-size: 0.95em;
     }
 
     .threep-currency-switcher {
-        width: 100%;
-        justify-content: space-between;
+        width: auto;
+        justify-content: center;
     }
 
     .register-progress-label {
@@ -1116,8 +1134,7 @@
     }
 
     .threep-training-pill {
-        max-width: 92%;
-        margin-top: -20px;
+        display: none;
     }
 
     .register-trainer-card {
@@ -1127,13 +1144,27 @@
 
     .register-trainer-photo {
         width: 118px;
-        margin-right:20px;
-
+        margin-right: 20px;
     }
 
     .threep-currency-select {
-        min-width: 112px;
-        max-width: 128px;
+        min-width: 88px;
+        max-width: 98px;
+        font-size: 0.74em;
+        padding: 3px 8px;
+    }
+
+    .threep-slider-row {
+        padding-top: 2px;
+    }
+
+    .threep-slider-pill {
+        font-size: 0.72em;
+        top: -8px;
+    }
+
+    .threep-modal-copy {
+        line-height: 1.34;
     }
 }
 
