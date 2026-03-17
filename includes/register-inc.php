@@ -1214,6 +1214,7 @@
         position: relative;
         margin-top: 80px;
         padding-top: 0px !important;
+        margin-top: 100px;
     }
 }
 
