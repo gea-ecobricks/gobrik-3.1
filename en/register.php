@@ -70,6 +70,8 @@ $registration_status_current = null;
 $show_free_registered_notice = false;
 $show_pledged_notice = false;
 
+
+
 // Check if the user is logged in
 if ($is_logged_in) {
     $buwana_id = $_SESSION['buwana_id'];
@@ -320,7 +322,7 @@ echo '<!DOCTYPE html>
             <?php if ($show_free_registered_notice): ?>
                 <div id="registered-notice" class="top-container-notice">
                     <span class="notice-icon">👍</span>
-                    <span>You're registered for this <?php echo $training_type; ?>! See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
+                    <span style="margin-right: auto;">You're registered for this <?php echo $training_type; ?>! See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
                     <button class="notice-close" aria-label="Close">&times;</button>
                 </div>
             <?php endif; ?>
@@ -328,7 +330,7 @@ echo '<!DOCTYPE html>
             <?php if ($show_pledged_notice): ?>
                 <div id="pledged-notice" class="top-container-notice">
                     <span class="notice-icon">🤝</span>
-                    <span>Your pledge to participate has been made! Trainers notified and public stats updated 👇.</span>
+                    <span style="margin-right: auto;">Your pledge to participate has been made! Trainers notified and public stats updated 👇.</span>
                     <button class="notice-close" aria-label="Close">&times;</button>
                 </div>
             <?php endif; ?>
@@ -458,6 +460,7 @@ const PLEDGE_DEADLINE_DISPLAY = <?php echo json_encode($pledge_deadline_display)
 const PLEDGED_AMOUNT_QUERY = <?php echo (int)$pledged_amount_from_query; ?>;
 const PLEDGED_DISPLAY_CURRENCY_QUERY = <?php echo json_encode($pledged_display_currency_from_query); ?>;
 const PLEDGED_DISPLAY_AMOUNT_QUERY = <?php echo json_encode($pledged_display_amount_from_query); ?>;
+const REGISTRATION_STATUS_CURRENT = <?php echo json_encode($registration_status_current); ?>;
 
 const CURRENCY_RATES = {
     IDR: 1,
@@ -817,17 +820,29 @@ function openCancelRegistrationModal() {
     photobox.style.display = 'none';
 
     const content = `
-        <div class="register-modal-stack register-modal-centered">
-            <div>
-                <h1>💔</h1>
-                <h2>Cancel Registration?</h2>
-                <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
+        const isPledgeState =
+            TRAINING_PAYMENT_MODE === 'pledge_threshold' &&
+            ['pledged', 'reserved', 'awaiting_payment'].includes(REGISTRATION_STATUS_CURRENT);
+
+        const modalTitle = isPledgeState ? 'Withdraw Pledge?' : 'Cancel Registration?';
+        const modalBody = isPledgeState
+            ? 'Are you sure you want to withdraw your pledge for this course?<br>Your pledge will be removed from the public totals.'
+            : 'Are you sure you want to un-enroll from this course?<br>If you\'ve made a payment it cannot be refunded.';
+        const actionLabel = isPledgeState ? 'Withdraw Pledge' : 'Cancel Registration';
+
+        const content = `
+            <div class="register-modal-stack register-modal-centered">
+                <div>
+                    <h1>💔</h1>
+                    <h2>${modalTitle}</h2>
+                    <p>${modalBody}</p>
+                </div>
+                <div class="register-modal-actions">
+                    <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">${actionLabel}</a>
+                    <a href="courses.php" class="confirm-button register-button-muted register-modal-action-half">↩️ Back to Courses</a>
+                </div>
             </div>
-            <div class="register-modal-actions">
-                <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">Cancel Registration</a>
-                <a href="courses.php" class="confirm-button register-button-muted register-modal-action-half">↩️ Back to Courses</a>
-            </div>
-        </div>
+        `;
     `;
 
     messageContainer.innerHTML = content;
@@ -879,14 +894,25 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('rsvp-register-button-desktop'),
         document.getElementById('rsvp-register-button-mobile')
     ];
+
+    const isPledgeState =
+        TRAINING_PAYMENT_MODE === 'pledge_threshold' &&
+        ['pledged', 'reserved', 'awaiting_payment'].includes(REGISTRATION_STATUS_CURRENT);
+
+    const rolloverText = isPledgeState
+        ? '💔 Withdraw Pledge'
+        : '💔 Cancel Registration';
+
     btns.forEach(btn => {
         if (!btn) return;
+
         btn.addEventListener('mouseover', function() {
             this.dataset.originalText = this.innerHTML;
             this.dataset.originalBg = this.style.background;
             this.style.background = 'grey';
-            this.innerHTML = '💔 Cancel Registration';
+            this.innerHTML = rolloverText;
         });
+
         btn.addEventListener('mouseout', function() {
             this.style.background = this.dataset.originalBg;
             this.innerHTML = this.dataset.originalText;

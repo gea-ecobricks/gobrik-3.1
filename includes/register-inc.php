@@ -117,8 +117,8 @@
     border: 1px solid rgba(0,0,0,0.08);
     border-left: 6px solid #6aa56a;
     border-radius: 10px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
+    padding: 12px 16px !important;
+    margin-bottom: 16px !important;
     font-size: 1rem;
     line-height: 1.45;
 }
