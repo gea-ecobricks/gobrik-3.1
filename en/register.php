@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php';
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.33';
+$version = '0.32';
 $page = 'register';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn();
@@ -29,9 +29,6 @@ $currency = '';
 $ecobricker_id = null;
 $users_email_address = '';
 $is_registered = false;
-$is_pledged = false;
-$is_confirmed_registration = false;
-$registration_status_new = null;
 
 // 3P defaults
 $payment_mode = 'free';
@@ -68,6 +65,7 @@ $pledged_amount_from_query = 0;
 $pledged_display_currency_from_query = 'IDR';
 $pledged_display_amount_from_query = '';
 
+// Check if the user is logged in
 if ($is_logged_in) {
     $buwana_id = $_SESSION['buwana_id'];
 
@@ -93,32 +91,20 @@ if ($is_logged_in) {
     $stmt->fetch();
     $stmt->close();
 
-    // Check new registration system first
-    $sql_check_new = "SELECT registration_id, status FROM training_registrations_tb WHERE training_id = ? AND buwana_id = ? LIMIT 1";
+    // Check if user is already registered in new table first
+    $sql_check_new = "SELECT registration_id, status FROM training_registrations_tb WHERE training_id = ? AND buwana_id = ? AND status IN ('reserved','pledged','awaiting_payment','confirmed')";
     $stmt_check_new = $gobrik_conn->prepare($sql_check_new);
     if ($stmt_check_new) {
         $stmt_check_new->bind_param("ii", $training_id, $buwana_id);
         $stmt_check_new->execute();
-        $stmt_check_new->bind_result($registration_id_new, $registration_status_new);
-        if ($stmt_check_new->fetch()) {
-            $registration_status_new = (string)$registration_status_new;
-
-            if (in_array($registration_status_new, ['pledged', 'awaiting_payment'], true)) {
-                $is_pledged = true;
-            }
-
-            if (in_array($registration_status_new, ['confirmed'], true)) {
-                $is_confirmed_registration = true;
-            }
-
-            if (in_array($registration_status_new, ['reserved', 'pledged', 'awaiting_payment', 'confirmed'], true)) {
-                $is_registered = true;
-            }
+        $stmt_check_new->store_result();
+        if ($stmt_check_new->num_rows > 0) {
+            $is_registered = true;
         }
         $stmt_check_new->close();
     }
 
-    // Fallback legacy table for free/older registrations
+    // Fallback to legacy table if needed
     if (!$is_registered && $ecobricker_id) {
         $sql_check = "SELECT id FROM tb_training_trainees WHERE training_id = ? AND ecobricker_id = ?";
         $stmt_check = $gobrik_conn->prepare($sql_check);
@@ -128,7 +114,6 @@ if ($is_logged_in) {
             $stmt_check->store_result();
             if ($stmt_check->num_rows > 0) {
                 $is_registered = true;
-                $is_confirmed_registration = true;
             }
             $stmt_check->close();
         }
@@ -264,6 +249,16 @@ $participants_threshold_pct = min(100, round(($status_participants_threshold / m
 $pledges_fill_pct = max(2, round(($status_pledged_current / max(1, $status_pledged_max)) * 100, 2));
 $pledges_threshold_pct = min(100, round(($status_pledged_threshold / max(1, $status_pledged_max)) * 100, 2));
 
+// Currency conversion rates from IDR (hardcoded approximate)
+$currency_options = [
+    'IDR' => 1,
+    'USD' => 0.000064,
+    'EUR' => 0.000059,
+    'CAD' => 0.000087,
+    'GBP' => 0.000050,
+    'MYR' => 0.00030
+];
+
 // Values for pledged success modal from redirect query
 if (isset($_GET['pledged_amount_idr'])) {
     $pledged_amount_from_query = intval($_GET['pledged_amount_idr']);
@@ -276,19 +271,6 @@ if (isset($_GET['display_amount']) && $_GET['display_amount'] !== '') {
 }
 
 $gobrik_conn->close();
-
-// Button state labels
-$primary_button_text = '';
-if ($is_pledged) {
-    $primary_button_text = "🤝 You're pledged";
-} elseif ($is_confirmed_registration) {
-    $primary_button_text = "✅ You're already registered";
-} else {
-    $primary_button_text = $is_logged_in ? ($earthling_emoji . " Register") : "🔑 Register";
-}
-
-$show_free_registered_notice = $is_confirmed_registration && !$is_pledged;
-$show_pledged_notice = ($is_pledged || (isset($_GET['pledged']) && $_GET['pledged'] == 1));
 
 echo '<!DOCTYPE html>
 <html lang="' . $lang . '">
@@ -307,7 +289,7 @@ echo '<!DOCTYPE html>
 
         <div class="register-content-wrap">
 
-            <?php if ($show_free_registered_notice): ?>
+            <?php if ($is_registered): ?>
                 <div id="registered-notice" class="top-container-notice">
                     <span class="notice-icon">👍</span>
                     <span>You're registered for this <?php echo $training_type; ?>! See your email or <a href="dashboard.php">dashboard</a> for full registration details.</span>
@@ -315,7 +297,7 @@ echo '<!DOCTYPE html>
                 </div>
             <?php endif; ?>
 
-            <?php if ($show_pledged_notice): ?>
+            <?php if (isset($_GET['pledged']) && $_GET['pledged'] == 1): ?>
                 <div id="pledged-notice" class="top-container-notice">
                     <span class="notice-icon">🤝</span>
                     <span>Your pledge to participate has been made! Trainers notified and public stats updated 👇.</span>
@@ -337,7 +319,7 @@ echo '<!DOCTYPE html>
                         <p class="register-meta-line"><?php echo $display_cost; ?></p>
 
                         <button id="rsvp-register-button-desktop" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
-                            <?php echo $primary_button_text; ?>
+                            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                         </button>
                     </div>
 
@@ -397,7 +379,7 @@ echo '<!DOCTYPE html>
                 </div>
 
                 <button id="rsvp-register-button-mobile" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
-                    <?php echo $primary_button_text; ?>
+                    <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                 </button>
             </div>
 
@@ -433,7 +415,7 @@ echo '<!DOCTYPE html>
         </div>
 
         <button id="rsvp-bottom-button" class="confirm-button register-bottom-button <?php echo $is_registered ? '' : 'enabled'; ?>">
-            <?php echo $primary_button_text; ?>
+            <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
         </button>
 
     </div>
@@ -448,8 +430,6 @@ const PLEDGE_DEADLINE_DISPLAY = <?php echo json_encode($pledge_deadline_display)
 const PLEDGED_AMOUNT_QUERY = <?php echo (int)$pledged_amount_from_query; ?>;
 const PLEDGED_DISPLAY_CURRENCY_QUERY = <?php echo json_encode($pledged_display_currency_from_query); ?>;
 const PLEDGED_DISPLAY_AMOUNT_QUERY = <?php echo json_encode($pledged_display_amount_from_query); ?>;
-const IS_PLEDGED = <?php echo $is_pledged ? 'true' : 'false'; ?>;
-const IS_CONFIRMED_REGISTRATION = <?php echo $is_confirmed_registration ? 'true' : 'false'; ?>;
 
 const CURRENCY_RATES = {
     IDR: 1,
@@ -458,15 +438,6 @@ const CURRENCY_RATES = {
     CAD: 0.000087,
     GBP: 0.000050,
     MYR: 0.00030
-};
-
-const CURRENCY_LABELS = {
-    IDR: '🇮🇩 IDR',
-    USD: '🇺🇸 USD',
-    EUR: '🇪🇺 EUR',
-    CAD: '🇨🇦 CAD',
-    GBP: '🇬🇧 GBP',
-    MYR: '🇲🇾 MYR'
 };
 
 function formatCurrencyFromIdr(idrAmount, currency) {
@@ -497,39 +468,6 @@ function escapeHtml(str) {
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
-}
-
-function mixColors(hex1, hex2, t) {
-    const c1 = hex1.replace('#', '');
-    const c2 = hex2.replace('#', '');
-
-    const r1 = parseInt(c1.substring(0, 2), 16);
-    const g1 = parseInt(c1.substring(2, 4), 16);
-    const b1 = parseInt(c1.substring(4, 6), 16);
-
-    const r2 = parseInt(c2.substring(0, 2), 16);
-    const g2 = parseInt(c2.substring(2, 4), 16);
-    const b2 = parseInt(c2.substring(4, 6), 16);
-
-    const r = Math.round(r1 + (r2 - r1) * t);
-    const g = Math.round(g1 + (g2 - g1) * t);
-    const b = Math.round(b1 + (b2 - b1) * t);
-
-    return `rgb(${r}, ${g}, ${b})`;
-}
-
-function getPledgeColor(value, min, max, suggested) {
-    if (max <= min) return '#7ccf7a';
-
-    const safeValue = Math.max(min, Math.min(max, value));
-
-    if (safeValue <= suggested) {
-        const t = suggested > min ? (safeValue - min) / (suggested - min) : 1;
-        return mixColors('#e89134', '#93d86c', t);
-    }
-
-    const t = max > suggested ? (safeValue - suggested) / (max - suggested) : 1;
-    return mixColors('#93d86c', '#2d7a34', t);
 }
 
 document.getElementById("rsvp-bottom-button").addEventListener("click", handleRegistrationClick);
@@ -627,31 +565,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (notice) notice.style.display = 'none';
         });
     });
-
-    // Hover state only if the user actually has a current registration/pledge
-    if (IS_PLEDGED || IS_CONFIRMED_REGISTRATION) {
-        const btns = [
-            document.getElementById('rsvp-bottom-button'),
-            document.getElementById('rsvp-register-button-desktop'),
-            document.getElementById('rsvp-register-button-mobile')
-        ];
-
-        const hoverText = IS_PLEDGED ? '💔 Cancel Pledge' : '💔 Cancel Registration';
-
-        btns.forEach(btn => {
-            if (!btn) return;
-            btn.addEventListener('mouseover', function() {
-                this.dataset.originalText = this.innerHTML;
-                this.dataset.originalBg = this.style.background;
-                this.style.background = 'grey';
-                this.innerHTML = hoverText;
-            });
-            btn.addEventListener('mouseout', function() {
-                this.style.background = this.dataset.originalBg || '';
-                this.innerHTML = this.dataset.originalText;
-            });
-        });
-    }
 });
 </script>
 
@@ -730,7 +643,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const content = `
         <div class="threep-modal-wrap">
 
-            <div class="threep-training-kicker-pill">${escapeHtml(trainingName)}</div>
+            <div class="threep-training-kicker">${escapeHtml(trainingName)}</div>
 
             <div class="threep-modal-head">
                 <div class="threep-modal-head-main">
@@ -752,9 +665,9 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
                 <div class="threep-amount-readout" id="threep_amount_readout">${formatCurrencyFromIdr(initial, 'IDR')}</div>
 
                 <div class="threep-slider-row">
-                    <span class="threep-slider-edge threep-edge-pill threep-edge-pill-zero" id="threep_edge_zero">${formatCurrencyFromIdr(min, 'IDR')}</span>
+                    <span class="threep-slider-edge">${formatCurrencyFromIdr(min, 'IDR')}</span>
                     <input type="range" id="threep_pledge_slider" min="${min}" max="${max}" value="${initial}" step="1000">
-                    <span class="threep-slider-edge threep-edge-pill threep-edge-pill-max" id="threep_edge_max">${formatCurrencyFromIdr(max, 'IDR')}</span>
+                    <span class="threep-slider-edge">${formatCurrencyFromIdr(max, 'IDR')}</span>
                 </div>
 
                 <div class="threep-suggested-row">
@@ -771,19 +684,19 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
                     <div class="threep-currency-switcher">
                         <span class="threep-currency-switch-label">Switch currency</span>
                         <select id="pledge_currency_select" class="form-field-style threep-currency-select">
-                            <option value="IDR">${CURRENCY_LABELS.IDR}</option>
-                            <option value="USD">${CURRENCY_LABELS.USD}</option>
-                            <option value="EUR">${CURRENCY_LABELS.EUR}</option>
-                            <option value="CAD">${CURRENCY_LABELS.CAD}</option>
-                            <option value="GBP">${CURRENCY_LABELS.GBP}</option>
-                            <option value="MYR">${CURRENCY_LABELS.MYR}</option>
+                            <option value="IDR">IDR</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="CAD">CAD</option>
+                            <option value="GBP">GBP</option>
+                            <option value="MYR">MYR</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <div class="register-modal-actions register-modal-actions-column register-modal-actions-centered">
-                <a href="#" id="threep_confirm_button" class="confirm-button enabled register-modal-action-wide threep-confirm-button">🤝 Confirm Course Pledge</a>
+                <a href="#" id="threep_confirm_button" class="confirm-button enabled register-modal-action-wide">🤝 Confirm Course Pledge</a>
                 <p class="threep-confirm-footnote">
                     You will not be asked to pay for this course until it has passed its participation and funding threshold by ${escapeHtml(PLEDGE_DEADLINE_DISPLAY)}. When it does (or doesn't!) we'll drop you a line to let you complete your payment.
                 </p>
@@ -803,8 +716,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const amountReadout = document.getElementById('threep_amount_readout');
     const suggestedReadout = document.getElementById('threep_suggested_amount');
     const confirmBtn = document.getElementById('threep_confirm_button');
-    const edgeZero = document.getElementById('threep_edge_zero');
-    const edgeMax = document.getElementById('threep_edge_max');
+    const edgeLabels = document.querySelectorAll('.threep-slider-edge');
 
     function update3PReadout() {
         const currency = currencySelect.value;
@@ -812,17 +724,13 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
         amountReadout.textContent = formatCurrencyFromIdr(idrAmount, currency);
         suggestedReadout.textContent = formatCurrencyFromIdr(suggested, currency);
-        edgeZero.textContent = formatCurrencyFromIdr(min, currency);
-        edgeMax.textContent = formatCurrencyFromIdr(max, currency);
+
+        if (edgeLabels.length >= 2) {
+            edgeLabels[0].textContent = formatCurrencyFromIdr(min, currency);
+            edgeLabels[1].textContent = formatCurrencyFromIdr(max, currency);
+        }
 
         const convertedDisplayAmount = getConvertedAmount(idrAmount, currency);
-        const t = max > min ? (idrAmount - min) / (max - min) : 0;
-        const activeColor = getPledgeColor(idrAmount, min, max, suggested);
-
-        slider.style.setProperty('--pledge-color', activeColor);
-        slider.style.background = `linear-gradient(90deg, ${activeColor} 0%, ${activeColor} ${t * 100}%, #d9e6d6 ${t * 100}%, #d9e6d6 100%)`;
-        confirmBtn.style.background = activeColor;
-        confirmBtn.style.borderColor = activeColor;
 
         confirmBtn.href =
             "registration_confirmation.php?id=<?php echo $training_id; ?>" +
@@ -838,6 +746,7 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     update3PReadout();
 }
 
+<?php if ($is_registered): ?>
 function openCancelRegistrationModal() {
     const modal = document.getElementById('form-modal-message');
     const messageContainer = modal.querySelector('.modal-message');
@@ -845,22 +754,15 @@ function openCancelRegistrationModal() {
 
     photobox.style.display = 'none';
 
-    const title = IS_PLEDGED ? 'Cancel Pledge?' : 'Cancel Registration?';
-    const copy = IS_PLEDGED
-        ? 'Are you sure you want to cancel your pledge for this course?<br>This will remove your participation pledge and update the public stats.'
-        : 'Are you sure you want to un-enroll from this course?<br>If you\\'ve made a payment it cannot be refunded.';
-
-    const actionText = IS_PLEDGED ? 'Cancel Pledge' : 'Cancel Registration';
-
     const content = `
         <div class="register-modal-stack register-modal-centered">
             <div>
                 <h1>💔</h1>
-                <h2>${title}</h2>
-                <p>${copy}</p>
+                <h2>Cancel Registration?</h2>
+                <p>Are you sure you want to un-enroll from this course?<br>If you've made a payment it cannot be refunded.</p>
             </div>
             <div class="register-modal-actions">
-                <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">${actionText}</a>
+                <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">Cancel Registration</a>
                 <a href="courses.php" class="confirm-button register-button-muted register-modal-action-half">↩️ Back to Courses</a>
             </div>
         </div>
@@ -884,6 +786,7 @@ function openCancelRegistrationModal() {
             .catch(() => alert('Unable to cancel registration.'));
     });
 }
+<?php endif; ?>
 
 function openUnregisterSuccessModal() {
     const modal = document.getElementById('form-modal-message');
@@ -895,8 +798,8 @@ function openUnregisterSuccessModal() {
     const content = `
         <div class="register-modal-stack register-modal-centered">
             <h1>😿</h1>
-            <h2>${IS_PLEDGED ? 'Your pledge has been cancelled.' : 'You\\'re un-enrolled.'}</h2>
-            <p>${IS_PLEDGED ? 'Your pledge has been removed and the course statistics have been updated.' : 'We\\'re sorry to see you go! We hope you can find another course that suits your interests and availability from our course listings'}</p>
+            <h2>You're un-enrolled.</h2>
+            <p>We're sorry to see you go! We hope you can find another course that suits your interests and availability from our course listings</p>
             <div class="register-modal-actions register-modal-actions-column">
                 <a href="courses.php" class="confirm-button enabled register-modal-action-wide">OK</a>
             </div>
@@ -907,6 +810,27 @@ function openUnregisterSuccessModal() {
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btns = [
+        document.getElementById('rsvp-bottom-button'),
+        document.getElementById('rsvp-register-button-desktop'),
+        document.getElementById('rsvp-register-button-mobile')
+    ];
+    btns.forEach(btn => {
+        if (!btn) return;
+        btn.addEventListener('mouseover', function() {
+            this.dataset.originalText = this.innerHTML;
+            this.dataset.originalBg = this.style.background;
+            this.style.background = 'grey';
+            this.innerHTML = '💔 Cancel Registration';
+        });
+        btn.addEventListener('mouseout', function() {
+            this.style.background = this.dataset.originalBg;
+            this.innerHTML = this.dataset.originalText;
+        });
+    });
+});
 </script>
 
 <?php
@@ -1011,7 +935,7 @@ function openPledgeSuccessModal(trainingTitle, pledgeDeadlineText, pledgedAmount
         <div class="register-success-modal">
             <img src="../webps/registration-confirmed.webp" class="register-success-image">
             <h3>Your pledge has been made!</h3>
-            <p>You have pledged <b>${escapeHtml(amountLine)}</b> to participate in <b>${escapeHtml(trainingTitle)}</b>. We’ve notified the trainers and updated the public course statistics. Before <b>${escapeHtml(pledgeDeadlineText)}</b>, we’ll get back to you to confirm whether the course is going ahead and provide the way to pay.</p>
+            <p>You have pledged <b>${escapeHtml(amountLine)}</b> to participate in <b>${escapeHtml(trainingTitle)}</b>.  We’ve notified the trainers and updated the public course statistics. Before <b>${escapeHtml(pledgeDeadlineText)}</b>, we’ll get back to you to confirm whether the course is going ahead and provide the way to pay.</p>
             <div class="register-modal-actions register-modal-actions-column">
                 <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button enabled register-modal-action-wide">Got it!</a>
             </div>
@@ -1029,3 +953,4 @@ function openPledgeSuccessModal(trainingTitle, pledgeDeadlineText, pledgedAmount
 
 </body>
 </html>
+
