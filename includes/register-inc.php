@@ -1120,6 +1120,7 @@
 
     .register-trainer-card {
         margin-top: -28px;
+        text-align: right;
     }
 
     .register-trainer-photo {
