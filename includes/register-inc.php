@@ -15,6 +15,8 @@
 
 
 <STYLE>
+
+
 /* ===================================================================== */
 /* ======================== REGISTER PAGE: 3P UI ======================== */
 /* ===================================================================== */
@@ -39,19 +41,84 @@
     background: var(--course-module);
     border-radius: 15px;
     padding: 10px;
+    overflow: hidden;
 }
 
 .register-lead-photo {
     width: 100%;
     border-radius: 10px;
+    display: block;
+}
+
+/* intro layout */
+.training-title-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.95fr);
+    gap: 28px;
+    align-items: start;
+    margin-top: -6px;
+    position: relative;
+}
+
+.the-titles {
+    min-width: 0;
+}
+
+.register-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+}
+
+.register-title-group {
+    min-width: 0;
+    flex: 1;
+}
+
+.register-trainer-inline {
+    min-width: 220px;
+    max-width: 320px;
+    text-align: center;
+    position: relative;
+    margin-top: -76px;
+    z-index: 4;
+}
+
+.register-trainer-inline .register-trainer-headshots {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 10px;
+}
+
+.register-trainer-inline .register-trainer-headshots img {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--course-module);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+    background: #ddd;
+}
+
+.register-trainer-inline .register-trainer-headshots img + img {
+    margin-left: -14px;
+}
+
+.register-trainer-names {
+    font-size: 1.02em;
+    line-height: 1.35;
+    margin: 0;
 }
 
 .register-subtitle {
-    margin: 10px 0;
+    margin: 8px 0 10px 0;
 }
 
 .register-meta-line {
     font-size: 1em;
+    margin: 0 0 6px 0;
 }
 
 .register-profile-line {
@@ -67,7 +134,7 @@
 }
 
 .register-main-button {
-    margin-top: 20px;
+    margin-top: 18px;
     font-size: 1.3em;
     padding: 10px 20px;
     cursor: pointer;
@@ -102,6 +169,18 @@
 .register-details-photo {
     width: 100%;
     padding: 10px;
+    display: block;
+}
+
+/* right column */
+.profile-images {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.profile-images > img {
+    display: none;
 }
 
 /* ===================================================================== */
@@ -157,13 +236,16 @@
 /* ===================================================================== */
 
 .register-status-panel {
-    margin-top: 16px;
+    margin-top: 14px;
     width: 100%;
+    max-width: 100%;
     background: rgba(255,255,255,0.16);
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 14px;
     padding: 14px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .register-status-title {
@@ -174,6 +256,8 @@
 
 .register-progress-block {
     margin-bottom: 16px;
+    width: 100%;
+    min-width: 0;
 }
 
 .register-progress-block:last-child {
@@ -195,11 +279,13 @@
     font-weight: 500;
     opacity: 0.78;
     font-variant-numeric: tabular-nums;
+    text-align: right;
 }
 
 .register-progress-bar {
     position: relative;
     width: 100%;
+    max-width: 100%;
     height: 22px;
     border-radius: 999px;
     overflow: hidden;
@@ -604,13 +690,13 @@
 }
 
 .threep-modal-copy {
-    font-size: 1rem;
+    font-size: 1.26em;
     line-height: 1.58;
     margin: 10px 0 18px 0;
     color: #333;
 }
 
-/* training title pill: supports all prior class names */
+/* training title pill */
 .threep-training-pill {
     display: inline-flex;
     align-self: center;
@@ -618,29 +704,30 @@
     align-items: center;
     width: fit-content;
     max-width: 100%;
-    background: var(--subdued-text);
-    color: var(--h1);
+    background: #e3e3e3;
+    color: var(--text-color);
     border-radius: 999px;
     padding: 8px 16px;
     font-size: 0.95em;
     font-weight: 600;
     margin: 0 auto 12px auto;
     box-shadow:
-        0 2px 6px rgba(0,0,0,0.10),
-        inset 0 1px 0 rgba(255,255,255,0.12);
+        0 2px 6px rgba(0,0,0,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.22);
     line-height: 1.25;
     white-space: normal;
     text-align: center;
 }
 
 .threep-modal-slider-block {
-    background: linear-gradient(180deg, rgba(0,0,0,0.038) 0%, rgba(0,0,0,0.028) 100%);
+    background:
+        linear-gradient(180deg, rgba(246,246,246,0.94) 0%, rgba(232,232,232,0.92) 100%);
     border: 1px solid rgba(0,0,0,0.07);
     border-radius: 14px;
     padding: 18px 16px 16px 16px;
     margin-top: 6px;
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.65),
         0 2px 8px rgba(0,0,0,0.04);
 }
 
@@ -660,39 +747,30 @@
     align-items: center;
 }
 
-.threep-slider-edge {
-    font-size: 0.88em;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.3;
-}
-
-.threep-slider-pill,
-.threep-edge-pill {
+.threep-slider-pill {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 999px;
-    padding: 7px 10px;
-    color: #fff;
-    font-weight: 600;
-    box-shadow:
-        0 2px 5px rgba(0,0,0,0.12),
-        inset 0 1px 0 rgba(255,255,255,0.14);
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    font-weight: 700;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95em;
 }
 
-.pill-zero,
-.threep-edge-pill-zero {
-    background: linear-gradient(180deg, #f0a343 0%, #de7f1e 100%);
+.pill-zero {
+    color: #d57d12;
 }
 
-.pill-max,
-.threep-edge-pill-max {
-    background: linear-gradient(180deg, #2f8c3b 0%, #21672a 100%);
+.pill-max {
+    color: #1d65c1;
 }
 
 #threep_pledge_slider {
-    --pledge-color: #7ed957;
+    --pledge-color: #28c76f;
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
@@ -700,11 +778,11 @@
     border-radius: 999px;
     outline: none;
     cursor: pointer;
-    background: linear-gradient(90deg, #7ed957 0%, #7ed957 50%, #e4efe3 50%, #e4efe3 100%);
+    background: linear-gradient(90deg, #28c76f 0%, #28c76f 50%, #d9dee3 50%, #d9dee3 100%);
     box-shadow:
         inset 0 1px 3px rgba(0,0,0,0.16),
-        inset 0 -1px 0 rgba(255,255,255,0.16),
-        0 0 0 rgba(126, 217, 87, 0);
+        inset 0 -1px 0 rgba(255,255,255,0.22),
+        0 0 0 rgba(40, 199, 111, 0);
     transition:
         background 180ms cubic-bezier(0.22, 1, 0.36, 1),
         box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -717,7 +795,7 @@
 #threep_pledge_slider:focus {
     box-shadow:
         inset 0 1px 3px rgba(0,0,0,0.16),
-        inset 0 -1px 0 rgba(255,255,255,0.16),
+        inset 0 -1px 0 rgba(255,255,255,0.22),
         0 0 16px color-mix(in srgb, var(--pledge-color) 28%, transparent);
 }
 
@@ -744,7 +822,7 @@
     border-radius: 50%;
     background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 42%, rgba(247,247,247,0.96) 100%);
-    border: 3px solid var(--pledge-color, #7ed957);
+    border: 3px solid var(--pledge-color, #28c76f);
     box-shadow:
         0 2px 8px rgba(0,0,0,0.18),
         0 0 0 6px color-mix(in srgb, var(--pledge-color) 20%, transparent),
@@ -783,7 +861,7 @@
     border-radius: 50%;
     background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 42%, rgba(247,247,247,0.96) 100%);
-    border: 3px solid var(--pledge-color, #7ed957);
+    border: 3px solid var(--pledge-color, #28c76f);
     box-shadow:
         0 2px 8px rgba(0,0,0,0.18),
         0 0 0 6px color-mix(in srgb, var(--pledge-color) 20%, transparent),
@@ -836,16 +914,16 @@
 }
 
 .threep-currency-switch-label {
-    font-size: 0.84em;
+    font-size: 0.78em;
     opacity: 0.8;
 }
 
 .threep-currency-select {
-    padding: 4px 8px;
-    font-size: 0.84em;
-    min-width: 88px;
-    max-width: 96px;
-    line-height: 1.2;
+    padding: 3px 7px;
+    font-size: 0.71em;
+    min-width: 74px;
+    max-width: 82px;
+    line-height: 1.1;
 }
 
 .threep-confirm-button {
@@ -931,12 +1009,12 @@
 @keyframes threep-confirm-soft-pulse {
     0%, 100% {
         box-shadow:
-            0 0 0 0 rgba(126, 217, 87, 0.00),
+            0 0 0 0 rgba(40, 199, 111, 0.00),
             0 2px 6px rgba(0,0,0,0.10);
     }
     50% {
         box-shadow:
-            0 0 0 6px rgba(126, 217, 87, 0.10),
+            0 0 0 6px rgba(40, 199, 111, 0.10),
             0 6px 16px rgba(0,0,0,0.14);
     }
 }
@@ -962,6 +1040,29 @@
 /* ===================================================================== */
 /* ============================ RESPONSIVE ============================== */
 /* ===================================================================== */
+
+@media (max-width: 1100px) {
+    .training-title-box {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .register-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .register-trainer-inline {
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+        margin-top: -42px;
+    }
+
+    .register-status-panel {
+        max-width: 100%;
+    }
+}
 
 @media (max-width: 900px) {
     .threep-status-grid {
@@ -993,7 +1094,7 @@
         grid-template-columns: 1fr;
     }
 
-    .threep-slider-edge {
+    .threep-slider-pill {
         justify-self: center;
     }
 
@@ -1026,10 +1127,20 @@
         max-width: 100%;
     }
 
-.threep-training-pill {
-    max-width: 90%;
+    .threep-training-pill {
+        max-width: 90%;
+    }
+
+    .register-trainer-inline {
+        margin-top: -30px;
+    }
+
+    .register-trainer-inline .register-trainer-headshots img {
+        width: 86px;
+        height: 86px;
+    }
 }
-}
+
 
 
 

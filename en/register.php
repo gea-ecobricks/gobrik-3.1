@@ -340,12 +340,28 @@ echo '<!DOCTYPE html>
                 <img src="<?php echo $feature_photo1_main; ?>" class="register-lead-photo" id="event-lead-photo">
 
                 <div class="training-title-box">
+
                     <div class="the-titles">
-                        <h3><?php echo $training_title; ?></h3>
-                        <h4 class="register-subtitle"><?php echo $training_subtitle; ?></h4>
+
+                        <div class="register-title-row">
+                            <div class="register-title-group">
+                                <h3><?php echo $training_title; ?></h3>
+                                <h4 class="register-subtitle"><?php echo $training_subtitle; ?></h4>
+                            </div>
+
+                            <div class="register-trainer-inline">
+                                <div class="register-trainer-headshots">
+                                    <img src="<?php echo $feature_photo2_main; ?>" alt="Trainer photo 1">
+                                    <img src="<?php echo $feature_photo3_main; ?>" alt="Trainer photo 2">
+                                </div>
+                                <p class="register-trainer-names">Led by <?php echo $lead_trainer; ?></p>
+                            </div>
+                        </div>
+
                         <p class="register-meta-line"><?php echo date("F j, Y", strtotime($training_date)); ?> | <?php echo $training_time_txt; ?></p>
                         <p class="register-meta-line"><?php echo $training_type; ?></p>
                         <p class="register-meta-line"><span data-lang-id="000-open-to">Open to:</span> <?php echo $registration_scope; ?></p>
+                        <p class="register-meta-line">Language: <?php echo $training_language; ?></p>
                         <p class="register-meta-line"><?php echo $display_cost; ?></p>
 
                         <button id="rsvp-register-button-desktop" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
@@ -354,10 +370,6 @@ echo '<!DOCTYPE html>
                     </div>
 
                     <div class="profile-images">
-                        <img src="<?php echo $feature_photo3_main; ?>">
-                        <p class="profile-names register-profile-line">Led by <?php echo $lead_trainer; ?></p>
-                        <p class="profile-names register-profile-line register-profile-line-small">Language: <?php echo $training_language; ?></p>
-
                         <?php if ($show_signup_count === 1): ?>
                             <div class="profile-names register-signup-line">
                                 <span class="signup-count-text">Registrations:</span>
@@ -765,6 +777,15 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
     const confirmBtn = document.getElementById('threep_confirm_button');
     const edgeLabels = document.querySelectorAll('.threep-slider-edge');
 
+    function formatSliderColor(pct) {
+        let hue
+        if (pct < 0.5) {
+            hue = 30 + (pct * 2) * 110
+        } else {
+            hue = 140 + ((pct - 0.5) * 2) * 80
+        }
+        return `hsl(${hue}, 70%, 46%)`
+    }
     function update3PReadout() {
 
         const currency = currencySelect.value
@@ -783,12 +804,18 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
         let hue
         if (pct < 0.5) {
-            hue = 30 + (pct * 2) * 60
+            hue = 30 + (pct * 2) * 110
         } else {
-            hue = 90 + (pct - 0.5) * 2 * 40
+            hue = 140 + ((pct - 0.5) * 2) * 80
         }
 
-        const sliderColor = `hsl(${hue},65%,45%)`
+    slider.style.setProperty('--pledge-color', sliderColor)
+    confirmBtn.style.setProperty('--pledge-color', sliderColor)
+    confirmBtn.classList.add('threep-confirm-button')
+    document.getElementById("threep_zero_label").style.color = formatSliderColor(min / max)
+    document.getElementById("threep_max_label").style.color = formatSliderColor(1)
+
+        const sliderColor = formatSliderColor(pct)
 
         slider.style.background =
             `linear-gradient(90deg, ${sliderColor} 0%, ${sliderColor} ${pct*100}%, #e0e0e0 ${pct*100}%)`
