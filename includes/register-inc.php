@@ -40,7 +40,7 @@
     width: 100%;
     background: var(--course-module);
     border-radius: 15px;
-    padding: 10px;
+    padding: 0px;
     overflow: hidden;
 }
 
@@ -136,10 +136,10 @@
 }
 
 .register-trainer-names {
-    font-size: 1.02em;
+    font-size: 0.9em;
     line-height: 1.35;
     margin: 10px 0 0 0;
-    text-align: right;
+    text-align: center;
 }
 
 .register-profile-line {
@@ -1203,7 +1203,7 @@
 }
 
 /* form container */
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 769px) {
     .form-container {
         width: calc(100% - 40px);
         margin: 0;
@@ -1214,12 +1214,13 @@
     }
 }
 
-@media screen and (min-width: 701px) {
+@media screen and (min-width: 769px) {
     .form-container {
         margin-top: auto;
         margin-bottom: auto;
         padding: 30px;
-        margin-top: 110px;
+        margin-top: 110px !important;
+        padding-top: 0px !important;
     }
 }
 
