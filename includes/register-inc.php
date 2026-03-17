@@ -17,716 +17,376 @@
 <STYLE>
 
 /* ===================================================================== */
-/* ======================== REGISTER PAGE: 3P UI ======================== */
+/* ======================== 3P SECTION STYLES =========================== */
 /* ===================================================================== */
 
-.register-page-shell {
-    margin-top: 108px;
+.threep-box{
+    margin-top:20px;
 }
 
-.register-page-container {
-    padding-top: 0;
+.threep-hr{
+    margin:18px 0 22px 0;
+    border:0;
+    border-top:1px solid rgba(0,0,0,0.18);
 }
 
-.register-content-wrap {
-    width: 100%;
-    margin: auto;
-    margin-top: 5px;
+.threep-subtitle{
+    font-size:1.55em;
+    font-weight:600;
+    margin-bottom:10px;
+    color:var(--text);
+    letter-spacing:0.01em;
 }
 
-.register-intro-card {
-    width: 100%;
-    background: var(--course-module);
-    border-radius: 15px;
-    padding: 10px;
+.threep-section-divider{
+    border-top:2px dotted rgba(0,0,0,0.22);
+    margin:12px 0 18px 0;
 }
 
-.register-lead-photo {
-    width: 100%;
-    border-radius: 10px;
+.threep-field-card{
+    background:rgba(255,255,255,0.20);
+    padding:16px 16px 14px 16px;
+    border-radius:10px;
+    margin-bottom:14px;
+    border:1px solid rgba(0,0,0,0.04);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
-.register-subtitle {
-    margin: 10px 0;
+.currency-locked{
+    padding:10px 14px;
+    background:rgba(0,0,0,0.06);
+    border-radius:8px;
+    font-weight:500;
+    display:inline-block;
+    border:1px solid rgba(0,0,0,0.06);
 }
 
-.register-meta-line {
-    font-size: 1em;
+.currency-input-wrap{
+    display:grid;
+    grid-template-columns:1fr 56px;
+    align-items:center;
+    gap:10px;
 }
 
-.register-profile-line {
-    margin-bottom: 10px;
+.currency-display-input{
+    text-align:left;
+    letter-spacing:0.01em;
+    font-variant-numeric:tabular-nums;
 }
 
-.register-profile-line-small {
-    font-size: 1em;
+.currency-suffix{
+    text-align:left;
+    font-weight:600;
+    opacity:0.72;
+    font-size:0.96em;
 }
 
-.register-signup-line {
-    margin-bottom: 10px;
+/* ===================================================================== */
+/* ========================== LIVE CALCULATOR =========================== */
+/* ===================================================================== */
+
+.threep-calculator{
+    margin-top:24px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.08) 100%);
+    padding:22px 18px 20px 18px;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,0.07);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 1px 2px rgba(0,0,0,0.04);
 }
 
-.register-main-button {
-    margin-top: 20px;
-    font-size: 1.3em;
-    padding: 10px 20px;
-    cursor: pointer;
+.threep-calculator-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:14px;
 }
 
-.register-bottom-button {
-    margin-top: 20px;
-    margin-bottom: 75px;
-    font-size: 1.3em;
-    padding: 10px 20px;
-    cursor: pointer;
-    width: 100%;
+.calc-card{
+    background:rgba(255,255,255,0.92);
+    padding:18px 16px 16px 16px;
+    border-radius:10px;
+    border:1px solid rgba(0,0,0,0.08);
+    min-height:104px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    box-shadow:
+        0 1px 1px rgba(0,0,0,0.03),
+        inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
-.register-featured-description {
-    margin-top: 20px;
-    font-size: 1.5em;
-    padding: 15px;
+.calc-title{
+    font-size:0.95em;
+    opacity:0.78;
+    margin-bottom:10px;
+    line-height:1.35;
 }
 
-.register-agenda {
-    font-size: 1.23em;
-    padding: 15px;
-    margin-top: 0;
+.calc-value{
+    font-size:2.05em;
+    font-weight:700;
+    line-height:1.1;
+    letter-spacing:0.01em;
+    font-variant-numeric:tabular-nums;
 }
 
-.register-details-panel {
-    margin-top: 20px;
-    font-size: small;
+.calc-value.is-green{
+    color:#2f7d32;
 }
 
-.register-details-photo {
-    width: 100%;
-    padding: 10px;
+.calc-value.is-earth{
+    color:#8a4b32;
 }
 
-/* Notices */
-.top-container-notice {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    background: #f3f8f2;
-    border: 1px solid rgba(0,0,0,0.08);
-    border-left: 6px solid #6aa56a;
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    font-size: 1rem;
-    line-height: 1.45;
+.threep-calculator .form-caption{
+    margin-top:16px;
 }
 
-#pledged-notice {
-    background: linear-gradient(90deg, rgba(46, 130, 50, 0.94) 0%, rgba(56, 151, 61, 0.96) 100%);
-    color: #fff;
-    border-left-color: #f0d85c;
+/* ===================================================================== */
+/* ======================= STATUS + PROGRESS AREA ======================= */
+/* ===================================================================== */
+
+.threep-status-grid{
+    display:grid;
+    grid-template-columns:1fr 1.1fr;
+    gap:22px;
+    align-items:start;
+    margin-top:10px;
 }
 
-#pledged-notice a {
-    color: #fff;
+.threep-status-textbox{
+    background:rgba(255,255,255,0.22);
+    padding:16px;
+    border-radius:10px;
+    border:1px solid rgba(0,0,0,0.06);
+    line-height:1.95;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
-.notice-icon {
-    margin-right: 10px;
-    flex-shrink: 0;
+/* ===================================================================== */
+/* =========================== PROGRESS BARS ============================ */
+/* ===================================================================== */
+
+.threep-progress-block{
+    background:rgba(255,255,255,0.22);
+    padding:16px 16px 14px 16px;
+    border-radius:10px;
+    margin-bottom:16px;
+    border:1px solid rgba(0,0,0,0.06);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
-.notice-close {
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    line-height: 1;
-    cursor: pointer;
-    opacity: 0.7;
-    color: inherit;
+.threep-progress-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:10px;
+    font-weight:600;
+    margin-bottom:12px;
+    font-size:1em;
+    line-height:1.2;
 }
 
-.notice-close:hover {
-    opacity: 1;
+.threep-progress-label span{
+    font-weight:500;
+    opacity:0.78;
+    font-size:0.93em;
+    font-variant-numeric:tabular-nums;
 }
 
-/* Status panel */
-.register-status-panel {
-    margin-top: 16px;
-    width: 100%;
-    background: rgba(255,255,255,0.16);
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 14px;
-    padding: 14px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
-}
-
-.register-status-title {
-    font-size: 1.04em;
-    font-weight: 600;
-    margin-bottom: 14px;
-}
-
-.register-progress-block {
-    margin-bottom: 16px;
-}
-
-.register-progress-block:last-child {
-    margin-bottom: 0;
-}
-
-.register-progress-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 10px;
-    font-size: 0.95em;
-    font-weight: 600;
-    margin-bottom: 8px;
-    line-height: 1.3;
-}
-
-.register-progress-label span {
-    font-weight: 500;
-    opacity: 0.78;
-    font-variant-numeric: tabular-nums;
-}
-
-.register-progress-bar {
-    position: relative;
-    width: 100%;
-    height: 22px;
-    border-radius: 999px;
-    overflow: hidden;
-    background: #e3e3e3;
+.threep-progress-bar{
+    position:relative;
+    width:100%;
+    height:24px;
+    border-radius:999px;
+    overflow:hidden;
+    background:#e4e4e4;
     box-shadow:
         inset 0 1px 3px rgba(0,0,0,0.10),
         inset 0 -1px 0 rgba(255,255,255,0.16);
 }
 
-.register-progress-zone-before {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    background: linear-gradient(180deg, #c6c6c6 0%, #b8b8b8 100%);
+.threep-progress-zone-before{
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    background:linear-gradient(180deg, #c7c7c7 0%, #bbbbbb 100%);
 }
 
-.register-progress-zone-after {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, rgba(105,176,115,0.35) 0%, rgba(88,153,96,0.28) 100%);
+.threep-progress-zone-after{
+    position:absolute;
+    top:0;
+    bottom:0;
+    right:0;
+    background:linear-gradient(180deg, rgba(112,176,120,0.34) 0%, rgba(89,155,96,0.28) 100%);
 }
 
-.register-progress-fill {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    min-width: 8px;
-    border-radius: 999px;
+.threep-progress-fill{
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    min-width:8px;
+    background:linear-gradient(90deg, #d85050 0%, #e56868 100%);
+    border-radius:999px;
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.20),
         0 0 0 1px rgba(0,0,0,0.03);
 }
 
-.register-progress-fill.is-red {
-    background: linear-gradient(90deg, #d65050 0%, #e46d6d 100%);
-}
-
-.register-progress-threshold {
-    position: absolute;
-    top: -2px;
-    bottom: -2px;
-    width: 0;
-    border-left: 3px solid rgba(20,20,20,0.9);
-    z-index: 4;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.16);
-}
-
-.register-progress-meta {
-    margin-top: 8px;
-    font-size: 0.87em;
-    line-height: 1.45;
-    opacity: 0.86;
-    font-variant-numeric: tabular-nums;
-}
-
-/* Shared modals */
-.register-modal-stack {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: space-between;
-}
-
-.register-modal-centered {
-    text-align: center;
-}
-
-.register-modal-actions {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.register-modal-actions-column {
-    flex-flow: column;
-    align-items: center;
-}
-
-.register-modal-actions-centered {
-    align-items: center;
-}
-
-.register-modal-action-wide {
-    width: 80%;
-}
-
-.register-modal-action-half {
-    flex: 1;
-}
-
-.register-modal-footnote {
-    font-size: 1em;
-    color: grey;
-    margin-top: 12px;
-}
-
-.register-button-muted {
-    background: grey !important;
-}
-
-.register-button-danger {
-    background: red !important;
-    color: white !important;
-}
-
-.register-success-modal {
-    text-align: center;
-    width: 100%;
-    margin: auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.register-success-image {
-    width: 50%;
-    max-width: 400px;
-}
-
-.preview-title {
-    font-size: 1rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #777;
-    margin-bottom: 6px;
-}
-
-/* 3P modal */
-.threep-modal-wrap {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-}
-
-.threep-training-kicker-pill {
-    display: inline-block;
-    align-self: center;
-    background: linear-gradient(180deg, #5bb567 0%, #3f9850 100%);
-    color: #fff;
-    border-radius: 999px;
-    padding: 8px 16px;
-    font-size: 0.95em;
-    font-weight: 600;
-    margin-bottom: 12px;
+.threep-progress-threshold{
+    position:absolute;
+    top:-2px;
+    bottom:-2px;
+    width:0;
+    border-left:3px solid rgba(24,24,24,0.88);
     box-shadow:
-        0 2px 6px rgba(0,0,0,0.10),
-        inset 0 1px 0 rgba(255,255,255,0.18);
+        0 0 0 1px rgba(255,255,255,0.20);
+    z-index:5;
 }
 
-.threep-modal-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 8px;
+.threep-progress-meta{
+    margin-top:10px;
+    font-size:0.94em;
+    line-height:1.55;
+    opacity:0.84;
+    font-variant-numeric:tabular-nums;
 }
 
-.threep-modal-head-main {
-    width: 100%;
+.threep-progress-meta strong{
+    font-weight:600;
 }
 
-.threep-modal-title {
-    margin-top: 0;
-    margin-bottom: 6px;
+/* ===================================================================== */
+/* =========================== MODAL UI ================================= */
+/* ===================================================================== */
+
+.threep-training-pill{
+    display:inline-block;
+    background:#2e7d32;
+    color:white;
+    padding:6px 14px;
+    border-radius:999px;
+    font-weight:600;
+    font-size:.95em;
+    margin-bottom:14px;
 }
 
-.threep-modal-copy {
-    font-size: 1rem;
-    line-height: 1.58;
-    margin: 10px 0 18px 0;
-    color: #333;
+/* slider row */
+
+.threep-slider-row{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    gap:12px;
+    margin-top:10px;
 }
 
-.threep-modal-slider-block {
-    background: linear-gradient(180deg, rgba(0,0,0,0.038) 0%, rgba(0,0,0,0.028) 100%);
-    border: 1px solid rgba(0,0,0,0.07);
-    border-radius: 14px;
-    padding: 18px 16px 16px 16px;
-    margin-top: 6px;
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.18),
-        0 2px 8px rgba(0,0,0,0.04);
+/* slider track */
+
+#threep_pledge_slider{
+    width:100%;
+    appearance:none;
+    height:10px;
+    border-radius:999px;
+    background:#b9e4b9;
+    outline:none;
+    transition:background .15s ease;
 }
 
-.threep-amount-readout {
-    font-size: 2.15em;
-    font-weight: 700;
-    line-height: 1.1;
-    margin-bottom: 14px;
-    letter-spacing: 0.01em;
-    font-variant-numeric: tabular-nums;
+/* slider thumb */
+
+#threep_pledge_slider::-webkit-slider-thumb{
+    appearance:none;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:white;
+    border:2px solid #666;
+    cursor:pointer;
 }
 
-.threep-slider-row {
-    display: grid;
-    grid-template-columns: minmax(72px,auto) 1fr minmax(72px,auto);
-    gap: 12px;
-    align-items: center;
+#threep_pledge_slider::-moz-range-thumb{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:white;
+    border:2px solid #666;
 }
 
-.threep-slider-edge {
-    font-size: 0.88em;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.3;
+/* pills */
+
+.threep-slider-pill{
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:.8em;
+    font-weight:600;
+    white-space:nowrap;
 }
 
-.threep-edge-pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    padding: 7px 10px;
-    color: #fff;
-    font-weight: 600;
-    box-shadow:
-        0 2px 5px rgba(0,0,0,0.12),
-        inset 0 1px 0 rgba(255,255,255,0.14);
+.pill-zero{
+    background:#f28c28;
+    color:white;
 }
 
-.threep-edge-pill-zero {
-    background: linear-gradient(180deg, #f0a343 0%, #de7f1e 100%);
+.pill-max{
+    background:#1b5e20;
+    color:white;
 }
 
-.threep-edge-pill-max {
-    background: linear-gradient(180deg, #2f8c3b 0%, #21672a 100%);
+/* readout */
+
+.threep-amount-readout{
+    font-size:1.8em;
+    font-weight:700;
+    margin-bottom:8px;
 }
 
-#threep_pledge_slider {
-    --pledge-color: #7ed957;
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 14px;
-    border-radius: 999px;
-    outline: none;
-    cursor: pointer;
-    background: linear-gradient(90deg, #7ed957 0%, #7ed957 50%, #e4efe3 50%, #e4efe3 100%);
-    box-shadow:
-        inset 0 1px 3px rgba(0,0,0,0.16),
-        inset 0 -1px 0 rgba(255,255,255,0.16),
-        0 0 0 rgba(126, 217, 87, 0);
-    transition:
-        background 180ms cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
-        transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: background, box-shadow, transform;
-    transform: translateZ(0);
+/* currency selector */
+
+.threep-currency-select{
+    font-size:.85em;
+    padding:6px 10px;
+    border-radius:6px;
 }
 
-#threep_pledge_slider:hover,
-#threep_pledge_slider:focus {
-    box-shadow:
-        inset 0 1px 3px rgba(0,0,0,0.16),
-        inset 0 -1px 0 rgba(255,255,255,0.16),
-        0 0 16px color-mix(in srgb, var(--pledge-color) 28%, transparent);
+/* subdued explanatory text */
+
+.subdued{
+    color:var(--subdued-text);
+    font-size:.9em;
+    margin-top:6px;
 }
 
-#threep_pledge_slider:active {
-    transform: scaleY(1.06) translateZ(0);
-    transition:
-        background 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
-        box-shadow 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
-        transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
+/* ===================================================================== */
+/* ========================== RESPONSIVENESS ============================ */
+/* ===================================================================== */
 
-#threep_pledge_slider::-webkit-slider-runnable-track {
-    height: 14px;
-    border-radius: 999px;
-    background: transparent;
-}
+@media (max-width:900px){
 
-#threep_pledge_slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 26px;
-    height: 26px;
-    margin-top: -6px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 42%, rgba(247,247,247,0.96) 100%);
-    border: 3px solid var(--pledge-color, #7ed957);
-    box-shadow:
-        0 2px 8px rgba(0,0,0,0.18),
-        0 0 0 6px color-mix(in srgb, var(--pledge-color) 20%, transparent),
-        inset 0 1px 0 rgba(255,255,255,0.82);
-    cursor: pointer;
-    transition:
-        border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1),
-        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
-    will-change: transform, box-shadow, border-color;
-    transform: translateZ(0);
-}
-
-#threep_pledge_slider:hover::-webkit-slider-thumb,
-#threep_pledge_slider:focus::-webkit-slider-thumb {
-    transform: scale(1.06) translateZ(0);
-    box-shadow:
-        0 3px 10px rgba(0,0,0,0.22),
-        0 0 0 8px color-mix(in srgb, var(--pledge-color) 26%, transparent),
-        inset 0 1px 0 rgba(255,255,255,0.88);
-}
-
-#threep_pledge_slider:active::-webkit-slider-thumb {
-    transform: scale(1.1) translateZ(0);
-}
-
-#threep_pledge_slider::-moz-range-track {
-    height: 14px;
-    border-radius: 999px;
-    background: transparent;
-}
-
-#threep_pledge_slider::-moz-range-thumb {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 42%, rgba(247,247,247,0.96) 100%);
-    border: 3px solid var(--pledge-color, #7ed957);
-    box-shadow:
-        0 2px 8px rgba(0,0,0,0.18),
-        0 0 0 6px color-mix(in srgb, var(--pledge-color) 20%, transparent),
-        inset 0 1px 0 rgba(255,255,255,0.82);
-    cursor: pointer;
-    transition:
-        border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1),
-        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
-    will-change: transform, box-shadow, border-color;
-    transform: translateZ(0);
-}
-
-#threep_pledge_slider:hover::-moz-range-thumb,
-#threep_pledge_slider:focus::-moz-range-thumb {
-    transform: scale(1.06) translateZ(0);
-    box-shadow:
-        0 3px 10px rgba(0,0,0,0.22),
-        0 0 0 8px color-mix(in srgb, var(--pledge-color) 26%, transparent),
-        inset 0 1px 0 rgba(255,255,255,0.88);
-}
-
-#threep_pledge_slider:active::-moz-range-thumb {
-    transform: scale(1.1) translateZ(0);
-}
-
-.threep-suggested-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-    padding-top: 12px;
-    border-top: 1px dotted rgba(0,0,0,0.14);
-}
-
-.threep-suggested-copy {
-    font-size: 0.95em;
-}
-
-.threep-suggested-row strong {
-    font-variant-numeric: tabular-nums;
-}
-
-.threep-currency-switcher {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.threep-currency-switch-label {
-    font-size: 0.84em;
-    opacity: 0.8;
-}
-
-.threep-currency-select {
-    padding: 4px 8px;
-    font-size: 0.84em;
-    min-width: 88px;
-    max-width: 96px;
-    line-height: 1.2;
-}
-
-.threep-confirm-button {
-    position: relative;
-    overflow: hidden;
-    transition:
-        background 180ms cubic-bezier(0.22, 1, 0.36, 1),
-        border-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
-        transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
-    will-change: background, border-color, box-shadow, transform;
-    animation: threep-confirm-soft-pulse 2.8s ease-in-out infinite;
-    transform: translateZ(0);
-}
-
-.threep-confirm-button:hover,
-.threep-confirm-button:focus {
-    transform: translateY(-1px) scale(1.01) translateZ(0);
-    box-shadow:
-        0 8px 20px rgba(0,0,0,0.14),
-        0 0 0 8px color-mix(in srgb, var(--pledge-color) 18%, transparent);
-}
-
-.threep-confirm-button::after {
-    content: "";
-    position: absolute;
-    top: -60%;
-    left: -25%;
-    width: 22%;
-    height: 220%;
-    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0) 100%);
-    transform: rotate(18deg);
-    pointer-events: none;
-    opacity: 0.66;
-    animation: threep-button-shimmer 3.6s ease-in-out infinite;
-}
-
-.threep-confirm-footnote {
-    font-size: 0.95em;
-    color: var(--subdued-text);
-    margin-top: 12px;
-    max-width: 80%;
-}
-
-/* tooltips */
-.threep-help-underline {
-    text-decoration: underline dotted;
-    text-underline-offset: 3px;
-    cursor: help;
-}
-
-.custom-tooltip-bubble {
-    position: absolute;
-    z-index: 99999;
-    max-width: 320px;
-    background: #2b2b2b;
-    color: #fff;
-    padding: 10px 12px;
-    border-radius: 10px;
-    font-size: 0.92rem;
-    line-height: 1.45;
-    box-shadow: 0 10px 26px rgba(0,0,0,0.22);
-    opacity: 0;
-    transform: translateY(3px);
-    transition: opacity 0.12s ease, transform 0.12s ease;
-    pointer-events: none;
-    border: 1px solid rgba(255,255,255,0.08);
-}
-
-.custom-tooltip-bubble.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* animations */
-@keyframes threep-confirm-soft-pulse {
-    0%, 100% {
-        box-shadow:
-            0 0 0 0 rgba(126, 217, 87, 0.00),
-            0 2px 6px rgba(0,0,0,0.10);
-    }
-    50% {
-        box-shadow:
-            0 0 0 6px rgba(126, 217, 87, 0.10),
-            0 6px 16px rgba(0,0,0,0.14);
-    }
-}
-
-@keyframes threep-button-shimmer {
-    0% {
-        left: -30%;
-        opacity: 0;
-    }
-    12% {
-        opacity: 0.48;
-    }
-    28% {
-        left: 108%;
-        opacity: 0.18;
-    }
-    100% {
-        left: 108%;
-        opacity: 0;
-    }
-}
-
-/* responsive */
-@media (max-width: 900px) {
-    .threep-modal-head {
-        flex-direction: column;
-        align-items: center;
+    .threep-status-grid{
+        grid-template-columns:1fr;
     }
 
-    .threep-slider-row {
-        grid-template-columns: 1fr;
+    .threep-calculator-grid{
+        grid-template-columns:1fr;
     }
 
-    .threep-slider-edge {
-        justify-self: center;
+    .currency-input-wrap{
+        grid-template-columns:1fr 52px;
     }
 
-    .threep-suggested-row {
-        flex-direction: column;
-        align-items: flex-start;
+    .calc-value{
+        font-size:1.8em;
     }
 
-    .threep-currency-switcher {
-        width: 100%;
-        justify-content: space-between;
+    .threep-progress-bar{
+        height:22px;
     }
 
-    .register-progress-label {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .register-modal-actions {
-        flex-direction: column;
-    }
-
-    .register-modal-action-half,
-    .register-modal-action-wide {
-        width: 100%;
-    }
-
-    .threep-confirm-footnote {
-        max-width: 100%;
-    }
 }
 
 
