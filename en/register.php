@@ -903,7 +903,14 @@ function openUnregisterSuccessModal() {
     document.body.classList.add('modal-open');
 }
 
+
 document.addEventListener('DOMContentLoaded', function() {
+
+    // Only enable rollover cancel behaviour if the user is registered
+    const isRegistered = <?php echo $is_registered ? 'true' : 'false'; ?>;
+
+    if (!isRegistered) return;
+
     const btns = [
         document.getElementById('rsvp-bottom-button'),
         document.getElementById('rsvp-register-button-desktop'),
@@ -912,13 +919,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const isPledgeState =
         TRAINING_PAYMENT_MODE === 'pledge_threshold' &&
-        ['pledged', 'reserved', 'awaiting_payment'].includes(REGISTRATION_STATUS_CURRENT);
+        ['pledged','reserved','awaiting_payment'].includes(REGISTRATION_STATUS_CURRENT);
 
     const rolloverText = isPledgeState
         ? '💔 Withdraw Pledge'
         : '💔 Cancel Registration';
 
     btns.forEach(btn => {
+
         if (!btn) return;
 
         btn.addEventListener('mouseover', function() {
@@ -932,7 +940,9 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.background = this.dataset.originalBg;
             this.innerHTML = this.dataset.originalText;
         });
+
     });
+
 });
 </script>
 
