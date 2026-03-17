@@ -813,54 +813,69 @@ function open3PRegistrationModal(trainingName, trainingType, trainingDate, train
 
 <?php if ($is_registered): ?>
 function openCancelRegistrationModal() {
+
     const modal = document.getElementById('form-modal-message');
     const messageContainer = modal.querySelector('.modal-message');
     const photobox = document.getElementById('modal-photo-box');
 
     photobox.style.display = 'none';
 
+    const isPledgeState =
+        TRAINING_PAYMENT_MODE === 'pledge_threshold' &&
+        ['pledged','reserved','awaiting_payment'].includes(REGISTRATION_STATUS_CURRENT);
+
+    const modalTitle = isPledgeState ? 'Withdraw Pledge?' : 'Cancel Registration?';
+
+    const modalBody = isPledgeState
+        ? 'Are you sure you want to withdraw your pledge for this course?<br>Your pledge will be removed from the public course totals.'
+        : 'Are you sure you want to un-enroll from this course?<br>If you\'ve already made a payment it cannot be refunded.';
+
+    const actionLabel = isPledgeState
+        ? 'Withdraw Pledge'
+        : 'Cancel Registration';
+
     const content = `
-        const isPledgeState =
-            TRAINING_PAYMENT_MODE === 'pledge_threshold' &&
-            ['pledged', 'reserved', 'awaiting_payment'].includes(REGISTRATION_STATUS_CURRENT);
-
-        const modalTitle = isPledgeState ? 'Withdraw Pledge?' : 'Cancel Registration?';
-        const modalBody = isPledgeState
-            ? 'Are you sure you want to withdraw your pledge for this course?<br>Your pledge will be removed from the public totals.'
-            : 'Are you sure you want to un-enroll from this course?<br>If you\'ve made a payment it cannot be refunded.';
-        const actionLabel = isPledgeState ? 'Withdraw Pledge' : 'Cancel Registration';
-
-        const content = `
-            <div class="register-modal-stack register-modal-centered">
-                <div>
-                    <h1>💔</h1>
-                    <h2>${modalTitle}</h2>
-                    <p>${modalBody}</p>
-                </div>
-                <div class="register-modal-actions">
-                    <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">${actionLabel}</a>
-                    <a href="courses.php" class="confirm-button register-button-muted register-modal-action-half">↩️ Back to Courses</a>
-                </div>
+        <div class="register-modal-stack register-modal-centered">
+            <div>
+                <h1>💔</h1>
+                <h2>${modalTitle}</h2>
+                <p>${modalBody}</p>
             </div>
-        `;
+
+            <div class="register-modal-actions">
+                <a href="#" id="confirm-unregister" class="confirm-button register-button-danger register-modal-action-half">
+                    ${actionLabel}
+                </a>
+
+                <a href="courses.php" class="confirm-button register-button-muted register-modal-action-half">
+                    ↩️ Back to Courses
+                </a>
+            </div>
+        </div>
     `;
 
     messageContainer.innerHTML = content;
+
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
 
     document.getElementById('confirm-unregister').addEventListener('click', function(e) {
+
         e.preventDefault();
+
         fetch('../api/unregister_training.php?id=<?php echo $training_id; ?>&ecobricker_id=<?php echo $ecobricker_id; ?>')
             .then(r => r.json())
             .then(data => {
+
                 if (data.success) {
                     openUnregisterSuccessModal();
                 } else {
                     alert('Unable to cancel registration.');
                 }
+
             })
             .catch(() => alert('Unable to cancel registration.'));
+
     });
 }
 <?php endif; ?>
