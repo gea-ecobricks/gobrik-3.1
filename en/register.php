@@ -444,6 +444,17 @@ echo '<!DOCTYPE html>
     </div>
 </div>
 
+<?php
+$relanding = false;
+if (isset($_GET['status']) && $_GET['status'] == 'relanding') {
+    $relanding = true;
+} elseif (isset($_GET['id']) && strpos($_GET['id'], 'status=relanding') !== false) {
+    $relanding = true;
+} elseif (strpos($_SERVER['REQUEST_URI'], 'status=relanding') !== false) {
+    $relanding = true;
+}
+?>
+
 <script>
 const TRAINING_PAYMENT_MODE = <?php echo json_encode($payment_mode, JSON_HEX_TAG) ?: '""'; ?>;
 const SUGGESTED_AMOUNT_IDR = <?php echo (int)$default_price_idr; ?>;
