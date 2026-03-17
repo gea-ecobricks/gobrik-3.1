@@ -311,8 +311,6 @@ echo '<!DOCTYPE html>
 
 <?php require_once("../includes/register-inc.php"); ?>
 
-<div class="splash-title-block"></div>
-<div id="splash-bar"></div>
 
 <div id="form-submission-box" class="register-page-shell">
     <div class="form-container register-page-container">
@@ -456,6 +454,8 @@ echo '<!DOCTYPE html>
         </button>
 
     </div>
+</div>
+
 </div>
 
 <script>
