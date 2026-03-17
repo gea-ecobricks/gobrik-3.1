@@ -1221,7 +1221,7 @@
         margin-top: auto;
         margin-bottom: auto;
         padding: 30px;
-        margin-top: 110px !important;
+
         padding-top: 0px !important;
     }
 }
