@@ -314,6 +314,10 @@
     background: linear-gradient(90deg, #d65050 0%, #e46d6d 100%);
 }
 
+.register-progress-fill.is-green {
+    background: linear-gradient(90deg, #2f9e50 0%, #44be6a 100%);
+}
+
 .register-progress-threshold {
     position: absolute;
     top: -2px;

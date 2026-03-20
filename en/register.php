@@ -370,43 +370,7 @@ echo '<!DOCTYPE html>
                         <?php endif; ?>
 
                         <?php if ($payment_mode === 'pledge_threshold'): ?>
-                            <div class="register-status-panel">
-                                <div class="register-status-title">Course Progress</div>
-
-                                <div class="register-progress-block">
-                                    <div class="register-progress-label">
-                                        Participant Threshold
-                                        <span><?php echo (int)$status_participants_current; ?> / <?php echo (int)$status_participants_max; ?></span>
-                                    </div>
-                                    <div class="register-progress-bar">
-                                        <div class="register-progress-zone-before" style="width: <?php echo $participants_threshold_pct; ?>%;"></div>
-                                        <div class="register-progress-zone-after" style="left: <?php echo $participants_threshold_pct; ?>%; width: <?php echo max(0, 100 - $participants_threshold_pct); ?>%;"></div>
-                                        <div class="register-progress-fill is-red" style="width: <?php echo $participants_fill_pct; ?>%;"></div>
-                                        <div class="register-progress-threshold" style="left: <?php echo $participants_threshold_pct; ?>%;"></div>
-                                    </div>
-                                    <div class="register-progress-meta">
-                                        <strong>Current:</strong> <?php echo (int)$status_participants_current; ?> &nbsp;|&nbsp;
-                                        <strong>Threshold:</strong> <?php echo (int)$status_participants_threshold; ?>
-                                    </div>
-                                </div>
-
-                                <div class="register-progress-block">
-                                    <div class="register-progress-label">
-                                        Pledge Threshold
-                                        <span><?php echo number_format((int)$status_pledged_current); ?> / <?php echo number_format((int)$status_pledged_max); ?> IDR</span>
-                                    </div>
-                                    <div class="register-progress-bar">
-                                        <div class="register-progress-zone-before" style="width: <?php echo $pledges_threshold_pct; ?>%;"></div>
-                                        <div class="register-progress-zone-after" style="left: <?php echo $pledges_threshold_pct; ?>%; width: <?php echo max(0, 100 - $pledges_threshold_pct); ?>%;"></div>
-                                        <div class="register-progress-fill is-red" style="width: <?php echo $pledges_fill_pct; ?>%;"></div>
-                                        <div class="register-progress-threshold" style="left: <?php echo $pledges_threshold_pct; ?>%;"></div>
-                                    </div>
-                                    <div class="register-progress-meta">
-                                        <strong>Current:</strong> <?php echo number_format((int)$status_pledged_current); ?> IDR &nbsp;|&nbsp;
-                                        <strong>Threshold:</strong> <?php echo number_format((int)$status_pledged_threshold); ?> IDR
-                                    </div>
-                                </div>
-                            </div>
+                            <?php require_once '../includes/3P-graph.php'; ?>
                         <?php endif; ?>
 
                     </div>
