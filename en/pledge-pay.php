@@ -232,7 +232,10 @@ echo '<!DOCTYPE html>
                     <?php endif; ?>
                 </div>
                 <div class="pledge-pay-pledge-meta">
-                    Pledge status: <strong><?php echo htmlspecialchars(ucfirst($pledge_status), ENT_QUOTES, 'UTF-8'); ?></strong>
+                    Pledge status:
+                    <span class="pledge-status-inline-pill pledge-status-<?php echo htmlspecialchars($pledge_status, ENT_QUOTES, 'UTF-8'); ?>">
+                        <?php echo htmlspecialchars(ucfirst($pledge_status), ENT_QUOTES, 'UTF-8'); ?>
+                    </span>
                 </div>
             </div>
 

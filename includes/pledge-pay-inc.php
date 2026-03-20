@@ -38,8 +38,6 @@
     width: 100%;
     display: block;
     border-radius: 10px 10px 0 0;
-    max-height: 260px;
-    object-fit: cover;
 }
 
 .pledge-pay-training-info {
@@ -89,6 +87,7 @@
     font-variant-numeric: tabular-nums;
     line-height: 1.1;
     display: block;
+    color: var(--h1);
 }
 
 .pledge-pay-amount-idr {
@@ -101,9 +100,32 @@
 
 .pledge-pay-pledge-meta {
     font-size: 0.9em;
-    opacity: 0.68;
+    opacity: 0.85;
     margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
+
+/* Inline pledge status pill (inside the pledge card) */
+.pledge-status-inline-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 11px;
+    border-radius: 999px;
+    font-size: 0.88em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+}
+
+.pledge-status-active    { background: #1e8c40; }
+.pledge-status-invited   { background: #d04b00; }
+.pledge-status-paid      { background: #1e8c40; }
+.pledge-status-cancelled { background: #666; }
+.pledge-status-expired   { background: #888; }
+.pledge-status-failed    { background: #c00; }
 
 /* ===================================================================== */
 /* ========================== 3P GRAPH SECTION ========================== */
@@ -121,7 +143,11 @@
 /* ========================== PAYMENT STATE CARDS ======================= */
 /* ===================================================================== */
 
+/* Base card — uses theme-adaptive panel background */
 .pledge-pay-state-card {
+    background: var(--course-module);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-top-width: 3px;
     border-radius: 14px;
     padding: 24px 22px;
     margin-bottom: 20px;
@@ -131,6 +157,7 @@
 .pledge-pay-state-card h3 {
     margin: 14px 0 10px 0;
     font-size: 1.4em;
+    color: var(--h1);
 }
 
 .pledge-pay-state-card p {
@@ -140,30 +167,27 @@
     max-width: 560px;
     margin-left: auto;
     margin-right: auto;
+    color: var(--text-color);
 }
 
 /* Pending */
 .state-pending {
-    background: linear-gradient(135deg, rgba(230,240,255,0.95) 0%, rgba(215,230,255,0.90) 100%);
-    border: 1px solid rgba(80,130,220,0.18);
+    border-top-color: #3b73d4;
 }
 
 /* Payment Due */
 .state-payment-due {
-    background: linear-gradient(135deg, rgba(255,244,230,0.98) 0%, rgba(255,235,210,0.94) 100%);
-    border: 1px solid rgba(220,100,30,0.18);
+    border-top-color: #e02020;
 }
 
 /* Paid */
 .state-paid {
-    background: linear-gradient(135deg, rgba(230,250,235,0.98) 0%, rgba(210,245,220,0.94) 100%);
-    border: 1px solid rgba(40,160,70,0.18);
+    border-top-color: #1e8c40;
 }
 
 /* Expired / Cancelled */
 .state-cancelled {
-    background: linear-gradient(135deg, rgba(245,245,245,0.98) 0%, rgba(232,232,232,0.94) 100%);
-    border: 1px solid rgba(0,0,0,0.10);
+    border-top-color: #888;
 }
 
 /* ===================================================================== */
@@ -184,9 +208,10 @@
 }
 
 .badge-pending {
-    background: rgba(80,130,220,0.14);
-    color: #2b6bcb;
-    border: 1px solid rgba(80,130,220,0.25);
+    background: #3b73d4;
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(60,110,210,0.22);
 }
 
 .badge-payment-due {
@@ -197,15 +222,16 @@
 }
 
 .badge-paid {
-    background: rgba(40,160,70,0.15);
-    color: #1a7a38;
-    border: 1px solid rgba(40,160,70,0.25);
+    background: #1e8c40;
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(30,140,64,0.22);
 }
 
 .badge-cancelled {
-    background: rgba(0,0,0,0.08);
-    color: #555;
-    border: 1px solid rgba(0,0,0,0.12);
+    background: #666;
+    color: #fff;
+    border: none;
 }
 
 /* ===================================================================== */
