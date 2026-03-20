@@ -497,6 +497,113 @@ margin-top:-100px !important;
     }
 }
 
+/* ===================================================================== */
+/* ========================= MY PROJECTS PANEL ========================= */
+/* ===================================================================== */
+
+.my-project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+.my-project-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+
+.my-project-row:last-child {
+    border-bottom: none;
+}
+
+.my-project-tmb {
+    flex-shrink: 0;
+    width: 58px;
+    height: 58px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+    border: 1px solid rgba(0,0,0,0.10);
+}
+
+.my-project-tmb:hover {
+    transform: scale(1.05);
+    filter: brightness(0.88);
+}
+
+.my-project-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+}
+
+.my-project-title {
+    font-weight: 600;
+    font-size: 0.97em;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.my-project-meta {
+    font-size: 0.82em;
+    opacity: 0.60;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.project-phase-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 104px;
+    height: 30px;
+    border-radius: 999px;
+    font-size: 0.76em;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+    border: 1.5px solid rgba(0,120,0,0.28);
+    background: linear-gradient(90deg, #29a654 0%, #42c46c 100%);
+    color: #fff;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.15s ease;
+    padding: 0 12px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    white-space: nowrap;
+}
+
+.project-phase-pill:hover {
+    filter: brightness(0.90);
+    transform: translateY(-1px);
+}
+
+@media screen and (max-width: 480px) {
+    .my-project-title {
+        font-size: 0.90em;
+    }
+    .my-project-tmb {
+        width: 46px;
+        height: 46px;
+    }
+    .project-phase-pill {
+        min-width: 84px;
+        font-size: 0.72em;
+    }
+}
+
 </style>
 
 

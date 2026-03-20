@@ -339,6 +339,26 @@ function fetchLatestProjects(mysqli $conn, int $limit = 9, int $offset = 0): arr
 $latest_projects = fetchLatestProjects($gobrik_conn, 9, 0);
 $latest_projects_json = json_encode($latest_projects, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
+// 🏗️ Fetch projects in which the current user is connected (via their ecobricks)
+$my_projects = [];
+$sql_my_projects = "SELECT DISTINCT p.project_id, p.project_name, p.description_short, p.project_type,
+                           p.construction_type, p.briks_used, p.project_phase, p.featured_img, p.tmb_featured_img
+                    FROM tb_projects p
+                    INNER JOIN tb_ecobricks e ON p.connected_ecobricks LIKE CONCAT('%', e.serial_no, '%')
+                    WHERE e.ecobricker_id = ?
+                    ORDER BY p.project_id DESC
+                    LIMIT 20";
+$stmt_my_projects = $gobrik_conn->prepare($sql_my_projects);
+if ($stmt_my_projects) {
+    $stmt_my_projects->bind_param('s', $ecobricker_id);
+    $stmt_my_projects->execute();
+    $result_my_projects = $stmt_my_projects->get_result();
+    while ($row = $result_my_projects->fetch_assoc()) {
+        $my_projects[] = $row;
+    }
+    $stmt_my_projects->close();
+}
+
 // 📣 Fetch the latest dashboard notice for display and admin controls
 function normalizeHexColor(?string $color, string $fallback = '#c66a0f'): string {
     $color = trim((string) $color);
@@ -846,6 +866,53 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <!-- DataTables will populate this via AJAX -->
                 </tbody>
             </table>
+        </div>
+
+        <div id="my-projects-panel" class="dashboard-v2-panel">
+            <h3>My Projects</h3>
+
+            <?php if (!empty($my_projects)): ?>
+                <div class="my-project-list">
+                    <?php foreach ($my_projects as $proj): ?>
+                        <?php
+                            $tmb_src     = htmlspecialchars($proj['tmb_featured_img'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $full_src    = htmlspecialchars($proj['featured_img'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $proj_name   = htmlspecialchars($proj['project_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $desc_short  = htmlspecialchars($proj['description_short'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $proj_type   = htmlspecialchars($proj['project_type'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $const_type  = htmlspecialchars($proj['construction_type'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $briks_used  = (int)($proj['briks_used'] ?? 0);
+                            $phase       = htmlspecialchars($proj['project_phase'] ?? 'Active', ENT_QUOTES, 'UTF-8');
+                            $proj_id     = (int)$proj['project_id'];
+                            $meta_parts  = array_filter([$proj_type, $briks_used ? $briks_used . ' briks' : '', $const_type]);
+                            $meta_str    = implode(' | ', $meta_parts);
+                            // Encode for JS: project data object for projectPreview modal
+                            $proj_js_name = json_encode($proj['project_name'] ?? '', JSON_HEX_TAG) ?: '""';
+                            $proj_js_desc = json_encode($proj['description_short'] ?? '', JSON_HEX_TAG) ?: '""';
+                            $proj_js_full = json_encode($proj['featured_img'] ?? '', JSON_HEX_TAG) ?: '""';
+                            $proj_js_tmb  = json_encode($proj['tmb_featured_img'] ?? '', JSON_HEX_TAG) ?: '""';
+                        ?>
+                        <div class="my-project-row">
+                            <img class="my-project-tmb"
+                                 src="<?php echo $tmb_src; ?>"
+                                 alt="<?php echo $proj_name; ?>"
+                                 onclick="projectPreview({project_id:<?php echo $proj_id; ?>,project_name:<?php echo $proj_js_name; ?>,description_short:<?php echo $proj_js_desc; ?>,photo1_main:<?php echo $proj_js_full; ?>,photo1_tmb:<?php echo $proj_js_tmb; ?>,briks_used:<?php echo $briks_used; ?>})"
+                            >
+                            <div class="my-project-info">
+                                <span class="my-project-title"><?php echo $proj_name; ?></span>
+                                <span class="my-project-meta"><?php echo $desc_short; ?></span>
+                                <span class="my-project-meta"><?php echo $meta_str; ?></span>
+                            </div>
+                            <button class="project-phase-pill"
+                                    onclick="openProjectActionsModal(<?php echo $proj_id; ?>, <?php echo $proj_js_name; ?>)">
+                                <?php echo $phase; ?>
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p class="reg-empty-note">No connected projects yet. <a href="add-project.php">Register a project →</a></p>
+            <?php endif; ?>
         </div>
 
         <?php if ($has_validation_access): ?>
@@ -1959,6 +2026,76 @@ function openTraineesModal(trainingId, trainingTitle) {
     // Show the modal
     modal.classList.remove('modal-hidden');
 }
+
+function openProjectActionsModal(projectId, projectName) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+    modalBox.innerHTML = '';
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'modal-message';
+    modalBox.appendChild(messageContainer);
+
+    let content = '';
+    content += `<a class="ecobrick-action-button" href="project.php?id=${projectId}" target="_blank">🔍 View Project</a>`;
+    content += `<a class="ecobrick-action-button" href="add-project.php?id=${projectId}">✏️ Edit Project</a>`;
+    content += `<a class="ecobrick-action-button" href="javascript:void(0);" onclick="copyProjectURL(${projectId}, this)">🔗 Share Project</a>`;
+    content += `<a class="ecobrick-action-button deleter-button" href="javascript:void(0);" onclick="deleteProject(${projectId})">❌ Delete Project</a>`;
+
+    messageContainer.innerHTML = content;
+    modal.style.display = 'flex';
+    modalBox.style.background = 'none';
+    document.getElementById('page-content').classList.add('blurred');
+    document.getElementById('footer-full').classList.add('blurred');
+    document.body.classList.add('modal-open');
+}
+window.openProjectActionsModal = openProjectActionsModal;
+
+function copyProjectURL(projectId, button) {
+    const url = `https://gobrik.com/en/project.php?id=${projectId}`;
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(() => {
+            button.innerHTML = '✅ URL Copied!';
+            setTimeout(closeInfoModal, 1000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Error copying URL. Please try again.');
+        });
+    } else {
+        const tmp = document.createElement('input');
+        tmp.value = url;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand('copy');
+        document.body.removeChild(tmp);
+        button.innerHTML = '✅ URL Copied!';
+        setTimeout(closeInfoModal, 1000);
+    }
+}
+window.copyProjectURL = copyProjectURL;
+
+function deleteProject(projectId) {
+    if (confirm('Are you sure you want to delete this project? This cannot be undone.')) {
+        fetch('../processes/delete_project.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ 'project_id': projectId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Project deleted successfully.');
+                window.location.reload();
+            } else {
+                alert('Error deleting project: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error processing your request.');
+        });
+    }
+}
+window.deleteProject = deleteProject;
 
 
 
