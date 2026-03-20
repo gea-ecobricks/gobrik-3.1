@@ -173,7 +173,7 @@ if ($stmt_trainings) {
     die("Error preparing statement for trainer trainings: " . $gobrik_conn->error);
 }
 
-// 📋 Fetch trainings where user is a registered trainee
+// 📋 Fetch trainings where user is a registered trainee (legacy confirmed, non-3P)
 $registered_trainings = [];
 $sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location,
                                     t.training_country, t.training_type, t.zoom_link, t.zoom_link_full
@@ -191,6 +191,68 @@ if ($stmt_registered_trainings) {
     $stmt_registered_trainings->close();
 } else {
     die("Error preparing statement for registered trainings: " . $gobrik_conn->error);
+}
+
+// 🤝 Fetch 3P pledge registrations for the user
+$pledge_registrations = [];
+$sql_pledge_regs = "SELECT
+        tp.pledge_id,
+        tp.training_id,
+        tp.pledged_amount_idr,
+        tp.display_currency,
+        tp.display_amount,
+        tp.pledge_status,
+        tp.invited_to_pay_at,
+        tp.payment_due_at,
+        t.training_title,
+        t.training_date,
+        t.training_type,
+        t.funding_goal_idr,
+        t.payment_deadline,
+        t.pledge_deadline,
+        t.threshold_status,
+        (SELECT COALESCE(SUM(tp2.pledged_amount_idr), 0)
+         FROM training_pledges_tb tp2
+         WHERE tp2.training_id = tp.training_id
+           AND tp2.pledge_status IN ('active','invited','paid')) AS total_pledged_idr
+    FROM training_pledges_tb tp
+    JOIN tb_trainings t ON t.training_id = tp.training_id
+    WHERE tp.buwana_id = ?
+      AND tp.pledge_status NOT IN ('cancelled','expired','failed')
+    ORDER BY tp.created_at DESC";
+$stmt_pledge_regs = $gobrik_conn->prepare($sql_pledge_regs);
+if ($stmt_pledge_regs) {
+    $stmt_pledge_regs->bind_param("i", $buwana_id);
+    $stmt_pledge_regs->execute();
+    $result_pledge_regs = $stmt_pledge_regs->get_result();
+    $now_ts = time();
+    while ($row = $result_pledge_regs->fetch_assoc()) {
+        // Compute client-side payment state
+        $p_status     = $row['pledge_status'];
+        $t_status     = $row['threshold_status'];
+        $pay_dl_ts    = !empty($row['payment_deadline'])  ? strtotime($row['payment_deadline'])  : 0;
+        $pledge_dl_ts = !empty($row['pledge_deadline'])   ? strtotime($row['pledge_deadline'])   : 0;
+
+        if ($p_status === 'paid') {
+            $row['payment_state'] = 'paid';
+        } elseif ($t_status === 'cancelled') {
+            $row['payment_state'] = 'cancelled';
+        } elseif ($p_status === 'invited') {
+            $row['payment_state'] = ($pay_dl_ts > 0 && $now_ts > $pay_dl_ts) ? 'expired' : 'payment_due';
+        } elseif ($pledge_dl_ts > 0 && $now_ts > $pledge_dl_ts && $t_status === 'open') {
+            $row['payment_state'] = 'expired';
+        } else {
+            $row['payment_state'] = 'pending';
+        }
+
+        // Funding fill % for bar graph
+        $goal = (int)($row['funding_goal_idr'] ?? 0);
+        $total = (int)($row['total_pledged_idr'] ?? 0);
+        $row['funding_pct'] = ($goal > 0) ? min(100, (int)round(($total / $goal) * 100)) : 0;
+
+        $pledge_registrations[] = $row;
+    }
+    $stmt_pledge_regs->close();
 }
 
 // 🧱 Fetch featured ecobricks for homepage slider and grid
@@ -543,43 +605,85 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         <div id="registrations-panel" class="dashboard-v2-panel">
             <h3 data-lang-id="002-my-registrations">My Registrations</h3>
-            <p>Trainings that you've registered for.</p>
 
-            <table id="trainee-trainings" class="display responsive" style="width:100%;">
-                <thead>
-                    <tr>
-                        <th>Training</th>
-                        <th>Launch</th>
-                        <th>Date</th>
-                        <th>Country</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <?php
+            // State label map
+            $pledge_state_labels = [
+                'pending'     => '⏳ Pending',
+                'payment_due' => '💳 Payment Due',
+                'paid'        => '✅ Paid',
+                'expired'     => '⌛ Voided',
+                'cancelled'   => '❌ Cancelled',
+            ];
+            // CSS class map (hyphens only)
+            $pledge_state_classes = [
+                'pending'     => 'pending',
+                'payment_due' => 'payment-due',
+                'paid'        => 'paid',
+                'expired'     => 'expired',
+                'cancelled'   => 'cancelled',
+            ];
+            ?>
+
+            <?php if (!empty($pledge_registrations)): ?>
+
+                <div class="pledge-reg-list">
+                    <?php foreach ($pledge_registrations as $pledge): ?>
+                        <?php
+                            $state       = $pledge['payment_state'];
+                            $state_label = $pledge_state_labels[$state] ?? ucfirst($state);
+                            $state_cls   = $pledge_state_classes[$state] ?? 'pending';
+                            $funding_pct = (int)$pledge['funding_pct'];
+                            $date_str    = !empty($pledge['training_date'])
+                                           ? date('M j, Y', strtotime($pledge['training_date'])) : '';
+                        ?>
+                        <div class="pledge-reg-row">
+                            <div class="pledge-reg-info">
+                                <span class="pledge-reg-title"><?php echo htmlspecialchars($pledge['training_title'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                <span class="pledge-reg-meta"><?php echo htmlspecialchars($pledge['training_type'], ENT_QUOTES, 'UTF-8'); ?><?php if ($date_str): ?> · <?php echo $date_str; ?><?php endif; ?></span>
+                            </div>
+                            <a href="pledge-pay.php?id=<?php echo (int)$pledge['training_id']; ?>"
+                               class="pledge-reg-pill pill-state-<?php echo $state_cls; ?>">
+                                <span class="pledge-pill-bar" style="width:<?php echo $funding_pct; ?>%;"></span>
+                                <span class="pledge-pill-label"><?php echo $state_label; ?></span>
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+            <?php else: ?>
+                <p class="reg-empty-note">No pledged courses yet. <a href="courses.php">Browse courses →</a></p>
+            <?php endif; ?>
+
+            <?php if (!empty($registered_trainings)): ?>
+                <p class="reg-section-label">Confirmed Registrations</p>
+                <div class="pledge-reg-list">
                     <?php foreach ($registered_trainings as $training): ?>
                         <?php
-                            $training_date_ts = strtotime($training['training_date']);
-                            $training_date = date('Y-m-d', $training_date_ts);
-                            $is_past_training = $training_date_ts < strtotime('today');
-                            $launch_class = $is_past_training ? 'is-past' : 'is-upcoming';
+                            $reg_date_ts  = strtotime($training['training_date']);
+                            $reg_date_str = date('M j, Y', $reg_date_ts);
+                            $is_past      = $reg_date_ts < strtotime('today');
                         ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($training['training_title']); ?></td>
-                            <td style="text-align:center;">
-                                <a href="javascript:void(0);"
-                                   class="trainee-launch-button <?php echo $launch_class; ?>"
-                                   onclick="openRegisteredTrainingsModal(<?php echo $training['training_id']; ?>,
-                                                                      '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
-                                    Open
-                                </a>
-                            </td>
-                            <td><?php echo htmlspecialchars($training_date); ?></td>
-                            <td><?php echo htmlspecialchars($training['training_country']); ?></td>
-                            <td><?php echo htmlspecialchars($training['training_type']); ?></td>
-                        </tr>
+                        <div class="pledge-reg-row">
+                            <div class="pledge-reg-info">
+                                <span class="pledge-reg-title"><?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                <span class="pledge-reg-meta"><?php echo htmlspecialchars($training['training_type'], ENT_QUOTES, 'UTF-8'); ?> · <?php echo $reg_date_str; ?></span>
+                            </div>
+                            <a href="javascript:void(0);"
+                               class="pledge-reg-pill pill-state-confirmed<?php echo $is_past ? ' pill-is-past' : ''; ?>"
+                               onclick="openRegisteredTrainingsModal(<?php echo (int)$training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
+                                <span class="pledge-pill-bar" style="width:100%;"></span>
+                                <span class="pledge-pill-label"><?php echo $is_past ? '✅ Attended' : '✅ Registered'; ?></span>
+                            </a>
+                        </div>
                     <?php endforeach; ?>
-                </tbody>
-            </table>
+                </div>
+            <?php endif; ?>
+
+            <?php if (empty($pledge_registrations) && empty($registered_trainings)): ?>
+                <p class="reg-empty-note">You haven't registered for any courses yet. <a href="courses.php">Browse courses →</a></p>
+            <?php endif; ?>
+
         </div>
 
         <div id="support-chats-panel" class="dashboard-v2-panel">
@@ -1551,39 +1655,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// REGISTRATION (TRAININGS)
-$(document).ready(function() {
-    let table = $("#trainee-trainings").DataTable({
-        "pageLength": 7,
-        "searching": false,
-        "lengthChange": false,
-        "responsive": {
-            "details": {
-                "type": "column",
-                "target": "tr"
-            }
-        },
-        "language": {
-            "emptyTable": "You haven't registered for any trainings yet.",
-            "info": "Showing _START_ to _END_ of _TOTAL_ trainings",
-            "infoEmpty": "No trainings available",
-            "loadingRecords": "Loading trainings...",
-            "processing": "Processing...",
-            "paginate": {
-                "first": "First",
-                "last": "Last",
-                "next": "Next",
-                "previous": "Previous"
-            }
-        },
-        "columnDefs": [
-            { "responsivePriority": 1, "targets": 0 },
-            { "responsivePriority": 2, "targets": 1 },
-            { "className": "none", "targets": [2, 3, 4] },
-            { "orderable": false, "targets": [3, 4] }
-        ]
-    });
-});
+// (registrations panel uses a plain list — no DataTable needed)
 
 
 function openRegisteredTrainingsModal(trainingId, trainingLocation) {

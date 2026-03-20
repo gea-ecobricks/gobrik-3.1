@@ -295,6 +295,208 @@ margin-top:-100px !important;
     }
 }
 
+/* ===================================================================== */
+/* ====================== PLEDGE REGISTRATIONS LIST ==================== */
+/* ===================================================================== */
+
+.pledge-reg-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+.pledge-reg-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+
+.pledge-reg-row:last-child {
+    border-bottom: none;
+}
+
+.pledge-reg-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+}
+
+.pledge-reg-title {
+    font-weight: 600;
+    font-size: 0.97em;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pledge-reg-meta {
+    font-size: 0.82em;
+    opacity: 0.60;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------------ */
+/* Pledge status pill — a bar graph wrapped in a rounded pill shape    */
+/* ------------------------------------------------------------------ */
+
+.pledge-reg-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 128px;
+    height: 30px;
+    border-radius: 999px;
+    overflow: hidden;
+    text-decoration: none;
+    font-size: 0.76em;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+    border: 1.5px solid rgba(0,0,0,0.10);
+    background: #e5e5e5;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.pledge-reg-pill:hover {
+    filter: brightness(0.94);
+    transform: translateY(-1px);
+}
+
+/* Fill bar — absolute, grows left-to-right based on funding % */
+.pledge-pill-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: none;
+}
+
+/* Status label on top of fill */
+.pledge-pill-label {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    padding: 0 10px;
+}
+
+/* ---- State: pending (threshold not yet met) ---- */
+.pill-state-pending {
+    border-color: rgba(60,110,210,0.28);
+}
+.pill-state-pending .pledge-pill-bar {
+    background: linear-gradient(90deg, #5b8fe8 0%, #78aaf0 100%);
+    opacity: 0.38;
+}
+.pill-state-pending .pledge-pill-label {
+    color: #1a50b0;
+}
+
+/* ---- State: payment-due (threshold met, awaiting payment) ---- */
+.pill-state-payment-due {
+    border-color: rgba(190,20,20,0.30);
+}
+.pill-state-payment-due .pledge-pill-bar {
+    background: linear-gradient(90deg, #29a654 0%, #42c46c 100%);
+    opacity: 0.55;
+}
+.pill-state-payment-due .pledge-pill-label {
+    color: #ae0000;
+}
+
+/* ---- State: paid ---- */
+.pill-state-paid {
+    border-color: rgba(28,130,60,0.35);
+}
+.pill-state-paid .pledge-pill-bar {
+    background: linear-gradient(90deg, #1d8c42 0%, #2eab5a 100%);
+}
+.pill-state-paid .pledge-pill-label {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+
+/* ---- State: expired / cancelled ---- */
+.pill-state-expired,
+.pill-state-cancelled {
+    border-color: rgba(0,0,0,0.12);
+}
+.pill-state-expired .pledge-pill-bar,
+.pill-state-cancelled .pledge-pill-bar {
+    background: linear-gradient(90deg, #999 0%, #b5b5b5 100%);
+    opacity: 0.45;
+}
+.pill-state-expired .pledge-pill-label,
+.pill-state-cancelled .pledge-pill-label {
+    color: #555;
+}
+
+/* ---- State: confirmed (non-3P legacy registrations) ---- */
+.pill-state-confirmed {
+    border-color: rgba(60,100,190,0.28);
+}
+.pill-state-confirmed .pledge-pill-bar {
+    background: linear-gradient(90deg, #4e7ec8 0%, #6a96dc 100%);
+    opacity: 0.55;
+}
+.pill-state-confirmed .pledge-pill-label {
+    color: #163a82;
+}
+
+/* Past confirmed registrations — grey out */
+.pill-state-confirmed.pill-is-past .pledge-pill-bar {
+    background: linear-gradient(90deg, #888 0%, #aaa 100%);
+    opacity: 0.45;
+}
+.pill-state-confirmed.pill-is-past .pledge-pill-label {
+    color: #555;
+}
+
+/* ---- Section dividers ---- */
+.reg-section-label {
+    font-size: 0.80em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.50;
+    margin: 18px 0 4px 0;
+}
+
+.reg-empty-note {
+    font-size: 0.92em;
+    opacity: 0.65;
+    margin: 8px 0 0 0;
+}
+
+.reg-empty-note a {
+    text-decoration: underline;
+}
+
+/* ---- Mobile adjustments ---- */
+@media screen and (max-width: 480px) {
+    .pledge-reg-title {
+        font-size: 0.90em;
+    }
+    .pledge-reg-pill {
+        min-width: 110px;
+        font-size: 0.72em;
+    }
+}
+
 </style>
 
 
