@@ -604,6 +604,81 @@ margin-top:-100px !important;
     }
 }
 
+/* ===================================================================== */
+/* ======================== MY ECOBRICKS PANEL ========================= */
+/* ===================================================================== */
+
+.ecobrick-status-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 104px;
+    height: 30px;
+    border-radius: 999px;
+    font-size: 0.76em;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+    border: 1.5px solid rgba(0,0,0,0.15);
+    color: #fff;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.15s ease;
+    padding: 0 12px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    white-space: nowrap;
+}
+
+.ecobrick-status-pill:hover {
+    filter: brightness(0.90);
+    transform: translateY(-1px);
+}
+
+.ecobrick-pill-authenticated {
+    background: linear-gradient(90deg, #29a654 0%, #42c46c 100%);
+    border-color: rgba(0,120,0,0.28);
+}
+
+.ecobrick-pill-awaiting {
+    background: linear-gradient(90deg, #e07b20 0%, #f0a040 100%);
+    border-color: rgba(180,90,0,0.28);
+}
+
+.ecobrick-pill-default {
+    background: linear-gradient(90deg, #888 0%, #aaa 100%);
+    border-color: rgba(0,0,0,0.18);
+}
+
+.my-ecobricks-loading {
+    font-size: 0.88em;
+    opacity: 0.55;
+    padding: 12px 0;
+}
+
+.my-ecobricks-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0,0,0,0.07);
+}
+
+.my-ecobricks-page-info {
+    font-size: 0.82em;
+    opacity: 0.60;
+    flex: 1;
+    text-align: center;
+}
+
+@media screen and (max-width: 480px) {
+    .ecobrick-status-pill {
+        min-width: 84px;
+        font-size: 0.72em;
+    }
+}
+
 </style>
 
 

@@ -849,22 +849,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
         <div id="my-ecobricks-panel" class="dashboard-v2-panel">
             <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
-            <table id="latest-ecobricks" class="display responsive nowrap" style="width:100%">
-                <thead>
-                    <tr>
-                        <th data-lang-id="1103-brik">Brik</th>
-                        <th data-lang-id="1104-weight">Weight</th>
-                        <th data-lang-id="1108-volume">Volume</th>
-                        <th data-lang-id="1109-density">Density</th>
-                        <th data-lang-id="1110-date-logged">Logged</th>
-                        <th data-lang-id="1106-status">Status</th>
-                        <th data-lang-id="1107-serial">Serial</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- DataTables will populate this via AJAX -->
-                </tbody>
-            </table>
+            <div id="my-ecobricks-list" class="my-project-list">
+                <div id="my-ecobricks-loading" class="my-ecobricks-loading">Loading ecobricks...</div>
+            </div>
+            <div id="my-ecobricks-empty" class="reg-empty-note" style="display:none;">
+                No ecobricks logged yet. <a href="log.php">Log an ecobrick →</a>
+            </div>
+            <div id="my-ecobricks-pagination" class="my-ecobricks-pagination" style="display:none;">
+                <button id="my-ecobricks-prev" class="page-button tertiary" disabled>← Prev</button>
+                <span id="my-ecobricks-page-info" class="my-ecobricks-page-info"></span>
+                <button id="my-ecobricks-next" class="page-button tertiary">Next →</button>
+            </div>
         </div>
 
         <div id="my-projects-panel" class="dashboard-v2-panel">
@@ -1068,6 +1063,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <script>
     //GET ECOBRICKER'S ECOBRICKS
+
+    const ECOBRICKER_ID = <?php echo (int)$ecobricker_id; ?>;
+    const USER_LANG = <?php echo json_encode($lang, JSON_HEX_TAG) ?: '"en"'; ?>;
 
     const featuredGridBricks = <?php echo $featured_ecobricks_json ?? '[]'; ?> || [];
     const FEATURED_LIMIT = 9;
@@ -1641,69 +1639,121 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     });
 
 
-    $(document).ready(function() {
-        var ecobrickerId = "<?php echo htmlspecialchars($ecobricker_id); ?>"; // Get the logged-in user's ecobricker_id
-        var userLang = "<?php echo htmlspecialchars($lang); ?>"; // Get the user's language
+    // My Ecobricks panel — custom paginated list
+    const MY_BRIKS_PAGE_SIZE = 5;
+    let myBriksCurrentPage = 0;
+    let myBriksTotalRecords = 0;
 
-        $("#latest-ecobricks").DataTable({
-            "responsive": true,
-            "serverSide": true,
-            "processing": true,
-            "ajax": {
-                "url": "../api/fetch_my_briks.php",
-                "type": "POST",
-                "data": function(d) {
-                    d.ecobricker_id = ecobrickerId; // Pass the ecobricker_id to filter the results to the user's ecobricks
-                }
-            },
-            "pageLength": 7, // Show 7 briks per page
-            "language": {
-                "emptyTable": "It looks like you haven't logged any ecobricks yet!",
-                "lengthMenu": "Show _MENU_ briks",
-                "search": "",
-                "info": "Showing _START_ to _END_ of _TOTAL_ ecobricks",
-                "infoEmpty": "No ecobricks available",
-                "loadingRecords": "Loading ecobricks...",
-                "processing": "Processing...",
-                "paginate": {
-                    "first": "First",
-                    "last": "Last",
-                    "next": "Next",
-                    "previous": "Previous"
-                }
-            },
-            "columns": [
-                { "data": "ecobrick_thumb_photo_url", "orderable": false },
-                { "data": "weight_g" },
-                { "data": "volume_ml" },
-                { "data": "density" },
-                { "data": "date_logged_ts" },
-                { "data": "status", "orderable": false },
-                {
-                    "data": "serial_no",
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            return `<button class="serial-button" data-serial-no="${data}" data-status="${row.status}" title="View Ecobrick Details">${data}</button>`;
-                        }
-                        return data;
-                    },
-                    "orderable": false
-                }
-            ],
-            "columnDefs": [
-                { "className": "all", "targets": [0, 1, 6] }, // Ensure Brik (thumbnail), Weight, and Serial always display
-                { "className": "min-tablet", "targets": [2, 3, 4] } // These fields can be hidden first on smaller screens
-            ],
-            "initComplete": function() {
-                var searchBox = $("div.dataTables_filter input");
-                searchBox.attr("placeholder", "Search your briks...");
+    function fetchMyEcobricks(page) {
+        const list = document.getElementById('my-ecobricks-list');
+        const emptyNote = document.getElementById('my-ecobricks-empty');
+        const pagination = document.getElementById('my-ecobricks-pagination');
 
-                // Add event listener for clicks on the serial number buttons
-                $('#latest-ecobricks tbody').on('click', '.serial-button', function() {
-                    var serialNo = $(this).data('serial-no');
-                    var status = $(this).data('status');
-                    viewEcobrickActions(serialNo, status, userLang);
-                });
+        list.innerHTML = '<div class="my-ecobricks-loading">Loading ecobricks...</div>';
+        emptyNote.style.display = 'none';
+        pagination.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('draw', 1);
+        formData.append('start', page * MY_BRIKS_PAGE_SIZE);
+        formData.append('length', MY_BRIKS_PAGE_SIZE);
+        formData.append('ecobricker_id', ECOBRICKER_ID);
+
+        fetch('../api/fetch_my_briks.php', { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                myBriksTotalRecords = data.recordsTotal || 0;
+                list.innerHTML = '';
+
+                if (!data.data || data.data.length === 0) {
+                    emptyNote.style.display = 'block';
+                    return;
+                }
+
+                renderMyEcobricks(data.data);
+
+                const totalPages = Math.ceil(myBriksTotalRecords / MY_BRIKS_PAGE_SIZE);
+                if (totalPages > 1) {
+                    pagination.style.display = 'flex';
+                    const pageInfo = document.getElementById('my-ecobricks-page-info');
+                    const start = page * MY_BRIKS_PAGE_SIZE + 1;
+                    const end = Math.min(start + data.data.length - 1, myBriksTotalRecords);
+                    pageInfo.textContent = start + '–' + end + ' of ' + myBriksTotalRecords;
+                    document.getElementById('my-ecobricks-prev').disabled = (page === 0);
+                    document.getElementById('my-ecobricks-next').disabled = (page >= totalPages - 1);
+                }
+            })
+            .catch(function() {
+                list.innerHTML = '<p style="color:red;">Error loading ecobricks.</p>';
+            });
+    }
+
+    function renderMyEcobricks(bricks) {
+        const list = document.getElementById('my-ecobricks-list');
+        bricks.forEach(function(brik) {
+            const serial = brik.serial_no || '';
+            const status = brik.status || '';
+            const weight = brik.weight_g ? Number(brik.weight_g).toLocaleString() + 'g' : '—';
+            const volume = brik.volume_ml ? brik.volume_ml + 'ml' : '';
+            const density = brik.density ? brik.density + ' g/ml' : '';
+            const dateRaw = brik.date_logged_ts || '';
+            const dateDisplay = dateRaw ? dateRaw.slice(0, 10) : '';
+            const tmb = brik.ecobrick_thumb_photo_url || '';
+
+            const metaParts = [weight, volume, density].filter(Boolean);
+            const metaStr = metaParts.join(' | ');
+
+            // Status pill class
+            let pillClass = 'ecobrick-status-pill';
+            if (status === 'authenticated') pillClass += ' ecobrick-pill-authenticated';
+            else if (status === 'awaiting') pillClass += ' ecobrick-pill-awaiting';
+            else pillClass += ' ecobrick-pill-default';
+
+            const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+
+            const row = document.createElement('div');
+            row.className = 'my-project-row';
+            row.dataset.serial = serial;
+            row.dataset.status = status;
+
+            row.innerHTML =
+                '<img class="my-project-tmb my-ecobrick-tmb" src="' + (tmb || '../images/no-photo.webp') + '" alt="Ecobrick ' + serial + '" style="cursor:pointer;">' +
+                '<div class="my-project-info">' +
+                    '<span class="my-project-title">' + serial + '</span>' +
+                    '<span class="my-project-meta">' + metaStr + '</span>' +
+                    '<span class="my-project-meta">' + dateDisplay + '</span>' +
+                '</div>' +
+                '<button class="' + pillClass + '">' + statusLabel + '</button>';
+
+            // Thumbnail click → ecobrick actions
+            row.querySelector('.my-ecobrick-tmb').addEventListener('click', function() {
+                viewEcobrickActions(serial, status, USER_LANG);
+            });
+
+            // Pill click → ecobrick actions
+            row.querySelector('.' + pillClass.split(' ')[0]).addEventListener('click', function() {
+                viewEcobrickActions(serial, status, USER_LANG);
+            });
+
+            list.appendChild(row);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchMyEcobricks(0);
+
+        document.getElementById('my-ecobricks-prev')?.addEventListener('click', function() {
+            if (myBriksCurrentPage > 0) {
+                myBriksCurrentPage--;
+                fetchMyEcobricks(myBriksCurrentPage);
+            }
+        });
+
+        document.getElementById('my-ecobricks-next')?.addEventListener('click', function() {
+            const totalPages = Math.ceil(myBriksTotalRecords / MY_BRIKS_PAGE_SIZE);
+            if (myBriksCurrentPage < totalPages - 1) {
+                myBriksCurrentPage++;
+                fetchMyEcobricks(myBriksCurrentPage);
             }
         });
     });
