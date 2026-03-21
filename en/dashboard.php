@@ -885,17 +885,18 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $proj_id     = (int)$proj['project_id'];
                             $meta_parts  = array_filter([$proj_type, $briks_used ? $briks_used . ' briks' : '', $const_type]);
                             $meta_str    = implode(' | ', $meta_parts);
-                            // Encode for JS: project data object for projectPreview modal
-                            $proj_js_name = json_encode($proj['project_name'] ?? '', JSON_HEX_TAG) ?: '""';
-                            $proj_js_desc = json_encode($proj['description_short'] ?? '', JSON_HEX_TAG) ?: '""';
-                            $proj_js_full = json_encode($proj['photo1_main'] ?? '', JSON_HEX_TAG) ?: '""';
-                            $proj_js_tmb  = json_encode($proj['photo1_tmb'] ?? '', JSON_HEX_TAG) ?: '""';
                         ?>
                         <div class="my-project-row">
                             <img class="my-project-tmb"
                                  src="<?php echo $tmb_src; ?>"
                                  alt="<?php echo $proj_name; ?>"
-                                 onclick="projectPreview({project_id:<?php echo $proj_id; ?>,project_name:<?php echo $proj_js_name; ?>,description_short:<?php echo $proj_js_desc; ?>,photo1_main:<?php echo $proj_js_full; ?>,photo1_tmb:<?php echo $proj_js_tmb; ?>,briks_used:<?php echo $briks_used; ?>})"
+                                 data-project-id="<?php echo $proj_id; ?>"
+                                 data-project-name="<?php echo $proj_name; ?>"
+                                 data-description-short="<?php echo $desc_short; ?>"
+                                 data-photo-main="<?php echo htmlspecialchars($proj['photo1_main'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                 data-photo-tmb="<?php echo htmlspecialchars($proj['photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                 data-briks-used="<?php echo $briks_used; ?>"
+                                 style="cursor:pointer;"
                             >
                             <div class="my-project-info">
                                 <span class="my-project-title"><?php echo $proj_name; ?></span>
@@ -903,7 +904,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                 <span class="my-project-meta"><?php echo $meta_str; ?></span>
                             </div>
                             <button class="project-phase-pill"
-                                    onclick="openProjectActionsModal(<?php echo $proj_id; ?>, <?php echo $proj_js_name; ?>)">
+                                    data-project-id="<?php echo $proj_id; ?>"
+                                    data-project-name="<?php echo $proj_name; ?>">
                                 <?php echo $phase; ?>
                             </button>
                         </div>
@@ -2041,6 +2043,7 @@ function openProjectActionsModal(projectId, projectName) {
     content += `<a class="ecobrick-action-button deleter-button" href="javascript:void(0);" onclick="deleteProject(${projectId})">❌ Delete Project</a>`;
 
     messageContainer.innerHTML = content;
+    modal.classList.remove('modal-hidden');
     modal.style.display = 'flex';
     modalBox.style.background = 'none';
     document.getElementById('page-content').classList.add('blurred');
@@ -2048,6 +2051,32 @@ function openProjectActionsModal(projectId, projectName) {
     document.body.classList.add('modal-open');
 }
 window.openProjectActionsModal = openProjectActionsModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // My Projects panel — thumbnail opens photo preview
+    document.querySelectorAll('.my-project-tmb[data-project-id]').forEach(function(img) {
+        img.addEventListener('click', function() {
+            projectPreview({
+                project_id:       parseInt(this.dataset.projectId) || 0,
+                project_name:     this.dataset.projectName     || '',
+                description_short:this.dataset.descriptionShort|| '',
+                photo1_main:      this.dataset.photoMain       || '',
+                photo1_tmb:       this.dataset.photoTmb        || '',
+                briks_used:       parseInt(this.dataset.briksUsed) || 0
+            });
+        });
+    });
+
+    // My Projects panel — phase pill opens actions menu
+    document.querySelectorAll('.project-phase-pill[data-project-id]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            openProjectActionsModal(
+                parseInt(this.dataset.projectId) || 0,
+                this.dataset.projectName || ''
+            );
+        });
+    });
+});
 
 function copyProjectURL(projectId, button) {
     const url = `https://gobrik.com/en/project.php?id=${projectId}`;
