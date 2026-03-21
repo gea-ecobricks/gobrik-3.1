@@ -856,9 +856,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 No ecobricks logged yet. <a href="log.php">Log an ecobrick →</a>
             </div>
             <div id="my-ecobricks-pagination" class="my-ecobricks-pagination" style="display:none;">
-                <button id="my-ecobricks-prev" class="page-button tertiary" disabled>← Prev</button>
+                <div class="my-ecobricks-page-buttons">
+                    <button id="my-ecobricks-prev" class="page-button tertiary" disabled>← Prev</button>
+                    <button id="my-ecobricks-next" class="page-button tertiary">Next →</button>
+                </div>
                 <span id="my-ecobricks-page-info" class="my-ecobricks-page-info"></span>
-                <button id="my-ecobricks-next" class="page-button tertiary">Next →</button>
             </div>
         </div>
 
@@ -1702,38 +1704,59 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             const metaParts = [weight, volume, density].filter(Boolean);
             const metaStr = metaParts.join(' | ');
 
-            // Status pill class
-            let pillClass = 'ecobrick-status-pill';
-            if (status === 'authenticated') pillClass += ' ecobrick-pill-authenticated';
-            else if (status === 'awaiting') pillClass += ' ecobrick-pill-awaiting';
-            else pillClass += ' ecobrick-pill-default';
-
-            const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
-
             const row = document.createElement('div');
             row.className = 'my-project-row';
             row.dataset.serial = serial;
             row.dataset.status = status;
 
-            row.innerHTML =
-                '<img class="my-project-tmb my-ecobrick-tmb" src="' + (tmb || '../images/no-photo.webp') + '" alt="Ecobrick ' + serial + '" style="cursor:pointer;">' +
-                '<div class="my-project-info">' +
-                    '<span class="my-project-title">' + serial + '</span>' +
-                    '<span class="my-project-meta">' + metaStr + '</span>' +
-                    '<span class="my-project-meta">' + dateDisplay + '</span>' +
-                '</div>' +
-                '<button class="' + pillClass + '">' + statusLabel + '</button>';
+            // Thumbnail
+            const img = document.createElement('img');
+            img.className = 'my-project-tmb my-ecobrick-tmb';
+            img.src = tmb || '../images/no-photo.webp';
+            img.alt = 'Ecobrick ' + serial;
+            img.style.cursor = 'pointer';
 
-            // Thumbnail click → ecobrick actions
-            row.querySelector('.my-ecobrick-tmb').addEventListener('click', function() {
+            // Info block
+            const info = document.createElement('div');
+            info.className = 'my-project-info';
+            info.innerHTML =
+                '<span class="my-project-title">' + serial + '</span>' +
+                '<span class="my-project-meta">' + metaStr + '</span>' +
+                '<span class="my-project-meta">' + dateDisplay + '</span>';
+
+            // Gear button (opens brik control menu)
+            const gear = document.createElement('button');
+            gear.className = 'brik-gear-btn';
+            gear.title = 'Ecobrick actions';
+            gear.textContent = '⚙️';
+
+            // Status pill — use status-pill + status-* classes (NOT ecobrick-status-pill which is position:absolute in main.css)
+            const pill = document.createElement('span');
+            pill.className = 'brik-row-pill status-pill ' + getStatusClassName(status);
+            pill.textContent = status || 'unknown';
+
+            // Wire clicks
+            img.addEventListener('click', function() {
+                openViewEcobricV2({
+                    ecobrick_full_photo_url: brik.full_url_raw || '',
+                    photo_version: brik.photo_version_raw || '',
+                    serial_no: serial,
+                    weight_g: brik.weight_g_raw || 0,
+                    ecobricker_maker: brik.ecobricker_maker || '',
+                    status: status,
+                    location_display: brik.location_brik || '',
+                    vision: '',
+                    selfie_photo_url: ''
+                });
+            });
+            gear.addEventListener('click', function() {
                 viewEcobrickActions(serial, status, USER_LANG);
             });
 
-            // Pill click → ecobrick actions
-            row.querySelector('.' + pillClass.split(' ')[0]).addEventListener('click', function() {
-                viewEcobrickActions(serial, status, USER_LANG);
-            });
-
+            row.appendChild(img);
+            row.appendChild(info);
+            row.appendChild(gear);
+            row.appendChild(pill);
             list.appendChild(row);
         });
     }

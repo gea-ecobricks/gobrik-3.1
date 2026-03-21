@@ -113,6 +113,9 @@ while ($row = $result->fetch_assoc()) {
         'ecobricker_maker' => safe_html($row['ecobricker_maker']),
         'community_name' => safe_html($row['community_name']),
         'tmb_url_raw' => safe_html($row['ecobrick_thumb_photo_url']) . '?v=' . safe_html($row['photo_version']),
+        'full_url_raw' => safe_html($row['ecobrick_full_photo_url']),
+        'photo_version_raw' => intval($row['photo_version']),
+        'weight_g_raw' => intval($row['weight_g']),
         'status' => safe_html($row['status']),
         'serial_no' => safe_html($row['serial_no']) // Pass only the raw serial number
     ];

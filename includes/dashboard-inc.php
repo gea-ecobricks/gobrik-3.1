@@ -608,45 +608,32 @@ margin-top:-100px !important;
 /* ======================== MY ECOBRICKS PANEL ========================= */
 /* ===================================================================== */
 
-.ecobrick-status-pill {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+/* Inline status pill for ecobrick rows — uses status-pill + status-* from main.css for colors.
+   Do NOT use .ecobrick-status-pill here — that class is position:absolute in main.css (for photo overlays). */
+.brik-row-pill {
     flex-shrink: 0;
-    min-width: 104px;
-    height: 30px;
-    border-radius: 999px;
-    font-size: 0.76em;
-    font-weight: 700;
-    letter-spacing: 0.015em;
-    border: 1.5px solid rgba(0,0,0,0.15);
-    color: #fff;
-    cursor: pointer;
-    transition: filter 0.15s ease, transform 0.15s ease;
-    padding: 0 12px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    font-size: 0.72em;
+    padding: 4px 10px;
+    min-width: 84px;
+    text-align: center;
     white-space: nowrap;
+    pointer-events: none;
 }
 
-.ecobrick-status-pill:hover {
-    filter: brightness(0.90);
-    transform: translateY(-1px);
+.brik-gear-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+    line-height: 1;
 }
 
-.ecobrick-pill-authenticated {
-    background: linear-gradient(90deg, #29a654 0%, #42c46c 100%);
-    border-color: rgba(0,120,0,0.28);
-}
-
-.ecobrick-pill-awaiting {
-    background: linear-gradient(90deg, #e07b20 0%, #f0a040 100%);
-    border-color: rgba(180,90,0,0.28);
-}
-
-.ecobrick-pill-default {
-    background: linear-gradient(90deg, #888 0%, #aaa 100%);
-    border-color: rgba(0,0,0,0.18);
+.brik-gear-btn:hover {
+    background: rgba(0,0,0,0.08);
 }
 
 .my-ecobricks-loading {
@@ -657,26 +644,22 @@ margin-top:-100px !important;
 
 .my-ecobricks-pagination {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 6px;
     margin-top: 10px;
     padding-top: 8px;
     border-top: 1px solid rgba(0,0,0,0.07);
 }
 
+.my-ecobricks-page-buttons {
+    display: flex;
+    gap: 10px;
+}
+
 .my-ecobricks-page-info {
     font-size: 0.82em;
     opacity: 0.60;
-    flex: 1;
-    text-align: center;
-}
-
-@media screen and (max-width: 480px) {
-    .ecobrick-status-pill {
-        min-width: 84px;
-        font-size: 0.72em;
-    }
 }
 
 </style>
