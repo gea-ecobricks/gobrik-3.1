@@ -265,6 +265,30 @@ echo '<!DOCTYPE html>
                         <p>The pledge window closes on <strong><?php echo $pledge_deadline_display; ?></strong>. We'll email you at <strong><?php echo htmlspecialchars($users_email_address, ENT_QUOTES, 'UTF-8'); ?></strong> to let you know whether the course is going ahead and when payment is due.</p>
                     <?php endif; ?>
                     <a href="register.php?id=<?php echo $training_id; ?>" class="confirm-button pledge-pay-back-btn">↩ Back to Course</a>
+
+                    <div class="pledge-pay-beta-row">
+                        <label class="pledge-pay-beta-label">
+                            <input type="checkbox" id="beta-pay-checkbox">
+                            I'd like to go ahead and pay anyway (i.e. beta testing!)
+                        </label>
+                    </div>
+
+                    <div id="beta-pay-buttons" class="pledge-pay-buttons" style="display:none;">
+                        <div class="pledge-pay-button-group">
+                            <a href="../api/create_midtrans_payment.php?pledge_id=<?php echo (int)$pledge_id; ?>"
+                               class="confirm-button enabled pledge-pay-idn-btn">
+                                🇮🇩 Indonesian Payment
+                            </a>
+                            <p class="pledge-pay-button-note">Indonesian local payments via Midtrans gateway</p>
+                        </div>
+                        <div class="pledge-pay-button-group">
+                            <a href="../api/create_stripe_payment.php?pledge_id=<?php echo (int)$pledge_id; ?>"
+                               class="confirm-button enabled pledge-pay-intl-btn">
+                                🌍 International Payment
+                            </a>
+                            <p class="pledge-pay-button-note">International payments via Stripe gateway</p>
+                        </div>
+                    </div>
                 </div>
 
             <?php elseif ($payment_state === 'payment_due'): ?>
@@ -392,6 +416,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (notice) notice.style.display = 'none';
         });
     });
+
+    const betaCheckbox = document.getElementById('beta-pay-checkbox');
+    const betaButtons = document.getElementById('beta-pay-buttons');
+    if (betaCheckbox && betaButtons) {
+        betaCheckbox.addEventListener('change', function() {
+            betaButtons.style.display = this.checked ? 'flex' : 'none';
+        });
+    }
 });
 </script>
 

@@ -1693,12 +1693,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         bricks.forEach(function(brik) {
             const serial = brik.serial_no || '';
             const status = brik.status || '';
-            const weight = brik.weight_g ? Number(brik.weight_g).toLocaleString() + 'g' : '—';
-            const volume = brik.volume_ml ? brik.volume_ml + 'ml' : '';
-            const density = brik.density ? brik.density + ' g/ml' : '';
-            const dateRaw = brik.date_logged_ts || '';
-            const dateDisplay = dateRaw ? dateRaw.slice(0, 10) : '';
-            const tmb = brik.ecobrick_thumb_photo_url || '';
+            const weight = brik.weight_g || '—';
+            const volume = brik.volume_ml || '';
+            const density = brik.density || '';
+            const dateDisplay = brik.date_logged_ts || '';
+            const tmb = brik.tmb_url_raw || '';
 
             const metaParts = [weight, volume, density].filter(Boolean);
             const metaStr = metaParts.join(' | ');

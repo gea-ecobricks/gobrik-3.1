@@ -494,6 +494,29 @@
     }
 }
 
+.pledge-pay-beta-row {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.10);
+}
+
+.pledge-pay-beta-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9em;
+    opacity: 0.70;
+    cursor: pointer;
+}
+
+.pledge-pay-beta-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+    margin: 0;
+}
+
 </style>
 
 
