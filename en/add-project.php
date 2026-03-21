@@ -66,12 +66,12 @@ $user_roles = getUser_Role($buwana_id);
 $user_community_name = getCommunityName($buwana_conn, $buwana_id);
 
 // 👤 Look up user's GoBrik account info
-$sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt, user_capabilities FROM tb_ecobrickers WHERE buwana_id = ?";
+$sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt, user_capabilities, full_name FROM tb_ecobrickers WHERE buwana_id = ?";
 $stmt_lookup_user = $gobrik_conn->prepare($sql_lookup_user);
 if ($stmt_lookup_user) {
     $stmt_lookup_user->bind_param("i", $buwana_id);
     $stmt_lookup_user->execute();
-    $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt, $user_capabilities_raw);
+    $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt, $user_capabilities_raw, $full_name);
     $stmt_lookup_user->fetch();
     $stmt_lookup_user->close();
 } else {
@@ -125,131 +125,8 @@ if (!empty($project_id)) {
     }
 }
 
-// PART 3: Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once '../gobrikconn_env.php';
-
-    $project_id = isset($_POST['project_id']) ? (int)$_POST['project_id'] : null;
-    $location_full = trim($_POST['location_address'] ?? '');
-    $project_name = trim($_POST['project_name'] ?? '');
-    $description_short = trim($_POST['description_short'] ?? '');
-    $description_long = trim($_POST['description_long'] ?? '');
-    $project_type = trim($_POST['project_type'] ?? '');
-    $construction_type = trim($_POST['construction_type'] ?? '');
-    $community = trim($_POST['community'] ?? '');
-    $project_admins = trim($_POST['project_admins'] ?? '');
-    $start_dt = trim($_POST['start_dt'] ?? '');
-    $end_dt = trim($_POST['end_dt'] ?? '');
-    $project_sort = trim($_POST['project_sort'] ?? '');
-    $briks_used = (int)($_POST['briks_used'] ?? 0);
-    $est_avg_brik_weight = (int)($_POST['est_avg_brik_weight'] ?? 0);
-    $latitude = isset($_POST['latitude']) ? (float)$_POST['latitude'] : null;
-    $longitude = isset($_POST['longitude']) ? (float)$_POST['longitude'] : null;
-    $connected_ecobricks = trim($_POST['connected_ecobricks'] ?? '');
-
-    $project_end = !empty($end_dt) ? $end_dt : $start_dt;
-    $briks_required = $briks_used > 0 ? $briks_used : 0;
-    $logged_ts = date('Y-m-d H:i:s');
-
-    if (!empty($project_id)) {
-        $update_sql = "UPDATE tb_projects SET project_name = ?, description_short = ?, description_long = ?, start_dt = ?, end_dt = ?, project_end = ?, briks_required = ?, briks_used = ?, est_avg_brik_weight = ?, project_type = ?, construction_type = ?, project_sort = ?, community = ?, project_admins = ?, location_full = ?, location_lat = ?, location_long = ?, connected_ecobricks = ? WHERE project_id = ?";
-        $stmt = $gobrik_conn->prepare($update_sql);
-        if ($stmt) {
-            $stmt->bind_param(
-                'ssssssiiissssssddsi',
-                $project_name,
-                $description_short,
-                $description_long,
-                $start_dt,
-                $end_dt,
-                $project_end,
-                $briks_required,
-                $briks_used,
-                $est_avg_brik_weight,
-                $project_type,
-                $construction_type,
-                $project_sort,
-                $community,
-                $project_admins,
-                $location_full,
-                $latitude,
-                $longitude,
-                $connected_ecobricks,
-                $project_id
-            );
-        } else {
-            echo "Prepare failed: " . $gobrik_conn->error;
-        }
-    } else {
-        $insert_sql = "INSERT INTO tb_projects (project_name, description_short, description_long, start_dt, end_dt, project_end, briks_required, briks_used, est_avg_brik_weight, project_type, construction_type, project_sort, community, project_admins, location_full, location_lat, location_long, connected_ecobricks, logged_ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $gobrik_conn->prepare($insert_sql);
-        if ($stmt) {
-            $stmt->bind_param(
-                'ssssssiiissssssddss',
-                $project_name,
-                $description_short,
-                $description_long,
-                $start_dt,
-                $end_dt,
-                $project_end,
-                $briks_required,
-                $briks_used,
-                $est_avg_brik_weight,
-                $project_type,
-                $construction_type,
-                $project_sort,
-                $community,
-                $project_admins,
-                $location_full,
-                $latitude,
-                $longitude,
-                $connected_ecobricks,
-                $logged_ts
-            );
-        } else {
-            echo "Prepare failed: " . $gobrik_conn->error;
-        }
-    }
-
-    if ($stmt) {
-        if ($stmt->execute()) {
-            if (empty($project_id)) {
-                $project_id = $gobrik_conn->insert_id;
-            }
-
-            $est_total_weight = ($briks_used * $est_avg_brik_weight) / 1000;
-            $update_weight_sql = "UPDATE tb_projects SET est_total_weight = ? WHERE project_id = ?";
-            $update_weight_stmt = $gobrik_conn->prepare($update_weight_sql);
-            if ($update_weight_stmt) {
-                $update_weight_stmt->bind_param('di', $est_total_weight, $project_id);
-                $update_weight_stmt->execute();
-                $update_weight_stmt->close();
-            }
-
-            $project_url = "https://ecobricks.org/en/project.php?id=" . $project_id;
-            $update_url_sql = "UPDATE tb_projects SET project_url = ? WHERE project_id = ?";
-            $update_url_stmt = $gobrik_conn->prepare($update_url_sql);
-            if ($update_url_stmt) {
-                $update_url_stmt->bind_param('si', $project_url, $project_id);
-                $update_url_stmt->execute();
-                $update_url_stmt->close();
-            }
-
-            $stmt->close();
-            echo "<script>window.location.href = 'add-project-images.php?project_id=" . $project_id . "';</script>";
-        } else {
-            echo "Error: " . $stmt->error . "<br>";
-            $stmt->close();
-        }
-    } else {
-        echo "Prepare failed: " . $gobrik_conn->error;
-    }
-
-    if ($gobrik_conn) {
-        $gobrik_conn->close();
-    }
-}
 ?>
+
 
 
 
@@ -284,8 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="lead-page-paragraph">
             <p data-lang-id="004-form-description">Share your ecobrick project with the world. Use this form to post your completed ecobricks project onto ecobricks.org. Projects will be featured on our main page and archived in our database.</p>
         </div>
-        <form id="submit-form" method="post" action="" enctype="multipart/form-data" novalidate>
-        <!-- <form id="submit-form" method="post" action="" enctype="multipart/form-data"> -->
+        <form id="submit-form" method="post" action="../processes/add_project_process.php" enctype="multipart/form-data" novalidate>
             <?php if (!empty($project_id)) { ?>
                 <input type="hidden" name="project_id" value="<?php echo htmlspecialchars($project_id); ?>">
             <?php } ?>
@@ -294,13 +170,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="project_name" data-lang-id="005-project-name">Project Name:</label><br>
                 <input type="text" id="project_name" name="project_name" aria-label="Project Name" title="Required. Max 255 characters." required value="<?php echo htmlspecialchars($project_name_value); ?>">
                 <p class="form-caption" data-lang-id="005b-project-name-caption">Give a name or title to your project post.  Avoid special characters.</p>
-                
+
                 <!--ERRORS-->
                 <div id="name-error-required" class="form-field-error" data-lang-id="000-field-required-error">This field is required.</div>
 
                 <div id="name-error-long" class="form-field-error" data-lang-id="000-name-field-too-long-error">Your project name is too long.  Max 50 characters.</div>
-                
+
                 <div id="name-error-invalid" class="form-field-error" data-lang-id="005b-project-name-error">Your entry contains invalid characters. Avoid quotes, slashes, and greater-than signs please.</div>
+            </div>
+
+            <div class="form-item">
+                <label for="admin_search" data-lang-id="014-project-admins">Who are the project admins?</label><br>
+                <input type="text" id="admin_search" placeholder="Type to search ecobrickers..." autocomplete="off">
+                <div id="admin_results" class="autocomplete-results"></div>
+
+                <div id="selected_admins" class="trainer-tag-container"></div>
+
+                <p class="form-caption" data-lang-id="014b-project-admins-caption">Select the ecobrickers who will admin this project. You are set as admin by default.</p>
+
+                <div id="admins-error-required" class="form-field-error" data-lang-id="000-field-required-error">At least one project admin is required.</div>
             </div>
     
     <div class="form-item">
@@ -426,13 +314,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div id="community-error-long" class="form-field-error" data-lang-id="000-field-too-long-error">Entry is too long.</div>
         </div>
         
-        <div class="form-item">
-            <label for="project_admins" data-lang-id="014-project-admins">Who's project is this?</label><br>
-            <input type="text" id="project_admins" name="project_admins" aria-label="Project Admins (optional)" value="<?php echo htmlspecialchars($project_admins_value); ?>">
-            <p class="form-caption" data-lang-id="014b-optional">Optional: Provide the name(s) of the project's principals. If you wish to link this to a GoBrik user account be sure to spell the name accordingly.</p>
-        <!--ERRORS-->
-            <div id="admins-error-long" class="form-field-error" data-lang-id="000-field-too-long-error">Entry is too long.</div>
-        </div>
 
     
         <div id="other-advanced-fields">
@@ -492,18 +373,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 <script>
+// PHP-rendered constants — all data injection at the top, never inside function bodies
+const CURRENT_ECOBRICKER_ID = <?php echo (int)$ecobricker_id; ?>;
+const CURRENT_FULL_NAME = <?php echo json_encode($full_name ?? $first_name ?? '', JSON_HEX_TAG) ?: '""'; ?>;
+
 //TOGGLE COMMUNITY OR PERSONAL PROJECT SORT FIELDS
 
 
 document.addEventListener("DOMContentLoaded", function() {
     // Initially hide all additional fields
     const communityField = document.getElementById("community").parentNode;
-    const adminsField = document.getElementById("project_admins").parentNode;
     const connectedEcoBricksField = document.getElementById("connected_ecobricks").parentNode;
     const projectDurationField = document.getElementById("start_dt").parentNode.parentNode; // Parent of start_dt also includes end_dt
 
     communityField.style.display = 'none';
-    adminsField.style.display = 'none';
     connectedEcoBricksField.style.display = 'none';
     projectDurationField.style.display = 'none';
 
@@ -513,14 +396,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Reset visibility
         communityField.style.display = 'none';
-        adminsField.style.display = 'none';
         connectedEcoBricksField.style.display = 'none';
         projectDurationField.style.display = 'none';
 
         if (projectSort === "community") {
             communityField.style.display = '';
-        } else if (projectSort === "personal") {
-            adminsField.style.display = '';
         }
 
         // Show connected ecobricks and project duration fields if a project sort is selected
@@ -644,9 +524,9 @@ document.getElementById('submit-form').addEventListener('submit', function(event
     var community = document.getElementById('community').value.trim();
     displayError('community-error-long', community.length > 255);
 
-    // 10. Project Admins (just check length)
-    var admins = document.getElementById('project_admins').value.trim();
-    displayError('admins-error-long', admins.length > 255);
+    // 10. Project Admins — must have at least one tag
+    var adminInputs = document.querySelectorAll('#selected_admins input[name="admin_ids[]"]');
+    displayError('admins-error-required', adminInputs.length === 0);
 
     // 11. Location Validation
     var location = document.getElementById('location_address').value.trim();
@@ -790,6 +670,86 @@ $(document).ready(function() {
     });
 });
 
+
+// PROJECT ADMIN SEARCH
+
+document.addEventListener('DOMContentLoaded', function() {
+    const adminInput = document.getElementById('admin_search');
+    const adminResults = document.getElementById('admin_results');
+    const adminContainer = document.getElementById('selected_admins');
+
+    function fetchAdmins(query) {
+        if (query.length >= 3) {
+            fetch('../api/search_ecobrickers.php?query=' + encodeURIComponent(query))
+                .then(response => response.json())
+                .then(data => {
+                    adminResults.innerHTML = '';
+                    if (data.length === 0) {
+                        adminResults.innerHTML = "<div class='autocomplete-item' style='color: gray;'>No results found</div>";
+                    } else {
+                        data.forEach(function(person) {
+                            var div = document.createElement('div');
+                            div.textContent = person.full_name;
+                            div.dataset.id = person.ecobricker_id;
+                            div.classList.add('autocomplete-item');
+                            div.addEventListener('mousedown', function(event) {
+                                event.preventDefault();
+                                addAdmin(person.ecobricker_id, person.full_name);
+                                adminInput.value = '';
+                                adminResults.innerHTML = '';
+                            });
+                            adminResults.appendChild(div);
+                        });
+                    }
+                });
+        } else {
+            adminResults.innerHTML = '';
+        }
+    }
+
+    function addAdmin(id, name) {
+        if (document.getElementById('admin-hidden-' + id)) return;
+        var box = document.createElement('div');
+        box.className = 'trainer-tag-box';
+        box.dataset.id = id;
+
+        var remove = document.createElement('span');
+        remove.className = 'remove-trainer';
+        remove.textContent = '\u00D7';
+        remove.addEventListener('click', function() {
+            box.remove();
+        });
+
+        var text = document.createElement('span');
+        text.textContent = name;
+
+        var hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'admin_ids[]';
+        hidden.value = id;
+        hidden.id = 'admin-hidden-' + id;
+
+        box.appendChild(remove);
+        box.appendChild(text);
+        box.appendChild(hidden);
+        adminContainer.appendChild(box);
+    }
+
+    // Pre-populate with the logged-in user
+    if (CURRENT_ECOBRICKER_ID && CURRENT_FULL_NAME) {
+        addAdmin(CURRENT_ECOBRICKER_ID, CURRENT_FULL_NAME);
+    }
+
+    adminInput.addEventListener('input', function() {
+        fetchAdmins(adminInput.value.trim());
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!adminInput.contains(event.target) && !adminResults.contains(event.target)) {
+            adminResults.innerHTML = '';
+        }
+    });
+});
 
 </script>
 

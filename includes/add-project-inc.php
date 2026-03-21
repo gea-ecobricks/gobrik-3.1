@@ -427,14 +427,14 @@ input[type="submit"]:hover {
 
 #location_address {
     width: 100%;
-    padding-right: 30px; /* Make space for the spinner */
+    padding-left: 30px; /* Make space for the spinner on the left */
 }
 
 .spinner {
     display: none;
     position: absolute;
     top: 30%;  /* Center vertically in the input field */
-    right: 15px; /* Distance from the right edge of the input field */
+    left: 10px; /* Position spinner at the left of the input field */
     transform: translateY(-50%); /* Ensures the spinner is exactly centered vertically */
     width: 20px;
     height: 20px;
@@ -442,6 +442,29 @@ input[type="submit"]:hover {
     border-top: 4px solid var(--emblem-pink);
     border-radius: 50%;
     animation: spin 1s linear infinite;
+}
+
+.trainer-tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.trainer-tag-box {
+    display: flex;
+    align-items: center;
+    background: #ccc;
+    border-radius: 12px;
+    padding: 4px 10px;
+    margin: 3px;
+    font-size: 0.9em;
+}
+
+.trainer-tag-box .remove-trainer {
+    margin-right: 6px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
 }
 
 @keyframes spin {
