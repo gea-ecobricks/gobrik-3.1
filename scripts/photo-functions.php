@@ -35,7 +35,9 @@ function handleFileUploadError($errorCode, $index) {
 }
 
 
-// Function to create a thumbnail using GD library
+// Function to create a thumbnail using GD library.
+// Scales the image so its smallest dimension equals $width (=$height, square target),
+// then center-crops the longer dimension — no squishing.
 function createThumbnail($source_path, $destination_path, $width, $height, $quality) {
     list($source_width, $source_height, $source_type) = getimagesize($source_path);
     switch ($source_type) {
@@ -51,10 +53,17 @@ function createThumbnail($source_path, $destination_path, $width, $height, $qual
         default:
             return false;
     }
+
+    // Crop a centered square from the source whose side equals min(source_width, source_height).
+    // imagecopyresampled will then scale that square to $width×$height in one step.
+    $src_size = min($source_width, $source_height);
+    $src_x    = (int)(($source_width  - $src_size) / 2);
+    $src_y    = (int)(($source_height - $src_size) / 2);
+
     $thumbnail = imagecreatetruecolor($width, $height);
-    imagecopyresampled($thumbnail, $source_image, 0, 0, 0, 0, $width, $height, $source_width, $source_height);
+    imagecopyresampled($thumbnail, $source_image, 0, 0, $src_x, $src_y, $width, $height, $src_size, $src_size);
     imagedestroy($source_image);
-    imagejpeg($thumbnail, $destination_path, $quality);
+    imagewebp($thumbnail, $destination_path, $quality);
     imagedestroy($thumbnail);
     return true;
 }
