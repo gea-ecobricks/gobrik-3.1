@@ -177,7 +177,7 @@ if ($stmt_trainings) {
 $registered_trainings = [];
 $sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location,
                                     t.training_country, t.training_type, t.zoom_link, t.zoom_link_full,
-                                    t.training_photo0_tmb
+                                    t.feature_photo1_tmb
                              FROM tb_trainings t
                              INNER JOIN tb_training_trainees tt ON t.training_id = tt.training_id
                              WHERE tt.ecobricker_id = ?";
@@ -208,7 +208,7 @@ $sql_pledge_regs = "SELECT
         t.training_title,
         t.training_date,
         t.training_type,
-        t.training_photo0_tmb,
+        t.feature_photo1_tmb,
         t.funding_goal_idr,
         t.payment_deadline,
         t.pledge_deadline,
@@ -749,9 +749,34 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         </div>
 
-        <!-- My Registrations -->
+        <!-- Latest Projects -->
+        <div id="latest-projects-panel" class="dashboard-v2-panel">
+            <h4 style="margin:0 0 12px 0;">Latest Projects</h4>
+            <div id="project-grid" class="ecobrick-grid project-grid" aria-label="Latest showcased projects">
+                <?php if (!empty($latest_projects)): ?>
+                    <?php foreach ($latest_projects as $project): ?>
+                        <button class="ecobrick-grid-item project-grid-item" type="button"
+                                data-project-id="<?php echo (int) $project['project_id']; ?>"
+                                title="<?php echo htmlspecialchars($project['project_name'] ?? 'View project'); ?>">
+                            <?php $project_thumb = !empty($project['photo1_tmb']) ? $project['photo1_tmb'] : ($project['photo1_main'] ?? ''); ?>
+                            <img src="<?php echo htmlspecialchars($project_thumb); ?>"
+                                 alt="<?php echo htmlspecialchars($project['project_name'] ?? 'Project photo'); ?>">
+                            <span class="project-grid-title"><?php echo htmlspecialchars($project['project_name'] ?? ''); ?></span>
+                        </button>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            <p id="projects-empty" class="ecobrick-empty-message" <?php echo !empty($latest_projects) ? 'style="display:none;"' : ''; ?>>No projects to display right now.</p>
+            <div class="ecobrick-grid-actions">
+                <button id="previous-projects" class="page-button tertiary" style="display:none;">Previous projects</button>
+                <button id="load-more-projects" class="page-button tertiary">Load more projects</button>
+                <a href="add-project.php" class="page-button" style="background:#0d6efd;color:#ffffff;text-decoration:none;">Post your project</a>
+            </div>
+        </div>
+
+        <!-- My Event Registrations -->
         <div id="registrations-panel" class="dashboard-v2-panel">
-            <h3 data-lang-id="002-my-registrations">My Registrations</h3>
+            <h3 data-lang-id="002-my-registrations">My Event Registrations</h3>
 
             <?php
             $pledge_state_labels = [
@@ -774,16 +799,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <div class="pledge-reg-list">
                     <?php foreach ($pledge_registrations as $pledge): ?>
                         <?php
-                            $state       = $pledge['payment_state'];
-                            $state_label = $pledge_state_labels[$state] ?? ucfirst($state);
-                            $state_cls   = $pledge_state_classes[$state] ?? 'pending';
-                            $funding_pct = (int)$pledge['funding_pct'];
-                            $date_str    = !empty($pledge['training_date'])
-                                           ? date('M j, Y', strtotime($pledge['training_date'])) : '';
-                            $reg_tmb     = htmlspecialchars($pledge['training_photo0_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $reg_tid     = (int)$pledge['training_id'];
+                            $state         = $pledge['payment_state'];
+                            $state_label   = $pledge_state_labels[$state] ?? ucfirst($state);
+                            $state_cls     = $pledge_state_classes[$state] ?? 'pending';
+                            $funding_pct   = (int)$pledge['funding_pct'];
+                            $pledge_date_ts = !empty($pledge['training_date']) ? strtotime($pledge['training_date']) : 0;
+                            $date_str      = $pledge_date_ts ? date('M j, Y', $pledge_date_ts) : '';
+                            $is_upcoming   = $pledge_date_ts && $pledge_date_ts >= strtotime('today');
+                            $reg_tmb       = htmlspecialchars($pledge['feature_photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $reg_tid       = (int)$pledge['training_id'];
                         ?>
-                        <div class="pledge-reg-row">
+                        <div class="pledge-reg-row<?php echo $is_upcoming ? ' reg-row-upcoming' : ''; ?>">
                             <?php if ($reg_tmb): ?>
                                 <a href="register.php?id=<?php echo $reg_tid; ?>" class="reg-training-tmb-link">
                                     <img class="reg-training-tmb" src="<?php echo $reg_tmb; ?>" alt="<?php echo htmlspecialchars($pledge['training_title'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -813,10 +839,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $reg_date_ts  = strtotime($training['training_date']);
                             $reg_date_str = date('M j, Y', $reg_date_ts);
                             $is_past      = $reg_date_ts < strtotime('today');
-                            $reg_tmb      = htmlspecialchars($training['training_photo0_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $is_upcoming  = !$is_past;
+                            $reg_tmb      = htmlspecialchars($training['feature_photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
                             $reg_tid      = (int)$training['training_id'];
                         ?>
-                        <div class="pledge-reg-row">
+                        <div class="pledge-reg-row<?php echo $is_upcoming ? ' reg-row-upcoming' : ''; ?>">
                             <?php if ($reg_tmb): ?>
                                 <a href="register.php?id=<?php echo $reg_tid; ?>" class="reg-training-tmb-link">
                                     <img class="reg-training-tmb" src="<?php echo $reg_tmb; ?>" alt="<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -840,6 +867,44 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <?php if (empty($pledge_registrations) && empty($registered_trainings)): ?>
                 <p class="reg-empty-note">You haven't registered for any courses yet. <a href="courses.php">Browse courses →</a></p>
             <?php endif; ?>
+        </div>
+
+        <!-- Latest Ecobricks -->
+        <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
+            <h4 style="margin:0 0 12px 0;">Latest featured ecobricks...</h4>
+            <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
+                <?php if (!empty($featured_ecobricks)): ?>
+                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                        <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
+                            <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                                 alt="Ecobrick photo for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
+                <?php if (!empty($featured_ecobricks)): ?>
+                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
+                        <?php
+                            $grid_image_src = !empty($brick['ecobrick_thumb_photo_url']) ? $brick['ecobrick_thumb_photo_url'] : ($brick['ecobrick_full_photo_url'] ?? '');
+                        ?>
+                        <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>" title="<?php echo htmlspecialchars($brick['vision'] ?? $brick['location_display'] ?? 'View featured ecobrick'); ?>">
+                            <img src="<?php echo htmlspecialchars($grid_image_src); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
+                                 alt="Ecobrick photo for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
+                        </button>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            <div class="ecobrick-grid-actions">
+                <div class="ecobrick-grid-action-row" id="featured-grid-action-row">
+                    <button id="previous-ecobricks" class="page-button tertiary previous-ecobricks" style="display:none;">Previous</button>
+                    <button id="load-next-ecobricks" class="page-button tertiary load-next-ecobricks" title="Load more of the latest authenticated ecobricks with selfies">More Ecobrick Selfies</button>
+                </div>
+                <div class="ecobrick-grid-action-row">
+                    <button id="load-featured-ecobricks" class="page-button tertiary">Load Featured Ecobricks</button>
+                </div>
+            </div>
+            <p id="featured-ecobricks-empty" class="ecobrick-empty-message" <?php echo !empty($featured_ecobricks) ? 'style="display:none;"' : ''; ?>>No featured ecobricks to display right now.</p>
         </div>
 
         <!-- Support Chats -->
@@ -921,44 +986,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         <?php endif; ?>
 
-        <!-- Latest Ecobricks -->
-        <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
-            <h4 style="margin:0 0 12px 0;">Latest featured ecobricks...</h4>
-            <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
-                <?php if (!empty($featured_ecobricks)): ?>
-                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
-                        <div class="slide<?php echo $index === 0 ? ' active' : ''; ?>">
-                            <img src="<?php echo htmlspecialchars($brick['ecobrick_full_photo_url']); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
-                                 alt="Ecobrick photo for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            <div class="ecobrick-grid" aria-label="Latest ecobrick selfies grid">
-                <?php if (!empty($featured_ecobricks)): ?>
-                    <?php foreach ($featured_ecobricks as $index => $brick): ?>
-                        <?php
-                            $grid_image_src = !empty($brick['ecobrick_thumb_photo_url']) ? $brick['ecobrick_thumb_photo_url'] : ($brick['ecobrick_full_photo_url'] ?? '');
-                        ?>
-                        <button class="ecobrick-grid-item" type="button" data-grid-index="<?php echo (int) $index; ?>" title="<?php echo htmlspecialchars($brick['vision'] ?? $brick['location_display'] ?? 'View featured ecobrick'); ?>">
-                            <img src="<?php echo htmlspecialchars($grid_image_src); ?>?v=<?php echo htmlspecialchars($brick['photo_version']); ?>"
-                                 alt="Ecobrick photo for serial <?php echo htmlspecialchars($brick['serial_no']); ?>">
-                        </button>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            <div class="ecobrick-grid-actions">
-                <div class="ecobrick-grid-action-row" id="featured-grid-action-row">
-                    <button id="previous-ecobricks" class="page-button tertiary previous-ecobricks" style="display:none;">Previous</button>
-                    <button id="load-next-ecobricks" class="page-button tertiary load-next-ecobricks" title="Load more of the latest authenticated ecobricks with selfies">More Ecobrick Selfies</button>
-                </div>
-                <div class="ecobrick-grid-action-row">
-                    <button id="load-featured-ecobricks" class="page-button tertiary">Load Featured Ecobricks</button>
-                </div>
-            </div>
-            <p id="featured-ecobricks-empty" class="ecobrick-empty-message" <?php echo !empty($featured_ecobricks) ? 'style="display:none;"' : ''; ?>>No featured ecobricks to display right now.</p>
-        </div>
-
         <!-- Validation Panel (admin/validator only) -->
         <?php if ($has_validation_access): ?>
             <div id="validation-panel" class="dashboard-v2-panel">
@@ -986,31 +1013,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <a href="admin-review.php" class="page-button" style="display:block;width:100%;max-width:420px;margin:0 auto;">Admin Validation</a>
             </div>
         <?php endif; ?>
-
-        <!-- Latest Projects -->
-        <div id="latest-projects-panel" class="dashboard-v2-panel">
-            <h4 style="margin:0 0 12px 0;">Latest Projects</h4>
-            <div id="project-grid" class="ecobrick-grid project-grid" aria-label="Latest showcased projects">
-                <?php if (!empty($latest_projects)): ?>
-                    <?php foreach ($latest_projects as $project): ?>
-                        <button class="ecobrick-grid-item project-grid-item" type="button"
-                                data-project-id="<?php echo (int) $project['project_id']; ?>"
-                                title="<?php echo htmlspecialchars($project['project_name'] ?? 'View project'); ?>">
-                            <?php $project_thumb = !empty($project['photo1_tmb']) ? $project['photo1_tmb'] : ($project['photo1_main'] ?? ''); ?>
-                            <img src="<?php echo htmlspecialchars($project_thumb); ?>"
-                                 alt="<?php echo htmlspecialchars($project['project_name'] ?? 'Project photo'); ?>">
-                            <span class="project-grid-title"><?php echo htmlspecialchars($project['project_name'] ?? ''); ?></span>
-                        </button>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            <p id="projects-empty" class="ecobrick-empty-message" <?php echo !empty($latest_projects) ? 'style="display:none;"' : ''; ?>>No projects to display right now.</p>
-            <div class="ecobrick-grid-actions">
-                <button id="previous-projects" class="page-button tertiary" style="display:none;">Previous projects</button>
-                <button id="load-more-projects" class="page-button tertiary">Load more projects</button>
-                <a href="add-project.php" class="page-button" style="background:#0d6efd;color:#ffffff;text-decoration:none;">Post your project</a>
-            </div>
-        </div>
 
         <!-- Earthen Mailer (admin only) -->
         <?php if ($is_admin): ?>

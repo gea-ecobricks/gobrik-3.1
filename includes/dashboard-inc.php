@@ -312,12 +312,21 @@ margin-top:-100px !important;
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    padding: 11px 0;
+    padding: 11px 0 11px 10px;
     border-bottom: 1px solid rgba(0,0,0,0.07);
+    border-left: 3px solid transparent;
+    margin-left: -10px;
+    padding-left: 10px;
+    border-radius: 0 4px 4px 0;
+    transition: border-color 0.15s ease;
 }
 
 .pledge-reg-row:last-child {
     border-bottom: none;
+}
+
+.pledge-reg-row.reg-row-upcoming {
+    border-left-color: #22c55e;
 }
 
 .pledge-reg-info {
