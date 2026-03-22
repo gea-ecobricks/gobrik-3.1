@@ -7,7 +7,7 @@ $version = '9.21';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-// 🔐 Start session and verify Buwana JWT (auto-redirects if not logged in)
+// 🔐 Start session and verify Buwana JWT (auto-redirects if not logged in) go
 require_once '../auth/session_start.php';
 
 // 🆔 Retrieve the authenticated user's Buwana ID
