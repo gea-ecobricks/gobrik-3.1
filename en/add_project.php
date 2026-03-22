@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO tb_projects (name, description, start, briks_used, est_avg_brik_weight, location_full, location_geo, project_type, construction_type, community, project_admins)
             VALUES (?, ?, ?, ?, ?, ?, ST_GeomFromText(?), ?, ?, ?, ?)";
 
-    // Prepare the SQL statement go
+    // Prepare the SQL statement go2
     $stmt = $conn->prepare($sql);
 
     // Updated bind_param to include 'est_avg_brik_weight'. Assuming 'est_avg_brik_weight' is a number, use 'i' for integer.
