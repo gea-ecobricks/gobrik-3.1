@@ -595,30 +595,31 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
 <div class="dashboard-wrapper">
 <div id="dashboard-v2-grid" class="dashboard-grid">
-    <div class="dashboard-column column-narrow">
-        <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel" style="--notice-bg: <?php echo htmlspecialchars($notice_background_rgba, ENT_QUOTES, 'UTF-8'); ?>;">
-            <div id="registered-notice" class="top-container-notice">
-                <span id="notice-icon" class="notice-icon">
-                    <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
-                </span>
-                <span id="notice-text" class="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
-                        <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
-                            <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
-                        </a>
-                    </span>
 
-                <button class="notice-close" aria-label="Close">&times;</button>
-            </div>
+    <!-- Dashboard Notice: spans 2/3 width (columns 1–2) -->
+    <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel" style="--notice-bg: <?php echo htmlspecialchars($notice_background_rgba, ENT_QUOTES, 'UTF-8'); ?>;">
+        <div id="registered-notice" class="top-container-notice">
+            <span id="notice-icon" class="notice-icon">
+                <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
+            </span>
+            <span id="notice-text" class="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
+                    <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
+                        <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
+                    </a>
+                </span>
+            <button class="notice-close" aria-label="Close">&times;</button>
         </div>
+    </div>
+
+    <!-- Left column (1/3): welcome + registrations + support + admin/trainer -->
+    <div class="dashboard-column column-narrow">
 
         <div id="welcome-greeting-panel" class="dashboard-v2-panel">
             <span class="dashboard-status-pill logged-in-pill">Logged in <?php echo htmlspecialchars($earthling_emoji ?? '🟢', ENT_QUOTES, 'UTF-8'); ?></span>
             <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
-            <p id="subgreeting">Welcome to your new 2026 GoBrik dashboard. We've revamped it for the new year.</p>
             <p class="dashboard-summary-text"><?php echo htmlspecialchars($dashboard_summary_text, ENT_QUOTES, 'UTF-8'); ?></p>
             <div class="dashboard-actions">
                 <a href="log.php" class="button" id="log-ecobrick-button" data-lang-id="001-log-an-ecobrick">➕ Log an Ecobrick</a>
-                <a href="add-project.php" class="button ghost" data-lang-id="001c-register-project">🏗️ Register Project</a>
             </div>
         </div>
 
@@ -807,9 +808,11 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </div>
             </div>
         <?php endif; ?>
-    </div>
+    </div><!-- end column-narrow -->
 
-    <div class="dashboard-column column-wide">
+    <!-- Middle column (1/3): My Ecobricks + latest ecobricks + validation -->
+    <div class="dashboard-column column-two">
+
         <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
             <h4 style="margin:0 0 12px 0;">Latest featured ecobricks...</h4>
             <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
@@ -853,16 +856,24 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <div id="my-ecobricks-loading" class="my-ecobricks-loading">Loading ecobricks...</div>
             </div>
             <div id="my-ecobricks-empty" class="reg-empty-note" style="display:none;">
-                No ecobricks logged yet. <a href="log.php">Log an ecobrick →</a>
+                No ecobricks logged yet.
             </div>
-            <div id="my-ecobricks-pagination" class="my-ecobricks-pagination" style="display:none;">
-                <div class="my-ecobricks-page-buttons">
-                    <button id="my-ecobricks-prev" class="page-button tertiary" disabled>← Prev</button>
-                    <button id="my-ecobricks-next" class="page-button tertiary">Next →</button>
+            <div class="panel-list-footer">
+                <a href="log.php" class="panel-grey-btn">➕ Log New Ecobrick</a>
+                <div id="my-ecobricks-pagination" class="my-ecobricks-pagination" style="display:none;">
+                    <span id="my-ecobricks-page-info" class="my-ecobricks-page-info"></span>
+                    <div class="my-ecobricks-page-buttons">
+                        <button id="my-ecobricks-prev" class="page-button tertiary" disabled>← Prev</button>
+                        <button id="my-ecobricks-next" class="page-button tertiary">Next →</button>
+                    </div>
                 </div>
-                <span id="my-ecobricks-page-info" class="my-ecobricks-page-info"></span>
             </div>
         </div>
+
+    </div><!-- end column-two -->
+
+    <!-- Right column (1/3): My Projects + latest projects + admin/trainer -->
+    <div class="dashboard-column column-wide">
 
         <div id="my-projects-panel" class="dashboard-v2-panel">
             <h3>My Projects</h3>
@@ -884,6 +895,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $meta_str    = implode(' | ', $meta_parts);
                         ?>
                         <div class="my-project-row">
+                            <button class="project-gear-btn"
+                                    data-project-id="<?php echo $proj_id; ?>"
+                                    data-project-name="<?php echo $proj_name; ?>"
+                                    title="Project actions">⚙️</button>
                             <img class="my-project-tmb"
                                  src="<?php echo $tmb_src; ?>"
                                  alt="<?php echo $proj_name; ?>"
@@ -909,8 +924,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
-                <p class="reg-empty-note">No admin projects yet. <a href="add-project.php">Register a project →</a></p>
+                <p class="reg-empty-note">No projects yet.</p>
             <?php endif; ?>
+            <div class="panel-list-footer">
+                <a href="add-project.php" class="panel-grey-btn">📋 Record Project</a>
+                <div id="my-projects-pagination" class="my-ecobricks-pagination" style="display:none;">
+                    <div class="my-ecobricks-page-buttons">
+                        <button id="my-projects-prev" class="page-button tertiary" disabled>← Prev</button>
+                        <button id="my-projects-next" class="page-button tertiary">Next →</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <?php if ($has_validation_access): ?>
@@ -1051,8 +1075,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </table>
             </div>
         <?php endif; ?>
-    </div>
-</div><!-- closes main container -->
+    </div><!-- end column-wide -->
+
+</div><!-- closes dashboard-v2-grid -->
 
 </div><!--closes main and starry background-->
 
@@ -1090,7 +1115,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     const welcomePanel = document.getElementById('welcome-greeting-panel');
     const latestPanel = document.getElementById('latest-ecobricks-panel');
     const narrowColumn = document.querySelector('.dashboard-column.column-narrow');
-    const wideColumn = document.querySelector('.dashboard-column.column-wide');
+    const wideColumn = document.querySelector('.dashboard-column.column-two');
     const latestOriginalNextSibling = latestPanel?.nextElementSibling ?? null;
     let sliderCurrentIndex = 0;
     let sliderIntervalId = null;
@@ -1753,9 +1778,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 viewEcobrickActions(serial, status, USER_LANG);
             });
 
+            row.appendChild(gear);
             row.appendChild(img);
             row.appendChild(info);
-            row.appendChild(gear);
             row.appendChild(pill);
             list.appendChild(row);
         });
@@ -2141,6 +2166,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // My Projects panel — phase pill opens actions menu
     document.querySelectorAll('.project-phase-pill[data-project-id]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            openProjectActionsModal(
+                parseInt(this.dataset.projectId) || 0,
+                this.dataset.projectName || ''
+            );
+        });
+    });
+
+    // My Projects panel — gear button opens same actions menu
+    document.querySelectorAll('.project-gear-btn[data-project-id]').forEach(function(btn) {
         btn.addEventListener('click', function() {
             openProjectActionsModal(
                 parseInt(this.dataset.projectId) || 0,

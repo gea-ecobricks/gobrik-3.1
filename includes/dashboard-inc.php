@@ -655,11 +655,69 @@ margin-top:-100px !important;
 .my-ecobricks-page-buttons {
     display: flex;
     gap: 10px;
+    width: 100%;
+}
+
+.my-ecobricks-page-buttons .page-button {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
 }
 
 .my-ecobricks-page-info {
     font-size: 0.82em;
     opacity: 0.60;
+}
+
+/* Footer section below ecobrick/project list (log btn + pagination) */
+.panel-list-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0,0,0,0.07);
+}
+
+/* Grey full-width action button used in panel footers */
+.panel-grey-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 14px;
+    background: #e8e8e8;
+    color: #3a3a3a;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.panel-grey-btn:hover {
+    background: #d4d4d4;
+}
+
+/* Gear button for project rows */
+.project-gear-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+    line-height: 1;
+}
+
+.project-gear-btn:hover {
+    background: rgba(0,0,0,0.08);
 }
 
 </style>
