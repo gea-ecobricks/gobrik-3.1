@@ -537,6 +537,27 @@ margin-top:-100px !important;
     filter: brightness(0.88);
 }
 
+.reg-training-tmb-link {
+    display: block;
+    flex-shrink: 0;
+}
+
+.reg-training-tmb {
+    display: block;
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(0,0,0,0.10);
+    transition: transform 0.15s ease, filter 0.15s ease;
+    cursor: pointer;
+}
+
+.reg-training-tmb:hover {
+    transform: scale(1.05);
+    filter: brightness(0.88);
+}
+
 .my-project-info {
     display: flex;
     flex-direction: column;

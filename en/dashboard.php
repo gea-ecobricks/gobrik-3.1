@@ -176,7 +176,8 @@ if ($stmt_trainings) {
 // 📋 Fetch trainings where user is a registered trainee (legacy confirmed, non-3P)
 $registered_trainings = [];
 $sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location,
-                                    t.training_country, t.training_type, t.zoom_link, t.zoom_link_full
+                                    t.training_country, t.training_type, t.zoom_link, t.zoom_link_full,
+                                    t.training_photo0_tmb
                              FROM tb_trainings t
                              INNER JOIN tb_training_trainees tt ON t.training_id = tt.training_id
                              WHERE tt.ecobricker_id = ?";
@@ -207,6 +208,7 @@ $sql_pledge_regs = "SELECT
         t.training_title,
         t.training_date,
         t.training_type,
+        t.training_photo0_tmb,
         t.funding_goal_idr,
         t.payment_deadline,
         t.pledge_deadline,
@@ -596,24 +598,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <div class="dashboard-wrapper">
 <div id="dashboard-v2-grid" class="dashboard-grid">
 
-    <!-- Dashboard Notice: spans 2/3 width (columns 1–2) -->
-    <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel" style="--notice-bg: <?php echo htmlspecialchars($notice_background_rgba, ENT_QUOTES, 'UTF-8'); ?>;">
-        <div id="registered-notice" class="top-container-notice">
-            <span id="notice-icon" class="notice-icon">
-                <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
-            </span>
-            <span id="notice-text" class="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
-                    <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
-                        <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
-                    </a>
-                </span>
-            <button class="notice-close" aria-label="Close">&times;</button>
-        </div>
-    </div>
-
-    <!-- Left column (1/3): welcome + registrations + support + admin/trainer -->
+    <!-- ============================================================ -->
+    <!-- LEFT COLUMN (1/3): welcome · my ecobricks · my projects      -->
+    <!--                     trainer menu · manage support chats      -->
+    <!-- ============================================================ -->
     <div class="dashboard-column column-narrow">
 
+        <!-- 1. Welcome Greeting -->
         <div id="welcome-greeting-panel" class="dashboard-v2-panel">
             <span class="dashboard-status-pill logged-in-pill">Logged in <?php echo htmlspecialchars($earthling_emoji ?? '🟢', ENT_QUOTES, 'UTF-8'); ?></span>
             <h2 id="greeting">Hello <?php echo htmlspecialchars($first_name); ?>!</h2>
@@ -623,11 +614,146 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         </div>
 
+        <!-- 2. My Ecobricks -->
+        <div id="my-ecobricks-panel" class="dashboard-v2-panel">
+            <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
+            <div id="my-ecobricks-list" class="my-project-list">
+                <div id="my-ecobricks-loading" class="my-ecobricks-loading">Loading ecobricks...</div>
+            </div>
+            <div id="my-ecobricks-empty" class="reg-empty-note" style="display:none;">
+                No ecobricks logged yet.
+            </div>
+            <div class="panel-list-footer">
+                <a href="log.php" class="panel-grey-btn">➕ Log New Ecobrick</a>
+                <div id="my-ecobricks-pagination" class="my-ecobricks-pagination" style="display:none;">
+                    <span id="my-ecobricks-page-info" class="my-ecobricks-page-info"></span>
+                    <div class="my-ecobricks-page-buttons">
+                        <button id="my-ecobricks-prev" class="page-button tertiary" disabled>← Prev</button>
+                        <button id="my-ecobricks-next" class="page-button tertiary">Next →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. My Projects -->
+        <div id="my-projects-panel" class="dashboard-v2-panel">
+            <h3>My Projects</h3>
+            <?php if (!empty($my_projects)): ?>
+                <div class="my-project-list">
+                    <?php foreach ($my_projects as $proj): ?>
+                        <?php
+                            $tmb_src    = htmlspecialchars($proj['photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $proj_name  = htmlspecialchars($proj['project_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $desc_short = htmlspecialchars($proj['description_short'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $proj_type  = htmlspecialchars($proj['project_type'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $const_type = htmlspecialchars($proj['construction_type'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $briks_used = (int)($proj['briks_used'] ?? 0);
+                            $phase      = htmlspecialchars($proj['project_phase'] ?? 'Active', ENT_QUOTES, 'UTF-8');
+                            $proj_id    = (int)$proj['project_id'];
+                            $meta_parts = array_filter([$proj_type, $briks_used ? $briks_used . ' briks' : '', $const_type]);
+                            $meta_str   = implode(' | ', $meta_parts);
+                        ?>
+                        <div class="my-project-row">
+                            <button class="project-gear-btn"
+                                    data-project-id="<?php echo $proj_id; ?>"
+                                    data-project-name="<?php echo $proj_name; ?>"
+                                    title="Project actions">⚙️</button>
+                            <img class="my-project-tmb"
+                                 src="<?php echo $tmb_src; ?>"
+                                 alt="<?php echo $proj_name; ?>"
+                                 data-project-id="<?php echo $proj_id; ?>"
+                                 data-project-name="<?php echo $proj_name; ?>"
+                                 data-description-short="<?php echo $desc_short; ?>"
+                                 data-photo-main="<?php echo htmlspecialchars($proj['photo1_main'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                 data-photo-tmb="<?php echo $tmb_src; ?>"
+                                 data-briks-used="<?php echo $briks_used; ?>"
+                                 style="cursor:pointer;">
+                            <div class="my-project-info">
+                                <span class="my-project-title"><?php echo $proj_name; ?></span>
+                                <span class="my-project-meta"><?php echo $desc_short; ?></span>
+                                <span class="my-project-meta"><?php echo $meta_str; ?></span>
+                            </div>
+                            <button class="project-phase-pill"
+                                    data-project-id="<?php echo $proj_id; ?>"
+                                    data-project-name="<?php echo $proj_name; ?>">
+                                <?php echo $phase; ?>
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p class="reg-empty-note">No projects yet.</p>
+            <?php endif; ?>
+            <div class="panel-list-footer">
+                <a href="add-project.php" class="panel-grey-btn">📋 Record Project</a>
+                <div id="my-projects-pagination" class="my-ecobricks-pagination" style="display:none;">
+                    <div class="my-ecobricks-page-buttons">
+                        <button id="my-projects-prev" class="page-button tertiary" disabled>← Prev</button>
+                        <button id="my-projects-next" class="page-button tertiary">Next →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. GEA Trainer Menu (trainer only) -->
+        <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
+            <div id="gea-trainer-menu" class="dashboard-v2-panel">
+                <span class="panel-pill trainer-pill">Trainer</span>
+                <h3>GEA Trainer Menu</h3>
+                <p>Trainer tools and resources.</p>
+                <div class="menu-buttons-row">
+                    <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
+                    <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>
+                    <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
+                    <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
+                    <a href="bug-report.php" class="page-button">Report a Bug</a>
+                    <a href="accounting.php" class="page-button">GEA Accounting</a>
+                    <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training">+ Set Buwana Totem</a>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- 5. Manage Support Chats (admin only) -->
+        <?php if ($is_admin): ?>
+            <div id="admin-support-chats" class="dashboard-v2-panel">
+                <span class="panel-pill admin-pill">Admin</span>
+                <h3>Manage Support Chats</h3>
+                <p>Admins manage user chats on development issues.</p>
+                <div class="menu-buttons-row" style="justify-content:center;">
+                    <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
+                </div>
+            </div>
+        <?php endif; ?>
+
+    </div><!-- end column-narrow -->
+
+    <!-- ============================================================ -->
+    <!-- RIGHT COLUMN (2/3): notice · registrations · support chats   -->
+    <!--   admin controls · latest ecobricks · validation             -->
+    <!--   latest projects · admin mailer · my trainings              -->
+    <!-- ============================================================ -->
+    <div class="dashboard-column column-wide">
+
+        <!-- Dashboard Notice -->
+        <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel" style="--notice-bg: <?php echo htmlspecialchars($notice_background_rgba, ENT_QUOTES, 'UTF-8'); ?>;">
+            <div id="registered-notice" class="top-container-notice">
+                <span id="notice-icon" class="notice-icon">
+                    <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
+                </span>
+                <span id="notice-text" class="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
+                    <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
+                        <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
+                    </a>
+                </span>
+                <button class="notice-close" aria-label="Close">&times;</button>
+            </div>
+        </div>
+
+        <!-- My Registrations -->
         <div id="registrations-panel" class="dashboard-v2-panel">
             <h3 data-lang-id="002-my-registrations">My Registrations</h3>
 
             <?php
-            // State label map
             $pledge_state_labels = [
                 'pending'     => '⏳ Pending',
                 'payment_due' => '💳 Payment Due',
@@ -635,7 +761,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 'expired'     => '⌛ Voided',
                 'cancelled'   => '❌ Cancelled',
             ];
-            // CSS class map (hyphens only)
             $pledge_state_classes = [
                 'pending'     => 'pending',
                 'payment_due' => 'payment-due',
@@ -646,7 +771,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             ?>
 
             <?php if (!empty($pledge_registrations)): ?>
-
                 <div class="pledge-reg-list">
                     <?php foreach ($pledge_registrations as $pledge): ?>
                         <?php
@@ -656,13 +780,20 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $funding_pct = (int)$pledge['funding_pct'];
                             $date_str    = !empty($pledge['training_date'])
                                            ? date('M j, Y', strtotime($pledge['training_date'])) : '';
+                            $reg_tmb     = htmlspecialchars($pledge['training_photo0_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $reg_tid     = (int)$pledge['training_id'];
                         ?>
                         <div class="pledge-reg-row">
+                            <?php if ($reg_tmb): ?>
+                                <a href="register.php?id=<?php echo $reg_tid; ?>" class="reg-training-tmb-link">
+                                    <img class="reg-training-tmb" src="<?php echo $reg_tmb; ?>" alt="<?php echo htmlspecialchars($pledge['training_title'], ENT_QUOTES, 'UTF-8'); ?>">
+                                </a>
+                            <?php endif; ?>
                             <div class="pledge-reg-info">
                                 <span class="pledge-reg-title"><?php echo htmlspecialchars($pledge['training_title'], ENT_QUOTES, 'UTF-8'); ?></span>
                                 <span class="pledge-reg-meta"><?php echo htmlspecialchars($pledge['training_type'], ENT_QUOTES, 'UTF-8'); ?><?php if ($date_str): ?> · <?php echo $date_str; ?><?php endif; ?></span>
                             </div>
-                            <a href="pledge-pay.php?id=<?php echo (int)$pledge['training_id']; ?>"
+                            <a href="pledge-pay.php?id=<?php echo $reg_tid; ?>"
                                class="pledge-reg-pill pill-state-<?php echo $state_cls; ?>">
                                 <span class="pledge-pill-bar" style="width:<?php echo $funding_pct; ?>%;"></span>
                                 <span class="pledge-pill-label"><?php echo $state_label; ?></span>
@@ -670,7 +801,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                         </div>
                     <?php endforeach; ?>
                 </div>
-
             <?php else: ?>
                 <p class="reg-empty-note">No pledged courses yet. <a href="courses.php">Browse courses →</a></p>
             <?php endif; ?>
@@ -683,15 +813,22 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $reg_date_ts  = strtotime($training['training_date']);
                             $reg_date_str = date('M j, Y', $reg_date_ts);
                             $is_past      = $reg_date_ts < strtotime('today');
+                            $reg_tmb      = htmlspecialchars($training['training_photo0_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $reg_tid      = (int)$training['training_id'];
                         ?>
                         <div class="pledge-reg-row">
+                            <?php if ($reg_tmb): ?>
+                                <a href="register.php?id=<?php echo $reg_tid; ?>" class="reg-training-tmb-link">
+                                    <img class="reg-training-tmb" src="<?php echo $reg_tmb; ?>" alt="<?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?>">
+                                </a>
+                            <?php endif; ?>
                             <div class="pledge-reg-info">
                                 <span class="pledge-reg-title"><?php echo htmlspecialchars($training['training_title'], ENT_QUOTES, 'UTF-8'); ?></span>
                                 <span class="pledge-reg-meta"><?php echo htmlspecialchars($training['training_type'], ENT_QUOTES, 'UTF-8'); ?> · <?php echo $reg_date_str; ?></span>
                             </div>
                             <a href="javascript:void(0);"
                                class="pledge-reg-pill pill-state-confirmed<?php echo $is_past ? ' pill-is-past' : ''; ?>"
-                               onclick="openRegisteredTrainingsModal(<?php echo (int)$training['training_id']; ?>, '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
+                               onclick="openRegisteredTrainingsModal(<?php echo $reg_tid; ?>, '<?php echo htmlspecialchars($training['training_location'], ENT_QUOTES, 'UTF-8'); ?>')">
                                 <span class="pledge-pill-bar" style="width:100%;"></span>
                                 <span class="pledge-pill-label"><?php echo $is_past ? '✅ Attended' : '✅ Registered'; ?></span>
                             </a>
@@ -703,9 +840,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <?php if (empty($pledge_registrations) && empty($registered_trainings)): ?>
                 <p class="reg-empty-note">You haven't registered for any courses yet. <a href="courses.php">Browse courses →</a></p>
             <?php endif; ?>
-
         </div>
 
+        <!-- Support Chats -->
         <div id="support-chats-panel" class="dashboard-v2-panel">
             <span class="panel-pill warning-pill">🚧 Under construction</span>
             <div class="support-chats-header">
@@ -741,16 +878,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </form>
         </div>
 
+        <!-- Dashboard Notice Control (admin only) -->
         <?php if ($is_admin): ?>
-            <div id="admin-support-chats" class="dashboard-v2-panel">
-                <span class="panel-pill admin-pill">Admin</span>
-                <h3>Manage Support Chats</h3>
-                <p>Admins manage user chats on development issues.</p>
-                <div class="menu-buttons-row" style="justify-content:center;">
-                    <a href="https://buwana.ecobricks.org/en/cs-chats.php?buwana=<?php echo urlencode($buwana_id); ?>&app=gbrk_f2c61a85a4cd4b8b89a7" class="page-button">💬 Support Chats</a>
-                </div>
-            </div>
-
             <div id="dash-notice-control" class="dashboard-v2-panel">
                 <span class="panel-pill admin-pill">Admin</span>
                 <div class="dash-notice-header">
@@ -792,27 +921,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         <?php endif; ?>
 
-        <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
-            <div id="gea-trainer-menu" class="dashboard-v2-panel">
-                <span class="panel-pill trainer-pill">Trainer</span>
-                <h3>GEA Trainer Menu</h3>
-                <p>Trainer tools and resources.</p>
-                <div class="menu-buttons-row">
-                    <a href="https://nextcloud.ecobricks.org/index.php/s/wCC2BwBwkW7GzTA" target="_blank" class="page-button">Trainer File Kit</a>
-                    <a href="https://learning.ecobricks.org" target="_blank" class="page-button">GEA Courses</a>
-                    <a href="https://ecobricks.org/<?php echo htmlspecialchars($lang); ?>/media.php" target="_blank" class="page-button">Ecobricks Media Kit</a>
-                    <a href="admin-review.php" class="page-button">Validate Ecobricks</a>
-                    <a href="bug-report.php" class="page-button">Report a Bug</a>
-                    <a href="accounting.php" class="page-button">GEA Accounting</a>
-                    <a href="finalizer.php" class="page-button" id="event-register-button" data-lang-id="005-totem-training">+ Set Buwana Totem</a>
-                </div>
-            </div>
-        <?php endif; ?>
-    </div><!-- end column-narrow -->
-
-    <!-- Middle column (1/3): My Ecobricks + latest ecobricks + validation -->
-    <div class="dashboard-column column-two">
-
+        <!-- Latest Ecobricks -->
         <div id="latest-ecobricks-panel" class="dashboard-v2-panel">
             <h4 style="margin:0 0 12px 0;">Latest featured ecobricks...</h4>
             <div id="ecobrick-slider" class="ecobrick-mobile-slider" aria-label="Latest ecobrick selfies slider">
@@ -850,93 +959,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             <p id="featured-ecobricks-empty" class="ecobrick-empty-message" <?php echo !empty($featured_ecobricks) ? 'style="display:none;"' : ''; ?>>No featured ecobricks to display right now.</p>
         </div>
 
-        <div id="my-ecobricks-panel" class="dashboard-v2-panel">
-            <h3 data-lang-id="002-my-ecobricks">My Ecobricks</h3>
-            <div id="my-ecobricks-list" class="my-project-list">
-                <div id="my-ecobricks-loading" class="my-ecobricks-loading">Loading ecobricks...</div>
-            </div>
-            <div id="my-ecobricks-empty" class="reg-empty-note" style="display:none;">
-                No ecobricks logged yet.
-            </div>
-            <div class="panel-list-footer">
-                <a href="log.php" class="panel-grey-btn">➕ Log New Ecobrick</a>
-                <div id="my-ecobricks-pagination" class="my-ecobricks-pagination" style="display:none;">
-                    <span id="my-ecobricks-page-info" class="my-ecobricks-page-info"></span>
-                    <div class="my-ecobricks-page-buttons">
-                        <button id="my-ecobricks-prev" class="page-button tertiary" disabled>← Prev</button>
-                        <button id="my-ecobricks-next" class="page-button tertiary">Next →</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div><!-- end column-two -->
-
-    <!-- Right column (1/3): My Projects + latest projects + admin/trainer -->
-    <div class="dashboard-column column-wide">
-
-        <div id="my-projects-panel" class="dashboard-v2-panel">
-            <h3>My Projects</h3>
-
-            <?php if (!empty($my_projects)): ?>
-                <div class="my-project-list">
-                    <?php foreach ($my_projects as $proj): ?>
-                        <?php
-                            $tmb_src     = htmlspecialchars($proj['photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $full_src    = htmlspecialchars($proj['photo1_main'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $proj_name   = htmlspecialchars($proj['project_name'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $desc_short  = htmlspecialchars($proj['description_short'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $proj_type   = htmlspecialchars($proj['project_type'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $const_type  = htmlspecialchars($proj['construction_type'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $briks_used  = (int)($proj['briks_used'] ?? 0);
-                            $phase       = htmlspecialchars($proj['project_phase'] ?? 'Active', ENT_QUOTES, 'UTF-8');
-                            $proj_id     = (int)$proj['project_id'];
-                            $meta_parts  = array_filter([$proj_type, $briks_used ? $briks_used . ' briks' : '', $const_type]);
-                            $meta_str    = implode(' | ', $meta_parts);
-                        ?>
-                        <div class="my-project-row">
-                            <button class="project-gear-btn"
-                                    data-project-id="<?php echo $proj_id; ?>"
-                                    data-project-name="<?php echo $proj_name; ?>"
-                                    title="Project actions">⚙️</button>
-                            <img class="my-project-tmb"
-                                 src="<?php echo $tmb_src; ?>"
-                                 alt="<?php echo $proj_name; ?>"
-                                 data-project-id="<?php echo $proj_id; ?>"
-                                 data-project-name="<?php echo $proj_name; ?>"
-                                 data-description-short="<?php echo $desc_short; ?>"
-                                 data-photo-main="<?php echo htmlspecialchars($proj['photo1_main'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                 data-photo-tmb="<?php echo htmlspecialchars($proj['photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                 data-briks-used="<?php echo $briks_used; ?>"
-                                 style="cursor:pointer;"
-                            >
-                            <div class="my-project-info">
-                                <span class="my-project-title"><?php echo $proj_name; ?></span>
-                                <span class="my-project-meta"><?php echo $desc_short; ?></span>
-                                <span class="my-project-meta"><?php echo $meta_str; ?></span>
-                            </div>
-                            <button class="project-phase-pill"
-                                    data-project-id="<?php echo $proj_id; ?>"
-                                    data-project-name="<?php echo $proj_name; ?>">
-                                <?php echo $phase; ?>
-                            </button>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <p class="reg-empty-note">No projects yet.</p>
-            <?php endif; ?>
-            <div class="panel-list-footer">
-                <a href="add-project.php" class="panel-grey-btn">📋 Record Project</a>
-                <div id="my-projects-pagination" class="my-ecobricks-pagination" style="display:none;">
-                    <div class="my-ecobricks-page-buttons">
-                        <button id="my-projects-prev" class="page-button tertiary" disabled>← Prev</button>
-                        <button id="my-projects-next" class="page-button tertiary">Next →</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <!-- Validation Panel (admin/validator only) -->
         <?php if ($has_validation_access): ?>
             <div id="validation-panel" class="dashboard-v2-panel">
                 <span class="panel-pill validator-pill">Validator</span>
@@ -964,6 +987,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         <?php endif; ?>
 
+        <!-- Latest Projects -->
         <div id="latest-projects-panel" class="dashboard-v2-panel">
             <h4 style="margin:0 0 12px 0;">Latest Projects</h4>
             <div id="project-grid" class="ecobrick-grid project-grid" aria-label="Latest showcased projects">
@@ -988,6 +1012,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         </div>
 
+        <!-- Earthen Mailer (admin only) -->
         <?php if ($is_admin): ?>
             <div id="admin-menu" class="dashboard-v2-panel">
                 <span class="panel-pill admin-pill">Admin</span>
@@ -1013,6 +1038,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         <?php endif; ?>
 
+        <!-- My Trainings (trainer only) -->
         <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
             <div id="my-trainings-panel" class="dashboard-v2-panel">
                 <span class="panel-pill trainer-pill">Trainer</span>
@@ -1021,7 +1047,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                     <a href="launch-training.php" class="page-button">🚀 New Training</a>
                     <a href="training-report.php" class="page-button" id="event-register-button" data-lang-id="004-log-training">📝Log Report</a>
                 </div>
-
                 <table id="trainer-trainings" class="display" style="width:100%;">
                     <thead>
                         <tr>
@@ -1035,7 +1060,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                         <?php $pendingReport = null; foreach ($trainings as $training): ?>
                             <?php
                                 $training_date_ts = strtotime($training['training_date']);
-                                $is_listed = $training['ready_to_show'] == 1;
+                                $is_listed  = $training['ready_to_show'] == 1;
                                 $show_report = $training['show_report'] == 1;
 
                                 if (!$is_listed) {
@@ -1048,9 +1073,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                     $circle = '🔴';
                                     if (!isset($pendingReport)) {
                                         $pendingReport = [
-                                            'id' => $training['training_id'],
+                                            'id'    => $training['training_id'],
                                             'title' => $training['training_title'],
-                                            'date' => date('Y-m-d', $training_date_ts)
+                                            'date'  => date('Y-m-d', $training_date_ts)
                                         ];
                                     }
                                 }
@@ -1075,6 +1100,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </table>
             </div>
         <?php endif; ?>
+
     </div><!-- end column-wide -->
 
 </div><!-- closes dashboard-v2-grid -->
