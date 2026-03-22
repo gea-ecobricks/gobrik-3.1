@@ -177,7 +177,7 @@ if ($stmt_trainings) {
 $registered_trainings = [];
 $sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location,
                                     t.training_country, t.training_type, t.zoom_link, t.zoom_link_full,
-                                    t.feature_photo1_tmb
+                                    t.feature_photo1_tmb, t.feature_photo1_main
                              FROM tb_trainings t
                              INNER JOIN tb_training_trainees tt ON t.training_id = tt.training_id
                              WHERE tt.ecobricker_id = ?";
@@ -208,7 +208,7 @@ $sql_pledge_regs = "SELECT
         t.training_title,
         t.training_date,
         t.training_type,
-        t.feature_photo1_tmb,
+        t.feature_photo1_tmb, t.feature_photo1_main,
         t.funding_goal_idr,
         t.payment_deadline,
         t.pledge_deadline,
@@ -725,6 +725,42 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         <?php endif; ?>
 
+        <!-- Support Chats -->
+        <div id="support-chats-panel" class="dashboard-v2-panel">
+            <span class="panel-pill warning-pill">🚧 Under construction</span>
+            <div class="support-chats-header">
+                <div>
+                    <h3>Support Chats</h3>
+                    <p>Message our developers for support.</p>
+                </div>
+                <button id="support-chat-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle support chat form">
+                    <span class="toggle-knob"></span>
+                </button>
+            </div>
+            <form class="support-chat-form" id="support-chat-form">
+                <div>
+                    <label for="support-subject">Subject</label>
+                    <input type="text" id="support-subject" name="subject" placeholder="Give your chat a subject" />
+                </div>
+                <div>
+                    <label for="support-priority">Priority</label>
+                    <select id="support-priority" name="priority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="support-description">Issue</label>
+                    <textarea id="support-description" name="description" placeholder="Describe your issue..."></textarea>
+                </div>
+                <div class="support-chat-actions">
+                    <button type="button" class="page-button">Start Chat</button>
+                    <button type="button" class="page-button">Your Support Chats</button>
+                </div>
+            </form>
+        </div>
+
     </div><!-- end column-narrow -->
 
     <!-- ============================================================ -->
@@ -806,7 +842,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $pledge_date_ts = !empty($pledge['training_date']) ? strtotime($pledge['training_date']) : 0;
                             $date_str      = $pledge_date_ts ? date('M j, Y', $pledge_date_ts) : '';
                             $is_upcoming   = $pledge_date_ts && $pledge_date_ts >= strtotime('today');
-                            $reg_tmb       = htmlspecialchars($pledge['feature_photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $reg_tmb       = htmlspecialchars($pledge['feature_photo1_tmb'] ?: ($pledge['feature_photo1_main'] ?? ''), ENT_QUOTES, 'UTF-8');
                             $reg_tid       = (int)$pledge['training_id'];
                         ?>
                         <div class="pledge-reg-row<?php echo $is_upcoming ? ' reg-row-upcoming' : ''; ?>">
@@ -840,7 +876,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $reg_date_str = date('M j, Y', $reg_date_ts);
                             $is_past      = $reg_date_ts < strtotime('today');
                             $is_upcoming  = !$is_past;
-                            $reg_tmb      = htmlspecialchars($training['feature_photo1_tmb'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $reg_tmb      = htmlspecialchars($training['feature_photo1_tmb'] ?: ($training['feature_photo1_main'] ?? ''), ENT_QUOTES, 'UTF-8');
                             $reg_tid      = (int)$training['training_id'];
                         ?>
                         <div class="pledge-reg-row<?php echo $is_upcoming ? ' reg-row-upcoming' : ''; ?>">
@@ -905,42 +941,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </div>
             </div>
             <p id="featured-ecobricks-empty" class="ecobrick-empty-message" <?php echo !empty($featured_ecobricks) ? 'style="display:none;"' : ''; ?>>No featured ecobricks to display right now.</p>
-        </div>
-
-        <!-- Support Chats -->
-        <div id="support-chats-panel" class="dashboard-v2-panel">
-            <span class="panel-pill warning-pill">🚧 Under construction</span>
-            <div class="support-chats-header">
-                <div>
-                    <h3>Support Chats</h3>
-                    <p>Message our developers for support.</p>
-                </div>
-                <button id="support-chat-toggle" class="vertical-toggle" aria-expanded="false" aria-label="Toggle support chat form">
-                    <span class="toggle-knob"></span>
-                </button>
-            </div>
-            <form class="support-chat-form" id="support-chat-form">
-                <div>
-                    <label for="support-subject">Subject</label>
-                    <input type="text" id="support-subject" name="subject" placeholder="Give your chat a subject" />
-                </div>
-                <div>
-                    <label for="support-priority">Priority</label>
-                    <select id="support-priority" name="priority">
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="support-description">Issue</label>
-                    <textarea id="support-description" name="description" placeholder="Describe your issue..."></textarea>
-                </div>
-                <div class="support-chat-actions">
-                    <button type="button" class="page-button">Start Chat</button>
-                    <button type="button" class="page-button">Your Support Chats</button>
-                </div>
-            </form>
         </div>
 
         <!-- Dashboard Notice Control (admin only) -->

@@ -314,19 +314,22 @@ margin-top:-100px !important;
     gap: 14px;
     padding: 11px 0 11px 10px;
     border-bottom: 1px solid rgba(0,0,0,0.07);
-    border-left: 3px solid transparent;
-    margin-left: -10px;
-    padding-left: 10px;
-    border-radius: 0 4px 4px 0;
-    transition: border-color 0.15s ease;
+    position: relative;
 }
 
 .pledge-reg-row:last-child {
     border-bottom: none;
 }
 
-.pledge-reg-row.reg-row-upcoming {
-    border-left-color: #22c55e;
+.pledge-reg-row.reg-row-upcoming::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    background: #22c55e;
+    border-radius: 999px;
 }
 
 .pledge-reg-info {
@@ -638,16 +641,46 @@ margin-top:-100px !important;
 /* ======================== MY ECOBRICKS PANEL ========================= */
 /* ===================================================================== */
 
-/* Inline status pill for ecobrick rows — uses status-pill + status-* from main.css for colors.
+/* Inline status pill for ecobrick rows — gradient style matching .project-phase-pill.
    Do NOT use .ecobrick-status-pill here — that class is position:absolute in main.css (for photo overlays). */
 .brik-row-pill {
     flex-shrink: 0;
-    font-size: 0.72em;
-    padding: 4px 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76em;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+    padding: 0 12px;
+    height: 30px;
     min-width: 84px;
-    text-align: center;
+    border-radius: 999px;
     white-space: nowrap;
     pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    border: 1.5px solid transparent;
+    /* override status-pill's loose padding/shadow */
+    box-shadow: none !important;
+}
+
+.brik-row-pill.status-authenticated {
+    background: linear-gradient(90deg, #29a654 0%, #42c46c 100%);
+    border-color: rgba(0,120,0,0.28);
+}
+
+.brik-row-pill.status-awaiting {
+    background: linear-gradient(90deg, #c07800 0%, #f59e0b 100%);
+    border-color: rgba(180,100,0,0.28);
+}
+
+.brik-row-pill.status-rejected {
+    background: linear-gradient(90deg, #c62828 0%, #e53935 100%);
+    border-color: rgba(180,0,0,0.28);
+}
+
+.brik-row-pill.status-default {
+    background: linear-gradient(90deg, #374151 0%, #4b5563 100%);
+    border-color: rgba(0,0,0,0.20);
 }
 
 .brik-gear-btn {
