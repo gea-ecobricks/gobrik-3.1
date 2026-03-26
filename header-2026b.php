@@ -372,15 +372,26 @@ display: none;
         transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Keep the fixed header above the sidebar so #function-icons stay accessible */
-    body.sidebar-is-open #header {
-        z-index: 201;
+    /* Slide the fixed header to match the remaining viewport space */
+    #header {
+        transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    top 0.3s ease, height 0.3s ease, transform 0.3s ease;
     }
 
-    /* Hide the hamburger button while the sidebar is open */
+    body.sidebar-is-open #header {
+        left: 360px;
+        width: calc(100vw - 360px);
+    }
+
+    /* Remove the hamburger from layout (not just hidden) so logo fills the space */
     body.sidebar-is-open .side-menu-button {
-        visibility: hidden;
-        pointer-events: none;
+        display: none;
+    }
+
+    /* Center the logo SVG within the remaining header space */
+    body.sidebar-is-open #logo-title {
+        justify-content: center;
     }
 
     /* X close button — top-right corner of the sidebar */
