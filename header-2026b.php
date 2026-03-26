@@ -343,7 +343,7 @@ display: none;
         flex-direction: column;
         transform: translateX(-360px);  /* hidden off-screen to the left */
         transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow-y: auto;
+        overflow-y: hidden;
         overflow-x: hidden;
         z-index: 200;
         box-shadow: 4px 0 24px rgba(0,0,0,0.18);
@@ -356,11 +356,31 @@ display: none;
     /* Push the page content to the right when the sidebar is open */
     #page-content.sidebar-pushed {
         margin-left: 360px;
+        max-width: calc(100vw - 360px);
+        overflow-x: hidden;
         transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Also compress #main so it doesn't overflow or scroll horizontally */
+    #page-content.sidebar-pushed #main {
+        max-width: 100%;
+        overflow-x: hidden;
+        box-sizing: border-box;
     }
 
     #page-content {
         transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Keep the fixed header above the sidebar so #function-icons stay accessible */
+    body.sidebar-is-open #header {
+        z-index: 201;
+    }
+
+    /* Hide the hamburger button while the sidebar is open */
+    body.sidebar-is-open .side-menu-button {
+        visibility: hidden;
+        pointer-events: none;
     }
 
     /* X close button — top-right corner of the sidebar */
@@ -395,7 +415,7 @@ display: none;
     /* Make the logo holder & content fill the column layout */
     #main-menu-overlay.sidebar-panel .overlay-content-settings {
         flex: 1;
-        overflow-y: auto;
+        overflow-y: hidden;
         padding-top: 10px;
     }
 }
@@ -817,6 +837,9 @@ function openSideMenu() {
         menu.style.width   = '';          // CSS sets 360px via .sidebar-panel
         if (closeBtn) closeBtn.style.display = 'flex';
 
+        // Hide hamburger & raise header above sidebar via body class
+        document.body.classList.add('sidebar-is-open');
+
         // Trigger transition on next frame
         requestAnimationFrame(function() {
             menu.classList.add('sidebar-open');
@@ -859,6 +882,8 @@ function closeSettings() {
                 menu.style.display = 'none';
                 menu.classList.remove('sidebar-panel');
                 if (closeBtn) closeBtn.style.display = 'none';
+                // Restore hamburger & header z-index
+                document.body.classList.remove('sidebar-is-open');
             }
             menu.removeEventListener('transitionend', onEnd);
         });
