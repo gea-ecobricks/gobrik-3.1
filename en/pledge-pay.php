@@ -24,7 +24,29 @@ require_once '../buwanaconn_env.php';
 
 // Fetch user info
 $first_name = getFirstName($buwana_conn, $buwana_id);
+
+// 🌎 Fetch user meta from Buwana database
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
 $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_roles = getUser_Role($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+
+// 👤 Look up user's GoBrik account info
+$sql_lookup_user = "SELECT first_name, ecobricks_made, ecobricker_id, location_full_txt, user_capabilities, full_name FROM tb_ecobrickers WHERE buwana_id = ?";
+$stmt_lookup_user = $gobrik_conn->prepare($sql_lookup_user);
+if ($stmt_lookup_user) {
+    $stmt_lookup_user->bind_param("i", $buwana_id);
+    $stmt_lookup_user->execute();
+    $stmt_lookup_user->bind_result($first_name, $ecobricks_made, $ecobricker_id, $location_full_txt, $user_capabilities_raw, $full_name);
+    $stmt_lookup_user->fetch();
+    $stmt_lookup_user->close();
+} else {
+    die("Error preparing statement for tb_ecobrickers: " . $gobrik_conn->error);
+}
+
 
 $ecobricker_id = null;
 $users_email_address = '';
