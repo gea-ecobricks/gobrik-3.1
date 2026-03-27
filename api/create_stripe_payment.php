@@ -194,7 +194,7 @@ try {
             VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
         ");
         $stmt->bind_param(
-            "iisssisssssss",
+            "iisssissssssss",
             $buwana_id,
             $pledge_id,
             $app_code,
