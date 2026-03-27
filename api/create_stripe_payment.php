@@ -47,8 +47,13 @@ $sql = "
 ";
 
 $stmt = $gobrik_conn->prepare($sql);
+if (!$stmt) {
+    throw new Exception('Prepare failed (pledge load): ' . $gobrik_conn->error);
+}
 $stmt->bind_param("ii", $pledge_id, $buwana_id);
-$stmt->execute();
+if (!$stmt->execute()) {
+    throw new Exception('Execute failed (pledge load): ' . $stmt->error);
+}
 $result = $stmt->get_result();
 $pledge = $result->fetch_assoc();
 $stmt->close();
@@ -72,23 +77,38 @@ $threshold_status = (string)($pledge['threshold_status'] ?? 'open');
 $allow_beta_threshold =
     ($stripe_mode === 'test' && in_array($pledge_status, ['active', 'invited'], true));
 
-if (!$allow_beta_threshold && !in_array($threshold_status, ['go', 'payment_open', 'reached'], true)) {
+if (
+    !$allow_beta_threshold &&
+    !in_array($threshold_status, ['go', 'payment_open', 'reached'], true)
+) {
     http_response_code(409);
     exit('This training is not yet open for payment.');
 }
 
-$deadline_raw = $pledge['payment_due_at'] ?: $pledge['payment_deadline'] ?: null;
-if ($deadline_raw && strtotime((string)$deadline_raw) < time()) {
-    http_response_code(410);
-    exit('This payment window has expired.');
+/**
+ * In live mode, enforce deadline.
+ * In test mode, allow sandbox testing even after deadline.
+ */
+if ($stripe_mode !== 'test') {
+    $deadline_raw = $pledge['payment_due_at'] ?: $pledge['payment_deadline'] ?: null;
+    if ($deadline_raw && strtotime((string)$deadline_raw) < time()) {
+        http_response_code(410);
+        exit('This payment window has expired.');
+    }
 }
 
 /**
  * Determine charge currency/amount from stored pledge values.
+ * For IDR, always use pledged_amount_idr directly.
  * Never trust browser-side conversions.
  */
 $currency = strtoupper(trim((string)($pledge['display_currency'] ?? 'IDR')));
-$display_amount = (float)($pledge['display_amount'] ?? 0);
+
+if ($currency === 'IDR') {
+    $display_amount = (float)($pledge['pledged_amount_idr'] ?? 0);
+} else {
+    $display_amount = (float)($pledge['display_amount'] ?? 0);
+}
 
 if ($display_amount <= 0) {
     $currency = 'IDR';
@@ -113,8 +133,13 @@ if ($amount_total <= 0) {
 $customer_email = null;
 $sql_email = "SELECT email_addr FROM tb_ecobrickers WHERE buwana_id = ? LIMIT 1";
 $stmt = $gobrik_conn->prepare($sql_email);
+if (!$stmt) {
+    throw new Exception('Prepare failed (email load): ' . $gobrik_conn->error);
+}
 $stmt->bind_param("i", $buwana_id);
-$stmt->execute();
+if (!$stmt->execute()) {
+    throw new Exception('Execute failed (email load): ' . $stmt->error);
+}
 $stmt->bind_result($email_addr);
 if ($stmt->fetch() && !empty($email_addr)) {
     $customer_email = $email_addr;
@@ -130,7 +155,21 @@ $status_created = 'created';
 $gateway = 'stripe';
 $gateway_method = 'checkout_session';
 $client_reference = 'training_pledge:' . $pledge_id . ':user:' . $buwana_id;
-$idempotency_key = hash('sha256', 'stripe|training_pledge|' . $pledge_id . '|user|' . $buwana_id);
+
+/**
+ * Stable in live mode, fresh on each run in test mode.
+ */
+if ($stripe_mode === 'test') {
+    $idempotency_key = hash(
+        'sha256',
+        'stripe|training_pledge|' . $pledge_id . '|user|' . $buwana_id . '|test|' . microtime(true)
+    );
+} else {
+    $idempotency_key = hash(
+        'sha256',
+        'stripe|training_pledge|' . $pledge_id . '|user|' . $buwana_id
+    );
+}
 
 $gateway_payload_json = json_encode([
     'source' => 'training_pledge',
@@ -138,6 +177,7 @@ $gateway_payload_json = json_encode([
     'training_id' => (int)$pledge['training_id'],
     'currency' => $currency,
     'display_amount' => $display_amount,
+    'amount_total' => $amount_total,
     'mode' => $stripe_mode
 ], JSON_UNESCAPED_UNICODE);
 
@@ -161,8 +201,13 @@ try {
         WHERE idempotency_key = ?
         LIMIT 1
     ");
+    if (!$stmt) {
+        throw new Exception('Prepare failed (existing payment lookup): ' . $gobrik_conn->error);
+    }
     $stmt->bind_param("s", $idempotency_key);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new Exception('Execute failed (existing payment lookup): ' . $stmt->error);
+    }
     $res = $stmt->get_result();
     $existing_payment = $res->fetch_assoc();
     $stmt->close();
@@ -193,6 +238,10 @@ try {
             )
             VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
         ");
+        if (!$stmt) {
+            throw new Exception('Prepare failed (payments insert): ' . $gobrik_conn->error);
+        }
+
         $stmt->bind_param(
             "iisssissssssss",
             $buwana_id,
@@ -210,7 +259,11 @@ try {
             $expires_at,
             $gateway_payload_json
         );
-        $stmt->execute();
+
+        if (!$stmt->execute()) {
+            throw new Exception('Execute failed (payments insert): ' . $stmt->error);
+        }
+
         $payment_id = (int)$stmt->insert_id;
         $stmt->close();
 
@@ -223,13 +276,32 @@ try {
             WHERE pledge_id = ?
             LIMIT 1
         ");
+        if (!$stmt) {
+            throw new Exception('Prepare failed (pledge payment_id update): ' . $gobrik_conn->error);
+        }
         $stmt->bind_param("ii", $payment_id, $pledge_id);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception('Execute failed (pledge payment_id update): ' . $stmt->error);
+        }
         $stmt->close();
     }
 
     $success_url = stripe_success_url((int)$pledge['training_id'], $site_base_url);
     $cancel_url  = stripe_cancel_url((int)$pledge['training_id'], $site_base_url);
+
+    error_log('--- STRIPE DEBUG START ---');
+    error_log('pledge_id=' . $pledge_id);
+    error_log('raw pledged_amount_idr=' . var_export($pledge['pledged_amount_idr'], true));
+    error_log('raw display_currency=' . var_export($pledge['display_currency'], true));
+    error_log('raw display_amount=' . var_export($pledge['display_amount'], true));
+    error_log('resolved currency=' . var_export($currency, true));
+    error_log('resolved display_amount=' . var_export($display_amount, true));
+    error_log('resolved amount_total=' . var_export($amount_total, true));
+    error_log('zero-decimal contains IDR=' . (in_array('IDR', $stripe_zero_decimal_currencies, true) ? 'yes' : 'no'));
+    error_log('stripe mode=' . var_export($stripe_mode, true));
+    error_log('payment_id=' . var_export($payment_id, true));
+    error_log('idempotency_key=' . $idempotency_key);
+    error_log('--- STRIPE DEBUG END ---');
 
     $session = \Stripe\Checkout\Session::create([
         'mode' => 'payment',
@@ -273,8 +345,13 @@ try {
         WHERE payment_id = ?
         LIMIT 1
     ");
+    if (!$stmt) {
+        throw new Exception('Prepare failed (payments update after stripe): ' . $gobrik_conn->error);
+    }
     $stmt->bind_param("sssi", $gateway_ref, $gateway_status, $session_payload_json, $payment_id);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new Exception('Execute failed (payments update after stripe): ' . $stmt->error);
+    }
     $stmt->close();
 
     $gobrik_conn->commit();
