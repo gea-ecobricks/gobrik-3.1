@@ -4,7 +4,7 @@ require_once '../earthenAuth_helper.php';
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.1';
+$version = '0.2';
 $page = 'pledge-pay';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 

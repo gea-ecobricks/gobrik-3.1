@@ -357,14 +357,13 @@ display: none;
     #page-content.sidebar-pushed {
         margin-left: 360px;
         max-width: calc(100vw - 360px);
-        overflow-x: hidden;
+        overflow-x: clip; /* clip does not create a scroll container — avoids double-scroll */
         transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Also compress #main so it doesn't overflow or scroll horizontally */
+    /* Compress #main to fit within the remaining viewport width */
     #page-content.sidebar-pushed #main {
         max-width: 100%;
-        overflow-x: hidden;
         box-sizing: border-box;
     }
 
