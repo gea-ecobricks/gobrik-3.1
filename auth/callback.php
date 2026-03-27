@@ -63,7 +63,8 @@ if (!$claims) {
 $_SESSION['buwana_user'] = [
     'sub' => $claims['sub'],
     'email' => $claims['email'] ?? null,
-    'name' => $claims['name'] ?? null,
+    'given_name' => $claims['given_name'] ?? null,
+    'earthling_emoji' => $claims['buwana:earthlingEmoji'] ?? null,
     'jwt' => $tokens['id_token']
 ];
 

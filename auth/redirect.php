@@ -26,7 +26,7 @@ $params = array_merge([
     'response_type' => 'code',
     'client_id' => 'gbrk_f2c61a85a4cd4b8b89a7',
     'redirect_uri' => 'https://gobrik.com/auth/callback.php',
-    'scope' => 'openid email profile',
+    'scope' => 'openid buwana:basic buwana:profile buwana:community buwana:bioregion',
     'state' => $state,
     'nonce' => $nonce
 ], $extras);
