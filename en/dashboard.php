@@ -173,6 +173,55 @@ if ($stmt_trainings) {
     die("Error preparing statement for trainer trainings: " . $gobrik_conn->error);
 }
 
+// 🏫 Fetch 3P pledge-threshold trainings where user is trainer
+$trainings_3p = [];
+$sql_trainings_3p = "SELECT
+    t.training_id,
+    t.training_title,
+    t.training_date,
+    t.training_location,
+    t.training_type,
+    t.ready_to_show,
+    t.show_report,
+    t.threshold_status,
+    t.funding_goal_idr,
+    t.min_participants_required,
+    t.pledge_deadline,
+    t.payment_deadline,
+    t.default_price_idr,
+    t.feature_photo1_tmb,
+    t.feature_photo1_main,
+    COALESCE((SELECT COUNT(*)
+              FROM training_registrations_tb r
+              WHERE r.training_id = t.training_id
+                AND r.status NOT IN ('cancelled','expired')), 0) AS registrant_count,
+    COALESCE((SELECT COUNT(*)
+              FROM training_pledges_tb p
+              WHERE p.training_id = t.training_id
+                AND p.pledge_status NOT IN ('cancelled','expired','failed')), 0) AS pledge_count,
+    COALESCE((SELECT SUM(p2.pledged_amount_idr)
+              FROM training_pledges_tb p2
+              WHERE p2.training_id = t.training_id
+                AND p2.pledge_status NOT IN ('cancelled','expired','failed')), 0) AS total_pledged_idr
+FROM tb_trainings t
+INNER JOIN tb_training_trainers tt ON t.training_id = tt.training_id
+WHERE tt.ecobricker_id = ?
+  AND t.payment_mode = 'pledge_threshold'
+ORDER BY t.training_date DESC";
+$stmt_trainings_3p = $gobrik_conn->prepare($sql_trainings_3p);
+if ($stmt_trainings_3p) {
+    $stmt_trainings_3p->bind_param("i", $ecobricker_id);
+    $stmt_trainings_3p->execute();
+    $result_trainings_3p = $stmt_trainings_3p->get_result();
+    while ($row = $result_trainings_3p->fetch_assoc()) {
+        $goal = (int)($row['funding_goal_idr'] ?? 0);
+        $total = (int)($row['total_pledged_idr'] ?? 0);
+        $row['funding_pct'] = ($goal > 0) ? min(100, (int)round(($total / $goal) * 100)) : 0;
+        $trainings_3p[] = $row;
+    }
+    $stmt_trainings_3p->close();
+}
+
 // 📋 Fetch trainings where user is a registered trainee (legacy confirmed, non-3P)
 $registered_trainings = [];
 $sql_registered_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location,
@@ -592,6 +641,72 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     .vertical-toggle.down .toggle-knob {
         background: #0d47a1;
+    }
+
+    /* ===== My Trainings v2 (3P) Panel ===== */
+    .training-v2-pledge-btn {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+        color: #fff;
+        font-size: 0.78em;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        min-width: 58px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+        white-space: nowrap;
+        transition: filter 0.15s ease, transform 0.15s ease;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+    .training-v2-pledge-btn:hover {
+        filter: brightness(0.90);
+        transform: translateY(-1px);
+    }
+    .training-v2-progress-wrap {
+        height: 5px;
+        width: 100%;
+        max-width: 160px;
+        background: rgba(0,0,0,0.09);
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 3px 0 2px 0;
+    }
+    .training-v2-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #2e7d32 0%, #66bb6a 100%);
+        border-radius: 3px;
+        transition: width 0.4s ease;
+    }
+    .training-v2-status-pill {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.75em;
+        font-weight: 700;
+        white-space: nowrap;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+        color: #fff;
+        background: #757575;
+        border: none;
+    }
+    .training-v2-status-pill.status-open {
+        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+    }
+    .training-v2-status-pill.status-reached {
+        background: linear-gradient(135deg, #0277bd 0%, #0288d1 100%);
+    }
+    .training-v2-status-pill.status-cancelled {
+        background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
     }
 </style>
 
@@ -1036,6 +1151,73 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
                         </div>
                     </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- My Trainings v2 (3P pledge-threshold trainings, trainer only) -->
+        <?php if (strpos(strtolower($gea_status), 'trainer') !== false && !empty($trainings_3p)): ?>
+            <div id="my-trainings-v2-panel" class="dashboard-v2-panel">
+                <span class="panel-pill trainer-pill">Trainer · 3P</span>
+                <h3>My Trainings | v2</h3>
+                <div class="my-project-list">
+                    <?php foreach ($trainings_3p as $t3p): ?>
+                        <?php
+                            $t_id         = (int)$t3p['training_id'];
+                            $t_title      = htmlspecialchars($t3p['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $t_date       = !empty($t3p['training_date']) ? date("Y-m-d", strtotime($t3p['training_date'])) : '—';
+                            $t_type       = htmlspecialchars($t3p['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $t_status_raw = strtolower($t3p['threshold_status'] ?? 'open');
+                            $t_status_labels = [
+                                'open'      => 'Open',
+                                'reached'   => 'Threshold Reached',
+                                'cancelled' => 'Cancelled',
+                            ];
+                            $t_status_label  = $t_status_labels[$t_status_raw] ?? ucfirst($t_status_raw);
+                            $pledge_count    = (int)($t3p['pledge_count'] ?? 0);
+                            $funding_goal    = (int)($t3p['funding_goal_idr'] ?? 0);
+                            $total_pledged   = (int)($t3p['total_pledged_idr'] ?? 0);
+                            $funding_pct     = (int)($t3p['funding_pct'] ?? 0);
+                            $funding_str     = 'IDR ' . number_format($total_pledged) . ' / ' . number_format($funding_goal);
+                            $pledge_deadline = !empty($t3p['pledge_deadline']) ? date("M j, Y", strtotime($t3p['pledge_deadline'])) : '—';
+                            $tmb_raw  = !empty($t3p['feature_photo1_tmb']) ? $t3p['feature_photo1_tmb'] : ($t3p['feature_photo1_main'] ?? '');
+                            $tmb_src  = htmlspecialchars($tmb_raw, ENT_QUOTES, 'UTF-8');
+                        ?>
+                        <div class="my-project-row">
+                            <button class="project-gear-btn"
+                                    data-show-report="<?php echo (int)($t3p['show_report'] ?? 0); ?>"
+                                    data-ready-to-show="<?php echo (int)($t3p['ready_to_show'] ?? 0); ?>"
+                                    onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
+                                    title="Training actions">⚙️</button>
+                            <?php if ($tmb_src): ?>
+                                <img class="my-project-tmb"
+                                     src="<?php echo $tmb_src; ?>"
+                                     alt="<?php echo $t_title; ?>"
+                                     style="cursor:default;">
+                            <?php else: ?>
+                                <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;cursor:default;">🎓</div>
+                            <?php endif; ?>
+                            <div class="my-project-info">
+                                <span class="my-project-title"><?php echo $t_title; ?></span>
+                                <span class="my-project-meta"><?php echo $t_date . ' · ' . $t_type; ?></span>
+                                <div class="training-v2-progress-wrap">
+                                    <div class="training-v2-progress-bar" style="width:<?php echo $funding_pct; ?>%"></div>
+                                </div>
+                                <span class="my-project-meta"><?php echo htmlspecialchars($funding_str, ENT_QUOTES, 'UTF-8'); ?> &nbsp;·&nbsp; Deadline: <?php echo htmlspecialchars($pledge_deadline, ENT_QUOTES, 'UTF-8'); ?></span>
+                            </div>
+                            <button class="training-v2-pledge-btn"
+                                    onclick="openPledgersModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
+                                    title="View pledgers">
+                                <?php echo $pledge_count; ?> 🤝
+                            </button>
+                            <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo $t_status_label; ?>
+                            </span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="panel-list-footer">
+                    <a href="launch-training.php" class="panel-grey-btn">🚀 New Training</a>
                 </div>
             </div>
         <?php endif; ?>
@@ -2152,6 +2334,91 @@ function openTraineesModal(trainingId, trainingTitle) {
     // Show the modal
     modal.classList.remove('modal-hidden');
 }
+
+function openPledgersModal(trainingId, trainingTitle) {
+    const modal = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+
+    modal.style.display = 'flex';
+    modalBox.style.flexFlow = 'column';
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+
+    modalBox.innerHTML = `
+        <h4 style="text-align:center;">3P Pledgers for <br> ${escapeHTML(trainingTitle)}</h4>
+        <div id="pledger-table-container" style="max-height:100%;overflow-y:auto;margin-bottom:20px;"><p style="text-align:center;">Loading...</p></div>
+        <button id="message-pledgers-btn" class="confirm-button enabled" style="margin-top:10px;">Message Participants...</button>
+    `;
+
+    document.getElementById('message-pledgers-btn').addEventListener('click', () => {
+        closeInfoModal();
+        openTraineeSender(trainingId);
+    });
+
+    fetch(`../api/fetch_3p_training_pledgers.php?training_id=${trainingId}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.error) {
+                document.getElementById('pledger-table-container').innerHTML = `<p style="text-align:center;color:red;">${escapeHTML(data.error)}</p>`;
+                return;
+            }
+            if (!data || data.length === 0) {
+                document.getElementById('pledger-table-container').innerHTML = `<p style="text-align:center;">No pledgers yet.</p>`;
+                return;
+            }
+
+            let tableHTML = `
+                <table id="pledgers-table" class="display" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>GEA Status</th>
+                            <th>Pledge Status</th>
+                            <th>Amount (IDR)</th>
+                            <th>Currency</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach(p => {
+                const idrFormatted = p.pledged_amount_idr
+                    ? parseInt(p.pledged_amount_idr).toLocaleString()
+                    : '—';
+                tableHTML += `
+                    <tr>
+                        <td>${escapeHTML(p.first_name || '—')}</td>
+                        <td>${escapeHTML(p.email_addr || '—')}</td>
+                        <td>${escapeHTML(p.gea_status || '—')}</td>
+                        <td>${escapeHTML(p.pledge_status || '—')}</td>
+                        <td>${idrFormatted}</td>
+                        <td>${escapeHTML(p.display_currency || 'IDR')}</td>
+                        <td>${escapeHTML(p.pledged_at || '—')}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+            document.getElementById('pledger-table-container').innerHTML = tableHTML;
+            $('#pledgers-table').DataTable({
+                paging: true,
+                searching: true,
+                info: true,
+                scrollX: true,
+                scrollY: '100%',
+                scrollCollapse: true
+            });
+        })
+        .catch(err => {
+            document.getElementById('pledger-table-container').innerHTML = `<p style="text-align:center;color:red;">Error loading pledgers: ${escapeHTML(err.message)}</p>`;
+        });
+
+    modal.classList.remove('modal-hidden');
+}
+window.openPledgersModal = openPledgersModal;
 
 function openProjectActionsModal(projectId, projectName) {
     const modal = document.getElementById('form-modal-message');
