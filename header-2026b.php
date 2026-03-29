@@ -84,6 +84,7 @@
 
 
 <link rel="stylesheet" type="text/css" href="../styles/footer.css?v=<?php echo ($version); ;?>">
+<link rel="stylesheet" href="../styles/header-2026.css?v=1">
 
 <?php if ($page === "messenger"): ?>
     <style>
@@ -323,112 +324,6 @@ display: none;
     display: flex;
 }
 
-
-/* ── Desktop sidebar panel (> 1200px) ──────────────────────────────────────
-   On large screens the main menu becomes a fixed 360px sidebar that pushes
-   #page-content to the right instead of overlaying it.
-   On smaller screens the existing full-screen overlay behaviour is kept.
--------------------------------------------------------------------------- */
-
-@media screen and (min-width: 1201px) {
-
-    /* The menu panel itself */
-    #main-menu-overlay.sidebar-panel {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 360px !important;        /* fixed width, not 100% */
-        display: flex !important;       /* always rendered; visibility driven by transform */
-        flex-direction: column;
-        transform: translateX(-360px);  /* hidden off-screen to the left */
-        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow-y: hidden;
-        overflow-x: hidden;
-        z-index: 200;
-        box-shadow: 4px 0 24px rgba(0,0,0,0.18);
-    }
-
-    #main-menu-overlay.sidebar-panel.sidebar-open {
-        transform: translateX(0);       /* slides in */
-    }
-
-    /* Push the page content to the right when the sidebar is open */
-    #page-content.sidebar-pushed {
-        margin-left: 360px;
-        max-width: calc(100vw - 360px);
-        overflow-x: clip; /* clip does not create a scroll container — avoids double-scroll */
-        transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Compress #main to fit within the remaining viewport width */
-    #page-content.sidebar-pushed #main {
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-
-    #page-content {
-        transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Slide the fixed header to match the remaining viewport space */
-    #header {
-        transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                    width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                    top 0.3s ease, height 0.3s ease, transform 0.3s ease;
-    }
-
-    body.sidebar-is-open #header {
-        left: 360px;
-        width: calc(100vw - 360px);
-    }
-
-    /* Remove the hamburger from layout (not just hidden) so logo fills the space */
-    body.sidebar-is-open .side-menu-button {
-        display: none;
-    }
-
-    /* Center the logo SVG within the remaining header space */
-    body.sidebar-is-open #logo-title {
-        justify-content: center;
-    }
-
-    /* X close button — top-right corner of the sidebar */
-    #main-menu-overlay.sidebar-panel .sidebar-close-btn {
-        display: flex;
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        z-index: 201;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 1.4rem;
-        line-height: 1;
-        color: var(--text-color);
-        padding: 6px 8px;
-        border-radius: 6px;
-        opacity: 0.7;
-        transition: opacity 0.2s, background 0.2s;
-    }
-
-    #main-menu-overlay.sidebar-panel .sidebar-close-btn:hover {
-        opacity: 1;
-        background: rgba(128,128,128,0.15);
-    }
-
-    /* Hide the original overlay-style X button on desktop */
-    #main-menu-overlay.sidebar-panel > .x-button:not(.sidebar-close-btn) {
-        display: none;
-    }
-
-    /* Make the logo holder & content fill the column layout */
-    #main-menu-overlay.sidebar-panel .overlay-content-settings {
-        flex: 1;
-        overflow-y: hidden;
-        padding-top: 10px;
-    }
-}
 
 
 </style>
@@ -829,85 +724,8 @@ function navigateTo(url) {
   window.location.href = url;
 }
 
-/* ── Main Menu — desktop sidebar vs. mobile overlay ──────────────────────
-   On viewports > 1200px the menu slides in as a 360px sidebar and pushes
-   the page content to the right.  On smaller viewports the original
-   full-screen overlay behaviour is preserved.
--------------------------------------------------------------------------- */
-
-function openSideMenu() {
-    var menu        = document.getElementById('main-menu-overlay');
-    var pageContent = document.getElementById('page-content');
-    var closeBtn    = menu.querySelector('.sidebar-close-btn');
-
-    if (window.innerWidth > 1200) {
-        // ── Desktop: sidebar panel mode ──
-        menu.classList.add('sidebar-panel');
-        menu.style.display = '';          // let CSS flex handle it
-        menu.style.width   = '';          // CSS sets 360px via .sidebar-panel
-        if (closeBtn) closeBtn.style.display = 'flex';
-
-        // Hide hamburger & raise header above sidebar via body class
-        document.body.classList.add('sidebar-is-open');
-
-        // Trigger transition on next frame
-        requestAnimationFrame(function() {
-            menu.classList.add('sidebar-open');
-            if (pageContent) pageContent.classList.add('sidebar-pushed');
-        });
-
-        // No body scroll lock — page remains scrollable alongside sidebar
-    } else {
-        // ── Mobile/tablet: original full-screen overlay ──
-        menu.classList.remove('sidebar-panel', 'sidebar-open');
-        if (closeBtn) closeBtn.style.display = 'none';
-        menu.style.width   = '100%';
-        menu.style.display = 'block';
-        document.body.style.overflowY  = 'hidden';
-        document.body.style.maxHeight  = '101vh';
-
-        // Close when clicking outside the menu content
-        menu.addEventListener('click', function overlayClickClose(e) {
-            if (e.target === menu) {
-                closeSettings();
-                menu.removeEventListener('click', overlayClickClose);
-            }
-        }, true);
-    }
-}
-
-function closeSettings() {
-    var menu        = document.getElementById('main-menu-overlay');
-    var pageContent = document.getElementById('page-content');
-    var closeBtn    = menu.querySelector('.sidebar-close-btn');
-
-    if (menu.classList.contains('sidebar-panel')) {
-        // ── Desktop: reverse sidebar slide ──
-        menu.classList.remove('sidebar-open');
-        if (pageContent) pageContent.classList.remove('sidebar-pushed');
-
-        // Hide element after transition completes
-        menu.addEventListener('transitionend', function onEnd() {
-            if (!menu.classList.contains('sidebar-open')) {
-                menu.style.display = 'none';
-                menu.classList.remove('sidebar-panel');
-                if (closeBtn) closeBtn.style.display = 'none';
-                // Restore hamburger & header z-index
-                document.body.classList.remove('sidebar-is-open');
-            }
-            menu.removeEventListener('transitionend', onEnd);
-        });
-    } else {
-        // ── Mobile/tablet: original close ──
-        menu.style.width         = '0%';
-        document.body.style.overflowY = 'unset';
-        document.body.style.maxHeight = 'unset';
-    }
-}
-
-window.openSideMenu  = openSideMenu;
-window.closeSettings = closeSettings;
 </script>
+<script src="../scripts/header-2026.js?v=1"></script>
 
 
 <!--

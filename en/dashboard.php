@@ -708,6 +708,14 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     .training-v2-status-pill.status-cancelled {
         background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
     }
+
+    /* ===== My Ecobricks — compact status pill ===== */
+    .brik-row-pill {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.75em;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
 </style>
 
 <div class="dashboard-wrapper">
@@ -924,6 +932,73 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <a href="add-project.php" class="page-button" style="background:#0d6efd;color:#ffffff;text-decoration:none;">Post your project</a>
             </div>
         </div>
+
+        <!-- My Trainings v2 (3P pledge-threshold trainings, trainer only) -->
+        <?php if (strpos(strtolower($gea_status), 'trainer') !== false && !empty($trainings_3p)): ?>
+            <div id="my-trainings-v2-panel" class="dashboard-v2-panel">
+                <span class="panel-pill trainer-pill">Trainer · 3P</span>
+                <h3>My Trainings | v2</h3>
+                <div class="my-project-list">
+                    <?php foreach ($trainings_3p as $t3p): ?>
+                        <?php
+                            $t_id         = (int)$t3p['training_id'];
+                            $t_title      = htmlspecialchars($t3p['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $t_date       = !empty($t3p['training_date']) ? date("Y-m-d", strtotime($t3p['training_date'])) : '—';
+                            $t_type       = htmlspecialchars($t3p['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $t_status_raw = strtolower($t3p['threshold_status'] ?? 'open');
+                            $t_status_labels = [
+                                'open'      => 'Open',
+                                'reached'   => 'Threshold Reached',
+                                'cancelled' => 'Cancelled',
+                            ];
+                            $t_status_label  = $t_status_labels[$t_status_raw] ?? ucfirst($t_status_raw);
+                            $pledge_count    = (int)($t3p['pledge_count'] ?? 0);
+                            $funding_goal    = (int)($t3p['funding_goal_idr'] ?? 0);
+                            $total_pledged   = (int)($t3p['total_pledged_idr'] ?? 0);
+                            $funding_pct     = (int)($t3p['funding_pct'] ?? 0);
+                            $funding_str     = 'IDR ' . number_format($total_pledged) . ' / ' . number_format($funding_goal);
+                            $pledge_deadline = !empty($t3p['pledge_deadline']) ? date("M j, Y", strtotime($t3p['pledge_deadline'])) : '—';
+                            $tmb_raw  = !empty($t3p['feature_photo1_tmb']) ? $t3p['feature_photo1_tmb'] : ($t3p['feature_photo1_main'] ?? '');
+                            $tmb_src  = htmlspecialchars($tmb_raw, ENT_QUOTES, 'UTF-8');
+                        ?>
+                        <div class="my-project-row">
+                            <button class="project-gear-btn"
+                                    data-show-report="<?php echo (int)($t3p['show_report'] ?? 0); ?>"
+                                    data-ready-to-show="<?php echo (int)($t3p['ready_to_show'] ?? 0); ?>"
+                                    onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
+                                    title="Training actions">⚙️</button>
+                            <?php if ($tmb_src): ?>
+                                <img class="my-project-tmb"
+                                     src="<?php echo $tmb_src; ?>"
+                                     alt="<?php echo $t_title; ?>"
+                                     style="cursor:default;">
+                            <?php else: ?>
+                                <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;cursor:default;">🎓</div>
+                            <?php endif; ?>
+                            <div class="my-project-info">
+                                <span class="my-project-title"><?php echo $t_title; ?></span>
+                                <span class="my-project-meta"><?php echo $t_date . ' · ' . $t_type; ?></span>
+                                <div class="training-v2-progress-wrap">
+                                    <div class="training-v2-progress-bar" style="width:<?php echo $funding_pct; ?>%"></div>
+                                </div>
+                                <span class="my-project-meta"><?php echo htmlspecialchars($funding_str, ENT_QUOTES, 'UTF-8'); ?> &nbsp;·&nbsp; Deadline: <?php echo htmlspecialchars($pledge_deadline, ENT_QUOTES, 'UTF-8'); ?></span>
+                            </div>
+                            <button class="training-v2-pledge-btn"
+                                    onclick="openPledgersModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
+                                    title="View pledgers">
+                                <?php echo $pledge_count; ?> 🤝
+                            </button>
+                            <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo $t_status_label; ?>
+                            </span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="panel-list-footer">
+                    <a href="launch-training.php" class="panel-grey-btn">🚀 New Training</a>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <!-- My Event Registrations -->
         <div id="registrations-panel" class="dashboard-v2-panel">
@@ -1151,73 +1226,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
                         </div>
                     </div>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <!-- My Trainings v2 (3P pledge-threshold trainings, trainer only) -->
-        <?php if (strpos(strtolower($gea_status), 'trainer') !== false && !empty($trainings_3p)): ?>
-            <div id="my-trainings-v2-panel" class="dashboard-v2-panel">
-                <span class="panel-pill trainer-pill">Trainer · 3P</span>
-                <h3>My Trainings | v2</h3>
-                <div class="my-project-list">
-                    <?php foreach ($trainings_3p as $t3p): ?>
-                        <?php
-                            $t_id         = (int)$t3p['training_id'];
-                            $t_title      = htmlspecialchars($t3p['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $t_date       = !empty($t3p['training_date']) ? date("Y-m-d", strtotime($t3p['training_date'])) : '—';
-                            $t_type       = htmlspecialchars($t3p['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $t_status_raw = strtolower($t3p['threshold_status'] ?? 'open');
-                            $t_status_labels = [
-                                'open'      => 'Open',
-                                'reached'   => 'Threshold Reached',
-                                'cancelled' => 'Cancelled',
-                            ];
-                            $t_status_label  = $t_status_labels[$t_status_raw] ?? ucfirst($t_status_raw);
-                            $pledge_count    = (int)($t3p['pledge_count'] ?? 0);
-                            $funding_goal    = (int)($t3p['funding_goal_idr'] ?? 0);
-                            $total_pledged   = (int)($t3p['total_pledged_idr'] ?? 0);
-                            $funding_pct     = (int)($t3p['funding_pct'] ?? 0);
-                            $funding_str     = 'IDR ' . number_format($total_pledged) . ' / ' . number_format($funding_goal);
-                            $pledge_deadline = !empty($t3p['pledge_deadline']) ? date("M j, Y", strtotime($t3p['pledge_deadline'])) : '—';
-                            $tmb_raw  = !empty($t3p['feature_photo1_tmb']) ? $t3p['feature_photo1_tmb'] : ($t3p['feature_photo1_main'] ?? '');
-                            $tmb_src  = htmlspecialchars($tmb_raw, ENT_QUOTES, 'UTF-8');
-                        ?>
-                        <div class="my-project-row">
-                            <button class="project-gear-btn"
-                                    data-show-report="<?php echo (int)($t3p['show_report'] ?? 0); ?>"
-                                    data-ready-to-show="<?php echo (int)($t3p['ready_to_show'] ?? 0); ?>"
-                                    onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
-                                    title="Training actions">⚙️</button>
-                            <?php if ($tmb_src): ?>
-                                <img class="my-project-tmb"
-                                     src="<?php echo $tmb_src; ?>"
-                                     alt="<?php echo $t_title; ?>"
-                                     style="cursor:default;">
-                            <?php else: ?>
-                                <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;cursor:default;">🎓</div>
-                            <?php endif; ?>
-                            <div class="my-project-info">
-                                <span class="my-project-title"><?php echo $t_title; ?></span>
-                                <span class="my-project-meta"><?php echo $t_date . ' · ' . $t_type; ?></span>
-                                <div class="training-v2-progress-wrap">
-                                    <div class="training-v2-progress-bar" style="width:<?php echo $funding_pct; ?>%"></div>
-                                </div>
-                                <span class="my-project-meta"><?php echo htmlspecialchars($funding_str, ENT_QUOTES, 'UTF-8'); ?> &nbsp;·&nbsp; Deadline: <?php echo htmlspecialchars($pledge_deadline, ENT_QUOTES, 'UTF-8'); ?></span>
-                            </div>
-                            <button class="training-v2-pledge-btn"
-                                    onclick="openPledgersModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
-                                    title="View pledgers">
-                                <?php echo $pledge_count; ?> 🤝
-                            </button>
-                            <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
-                                <?php echo $t_status_label; ?>
-                            </span>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <div class="panel-list-footer">
-                    <a href="launch-training.php" class="panel-grey-btn">🚀 New Training</a>
                 </div>
             </div>
         <?php endif; ?>

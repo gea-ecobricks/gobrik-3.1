@@ -1,9 +1,3 @@
-<?php
-require_once '../earthenAuth_helper.php';
-require '../vendor/autoload.php';
-use GuzzleHttp\Client;
-
-header('Content-Type: application/json');
 
 if (!isset($_SESSION['buwana_id'])) {
     echo json_encode(['success' => false, 'message' => 'Not logged in']);
@@ -40,6 +34,11 @@ $zoom_link_full = $zoom_link_full ?? '';
 $client = new Client(['base_uri' => 'https://api.eu.mailgun.net/v3/']); // EU-based endpoint
 $mailgunApiKey = getenv('MAILGUN_API_KEY'); // Use environment variable for Mailgun API key
 $mailgunDomain = 'mail.gobrik.com'; // Your Mailgun domain
+
+if (!$mailgunApiKey) {
+    echo json_encode(['success' => false, 'message' => 'MAILGUN_API_KEY is not configured on this server.']);
+    exit();
+}
 
 function sendMsg($to, $first_name, $vars, $override = '', $subject_override = '') {
     global $client, $mailgunApiKey, $mailgunDomain, $trainer_contact_email, $lead_trainer, $training_title, $training_type;
