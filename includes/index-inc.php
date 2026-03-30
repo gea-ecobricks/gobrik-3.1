@@ -19,6 +19,18 @@
 @-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
+/* Force white logo on the landing page regardless of colour scheme */
+:root {
+    --logo-color: rgb(213, 213, 213);
+}
+
+/* Remove fixed-position lock and backdrop blur on the landing page */
+#header {
+    position: relative !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
 
 /*COMMON*/
 
