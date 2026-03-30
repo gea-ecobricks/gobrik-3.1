@@ -591,9 +591,9 @@ margin-top:-100px !important;
     font-size: 0.82em;
     opacity: 0.60;
     line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
 }
 
 .project-phase-pill {
@@ -806,7 +806,7 @@ margin-top:-100px !important;
 
 
 <?php
-    $dashboard_header_version = $dashboard_header_version ?? "../header-2026.php";
+    $dashboard_header_version = $dashboard_header_version ?? "../header-2026b.php";
     require_once ($dashboard_header_version);
 ?>
 
