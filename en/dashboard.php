@@ -1333,7 +1333,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     const welcomePanel = document.getElementById('welcome-greeting-panel');
     const latestPanel = document.getElementById('latest-ecobricks-panel');
     const narrowColumn = document.querySelector('.dashboard-column.column-narrow');
-    const wideColumn = document.querySelector('.dashboard-column.column-two');
+    const wideColumn = document.querySelector('.dashboard-column.column-wide');
     const latestOriginalNextSibling = latestPanel?.nextElementSibling ?? null;
     let sliderCurrentIndex = 0;
     let sliderIntervalId = null;
