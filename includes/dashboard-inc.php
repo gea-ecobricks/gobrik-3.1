@@ -500,14 +500,22 @@ margin-top:-100px !important;
     text-decoration: underline;
 }
 
-/* ---- Mobile adjustments ---- */
+/* ---- Mobile adjustments (≤480px) ---- */
 @media screen and (max-width: 480px) {
     .pledge-reg-title {
         font-size: 0.90em;
     }
     .pledge-reg-pill {
-        min-width: 110px;
-        font-size: 0.72em;
+        min-width: 96px;
+        font-size: 0.70em;
+    }
+    /* Ensure pledge-reg row doesn't overflow the panel */
+    .pledge-reg-row {
+        overflow: hidden;
+    }
+    .pledge-reg-info {
+        min-width: 0;
+        overflow: hidden;
     }
 }
 
@@ -629,13 +637,86 @@ margin-top:-100px !important;
     .my-project-title {
         font-size: 0.90em;
     }
-    .my-project-tmb {
-        width: 46px;
-        height: 46px;
-    }
     .project-phase-pill {
-        min-width: 84px;
+        min-width: 80px;
+        font-size: 0.70em;
+        padding: 0 8px;
+    }
+
+    /* ---- Gear-stacking layout for project / ecobrick / training rows ----
+       Desktop: flex row →  [gear] [img] [info…] [pill]
+       Mobile:  2-col grid → col1: img (top) + gear (bottom)
+                              col2: info (spans both rows)
+                              row3: pill(s) below
+    -------------------------------------------------------------------- */
+    .my-project-row {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        grid-template-areas:
+            "tmb  info"
+            "gear info";
+        column-gap: 10px;
+        row-gap: 5px;
+        align-items: start;
+    }
+
+    .my-project-row > .my-project-tmb {
+        grid-area: tmb;
+        width: 48px;
+        height: 48px;
+    }
+
+    /* Gear button sits below the thumbnail */
+    .my-project-row > .project-gear-btn,
+    .my-project-row > .brik-gear-btn {
+        grid-area: gear;
+        justify-self: center;
+        align-self: center;
+        padding: 2px 4px;
+    }
+
+    /* Info fills the right column for both rows */
+    .my-project-row > .my-project-info {
+        grid-area: info;
+        align-self: center;
+    }
+
+    /* Pills / action buttons drop into row 3 */
+    .my-project-row > .project-phase-pill {
+        grid-column: 1 / -1;
+        grid-row: 3;
+        justify-self: start;
+    }
+
+    .my-project-row > .brik-row-pill {
+        grid-column: 1 / -1;
+        grid-row: 3;
+        justify-self: start;
+        min-width: 72px;
+        font-size: 0.70em;
+        height: 26px;
+    }
+
+    /* Training v2: pledge-btn col1 + status-pill col2 in row 3 */
+    .my-project-row > .training-v2-pledge-btn {
+        grid-column: 1;
+        grid-row: 3;
+        justify-self: center;
+        align-self: center;
         font-size: 0.72em;
+        min-width: 0;
+        padding: 4px 8px;
+    }
+
+    .my-project-row > .training-v2-status-pill {
+        grid-column: 2;
+        grid-row: 3;
+        justify-self: start;
+        align-self: center;
+        font-size: 0.68em;
+        padding: 4px 8px;
+        white-space: normal;
+        text-align: center;
     }
 }
 

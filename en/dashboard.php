@@ -2228,6 +2228,7 @@ $(document).ready(function() {
         "pageLength": 5,
         "searching": false,
         "lengthChange": false,
+        "scrollX": true,
         "order": [[1, "desc"]],
         "language": {
             "emptyTable": "You are not a trainer for any trainings yet.",

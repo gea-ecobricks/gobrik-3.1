@@ -498,10 +498,12 @@ body {
         grid-template-columns: repeat(3, minmax(90px, 1fr));
     }
 
-    /* Panels: ensure padding stays inside the box */
+    /* Panels: ensure padding stays inside the box and panels can shrink */
     .dashboard-v2-panel {
         box-sizing: border-box;
         overflow-x: hidden;
+        min-width: 0; /* panels are flex children — allow them to shrink below content min-size */
+        width: 100%;
     }
 
     /* Pill rows: tighten up for narrow screens */
