@@ -249,6 +249,7 @@ width: 100%;
 text-align: center;
 margin: auto;
 margin-bottom: -50vh;
+
   }
 
 

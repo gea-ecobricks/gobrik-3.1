@@ -288,6 +288,8 @@ margin-top:-100px !important;
     #trainer-trainings_wrapper {
         padding: 0 7px;
         box-sizing: border-box;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     #trainer-trainings {
         margin: 0;

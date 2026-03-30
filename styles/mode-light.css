@@ -502,13 +502,23 @@ light.css
       background-size: contain;
       }
 
-      .biosphere {
-        background: url(../webps/biosphere-day.webp) no-repeat  center bottom;
-        background-size: contain;
-        margin: -100px auto -40vh auto;
-        opacity: 0.8;
+      /*.biosphere {*/
+      /*  background: url(../webps/biosphere-day.webp) no-repeat  center bottom;*/
+      /*  background-size: contain;*/
+      /*  margin: -100px auto -40vh auto;*/
+      /*  opacity: 0.8;*/
 
-      }
+      /*}*/
+
+.biosphere {
+    background: none;
+    background-size: contain;
+    margin: -37px auto -56vh auto;
+    opacity: 0.8;
+
+}
+
+
 
 
   .tree-coins {

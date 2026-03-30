@@ -1,6 +1,7 @@
 body {
     background: var(--dashboard-page-background, #f5f5f5);
     font-family: 'Mulish', 'Helvetica Neue', Arial, sans-serif;
+    overflow-x: hidden; /* prevent any panel content from causing horizontal page scroll */
 }
 
 :root {
@@ -469,7 +470,8 @@ body {
     .dashboard-wrapper {
         max-width: none;
         padding: 0;
-        width: 100vw;
+        width: 100%; /* was 100vw — avoids scrollbar-width overflow */
+        overflow-x: hidden;
     }
 
     .dashboard-column {
@@ -493,6 +495,86 @@ body {
 
     .ecobrick-grid {
         grid-template-columns: repeat(3, minmax(90px, 1fr));
+    }
+
+    /* Panels: ensure padding stays inside the box */
+    .dashboard-v2-panel {
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    /* Pill rows: tighten up for narrow screens */
+    .pledge-reg-pill {
+        min-width: 96px;
+        font-size: 0.70em;
+    }
+
+    .project-phase-pill {
+        min-width: 72px;
+        font-size: 0.70em;
+        padding: 0 8px;
+    }
+
+    /* Training v2 status pill: allow wrapping on narrow screens */
+    .training-v2-status-pill {
+        font-size: 0.68em;
+        padding: 5px 7px;
+        white-space: normal;
+        text-align: center;
+        max-width: 80px;
+    }
+
+    /* DataTables wrapper: scroll internally, don't push the panel */
+    .dataTables_wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Validation stats: tighten gap so numbers don't overflow */
+    #validation-panel .stats-row {
+        gap: 18px;
+    }
+
+    /* Admin notice form inputs: prevent width+padding overflow */
+    #dash-notice-form input,
+    #dash-notice-form textarea,
+    #dash-notice-form select {
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    /* Earthen mailer chart: don't overflow panel */
+    .earthen-mailer-chart {
+        max-width: 100%;
+    }
+
+    /* My-project / pledge rows: ensure info shrinks, not overflows */
+    .my-project-row,
+    .pledge-reg-row {
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+
+    .my-project-info,
+    .pledge-reg-info {
+        overflow: hidden;
+        min-width: 0;
+    }
+}
+
+/* Very small phones (< 380px): shrink ecobrick grid min so 3 columns still fit */
+@media (max-width: 379px) {
+    .ecobrick-grid {
+        grid-template-columns: repeat(3, minmax(72px, 1fr));
+    }
+
+    .pledge-reg-pill {
+        min-width: 84px;
+        font-size: 0.67em;
+    }
+
+    .dashboard-v2-panel {
+        padding: 14px;
     }
 }
 

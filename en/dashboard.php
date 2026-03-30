@@ -1149,26 +1149,26 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 <form id="dash-notice-form" action="../api/add_new_dash_notice.php" method="post" class="dash-notice-form" style="display:none;margin-top:12px;font-size:0.92em;">
                     <div class="form-field" style="margin-bottom:10px;">
                         <label for="notice-message-body" style="display:block;margin-bottom:4px;">Message</label>
-                        <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                        <textarea id="notice-message-body" name="message_body" rows="2" required style="width:100%;padding:8px;box-sizing:border-box;"><?php echo htmlspecialchars($latest_notice['message_body'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                     </div>
                     <div class="form-field" style="margin-bottom:10px;">
                         <label for="notice-featured-text" style="display:block;margin-bottom:4px;">Featured Text</label>
-                        <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;"
+                        <input type="text" id="notice-featured-text" name="featured_text" maxlength="100" style="width:100%;padding:8px;box-sizing:border-box;"
                                value="<?php echo htmlspecialchars($latest_notice['featured_text'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                     <div class="form-field" style="margin-bottom:10px;">
                         <label for="notice-featured-url" style="display:block;margin-bottom:4px;">Featured URL</label>
-                        <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;"
+                        <input type="url" id="notice-featured-url" name="featured_url" style="width:100%;padding:8px;box-sizing:border-box;"
                                value="<?php echo htmlspecialchars($latest_notice['featured_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                     <div class="form-field" style="margin-bottom:10px;">
                         <label for="notice-message-emoji" style="display:block;margin-bottom:4px;">Message Emoji</label>
-                        <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;"
+                        <input type="text" id="notice-message-emoji" name="message_emoji" maxlength="10" style="width:100%;padding:8px;box-sizing:border-box;"
                                value="<?php echo htmlspecialchars($latest_notice['message_emoji'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                     <div class="form-field" style="margin-bottom:12px;">
                         <label for="notice-background-colour" style="display:block;margin-bottom:4px;">Background Colour</label>
-                        <input type="color" id="notice-background-colour" name="background_colour" style="width:100%;padding:8px;height:42px;"
+                        <input type="color" id="notice-background-colour" name="background_colour" style="width:100%;padding:8px;height:42px;box-sizing:border-box;"
                                value="<?php echo htmlspecialchars($notice_background_hex ?? $default_notice_color, ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                     <button type="submit" class="button secondary" style="width:100%;background:#0d6efd;color:#ffffff;">Save Notice</button>
@@ -1180,7 +1180,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php if ($has_validation_access): ?>
             <div id="validation-panel" class="dashboard-v2-panel">
                 <span class="panel-pill validator-pill">Validator</span>
-                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:35px;margin:10px 0 25px 0;">
+                <div class="stats-row" style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin:10px 0 25px 0;">
                     <div style="text-align:center;">
                         <div style="font-size:1.9em;font-weight:600;color:#f57c00;line-height:1;">
                             ⏲️ <?php echo number_format((int) $awaiting_validation_count); ?>
