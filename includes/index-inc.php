@@ -65,7 +65,7 @@ html {
     padding-bottom: 0px;
     margin-left: 0px;
     margin-right: 0px;
-    background-color: var(--general-background);
+    background: var(--dashboard-page-background, #f5f5f5);
       overflow-x: hidden;
     /*General interface background slightly off-white to make the white buttons and boxes show up better*/
   }

@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '7.24';
+$version = '7.25';
 $page = 'index';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -57,7 +57,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php require_once ("../includes/index-inc.php");?>
 
 
-<div class="clouds-new2" style=" margin-bottom:25px;background-color:var(--general-background);">
+<div class="clouds-new2" style="margin-bottom:25px;">
     <div class="biosphere">
             <img src="../webps/biosphere-blanked.webp" width="400" height="400" alt="biosphere">
     </div>

@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '9.22';
+$version = '9.23';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -531,7 +531,7 @@ if ($is_admin) {
 // 🔒 Clean exit: close DB connections
 $buwana_conn->close();
 $gobrik_conn->close();
-$dashboard_header_version = "../header-2026.php";
+$dashboard_header_version = "../header-2026b.php";
 ?>
 
 
@@ -548,9 +548,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php require_once("../includes/dashboard-inc.php"); ?>
 
 <style>
-    #header.top-menu {
-        position: relative !important;
-        top: auto !important;
+    /* Give the content room below the fixed header */
+    .dashboard-wrapper {
+        padding-top: 70px;
     }
 
     .dashboard-v2-panel {
