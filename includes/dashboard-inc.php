@@ -533,7 +533,7 @@ margin-top:-100px !important;
 
 .my-project-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 14px;
     padding: 11px 0;
     border-bottom: 1px solid rgba(0,0,0,0.07);
@@ -652,7 +652,7 @@ margin-top:-100px !important;
     /* Mobile: project/ecobrick rows stay flex, pill pinned to the right */
     .my-project-row {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 10px;
     }
 
@@ -687,17 +687,15 @@ margin-top:-100px !important;
         cursor: pointer;
     }
 
-    /* Training v2: pledge-btn + status-pill stay in flex row */
-    .my-project-row > .training-v2-pledge-btn {
-        flex-shrink: 0;
-        font-size: 0.72em;
-        min-width: 0;
-        padding: 4px 8px;
+    /* Training v2: stack pledge-btn and status-pill vertically on mobile */
+    .training-v2-pills {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
     }
-
-    .my-project-row > .training-v2-status-pill {
-        flex-shrink: 0;
-        font-size: 0.68em;
+    .training-v2-pills .training-v2-pledge-btn,
+    .training-v2-pills .training-v2-status-pill {
+        font-size: 0.70em;
         padding: 4px 8px;
         white-space: normal;
         text-align: center;
@@ -733,6 +731,15 @@ margin-top:-100px !important;
 /* Gear emoji inside pills — hidden on desktop, revealed on mobile */
 .pill-gear-emoji {
     display: none;
+}
+
+/* Training v2 pills container — row on desktop, column on mobile */
+.training-v2-pills {
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 6px;
 }
 
 .brik-row-pill.status-authenticated {

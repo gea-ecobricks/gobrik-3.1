@@ -717,18 +717,30 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         padding: 0 10px;
     }
 
-    /* ===== Mobile modal fix — center action buttons horizontally ===== */
+    /* ===== Mobile modal fix — box-sizing prevents padding from blowing past 100vw ===== */
     @media (max-width: 700px) {
+        /* The header sets width:100% + padding:10px without box-sizing, causing 20px overflow.
+           Override here so padding is included in the 100% width. */
         .modal-content-box {
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
             flex-direction: column;
             align-items: stretch;
             justify-content: center;
         }
         .modal-message {
-            width: 100%;
             box-sizing: border-box;
-            padding: 20px;
+            width: 100%;
             margin: 0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .ecobrick-action-button {
+            box-sizing: border-box;
+            max-width: 100%;
         }
     }
 </style>
@@ -1000,14 +1012,16 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                 </div>
                                 <span class="my-project-meta"><?php echo htmlspecialchars($funding_str, ENT_QUOTES, 'UTF-8'); ?> &nbsp;·&nbsp; Deadline: <?php echo htmlspecialchars($pledge_deadline, ENT_QUOTES, 'UTF-8'); ?></span>
                             </div>
-                            <button class="training-v2-pledge-btn"
-                                    onclick="openPledgersModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
-                                    title="View pledgers">
-                                <?php echo $pledge_count; ?> 🤝
-                            </button>
-                            <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
-                                <?php echo $t_status_label; ?>
-                            </span>
+                            <div class="training-v2-pills">
+                                <button class="training-v2-pledge-btn"
+                                        onclick="openPledgersModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
+                                        title="View pledgers">
+                                    <?php echo $pledge_count; ?> 🤝
+                                </button>
+                                <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
+                                    <?php echo $t_status_label; ?>
+                                </span>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>

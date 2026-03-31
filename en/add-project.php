@@ -409,9 +409,12 @@ document.addEventListener("DOMContentLoaded", function() {
             projectDurationField.style.display = '';
         }
 
-        // Dynamically adjust the max-height for the advanced box content
+        // Dynamically adjust the max-height for the advanced box content if it's already open
         const advancedBoxContent = document.querySelector('.advanced-box-content');
-        advancedBoxContent.style.maxHeight = advancedBoxContent.scrollHeight + "px";
+        const advancedHeader = document.querySelector('.advanced-box-header');
+        if (advancedHeader && advancedHeader.getAttribute('aria-expanded') === 'true') {
+            advancedBoxContent.style.maxHeight = advancedBoxContent.scrollHeight + "px";
+        }
     }
 
     // Add change event listener to the project sort dropdown
