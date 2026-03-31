@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biosphere Globe</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a3a52 50%, #2d5a7b 100%);
+            overflow: hidden;
+            color: #e8f4f8;
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            cursor: grab;
+        }
+
+        #container:active {
+            cursor: grabbing;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            z-index: 10;
+            background: rgba(13, 27, 42, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 25px 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(104, 211, 145, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 320px;
+        }
+
+        .info-panel h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #68d391;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .info-panel p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #a0b9c8;
+            margin-bottom: 15px;
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(104, 211, 145, 0.2);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: #a0b9c8;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #tooltip {
+            position: absolute;
+            background: rgba(13, 27, 42, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(104, 211, 145, 0.3);
+            font-size: 14px;
+            font-weight: 400;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 100;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            color: #68d391;
+            font-family: 'Space Mono', monospace;
+        }
+
+        #tooltip.visible {
+            opacity: 1;
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .control-btn {
+            background: rgba(13, 27, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(104, 211, 145, 0.3);
+            color: #68d391;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(104, 211, 145, 0.2);
+            border-color: #68d391;
+            transform: translateY(-2px);
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            color: #68d391;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div id="loading">Loading biosphere...</div>
+    
+    <div class="info-panel">
+        <h1>Earth's Biosphere</h1>
+        <p>An interactive visualization of life on our planet. Drag to rotate and explore.</p>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2a5aa8;"></div>
+                <span>Oceans & Water</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(to right, #2d8b4b, #68d391);"></div>
+                <span>Dense Vegetation</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(to right, #d4a574, #c89664);"></div>
+                <span>Arid Regions</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e8f4f8;"></div>
+                <span>Ice & Snow</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" id="reset-btn">Reset View</button>
+        <button class="control-btn" id="auto-rotate-btn">Auto-Rotate</button>
+    </div>
+
+    <div id="tooltip"></div>
+    <div id="container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Generate starfield
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = Math.random() * 2 + 1 + 'px';
+            star.style.height = star.style.width;
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Three.js setup
+        const container = document.getElementById('container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0x0a1628, 10, 30);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // Create custom biosphere texture
+        const canvas = document.createElement('canvas');
+        canvas.width = 2048;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+
+        // Draw oceans
+        ctx.fillStyle = '#2a5aa8';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Define continents with biomass data (simplified representation)
+        const continents = [
+            // Africa
+            { 
+                name: 'Africa',
+                regions: [
+                    { x: 0.52, y: 0.45, w: 0.15, h: 0.25, biomass: 0.7 }, // Central Africa (high)
+                    { x: 0.50, y: 0.35, w: 0.13, h: 0.15, biomass: 0.3 }, // Sahara (low)
+                    { x: 0.52, y: 0.65, w: 0.12, h: 0.12, biomass: 0.5 }  // Southern Africa (medium)
+                ]
+            },
+            // South America
+            { 
+                name: 'South America',
+                regions: [
+                    { x: 0.25, y: 0.52, w: 0.12, h: 0.20, biomass: 0.85 }, // Amazon (very high)
+                    { x: 0.24, y: 0.68, w: 0.08, h: 0.10, biomass: 0.4 }   // Southern cone (medium)
+                ]
+            },
+            // North America
+            { 
+                name: 'North America',
+                regions: [
+                    { x: 0.15, y: 0.25, w: 0.18, h: 0.15, biomass: 0.5 }, // USA/Canada forests
+                    { x: 0.17, y: 0.35, w: 0.10, h: 0.10, biomass: 0.3 }, // Southwest (arid)
+                    { x: 0.13, y: 0.15, w: 0.15, h: 0.08, biomass: 0.1 }  // Arctic (ice)
+                ]
+            },
+            // Europe
+            { 
+                name: 'Europe',
+                regions: [
+                    { x: 0.48, y: 0.25, w: 0.10, h: 0.10, biomass: 0.6 }
+                ]
+            },
+            // Asia
+            { 
+                name: 'Asia',
+                regions: [
+                    { x: 0.65, y: 0.20, w: 0.25, h: 0.12, biomass: 0.2 }, // Siberia/tundra
+                    { x: 0.72, y: 0.35, w: 0.12, h: 0.10, biomass: 0.7 }, // Southeast Asia (high)
+                    { x: 0.60, y: 0.35, w: 0.10, h: 0.08, biomass: 0.3 }  // Middle East (arid)
+                ]
+            },
+            // Australia
+            { 
+                name: 'Australia',
+                regions: [
+                    { x: 0.80, y: 0.65, w: 0.12, h: 0.10, biomass: 0.25 } // Mostly arid
+                ]
+            },
+            // Antarctica
+            {
+                name: 'Antarctica',
+                regions: [
+                    { x: 0.50, y: 0.88, w: 0.40, h: 0.10, biomass: 0.0 } // Ice
+                ]
+            }
+        ];
+
+        // Helper function to get color based on biomass
+        function getBiomassColor(biomass) {
+            if (biomass === 0) {
+                return '#f0f8ff'; // Ice/snow
+            } else if (biomass < 0.2) {
+                return '#e8d4c0'; // Desert/tundra
+            } else if (biomass < 0.4) {
+                return '#d4a574'; // Arid/grassland
+            } else if (biomass < 0.6) {
+                return '#9cb369'; // Temperate
+            } else if (biomass < 0.8) {
+                return '#5a9367'; // Forest
+            } else {
+                return '#2d8b4b'; // Rainforest
+            }
+        }
+
+        // Draw continents
+        continents.forEach(continent => {
+            continent.regions.forEach(region => {
+                const color = getBiomassColor(region.biomass);
+                ctx.fillStyle = color;
+                
+                // Add some noise/variation
+                const x = region.x * canvas.width;
+                const y = region.y * canvas.height;
+                const w = region.w * canvas.width;
+                const h = region.h * canvas.height;
+                
+                // Draw organic shape
+                ctx.beginPath();
+                ctx.ellipse(x, y, w, h, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add texture
+                for (let i = 0; i < 50; i++) {
+                    const px = x + (Math.random() - 0.5) * w * 1.5;
+                    const py = y + (Math.random() - 0.5) * h * 1.5;
+                    const size = Math.random() * 15 + 5;
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = 0.3;
+                    ctx.beginPath();
+                    ctx.arc(px, py, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1.0;
+            });
+        });
+
+        // Draw rivers (simplified major rivers)
+        const rivers = [
+            { name: 'Amazon River', points: [[0.25, 0.55], [0.30, 0.55], [0.33, 0.56]] },
+            { name: 'Nile River', points: [[0.55, 0.35], [0.54, 0.45], [0.53, 0.55]] },
+            { name: 'Mississippi River', points: [[0.20, 0.32], [0.21, 0.38], [0.22, 0.42]] },
+            { name: 'Yangtze River', points: [[0.75, 0.35], [0.78, 0.36], [0.81, 0.37]] },
+        ];
+
+        ctx.strokeStyle = '#1a5a8a';
+        ctx.lineWidth = 3;
+        rivers.forEach(river => {
+            ctx.beginPath();
+            river.points.forEach((point, i) => {
+                const x = point[0] * canvas.width;
+                const y = point[1] * canvas.height;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        });
+
+        // Create Earth geometry
+        const geometry = new THREE.SphereGeometry(2, 64, 64);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.needsUpdate = true;
+
+        const material = new THREE.MeshPhongMaterial({
+            map: texture,
+            shininess: 15,
+            specular: new THREE.Color(0x333333)
+        });
+
+        const earth = new THREE.Mesh(geometry, material);
+        scene.add(earth);
+
+        // Add atmosphere glow
+        const glowGeometry = new THREE.SphereGeometry(2.1, 32, 32);
+        const glowMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                c: { value: 0.4 },
+                p: { value: 3.5 },
+                glowColor: { value: new THREE.Color(0x68d391) }
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 glowColor;
+                uniform float c;
+                uniform float p;
+                varying vec3 vNormal;
+                void main() {
+                    float intensity = pow(c - dot(vNormal, vec3(0.0, 0.0, 1.0)), p);
+                    gl_FragColor = vec4(glowColor, 1.0) * intensity;
+                }
+            `,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending,
+            transparent: true
+        });
+
+        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+        scene.add(glow);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        sunLight.position.set(5, 3, 5);
+        scene.add(sunLight);
+
+        const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.3);
+        fillLight.position.set(-5, 0, -5);
+        scene.add(fillLight);
+
+        // Mouse interaction
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let autoRotate = false;
+        const rotationSpeed = 0.001;
+
+        renderer.domElement.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        renderer.domElement.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+                
+                earth.rotation.y += deltaX * 0.005;
+                earth.rotation.x += deltaY * 0.005;
+                glow.rotation.copy(earth.rotation);
+                
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+                autoRotate = false;
+            }
+
+            // Update tooltip position
+            updateTooltip(e);
+        });
+
+        renderer.domElement.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Raycasting for tooltips
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const tooltip = document.getElementById('tooltip');
+
+        function updateTooltip(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(earth);
+
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                const uv = intersects[0].uv;
+                
+                // Determine what region was hit
+                let hoveredFeature = null;
+                
+                continents.forEach(continent => {
+                    continent.regions.forEach(region => {
+                        const dx = Math.abs(uv.x - region.x);
+                        const dy = Math.abs(uv.y - region.y);
+                        if (dx < region.w * 0.5 && dy < region.h * 0.5) {
+                            hoveredFeature = continent.name;
+                        }
+                    });
+                });
+
+                rivers.forEach(river => {
+                    river.points.forEach(point => {
+                        const dx = Math.abs(uv.x - point[0]);
+                        const dy = Math.abs(uv.y - point[1]);
+                        if (dx < 0.02 && dy < 0.02) {
+                            hoveredFeature = river.name;
+                        }
+                    });
+                });
+
+                if (hoveredFeature) {
+                    tooltip.textContent = hoveredFeature;
+                    tooltip.style.left = event.clientX + 15 + 'px';
+                    tooltip.style.top = event.clientY + 15 + 'px';
+                    tooltip.classList.add('visible');
+                } else {
+                    tooltip.classList.remove('visible');
+                }
+            } else {
+                tooltip.classList.remove('visible');
+            }
+        }
+
+        // Controls
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            earth.rotation.set(0, 0, 0);
+            glow.rotation.set(0, 0, 0);
+            camera.position.set(0, 0, 5);
+        });
+
+        document.getElementById('auto-rotate-btn').addEventListener('click', (e) => {
+            autoRotate = !autoRotate;
+            e.target.textContent = autoRotate ? 'Stop Rotation' : 'Auto-Rotate';
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (autoRotate && !isDragging) {
+                earth.rotation.y += rotationSpeed;
+                glow.rotation.copy(earth.rotation);
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Hide loading screen
+        document.getElementById('loading').style.display = 'none';
+        
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>

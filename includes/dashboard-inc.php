@@ -637,82 +637,66 @@ margin-top:-100px !important;
     .my-project-title {
         font-size: 0.90em;
     }
-    .project-phase-pill {
-        min-width: 80px;
-        font-size: 0.70em;
-        padding: 0 8px;
+
+    /* Mobile: hide standalone gear buttons — pill takes over that role */
+    .brik-gear-btn,
+    .project-gear-btn {
+        display: none !important;
     }
 
-    /* ---- Gear-stacking layout for project / ecobrick / training rows ----
-       Desktop: flex row →  [gear] [img] [info…] [pill]
-       Mobile:  2-col grid → col1: img (top) + gear (bottom)
-                              col2: info (spans both rows)
-                              row3: pill(s) below
-    -------------------------------------------------------------------- */
+    /* Mobile: show gear emoji inside pills */
+    .pill-gear-emoji {
+        display: inline;
+    }
+
+    /* Mobile: project/ecobrick rows stay flex, pill pinned to the right */
     .my-project-row {
-        display: grid;
-        grid-template-columns: 48px 1fr;
-        grid-template-areas:
-            "tmb  info"
-            "gear info";
-        column-gap: 10px;
-        row-gap: 5px;
-        align-items: start;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     .my-project-row > .my-project-tmb {
-        grid-area: tmb;
-        width: 48px;
-        height: 48px;
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
     }
 
-    /* Gear button sits below the thumbnail */
-    .my-project-row > .project-gear-btn,
-    .my-project-row > .brik-gear-btn {
-        grid-area: gear;
-        justify-self: center;
-        align-self: center;
-        padding: 2px 4px;
-    }
-
-    /* Info fills the right column for both rows */
     .my-project-row > .my-project-info {
-        grid-area: info;
-        align-self: center;
+        flex: 1;
+        min-width: 0;
     }
 
-    /* Pills / action buttons drop into row 3 */
+    /* Project pill: stays in flex row on the far right */
     .my-project-row > .project-phase-pill {
-        grid-column: 1 / -1;
-        grid-row: 3;
-        justify-self: start;
+        flex-shrink: 0;
+        min-width: 72px;
+        font-size: 0.70em;
+        padding: 0 8px;
+        pointer-events: auto;
+        cursor: pointer;
     }
 
+    /* Ecobrick pill: stays in flex row on the far right, interactive on mobile */
     .my-project-row > .brik-row-pill {
-        grid-column: 1 / -1;
-        grid-row: 3;
-        justify-self: start;
+        flex-shrink: 0;
         min-width: 72px;
         font-size: 0.70em;
         height: 26px;
+        pointer-events: auto;
+        cursor: pointer;
     }
 
-    /* Training v2: pledge-btn col1 + status-pill col2 in row 3 */
+    /* Training v2: pledge-btn + status-pill stay in flex row */
     .my-project-row > .training-v2-pledge-btn {
-        grid-column: 1;
-        grid-row: 3;
-        justify-self: center;
-        align-self: center;
+        flex-shrink: 0;
         font-size: 0.72em;
         min-width: 0;
         padding: 4px 8px;
     }
 
     .my-project-row > .training-v2-status-pill {
-        grid-column: 2;
-        grid-row: 3;
-        justify-self: start;
-        align-self: center;
+        flex-shrink: 0;
         font-size: 0.68em;
         padding: 4px 8px;
         white-space: normal;
@@ -734,9 +718,9 @@ margin-top:-100px !important;
     font-size: 0.76em;
     font-weight: 700;
     letter-spacing: 0.015em;
-    padding: 0 12px;
-    height: 30px;
-    min-width: 84px;
+    padding: 0 10px;
+    height: 28px;
+    min-width: 80px;
     border-radius: 999px;
     white-space: nowrap;
     pointer-events: none;
@@ -744,6 +728,11 @@ margin-top:-100px !important;
     border: 1.5px solid transparent;
     /* override status-pill's loose padding/shadow */
     box-shadow: none !important;
+}
+
+/* Gear emoji inside pills — hidden on desktop, revealed on mobile */
+.pill-gear-emoji {
+    display: none;
 }
 
 .brik-row-pill.status-authenticated {

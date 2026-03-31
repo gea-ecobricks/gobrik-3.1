@@ -108,6 +108,14 @@ body {
     color: var(--text-color, #0d1b2a);
 }
 
+/* On mobile, push h3/h4 down so the absolute panel-pill doesn't overlap */
+@media (max-width: 768px) {
+    .dashboard-v2-panel h3,
+    .dashboard-v2-panel h4 {
+        margin-top: 15px;
+    }
+}
+
 .dashboard-v2-panel .panel-title {
     margin-top: 24px;
 }
@@ -281,6 +289,8 @@ body {
     background: transparent;
     border: none;
     box-shadow: none;
+    /* Spans both columns when it is a direct grid child */
+    grid-column: 1 / -1;
 }
 
 .top-container-notice {

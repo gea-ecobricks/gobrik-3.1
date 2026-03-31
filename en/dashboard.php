@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // 🌿 Optional helper functions
 
 // 🌍 Set up page environment
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '9.31';
+$version = '9.32';
 $page = 'dashboard';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
@@ -709,17 +709,49 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
     }
 
-    /* ===== My Ecobricks — compact status pill ===== */
+    /* ===== My Ecobricks — compact status pill (matches project-phase-pill size) ===== */
     .brik-row-pill {
-        flex-shrink: 0;
-        padding: 5px 9px;
-        font-size: 0.75em;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        font-size: 0.76em;
+        height: 28px;
+        min-width: 80px;
+        padding: 0 10px;
+    }
+
+    /* ===== Mobile modal fix — center action buttons horizontally ===== */
+    @media (max-width: 700px) {
+        .modal-content-box {
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: center;
+        }
+        .modal-message {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            margin: 0;
+        }
     }
 </style>
 
 <div class="dashboard-wrapper">
 <div id="dashboard-v2-grid" class="dashboard-grid">
+
+    <!-- ============================================================ -->
+    <!-- FULL-WIDTH ROW: notice — always first on both desktop+mobile  -->
+    <!-- ============================================================ -->
+    <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel" style="--notice-bg: <?php echo htmlspecialchars($notice_background_rgba, ENT_QUOTES, 'UTF-8'); ?>;">
+        <div id="registered-notice" class="top-container-notice">
+            <span id="notice-icon" class="notice-icon">
+                <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
+            </span>
+            <span id="notice-text" class="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
+                <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
+                </a>
+            </span>
+            <button class="notice-close" aria-label="Close">&times;</button>
+        </div>
+    </div>
 
     <!-- ============================================================ -->
     <!-- LEFT COLUMN (1/3): welcome · my ecobricks · my projects      -->
@@ -799,7 +831,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             <button class="project-phase-pill"
                                     data-project-id="<?php echo $proj_id; ?>"
                                     data-project-name="<?php echo $proj_name; ?>">
-                                <?php echo $phase; ?>
+                                <?php echo $phase; ?><span class="pill-gear-emoji"> ⚙️</span>
                             </button>
                         </div>
                     <?php endforeach; ?>
@@ -892,21 +924,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     <!--   latest projects · admin mailer · my trainings              -->
     <!-- ============================================================ -->
     <div class="dashboard-column column-wide">
-
-        <!-- Dashboard Notice -->
-        <div id="registered-notice-panel" class="dashboard-v2-panel notice-panel" style="--notice-bg: <?php echo htmlspecialchars($notice_background_rgba, ENT_QUOTES, 'UTF-8'); ?>;">
-            <div id="registered-notice" class="top-container-notice">
-                <span id="notice-icon" class="notice-icon">
-                    <?php echo htmlspecialchars($notice_icon ?: '👉', ENT_QUOTES, 'UTF-8'); ?>
-                </span>
-                <span id="notice-text" class="notice-text"><?php echo nl2br(htmlspecialchars($notice_text, ENT_QUOTES, 'UTF-8')); ?>
-                    <a href="<?php echo htmlspecialchars($notice_featured_url, ENT_QUOTES, 'UTF-8'); ?>">
-                        <?php echo htmlspecialchars($notice_featured_text, ENT_QUOTES, 'UTF-8'); ?>
-                    </a>
-                </span>
-                <button class="notice-close" aria-label="Close">&times;</button>
-            </div>
-        </div>
 
         <!-- Latest Projects -->
         <div id="latest-projects-panel" class="dashboard-v2-panel">
@@ -1967,7 +1984,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 '<span class="my-project-meta">' + metaStr + '</span>' +
                 '<span class="my-project-meta">' + dateDisplay + '</span>';
 
-            // Gear button (opens brik control menu)
+            // Gear button (opens brik control menu — hidden on mobile via CSS)
             const gear = document.createElement('button');
             gear.className = 'brik-gear-btn';
             gear.title = 'Ecobrick actions';
@@ -1976,7 +1993,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             // Status pill — use status-pill + status-* classes (NOT ecobrick-status-pill which is position:absolute in main.css)
             const pill = document.createElement('span');
             pill.className = 'brik-row-pill status-pill ' + getStatusClassName(status);
-            pill.textContent = status || 'unknown';
+            // Pill label + hidden-on-desktop gear emoji (shown on mobile via CSS)
+            const pillLabel = document.createTextNode(status || 'unknown');
+            const gearSpan = document.createElement('span');
+            gearSpan.className = 'pill-gear-emoji';
+            gearSpan.textContent = ' ⚙️';
+            pill.appendChild(pillLabel);
+            pill.appendChild(gearSpan);
+            // Pill click opens actions (pointer-events enabled on mobile via CSS)
+            pill.addEventListener('click', function() {
+                viewEcobrickActions(serial, status, USER_LANG);
+            });
 
             // Wire clicks
             img.addEventListener('click', function() {
