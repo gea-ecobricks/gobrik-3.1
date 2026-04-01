@@ -5,53 +5,60 @@ require_once '../auth/session_start.php';
 // PART 1: Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
 $version = '0.546';
-$page = 'log';
+$page = 'community-3p';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
+$source_training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+if ($source_training_id <= 0) {
+    header('Location: courses.php');
+    exit();
+}
 
 // PART 2: Check if user is logged in and session active
-if ($is_logged_in) {
-    $buwana_id = $_SESSION['buwana_id'];
-
-    // Include database connections
-    require_once '../gobrikconn_env.php';
-    require_once '../buwanaconn_env.php';
-
-    // Fetch user meta and location data
-    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
-    $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
-    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
-    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
-    $gea_status = getGEA_status($buwana_id);
-    $user_ecobricker_id = getEcobrickerID($buwana_id);
-    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
-    $user_community_id = null;
-    $ecobrick_unique_id = 0;
-    $first_name = getFirstName($buwana_conn, $buwana_id);
-
-
-
-    // Fetch community_id from community name
-    if (!empty($user_community_name)) {
-        $stmt_com = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE com_name = ?");
-        if ($stmt_com) {
-            $stmt_com->bind_param("s", $user_community_name);
-            $stmt_com->execute();
-            $stmt_com->bind_result($user_community_id);
-            $stmt_com->fetch();
-            $stmt_com->close();
-        }
-    }
-
-    // Check if retry parameter is passed in the URL
-    if (isset($_GET['retry']) && is_numeric($_GET['retry'])) {
-        $ecobrick_unique_id = (int)$_GET['retry'];
-        retryEcobrick($gobrik_conn, $ecobrick_unique_id);
-    }
-
-} else {
-    header('Location: login.php?redirect=' . urlencode($page)).php;
+if (!isLoggedIn()) {
+    header('Location: login.php?redirect=' . urlencode($page . '.php'));
     exit();
+}
+
+$buwana_id = $_SESSION['buwana_id'];
+
+// Include database connections
+require_once '../gobrikconn_env.php';
+require_once '../buwanaconn_env.php';
+
+// Fetch user meta and location data
+$user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+$earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
+$user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+$user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+$gea_status = getGEA_status($buwana_id);
+$user_ecobricker_id = getEcobrickerID($buwana_id);
+$user_community_name = getCommunityName($buwana_conn, $buwana_id);
+$user_community_id = null;
+$first_name = getFirstName($buwana_conn, $buwana_id);
+
+// Fetch user's email address from GoBrik ecobricker record
+$users_email_address = '';
+$full_name = '';
+$stmt_user = $gobrik_conn->prepare("SELECT email_addr, full_name FROM tb_ecobrickers WHERE buwana_id = ?");
+if ($stmt_user) {
+    $stmt_user->bind_param("i", $buwana_id);
+    $stmt_user->execute();
+    $stmt_user->bind_result($users_email_address, $full_name);
+    $stmt_user->fetch();
+    $stmt_user->close();
+}
+
+// Fetch community_id from community name
+if (!empty($user_community_name)) {
+    $stmt_com = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE com_name = ?");
+    if ($stmt_com) {
+        $stmt_com->bind_param("s", $user_community_name);
+        $stmt_com->execute();
+        $stmt_com->bind_result($user_community_id);
+        $stmt_com->fetch();
+        $stmt_com->close();
+    }
 }
 
 
@@ -249,7 +256,7 @@ echo '<!DOCTYPE html>
                     <form id="community-3p-form" method="post" action="../processes/community_training_request.php" novalidate>
                         <input type="hidden" name="source_training_id" value="<?php echo (int)$source_training_id; ?>">
                         <input type="hidden" name="buwana_id" value="<?php echo (int)$buwana_id; ?>">
-                        <input type="hidden" name="ecobricker_id" value="<?php echo (int)$ecobricker_id; ?>">
+                        <input type="hidden" name="ecobricker_id" value="<?php echo (int)$user_ecobricker_id; ?>">
 
                         <div class="c3p-form-row">
                             <label for="proposed_date">Proposed Training Date &amp; Time *</label>
@@ -292,8 +299,10 @@ echo '<!DOCTYPE html>
                             <div class="c3p-autocomplete-wrap">
                                 <input type="text" id="community_search_c3p" name="community_search"
                                        placeholder="Start typing your community name..."
-                                       autocomplete="off">
-                                <input type="hidden" id="community_id_c3p" name="community_id">
+                                       autocomplete="off"
+                                       value="<?php echo htmlspecialchars($user_community_name ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                                <input type="hidden" id="community_id_c3p" name="community_id"
+                                       value="<?php echo $user_community_id !== null ? (int)$user_community_id : ''; ?>">
                                 <div id="community_results_c3p" class="c3p-autocomplete-results"></div>
                             </div>
                             <p class="c3p-form-caption">Search for and select your community. <a href="#" onclick="openAddCommunityModal(); return false;" style="color:#1a56a0;">Don't see it? Add one.</a></p>
@@ -322,6 +331,8 @@ const FUNDING_GOAL_IDR    = <?php echo (int)$funding_goal_idr; ?>;
 const MIN_PARTICIPANTS    = <?php echo (int)$min_participants_required; ?>;
 const TRAINING_NAME       = <?php echo json_encode($training_title, JSON_HEX_TAG) ?: '""'; ?>;
 const USER_EMAIL          = <?php echo json_encode($users_email_address, JSON_HEX_TAG) ?: '""'; ?>;
+const USER_COMMUNITY_NAME = <?php echo json_encode($user_community_name ?? '', JSON_HEX_TAG) ?: '""'; ?>;
+const USER_COMMUNITY_ID   = <?php echo $user_community_id !== null ? (int)$user_community_id : 'null'; ?>;
 
 const CURRENCY_RATES = {
     IDR: 1,
@@ -393,7 +404,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                         }
                     })
-                    .catch(function() { suggestionBox.innerHTML = ''; });
+                    .catch(function(err) {
+                        console.error('Community search failed:', err);
+                        suggestionBox.innerHTML = '';
+                    });
             } else {
                 suggestionBox.innerHTML = '';
             }
