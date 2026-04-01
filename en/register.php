@@ -376,7 +376,7 @@ echo '<!DOCTYPE html>
 
                 </div>
 
-                <div id="the-bottom-buttons" style="width:100%;padding 20px">
+                <div id="the-bottom-buttons" style="width:100%;padding 20px;">
                     <button id="rsvp-register-button-desktop" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                         <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                     </button>
@@ -389,8 +389,8 @@ echo '<!DOCTYPE html>
                         <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                     </button>
                     <?php if ($payment_mode === 'pledge_threshold' && !$is_registered): ?>
-                        <!--<a href="community-3p.php?id=<?php echo (int)$training_id; ?>" class="register-community-btn" style="margin-top:8px;">Register my Community</a>
-                        <p class="register-community-note">Have a whole community that wants to do this training? Register your own event.</p>-->
+                        <a href="community-3p.php?id=<?php echo (int)$training_id; ?>" class="register-community-btn" style="margin-top:8px;">Register my Community</a>
+                        <p class="register-community-note">Have a whole community that wants to do this training? Register your own event.</p>
                     <?php endif; ?>
                 </div>
             </div>
