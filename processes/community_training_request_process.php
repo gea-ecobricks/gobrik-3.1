@@ -16,6 +16,10 @@ require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
 require_once '../vendor/autoload.php';
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use PHPMailer\PHPMailer\PHPMailer;
 
 $buwana_id = (int)$_SESSION['buwana_id'];
