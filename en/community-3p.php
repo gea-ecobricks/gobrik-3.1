@@ -112,6 +112,16 @@ $funding_goal_display = number_format($funding_goal_idr) . ' IDR';
 $show_success = isset($_GET['requested']) && $_GET['requested'] == '1';
 $new_training_id = isset($_GET['new_id']) ? intval($_GET['new_id']) : 0;
 
+// Check for error redirect
+$error_code = isset($_GET['error']) ? trim($_GET['error']) : '';
+$error_messages = [
+    'missing_fields' => 'Some required fields were missing. Please fill in all required fields and try again.',
+    'invalid_date'   => 'The proposed date you entered was not valid. Please select a valid date and time.',
+    'not_found'      => 'This training could not be found or is not available for community requests.',
+    'db'             => 'A database error occurred while submitting your request. Please try again.',
+];
+$error_display = isset($error_messages[$error_code]) ? $error_messages[$error_code] : '';
+
 $gobrik_conn->close();
 
 echo '<!DOCTYPE html>
@@ -192,6 +202,16 @@ echo '<!DOCTYPE html>
                     </div>
                 </div>
 
+                <?php if (!empty($error_display)): ?>
+                <!-- ============================================================ -->
+                <!-- ERROR CARD                                                     -->
+                <!-- ============================================================ -->
+                <div class="community-3p-error-card" style="background:rgba(200,0,0,0.07);border:1px solid rgba(200,0,0,0.25);border-radius:12px;padding:18px 22px;margin-bottom:20px;color:#b00;">
+                    <strong>⚠️ There was a problem with your submission</strong>
+                    <p style="margin:8px 0 0 0;"><?php echo htmlspecialchars($error_display, ENT_QUOTES, 'UTF-8'); ?></p>
+                </div>
+                <?php endif; ?>
+
                 <!-- ============================================================ -->
                 <!-- COMMUNITY REQUEST FORM                                         -->
                 <!-- ============================================================ -->
@@ -203,7 +223,7 @@ echo '<!DOCTYPE html>
                         you're proposing a new date, location, and community for a dedicated event.
                     </p>
 
-                    <form id="community-3p-form" method="post" action="../processes/community_training_request_process.php" novalidate>
+                    <form id="community-3p-form" method="post" action="../processes/community_training_request.php" novalidate>
                         <input type="hidden" name="source_training_id" value="<?php echo (int)$source_training_id; ?>">
                         <input type="hidden" name="buwana_id" value="<?php echo (int)$buwana_id; ?>">
                         <input type="hidden" name="ecobricker_id" value="<?php echo (int)$ecobricker_id; ?>">
@@ -244,9 +264,8 @@ echo '<!DOCTYPE html>
                             <p class="c3p-form-caption">Where will the training be held? Include city and country, or write "Online".</p>
                         </div>
 
-                        <?php /*
                         <div class="c3p-form-row">
-                            <label for="community_search_c3p">Your Community *</label>
+                            <label for="community_search_c3p">Your Community</label>
                             <div class="c3p-autocomplete-wrap">
                                 <input type="text" id="community_search_c3p" name="community_search"
                                        placeholder="Start typing your community name..."
@@ -256,7 +275,6 @@ echo '<!DOCTYPE html>
                             </div>
                             <p class="c3p-form-caption">Search for and select your community. <a href="#" onclick="openAddCommunityModal(); return false;" style="color:#1a56a0;">Don't see it? Add one.</a></p>
                         </div>
-                        */ ?>
 
                         <div id="c3p-validation-error" style="display:none;color:#c00;font-size:0.93em;margin-bottom:14px;padding:10px 14px;background:rgba(200,0,0,0.07);border-radius:8px;"></div>
 
@@ -330,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const query = communityInput.value.trim();
             communityIdInput.value = '';
             if (query.length >= 3) {
-                fetch('https://buwana.ecobricks.org/api/api/search_communities_by_id.php?query=' + encodeURIComponent(query))
+                fetch('https://buwana.ecobricks.org/api/search_communities_by_id.php?query=' + encodeURIComponent(query))
                     .then(function(res) { return res.json(); })
                     .then(function(list) {
                         suggestionBox.innerHTML = '';
