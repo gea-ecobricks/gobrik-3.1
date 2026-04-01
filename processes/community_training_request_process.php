@@ -14,26 +14,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
-require_once '../vendor/autoload.php';
+// require_once '../vendor/autoload.php';
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\PHPMailer;
 
 $buwana_id = (int)$_SESSION['buwana_id'];
 
 // Read and sanitize POST data
 $source_training_id = isset($_POST['source_training_id']) ? intval($_POST['source_training_id']) : 0;
-$proposed_date      = trim($_POST['proposed_date']      ?? '');
-$time_txt           = trim($_POST['time_txt']           ?? '');
-$proposed_language  = preg_replace('/[^a-z]/', '', strtolower(trim($_POST['proposed_language'] ?? 'en')));
-$proposed_location  = trim($_POST['proposed_location']  ?? '');
+$proposed_date      = trim($_POST['proposed_date'] ?? '');
+$time_txt           = trim($_POST['time_txt'] ?? '');
+$proposed_language  = isset($_POST['proposed_language']) ? intval($_POST['proposed_language']) : 0;
+$proposed_location  = trim($_POST['proposed_location'] ?? '');
 $community_id       = isset($_POST['community_id']) && $_POST['community_id'] !== '' ? intval($_POST['community_id']) : null;
-$community_name     = trim($_POST['community_search']   ?? '');
+$community_name     = trim($_POST['community_search'] ?? '');
 
-if ($source_training_id <= 0 || empty($proposed_date) || empty($proposed_location)) {
+if ($source_training_id <= 0 || empty($proposed_date) || empty($proposed_location) || $proposed_language <= 0) {
     header("Location: /en/community-3p.php?id=$source_training_id&error=missing_fields");
     exit();
 }
@@ -237,12 +233,13 @@ if ($requester_ecobricker_id) {
 }
 
 // ---------------------------------------------------------------
-// Send notification emails
+// Email sending temporarily disabled while PHPMailer is not installed
 // ---------------------------------------------------------------
 
 $proposed_date_display = $proposed_dt ? $proposed_dt->format('F j, Y \a\t g:i A') : $proposed_date;
 $funding_display = 'IDR ' . number_format($new_goal);
 
+/*
 function sendCommunityRequestEmail(string $to, string $subject, string $htmlBody, string $cc = ''): bool {
     $host   = (string)getenv('SMTP_HOST');
     $port   = (int)getenv('SMTP_PORT');
@@ -286,6 +283,7 @@ function sendCommunityRequestEmail(string $to, string $subject, string $htmlBody
         return false;
     }
 }
+*/
 
 $requester_display_name = $requester_name ?: $requester_email;
 
@@ -299,7 +297,7 @@ $trainer_email_body = '
     <tr><td style="padding:8px 12px;background:#f5f5f5;font-weight:600;width:40%;">Requested by</td><td style="padding:8px 12px;">' . htmlspecialchars($requester_display_name, ENT_QUOTES, 'UTF-8') . ' &lt;' . htmlspecialchars($requester_email, ENT_QUOTES, 'UTF-8') . '&gt;</td></tr>
     <tr><td style="padding:8px 12px;background:#f0f0f0;font-weight:600;">Proposed Date</td><td style="padding:8px 12px;">' . htmlspecialchars($proposed_date_display, ENT_QUOTES, 'UTF-8') . '</td></tr>
     <tr><td style="padding:8px 12px;background:#f5f5f5;font-weight:600;">Time Zones</td><td style="padding:8px 12px;">' . htmlspecialchars($time_txt ?: '(not specified)', ENT_QUOTES, 'UTF-8') . '</td></tr>
-    <tr><td style="padding:8px 12px;background:#f0f0f0;font-weight:600;">Language</td><td style="padding:8px 12px;">' . htmlspecialchars(strtoupper($proposed_language), ENT_QUOTES, 'UTF-8') . '</td></tr>
+    <tr><td style="padding:8px 12px;background:#f0f0f0;font-weight:600;">Language</td><td style="padding:8px 12px;">' . htmlspecialchars((string)$proposed_language, ENT_QUOTES, 'UTF-8') . '</td></tr>
     <tr><td style="padding:8px 12px;background:#f5f5f5;font-weight:600;">Location</td><td style="padding:8px 12px;">' . htmlspecialchars($proposed_location, ENT_QUOTES, 'UTF-8') . '</td></tr>
     <tr><td style="padding:8px 12px;background:#f0f0f0;font-weight:600;">Community</td><td style="padding:8px 12px;">' . htmlspecialchars($resolved_community_name ?: '(not specified)', ENT_QUOTES, 'UTF-8') . '</td></tr>
     <tr><td style="padding:8px 12px;background:#f5f5f5;font-weight:600;">Full Course Amount</td><td style="padding:8px 12px;">' . htmlspecialchars($funding_display, ENT_QUOTES, 'UTF-8') . '</td></tr>
@@ -310,14 +308,14 @@ $trainer_email_body = '
 </body></html>
 ';
 
-if (!empty($trainer_contact_email)) {
-    sendCommunityRequestEmail(
-        $trainer_contact_email,
-        'New Community Training Request: ' . $new_title,
-        $trainer_email_body,
-        $requester_email
-    );
-}
+// if (!empty($trainer_contact_email)) {
+//     sendCommunityRequestEmail(
+//         $trainer_contact_email,
+//         'New Community Training Request: ' . $new_title,
+//         $trainer_email_body,
+//         $requester_email
+//     );
+// }
 
 // Confirmation email to requester
 $requester_email_body = '
@@ -336,13 +334,13 @@ $requester_email_body = '
 </body></html>
 ';
 
-if (!empty($requester_email)) {
-    sendCommunityRequestEmail(
-        $requester_email,
-        'Your Community Training Request: ' . $new_title,
-        $requester_email_body
-    );
-}
+// if (!empty($requester_email)) {
+//     sendCommunityRequestEmail(
+//         $requester_email,
+//         'Your Community Training Request: ' . $new_title,
+//         $requester_email_body
+//     );
+// }
 
 $gobrik_conn->close();
 
