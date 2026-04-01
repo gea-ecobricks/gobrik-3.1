@@ -352,6 +352,10 @@ echo '<!DOCTYPE html>
                         <button id="rsvp-register-button-desktop" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                             <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                         </button>
+                        <?php if ($payment_mode === 'pledge_threshold' && !$is_registered): ?>
+                            <a href="community-3p.php?id=<?php echo (int)$training_id; ?>" class="register-community-btn">Register my Community</a>
+                            <p class="register-community-note">Have a whole community that wants to do this training? Register your own event.</p>
+                        <?php endif; ?>
                     </div>
 
                     <div class="profile-images">
@@ -380,6 +384,10 @@ echo '<!DOCTYPE html>
                 <button id="rsvp-register-button-mobile" class="register-main-button <?php echo $is_registered ? '' : 'enabled'; ?>">
                     <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
                 </button>
+                <?php if ($payment_mode === 'pledge_threshold' && !$is_registered): ?>
+                    <a href="community-3p.php?id=<?php echo (int)$training_id; ?>" class="register-community-btn" style="margin-top:8px;">Register my Community</a>
+                    <p class="register-community-note">Have a whole community that wants to do this training? Register your own event.</p>
+                <?php endif; ?>
             </div>
 
             <p class="register-featured-description"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
@@ -416,6 +424,10 @@ echo '<!DOCTYPE html>
         <button id="rsvp-bottom-button" class="confirm-button register-bottom-button <?php echo $is_registered ? '' : 'enabled'; ?>">
             <?php echo $is_registered ? "✅ You're already registered" : ($is_logged_in ? $earthling_emoji . " Register" : "🔑 Register"); ?>
         </button>
+        <?php if ($payment_mode === 'pledge_threshold' && !$is_registered): ?>
+            <a href="community-3p.php?id=<?php echo (int)$training_id; ?>" class="register-community-btn" style="margin-top:10px;margin-bottom:16px;">Register my Community</a>
+            <p class="register-community-note" style="margin-bottom:60px;">Have a whole community that wants to do this training? Register your own event.</p>
+        <?php endif; ?>
 
     </div>
 </div>

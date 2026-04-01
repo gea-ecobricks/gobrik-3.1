@@ -702,6 +702,112 @@ This decision belongs in GoBrik backend logic, not in the UI alone.
 
 ---
 
+---
+
+## Community Registration — Whole-Group Booking
+
+### Overview
+
+Community Registration is an extension of the 3P system that allows an individual to book an entire training for their community by committing to the full course funding amount and minimum participant count. Rather than pledging a personal portion, the community organiser commits to the entire course — making the course viable in a single step.
+
+This model serves a different persona than the standard 3P pledge flow: the community leader or organisation coordinator who wants to bring a training to their specific group, on a date and in a language that suits them.
+
+### New `threshold_status` value: `open_request`
+
+A community training request creates a **new training record** that is a copy of an existing published course, with:
+- A proposed new date, language, location, timezone description, and community association set by the requester
+- `threshold_status = 'open_request'` — a new status value that flags the record as a community booking request awaiting trainer confirmation
+- `ready_to_show = 0` — the course is not yet publicly visible
+- `training_logged` set to the current datetime
+- All pricing fields (`funding_goal_idr`, `min_participants_required`, `default_price_idr`) inherited from the source training
+
+The original training is not modified.
+
+### User Flow
+
+#### 1. Discovery: Register my Community
+
+On any `pledge_threshold` course registration page (`register.php`), below the primary Register button, a grey **"Register my Community"** button appears. Below it, small text reads: *"Have a whole community that wants to do this training? Register your own event."*
+
+#### 2. Community-3p form (`community-3p.php`)
+
+The requester is taken to a form page showing:
+- The source training's title, subtitle, type, and lead trainer (read-only)
+- A **Commitment Summary** card displaying:
+  - Full course amount (`funding_goal_idr`) with a live currency converter
+  - Minimum participant count
+- A form to propose:
+  - New training date and time
+  - Time in key timezones (text)
+  - Training language (select from all languages)
+  - Training location
+  - Community (autocomplete against the Buwana community search API)
+
+Submitting the form POSTs to `processes/community_training_request_process.php`.
+
+#### 3. Processing (`processes/community_training_request_process.php`)
+
+The process file:
+1. Validates session and POST data
+2. Fetches the source training
+3. Inserts a new `tb_trainings` record with `threshold_status = 'open_request'` and all inherited + proposed fields
+4. Copies all trainers from `tb_training_trainers` to the new training record
+5. Inserts the requester into `training_registrations_tb` with `status = 'reserved'`
+6. Sends a notification email to `trainer_contact_email` (CC: requester) with a full breakdown
+7. Sends a confirmation email to the requester acknowledging the request
+8. Redirects to `community-3p.php?id=SOURCE_ID&requested=1&new_id=NEW_ID`
+
+#### 4. Trainer review: Dashboard "My Trainings v2"
+
+The new training appears in the trainer's **My Trainings v2** panel on their dashboard with an orange **"🏘 Community Request"** status pill. Clicking the pill opens a modal that:
+- Displays training details (proposed date, language, location, community)
+- Shows who made the request (name + email)
+- Shows the full course amount and minimum participants
+- Provides a pre-filled reply email text area (polite confirmation template)
+- Includes a **slide toggle** to confirm the course is going ahead
+
+**API: `api/fetch_community_request.php`** — fetches training + requester details for the modal.
+
+**API: `api/confirm_community_training.php`** — processes the trainer's response:
+- If **toggle is ON (confirmed)**:
+  - Updates training: `threshold_status = 'reached'`, `course_confirmed_at = NOW()`, `ready_to_show = 1`
+  - Creates a `training_pledges_tb` record for the requester with `pledged_amount_idr = funding_goal_idr` and `pledge_status = 'invited'`
+  - Updates the registration to `status = 'awaiting_payment'`
+  - Sends a confirmation email to the requester that includes a **"Complete Community Course Payment →"** button linking to `community-pledge-pay.php?id=NEW_TRAINING_ID`
+- If **toggle is OFF**: sends a generic update/reply email
+- Either way, a reply email is sent to the requester
+
+#### 5. Community payment (`community-pledge-pay.php`)
+
+The requester follows the payment link to `community-pledge-pay.php`, a page based on `pledge-pay.php` that:
+- Shows the training details under a "Your Community Commitment" card displaying the full course amount
+- Uses the same 3P progress graph
+- Routes to `create_midtrans_payment.php` (IDR) or `create_stripe_payment.php` (non-IDR) via the existing payment gateway APIs
+
+### Key Files
+
+| File | Purpose |
+|---|---|
+| `/en/community-3p.php` | Community booking form page |
+| `/includes/community-3p-inc.php` | CSS + header include for community-3p |
+| `/meta/community-3p-{lang}.php` | SEO/OG meta tags (en, id, es, fr) |
+| `/processes/community_training_request_process.php` | POST handler: clone training, copy trainers, send emails |
+| `/api/fetch_community_request.php` | GET: training + requester details for trainer modal |
+| `/api/confirm_community_training.php` | POST: trainer confirms or replies to community request |
+| `/en/community-pledge-pay.php` | Community payment page (full course amount) |
+| `/includes/community-pledge-pay-inc.php` | CSS + header include for community payment page |
+| `/meta/community-pledge-pay-{lang}.php` | SEO/OG meta tags for payment page (en, id, es, fr) |
+
+### No New Database Fields Required
+
+The community registration flow uses only existing `tb_trainings` fields:
+- `threshold_status = 'open_request'` — new value for an existing VARCHAR field
+- All other fields already exist in the schema
+
+The `training_registrations_tb` table tracks the requester via `status = 'reserved'`, and `training_pledges_tb` records the community pledge when the trainer confirms.
+
+---
+
 ##  Making it happen!
 
 While this may sound like a big undertaking, in fact, the current GoBrik payment schema is already well-positioned to support the **actual payment processing** side of this feature, especially because it separates payment headers, line items, webhook events, and accounting linkage. The major missing layer is the **pledge-and-threshold logic**, which should be modeled explicitly rather than forcing it into the payment tables too early.

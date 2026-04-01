@@ -161,6 +161,44 @@ $photo_values  = [];
 $photo_types   = '';
 $photo_error   = '';
 
+// Fetch existing photo DB values so we can read and increment their ?v= numbers
+$existing_photos = [];
+$stmt_photos = $gobrik_conn->prepare(
+    "SELECT photo1_main, photo1_tmb, photo2_main, photo2_tmb,
+            photo3_main, photo3_tmb, photo4_main, photo4_tmb,
+            photo5_main, photo5_tmb, photo6_main, photo6_tmb
+     FROM tb_projects WHERE project_id = ?"
+);
+if ($stmt_photos) {
+    $stmt_photos->bind_param('i', $project_id);
+    $stmt_photos->execute();
+    $stmt_photos->bind_result(
+        $ep1m, $ep1t, $ep2m, $ep2t,
+        $ep3m, $ep3t, $ep4m, $ep4t,
+        $ep5m, $ep5t, $ep6m, $ep6t
+    );
+    $stmt_photos->fetch();
+    $stmt_photos->close();
+    $existing_photos = [
+        1 => ['main' => $ep1m, 'tmb' => $ep1t],
+        2 => ['main' => $ep2m, 'tmb' => $ep2t],
+        3 => ['main' => $ep3m, 'tmb' => $ep3t],
+        4 => ['main' => $ep4m, 'tmb' => $ep4t],
+        5 => ['main' => $ep5m, 'tmb' => $ep5t],
+        6 => ['main' => $ep6m, 'tmb' => $ep6t],
+    ];
+}
+
+// Returns the next cache-bust version for a DB-stored path.
+// e.g. "../projects/photos/project-5-1.webp"     → 2
+//      "../projects/photos/project-5-1.webp?v=3"  → 4
+function nextPhotoVersion(string $existing_db_path): int {
+    if (preg_match('/\?v=(\d+)$/', $existing_db_path, $m)) {
+        return (int)$m[1] + 1;
+    }
+    return 2; // first edit of an unversioned original
+}
+
 for ($i = 1; $i <= 6; $i++) {
     $input_name = "photo{$i}_main";
     if (!isset($_FILES[$input_name]) || $_FILES[$input_name]['error'] !== UPLOAD_ERR_OK) {
@@ -173,8 +211,14 @@ for ($i = 1; $i <= 6; $i++) {
 
     if (resizeAndConvertToWebP($_FILES[$input_name]['tmp_name'], $target_path, 1000, 88)) {
         createThumbnail($target_path, $tmb_path, 250, 250, 77);
+
+        // Increment version based on whatever is currently stored in the DB
+        $v           = nextPhotoVersion($existing_photos[$i]['main'] ?? '');
+        $main_db_val = $target_path . '?v=' . $v;
+        $tmb_db_val  = $tmb_path   . '?v=' . $v;
+
         array_push($photo_fields, "photo{$i}_main", "photo{$i}_tmb");
-        array_push($photo_values, $target_path, $tmb_path);
+        array_push($photo_values, $main_db_val, $tmb_db_val);
         $photo_types .= 'ss';
     } else {
         $photo_error .= "Error processing photo {$i}. ";

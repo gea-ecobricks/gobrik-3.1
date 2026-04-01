@@ -708,6 +708,91 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
     .training-v2-status-pill.status-cancelled {
         background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
     }
+    .training-v2-status-pill.status-open_request {
+        background: linear-gradient(135deg, #e65100 0%, #f57c00 100%);
+        cursor: pointer;
+        transition: filter 0.15s ease, transform 0.15s ease;
+    }
+    .training-v2-status-pill.status-open_request:hover {
+        filter: brightness(0.90);
+        transform: translateY(-1px);
+    }
+
+    /* Community Request Modal */
+    .community-request-modal-body {
+        padding: 4px 0;
+        font-size: 0.97em;
+    }
+    .community-request-detail-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .community-request-detail-label {
+        font-weight: 600;
+        min-width: 120px;
+        opacity: 0.72;
+        font-size: 0.88em;
+    }
+    .community-request-detail-value {
+        flex: 1;
+    }
+    .community-request-reply-area {
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 12px;
+        padding: 10px 13px;
+        border: 1px solid rgba(0,0,0,0.15);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.95em;
+        background: rgba(255,255,255,0.07);
+        color: inherit;
+        resize: vertical;
+        min-height: 100px;
+    }
+    .community-request-confirm-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 16px;
+        padding: 14px;
+        background: rgba(30,140,64,0.08);
+        border-radius: 10px;
+        border: 1px solid rgba(30,140,64,0.20);
+    }
+    .community-confirm-toggle {
+        position: relative;
+        display: inline-block;
+        width: 52px;
+        height: 28px;
+        flex-shrink: 0;
+    }
+    .community-confirm-toggle input { opacity: 0; width: 0; height: 0; }
+    .community-confirm-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #ccc;
+        border-radius: 28px;
+        transition: 0.3s;
+    }
+    .community-confirm-slider:before {
+        content: "";
+        position: absolute;
+        height: 20px; width: 20px;
+        left: 4px; bottom: 4px;
+        background: #fff;
+        border-radius: 50%;
+        transition: 0.3s;
+    }
+    .community-confirm-toggle input:checked + .community-confirm-slider {
+        background: #1e8c40;
+    }
+    .community-confirm-toggle input:checked + .community-confirm-slider:before {
+        transform: translateX(24px);
+    }
 
     /* ===== My Ecobricks — compact status pill (matches project-phase-pill size) ===== */
     .brik-row-pill {
@@ -976,9 +1061,10 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $t_type       = htmlspecialchars($t3p['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
                             $t_status_raw = strtolower($t3p['threshold_status'] ?? 'open');
                             $t_status_labels = [
-                                'open'      => 'Open',
-                                'reached'   => 'Threshold Reached',
-                                'cancelled' => 'Cancelled',
+                                'open'         => 'Open',
+                                'reached'      => 'Threshold Reached',
+                                'cancelled'    => 'Cancelled',
+                                'open_request' => '🏘 Community Request',
                             ];
                             $t_status_label  = $t_status_labels[$t_status_raw] ?? ucfirst($t_status_raw);
                             $pledge_count    = (int)($t3p['pledge_count'] ?? 0);
@@ -1018,9 +1104,17 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                         title="View pledgers">
                                     <?php echo $pledge_count; ?> 🤝
                                 </button>
-                                <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
-                                    <?php echo $t_status_label; ?>
-                                </span>
+                                <?php if ($t_status_raw === 'open_request'): ?>
+                                    <button class="training-v2-status-pill status-open_request"
+                                            onclick="openCommunityRequestModal(<?php echo $t_id; ?>)"
+                                            title="Review community training request">
+                                        <?php echo $t_status_label; ?>
+                                    </button>
+                                <?php else: ?>
+                                    <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <?php echo $t_status_label; ?>
+                                    </span>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -2470,6 +2564,119 @@ function openPledgersModal(trainingId, trainingTitle) {
 }
 window.openPledgersModal = openPledgersModal;
 
+function openCommunityRequestModal(trainingId) {
+    const modal    = document.getElementById('form-modal-message');
+    const modalBox = document.getElementById('modal-content-box');
+    modalBox.innerHTML = '';
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'modal-message';
+    modalBox.appendChild(messageContainer);
+
+    messageContainer.innerHTML = '<div style="text-align:center;padding:30px;"><span style="font-size:1.8em;">🌿</span><p>Loading request details…</p></div>';
+    modal.style.display = 'flex';
+    modal.classList.remove('modal-hidden');
+    document.body.classList.add('modal-open');
+
+    fetch(`../api/fetch_community_request.php?training_id=${encodeURIComponent(trainingId)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                messageContainer.innerHTML = `<p style="color:red;">Unable to load request: ${escapeHTML(data.error || 'Unknown error')}</p>`;
+                return;
+            }
+
+            const amountFmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(data.funding_goal_idr);
+
+            const defaultMsg = `Dear ${escapeHTML(data.requester_name)},\n\nThank you so much for your community training request for "${escapeHTML(data.training_title)}". We are delighted to hear that your community wants to participate!\n\nWe can confirm that we will be going ahead with your community training as requested, on ${escapeHTML(data.training_date)} at ${escapeHTML(data.location)}.\n\nPlease use the payment link that accompanies this email to complete the full course payment for your community. Once payment is confirmed, we will send you all the joining instructions and materials.\n\nWith warm regards,\nThe Training Team`;
+
+            messageContainer.innerHTML = `
+                <h2 style="margin:0 0 16px 0;">🏘 Community Training Request</h2>
+                <div class="community-request-modal-body">
+                    <div class="community-request-detail-row"><span class="community-request-detail-label">Training</span><span class="community-request-detail-value">${escapeHTML(data.training_title)}</span></div>
+                    <div class="community-request-detail-row"><span class="community-request-detail-label">Requested by</span><span class="community-request-detail-value">${escapeHTML(data.requester_name)} &lt;${escapeHTML(data.requester_email)}&gt;</span></div>
+                    <div class="community-request-detail-row"><span class="community-request-detail-label">Proposed Date</span><span class="community-request-detail-value">${escapeHTML(data.training_date)}</span></div>
+                    ${data.time_txt ? `<div class="community-request-detail-row"><span class="community-request-detail-label">Timezones</span><span class="community-request-detail-value">${escapeHTML(data.time_txt)}</span></div>` : ''}
+                    <div class="community-request-detail-row"><span class="community-request-detail-label">Language</span><span class="community-request-detail-value">${escapeHTML(data.language)}</span></div>
+                    <div class="community-request-detail-row"><span class="community-request-detail-label">Location</span><span class="community-request-detail-value">${escapeHTML(data.location)}</span></div>
+                    ${data.community_name ? `<div class="community-request-detail-row"><span class="community-request-detail-label">Community</span><span class="community-request-detail-value">${escapeHTML(data.community_name)}</span></div>` : ''}
+                    <div class="community-request-detail-row"><span class="community-request-detail-label">Full Amount</span><span class="community-request-detail-value"><strong>IDR ${amountFmt}</strong></span></div>
+                    <div class="community-request-detail-row"><span class="community-request-detail-label">Min. Participants</span><span class="community-request-detail-value">${data.min_participants}</span></div>
+                </div>
+
+                <hr style="margin:16px 0;opacity:0.15;">
+                <p style="font-size:0.93em;font-weight:600;margin:0 0 6px 0;">Reply Email to Requester</p>
+                <textarea id="community-reply-msg" class="community-request-reply-area" rows="8">${defaultMsg}</textarea>
+
+                <div class="community-request-confirm-row">
+                    <label class="community-confirm-toggle">
+                        <input type="checkbox" id="community-confirm-toggle-input">
+                        <span class="community-confirm-slider"></span>
+                    </label>
+                    <div>
+                        <strong>Confirm course is going ahead</strong>
+                        <div style="font-size:0.85em;opacity:0.72;margin-top:2px;">Enables payment link in email. Course status will update to Threshold Reached.</div>
+                    </div>
+                </div>
+
+                <div id="community-request-feedback" style="margin-top:10px;font-size:0.9em;"></div>
+
+                <div style="display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;">
+                    <button class="confirm-button enabled" onclick="submitCommunityRequestReply(${trainingId})" style="flex:1;min-width:160px;">
+                        Send Reply Email
+                    </button>
+                    <button class="page-button" onclick="closeInfoModal()" style="flex:0 0 auto;">Cancel</button>
+                </div>
+            `;
+        })
+        .catch(err => {
+            messageContainer.innerHTML = `<p style="color:red;">Error: ${escapeHTML(err.message)}</p>`;
+        });
+}
+window.openCommunityRequestModal = openCommunityRequestModal;
+
+function submitCommunityRequestReply(trainingId) {
+    const replyMsg  = document.getElementById('community-reply-msg');
+    const confirmToggle = document.getElementById('community-confirm-toggle-input');
+    const feedback  = document.getElementById('community-request-feedback');
+    const confirm   = confirmToggle && confirmToggle.checked ? '1' : '0';
+    const message   = replyMsg ? replyMsg.value.trim() : '';
+    const sendBtn   = document.querySelector('#community-request-feedback')?.closest('.modal-message')?.querySelector('.confirm-button');
+
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Sending…'; }
+    if (feedback) { feedback.textContent = ''; feedback.style.color = ''; }
+
+    const formData = new FormData();
+    formData.append('training_id', trainingId);
+    formData.append('reply_message', message);
+    formData.append('confirm', confirm);
+
+    fetch('../api/confirm_community_training.php', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                if (feedback) {
+                    feedback.textContent = data.confirmed
+                        ? '✅ Course confirmed and payment link email sent to requester!'
+                        : '✅ Reply email sent to requester.';
+                    feedback.style.color = '#1e8c40';
+                }
+                if (sendBtn) { sendBtn.textContent = 'Sent!'; }
+                setTimeout(() => { closeInfoModal(); location.reload(); }, 2200);
+            } else {
+                if (feedback) {
+                    feedback.textContent = '❌ Error: ' + (data.error || 'Unknown error');
+                    feedback.style.color = '#c00';
+                }
+                if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send Reply Email'; }
+            }
+        })
+        .catch(err => {
+            if (feedback) { feedback.textContent = '❌ Network error: ' + err.message; feedback.style.color = '#c00'; }
+            if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send Reply Email'; }
+        });
+}
+window.submitCommunityRequestReply = submitCommunityRequestReply;
+
 function openProjectActionsModal(projectId, projectName) {
     const modal = document.getElementById('form-modal-message');
     const modalBox = document.getElementById('modal-content-box');
@@ -2480,7 +2687,8 @@ function openProjectActionsModal(projectId, projectName) {
 
     let content = '';
     content += `<a class="ecobrick-action-button" href="project.php?id=${projectId}" target="_blank">🔍 View Project</a>`;
-    content += `<a class="ecobrick-action-button" href="add-project.php?id=${projectId}">✏️ Edit Project</a>`;
+    content += `<a class="ecobrick-action-button" href="edit-project.php?id=${projectId}">✏️ Edit Project</a>`;
+    content += `<a class="ecobrick-action-button" href="add-project.php">➕ Add Project</a>`;
     content += `<a class="ecobrick-action-button" href="javascript:void(0);" onclick="copyProjectURL(${projectId}, this)">🔗 Share Project</a>`;
     content += `<a class="ecobrick-action-button deleter-button" href="javascript:void(0);" onclick="deleteProject(${projectId})">❌ Delete Project</a>`;
 

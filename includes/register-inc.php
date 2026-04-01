@@ -162,6 +162,35 @@
     cursor: pointer;
 }
 
+.register-community-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: 600;
+    background: #888 !important;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+.register-community-btn:hover {
+    background: #666 !important;
+    color: #fff;
+    text-decoration: none;
+}
+.register-community-note {
+    font-size: 0.82em;
+    opacity: 0.65;
+    margin: 4px 0 0 0;
+    line-height: 1.4;
+    text-align: center;
+}
+
 .register-bottom-button {
     margin-top: 20px;
     margin-bottom: 75px;
