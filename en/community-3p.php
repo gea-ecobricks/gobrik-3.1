@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const query = communityInput.value.trim();
             communityIdInput.value = '';
             if (query.length >= 3) {
-                fetch('https://buwana.ecobricks.org/api/search_communities_by_id.php?query=' + encodeURIComponent(query))
+                fetch('../api/search_communities.php?query=' + encodeURIComponent(query))
                     .then(function(res) { return res.json(); })
                     .then(function(list) {
                         suggestionBox.innerHTML = '';
