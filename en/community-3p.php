@@ -167,6 +167,7 @@ echo '<!DOCTYPE html>
                         <img src="<?php echo $feature_photo1_main; ?>" class="community-3p-lead-photo" alt="<?php echo $training_title; ?>">
                     <?php endif; ?>
                     <div class="community-3p-training-info">
+                        <h2>Community Training Registration</h2>
                         <h3><?php echo $training_title; ?></h3>
                         <?php if (!empty($training_subtitle)): ?>
                             <p><?php echo $training_subtitle; ?></p>

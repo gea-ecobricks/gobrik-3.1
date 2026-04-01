@@ -743,9 +743,9 @@ The requester is taken to a form page showing:
   - Training location
   - Community (autocomplete against the Buwana community search API)
 
-Submitting the form POSTs to `processes/community_training_request_process.php`.
+Submitting the form POSTs to `processes/community_training_request.php`.
 
-#### 3. Processing (`processes/community_training_request_process.php`)
+#### 3. Processing (`processes/community_training_request.php`)
 
 The process file:
 1. Validates session and POST data
@@ -791,7 +791,7 @@ The requester follows the payment link to `community-pledge-pay.php`, a page bas
 | `/en/community-3p.php` | Community booking form page |
 | `/includes/community-3p-inc.php` | CSS + header include for community-3p |
 | `/meta/community-3p-{lang}.php` | SEO/OG meta tags (en, id, es, fr) |
-| `/processes/community_training_request_process.php` | POST handler: clone training, copy trainers, send emails |
+| `/processes/community_training_request.php` | POST handler: clone training, copy trainers, send emails |
 | `/api/fetch_community_request.php` | GET: training + requester details for trainer modal |
 | `/api/confirm_community_training.php` | POST: trainer confirms or replies to community request |
 | `/en/community-pledge-pay.php` | Community payment page (full course amount) |
