@@ -27,7 +27,7 @@ $buwana_id = (int)$_SESSION['buwana_id'];
 $source_training_id = isset($_POST['source_training_id']) ? intval($_POST['source_training_id']) : 0;
 $proposed_date      = trim($_POST['proposed_date'] ?? '');
 $time_txt           = trim($_POST['time_txt'] ?? '');
-$proposed_language  = isset($_POST['proposed_language']) ? intval($_POST['proposed_language']) : 0;
+$proposed_language  = trim($_POST['proposed_language'] ?? '');
 $proposed_location  = trim($_POST['proposed_location'] ?? '');
 
 /**
@@ -41,7 +41,7 @@ $community_name     = trim($_POST['community_search'] ?? '');
  * Required fields
  * Note: community is intentionally omitted for now.
  */
-if ($source_training_id <= 0 || empty($proposed_date) || empty($proposed_location) || $proposed_language <= 0) {
+if ($source_training_id <= 0 || empty($proposed_date) || empty($proposed_location) || empty($proposed_language)) {
     header("Location: /en/community-3p.php?id=$source_training_id&error=missing_fields");
     exit();
 }
