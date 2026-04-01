@@ -393,6 +393,7 @@ echo '<!DOCTYPE html>
                         <p class="register-community-note">Have a whole community that wants to do this training? Register your own event.</p>-->
                     <?php endif; ?>
                 </div>
+            </div>
 
             <p class="register-featured-description"><?php echo nl2br(htmlspecialchars_decode($featured_description, ENT_QUOTES)); ?></p>
             <p class="register-agenda"><?php echo nl2br($training_agenda); ?></p>
