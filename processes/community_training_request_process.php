@@ -14,30 +14,48 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once '../gobrikconn_env.php';
 require_once '../buwanaconn_env.php';
-// require_once '../vendor/autoload.php';
+require_once '../vendor/autoload.php';
 
-// use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 $buwana_id = (int)$_SESSION['buwana_id'];
 
-// Read and sanitize POST data
+/**
+ * Read and sanitize POST data
+ */
 $source_training_id = isset($_POST['source_training_id']) ? intval($_POST['source_training_id']) : 0;
 $proposed_date      = trim($_POST['proposed_date'] ?? '');
 $time_txt           = trim($_POST['time_txt'] ?? '');
 $proposed_language  = isset($_POST['proposed_language']) ? intval($_POST['proposed_language']) : 0;
 $proposed_location  = trim($_POST['proposed_location'] ?? '');
-$community_id       = isset($_POST['community_id']) && $_POST['community_id'] !== '' ? intval($_POST['community_id']) : null;
+
+/**
+ * Community is TEMPORARILY NOT REQUIRED.
+ * If no community is selected, we allow null community_id and/or blank community_name.
+ */
+$community_id       = (isset($_POST['community_id']) && $_POST['community_id'] !== '') ? intval($_POST['community_id']) : null;
 $community_name     = trim($_POST['community_search'] ?? '');
 
+/**
+ * Required fields
+ * Note: community is intentionally omitted for now.
+ */
 if ($source_training_id <= 0 || empty($proposed_date) || empty($proposed_location) || $proposed_language <= 0) {
     header("Location: /en/community-3p.php?id=$source_training_id&error=missing_fields");
     exit();
 }
 
-// Validate and parse date
+/**
+ * Validate and parse date
+ */
 $proposed_dt = DateTime::createFromFormat('Y-m-d\TH:i', $proposed_date);
 if (!$proposed_dt) {
-    $proposed_dt = new DateTime($proposed_date);
+    try {
+        $proposed_dt = new DateTime($proposed_date);
+    } catch (Throwable $e) {
+        $proposed_dt = false;
+    }
 }
 $proposed_date_sql = $proposed_dt ? $proposed_dt->format('Y-m-d H:i:s') : null;
 
@@ -46,33 +64,53 @@ if (!$proposed_date_sql) {
     exit();
 }
 
-// Fetch the requester's GoBrik details
+/**
+ * Fetch the requester's GoBrik details
+ */
 $requester_ecobricker_id = null;
 $requester_email = '';
 $requester_name = '';
+
 $stmt_req = $gobrik_conn->prepare("SELECT ecobricker_id, email_addr, full_name FROM tb_ecobrickers WHERE buwana_id = ?");
+if (!$stmt_req) {
+    error_log('community_training_request_process: requester prepare failed: ' . $gobrik_conn->error);
+    header("Location: /en/community-3p.php?id=$source_training_id&error=db");
+    exit();
+}
 $stmt_req->bind_param("i", $buwana_id);
 $stmt_req->execute();
 $stmt_req->bind_result($requester_ecobricker_id, $requester_email, $requester_name);
 $stmt_req->fetch();
 $stmt_req->close();
 
-// Fetch source training
+/**
+ * Fetch source training
+ */
 $sql_src = "SELECT * FROM tb_trainings WHERE training_id = ? AND ready_to_show = 1 AND payment_mode = 'pledge_threshold'";
 $stmt_src = $gobrik_conn->prepare($sql_src);
+if (!$stmt_src) {
+    error_log('community_training_request_process: source training prepare failed: ' . $gobrik_conn->error);
+    header("Location: /en/community-3p.php?id=$source_training_id&error=db");
+    exit();
+}
 $stmt_src->bind_param("i", $source_training_id);
 $stmt_src->execute();
 $result_src = $stmt_src->get_result();
+
 if ($result_src->num_rows === 0) {
+    $stmt_src->close();
     header("Location: /en/community-3p.php?id=$source_training_id&error=not_found");
     exit();
 }
+
 $src = $result_src->fetch_assoc();
 $stmt_src->close();
 
 $trainer_contact_email = $src['trainer_contact_email'] ?? '';
 
-// Look up community name from Buwana if ID provided
+/**
+ * Look up community name from Buwana if ID provided
+ */
 $resolved_community_name = $community_name;
 if ($community_id) {
     $stmt_com = $buwana_conn->prepare("SELECT com_name FROM communities_tb WHERE community_id = ?");
@@ -87,7 +125,9 @@ if ($community_id) {
     }
 }
 
-// Insert the new community training request
+/**
+ * Insert the new community training request
+ */
 $now = date('Y-m-d H:i:s');
 
 $insert_sql = "INSERT INTO tb_trainings (
@@ -119,36 +159,36 @@ if (!$stmt_ins) {
     exit();
 }
 
-$new_title     = $src['training_title'];
-$new_subtitle  = $src['training_subtitle'];
-$new_type      = $src['training_type'] ?? '';
-$new_trainer   = $src['lead_trainer'] ?? '';
-$new_desc      = $src['featured_description'] ?? '';
-$new_agenda    = $src['training_agenda'] ?? '';
-$new_pay_mode  = 'pledge_threshold';
-$new_cur       = $src['base_currency'] ?? 'IDR';
-$new_price     = intval($src['default_price_idr'] ?? 0);
-$new_goal      = intval($src['funding_goal_idr'] ?? 0);
-$new_min_part  = intval($src['min_participants_required'] ?? 0);
-$new_status    = 'open_request';
-$new_no_part   = intval($src['no_participants'] ?? $new_min_part);
+$new_title         = $src['training_title'];
+$new_subtitle      = $src['training_subtitle'];
+$new_type          = $src['training_type'] ?? '';
+$new_trainer       = $src['lead_trainer'] ?? '';
+$new_desc          = $src['featured_description'] ?? '';
+$new_agenda        = $src['training_agenda'] ?? '';
+$new_pay_mode      = 'pledge_threshold';
+$new_cur           = $src['base_currency'] ?? 'IDR';
+$new_price         = intval($src['default_price_idr'] ?? 0);
+$new_goal          = intval($src['funding_goal_idr'] ?? 0);
+$new_min_part      = intval($src['min_participants_required'] ?? 0);
+$new_status        = 'open_request';
+$new_no_part       = intval($src['no_participants'] ?? $new_min_part);
 $new_trainer_email = $trainer_contact_email;
-$new_scope     = $src['registration_scope'] ?? 'anyone';
-$f1m = $src['feature_photo1_main'] ?? '';
-$f1t = $src['feature_photo1_tmb'] ?? '';
-$f2m = $src['feature_photo2_main'] ?? '';
-$f2t = $src['feature_photo2_tmb'] ?? '';
-$f3m = $src['feature_photo3_main'] ?? '';
-$f3t = $src['feature_photo3_tmb'] ?? '';
-$p0m = $src['training_photo0_main'] ?? '';
-$p0t = $src['training_photo0_tmb'] ?? '';
-$show_signup   = 0;
-$show_report   = 0;
-$allow_over    = 1;
-$auto_confirm  = 1;
-$min_pledge    = intval($src['min_pledge_idr'] ?? 0);
-$src_country   = $src['country_id'] ? intval($src['country_id']) : null;
-$ready = 0;
+$new_scope         = $src['registration_scope'] ?? 'anyone';
+$f1m               = $src['feature_photo1_main'] ?? '';
+$f1t               = $src['feature_photo1_tmb'] ?? '';
+$f2m               = $src['feature_photo2_main'] ?? '';
+$f2t               = $src['feature_photo2_tmb'] ?? '';
+$f3m               = $src['feature_photo3_main'] ?? '';
+$f3t               = $src['feature_photo3_tmb'] ?? '';
+$p0m               = $src['training_photo0_main'] ?? '';
+$p0t               = $src['training_photo0_tmb'] ?? '';
+$show_signup       = 0;
+$show_report       = 0;
+$allow_over        = 1;
+$auto_confirm      = 1;
+$min_pledge        = intval($src['min_pledge_idr'] ?? 0);
+$src_country       = $src['country_id'] ? intval($src['country_id']) : null;
+$ready             = 0;
 
 $stmt_ins->bind_param(
     "sssssssssissssiiisisiisssssssssiiiii",
@@ -175,10 +215,14 @@ $stmt_ins->bind_param(
     $community_id,
     $src_country,
     $new_scope,
-    $f1m, $f1t,
-    $f2m, $f2t,
-    $f3m, $f3t,
-    $p0m, $p0t,
+    $f1m,
+    $f1t,
+    $f2m,
+    $f2t,
+    $f3m,
+    $f3t,
+    $p0m,
+    $p0t,
     $show_signup,
     $show_report,
     $allow_over,
@@ -192,16 +236,20 @@ if (!$stmt_ins->execute()) {
     header("Location: /en/community-3p.php?id=$source_training_id&error=db");
     exit();
 }
+
 $new_training_id = $gobrik_conn->insert_id;
 $stmt_ins->close();
 
-// Copy trainers from source training to new training
+/**
+ * Copy trainers from source training to new training
+ */
 $stmt_tr_fetch = $gobrik_conn->prepare("SELECT ecobricker_id FROM tb_training_trainers WHERE training_id = ?");
 if ($stmt_tr_fetch) {
     $stmt_tr_fetch->bind_param("i", $source_training_id);
     $stmt_tr_fetch->execute();
     $result_tr = $stmt_tr_fetch->get_result();
     $trainer_ids = [];
+
     while ($tr_row = $result_tr->fetch_assoc()) {
         $trainer_ids[] = intval($tr_row['ecobricker_id']);
     }
@@ -219,7 +267,9 @@ if ($stmt_tr_fetch) {
     }
 }
 
-// Register the requester in training_registrations_tb (status='reserved')
+/**
+ * Register the requester in training_registrations_tb (status='reserved')
+ */
 if ($requester_ecobricker_id) {
     $stmt_reg = $gobrik_conn->prepare(
         "INSERT IGNORE INTO training_registrations_tb (training_id, buwana_id, status)
@@ -232,14 +282,12 @@ if ($requester_ecobricker_id) {
     }
 }
 
-// ---------------------------------------------------------------
-// Email sending temporarily disabled while PHPMailer is not installed
-// ---------------------------------------------------------------
-
 $proposed_date_display = $proposed_dt ? $proposed_dt->format('F j, Y \a\t g:i A') : $proposed_date;
 $funding_display = 'IDR ' . number_format($new_goal);
 
-/*
+/**
+ * Send email using PHPMailer + SMTP env vars
+ */
 function sendCommunityRequestEmail(string $to, string $subject, string $htmlBody, string $cc = ''): bool {
     $host   = (string)getenv('SMTP_HOST');
     $port   = (int)getenv('SMTP_PORT');
@@ -253,6 +301,7 @@ function sendCommunityRequestEmail(string $to, string $subject, string $htmlBody
     }
 
     $mail = new PHPMailer(true);
+
     try {
         $mail->isSMTP();
         $mail->Host = $host;
@@ -260,34 +309,42 @@ function sendCommunityRequestEmail(string $to, string $subject, string $htmlBody
         $mail->Username = $user;
         $mail->Password = $pass;
         $mail->Port = $port;
+
         if ($secure === 'ssl') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         } elseif ($secure === 'tls') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         }
+
         $mail->SMTPAutoTLS = true;
+        $mail->CharSet = 'UTF-8';
+
         $mail->setFrom($user, 'GoBrik Training');
         $mail->addAddress($to);
+
         if ($cc !== '') {
             $mail->addCC($cc);
         }
+
         $mail->addReplyTo($user, 'GoBrik Training');
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body = $htmlBody;
-        $mail->AltBody = strip_tags($htmlBody);
+        $mail->AltBody = trim(strip_tags(str_replace(['<br>', '<br/>', '<br />', '</p>'], ["\n", "\n", "\n", "\n\n"], $htmlBody)));
+
         $mail->send();
         return true;
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         error_log('[community_training_request] PHPMailer error: ' . $e->getMessage());
         return false;
     }
 }
-*/
 
 $requester_display_name = $requester_name ?: $requester_email;
 
-// Email to trainer (cc: requester)
+/**
+ * Email to trainer (cc: requester)
+ */
 $trainer_email_body = '
 <!DOCTYPE html><html><body style="font-family:sans-serif;color:#222;max-width:600px;margin:auto;">
 <h2 style="color:#1e8c40;">New Community Training Request</h2>
@@ -308,16 +365,18 @@ $trainer_email_body = '
 </body></html>
 ';
 
-// if (!empty($trainer_contact_email)) {
-//     sendCommunityRequestEmail(
-//         $trainer_contact_email,
-//         'New Community Training Request: ' . $new_title,
-//         $trainer_email_body,
-//         $requester_email
-//     );
-// }
+if (!empty($trainer_contact_email)) {
+    sendCommunityRequestEmail(
+        $trainer_contact_email,
+        'New Community Training Request: ' . $new_title,
+        $trainer_email_body,
+        $requester_email
+    );
+}
 
-// Confirmation email to requester
+/**
+ * Confirmation email to requester
+ */
 $requester_email_body = '
 <!DOCTYPE html><html><body style="font-family:sans-serif;color:#222;max-width:600px;margin:auto;">
 <h2 style="color:#1e8c40;">Your Community Training Request Has Been Submitted</h2>
@@ -334,16 +393,18 @@ $requester_email_body = '
 </body></html>
 ';
 
-// if (!empty($requester_email)) {
-//     sendCommunityRequestEmail(
-//         $requester_email,
-//         'Your Community Training Request: ' . $new_title,
-//         $requester_email_body
-//     );
-// }
+if (!empty($requester_email)) {
+    sendCommunityRequestEmail(
+        $requester_email,
+        'Your Community Training Request: ' . $new_title,
+        $requester_email_body
+    );
+}
 
 $gobrik_conn->close();
 
-// Redirect back to community-3p page with success flags
+/**
+ * Redirect back to community-3p page with success flags
+ */
 header("Location: /en/community-3p.php?id=$source_training_id&requested=1&new_id=$new_training_id");
 exit();
