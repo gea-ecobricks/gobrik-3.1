@@ -244,17 +244,19 @@ echo '<!DOCTYPE html>
                             <p class="c3p-form-caption">Where will the training be held? Include city and country, or write "Online".</p>
                         </div>
 
+                        <?php /*
                         <div class="c3p-form-row">
                             <label for="community_search_c3p">Your Community *</label>
                             <div class="c3p-autocomplete-wrap">
                                 <input type="text" id="community_search_c3p" name="community_search"
                                        placeholder="Start typing your community name..."
-                                       autocomplete="off" required>
+                                       autocomplete="off">
                                 <input type="hidden" id="community_id_c3p" name="community_id">
                                 <div id="community_results_c3p" class="c3p-autocomplete-results"></div>
                             </div>
                             <p class="c3p-form-caption">Search for and select your community. <a href="#" onclick="openAddCommunityModal(); return false;" style="color:#1a56a0;">Don't see it? Add one.</a></p>
                         </div>
+                        */ ?>
 
                         <div id="c3p-validation-error" style="display:none;color:#c00;font-size:0.93em;margin-bottom:14px;padding:10px 14px;background:rgba(200,0,0,0.07);border-radius:8px;"></div>
 
@@ -323,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const communityIdInput = document.getElementById('community_id_c3p');
     const suggestionBox  = document.getElementById('community_results_c3p');
 
-    if (communityInput) {
+    if (communityInput && communityIdInput && suggestionBox) {
         communityInput.addEventListener('input', function() {
             const query = communityInput.value.trim();
             communityIdInput.value = '';
@@ -372,15 +374,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const date     = document.getElementById('proposed_date').value.trim();
             const location = document.getElementById('proposed_location').value.trim();
             const language = document.getElementById('proposed_language').value.trim();
-            const comId    = document.getElementById('community_id_c3p').value.trim();
-            const comName  = document.getElementById('community_search_c3p').value.trim();
 
             const errors = [];
             if (!date) errors.push('Please select a proposed training date.');
             if (!location) errors.push('Please enter a training location.');
             if (!language) errors.push('Please select a training language.');
-            if (!comName) errors.push('Please select a community.');
-            if (comName && !comId) errors.push('Please select a community from the suggestions list.');
 
             if (errors.length > 0) {
                 e.preventDefault();

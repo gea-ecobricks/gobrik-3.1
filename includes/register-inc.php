@@ -1241,7 +1241,7 @@
     text-decoration: none;
     margin-top: 10px;
     display: flex;
-    width: 80%;
+/*     width: 80%; */
 }
 
 @media screen and (max-width: 768px) {
