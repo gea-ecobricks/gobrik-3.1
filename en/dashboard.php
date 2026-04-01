@@ -1099,11 +1099,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                 <span class="my-project-meta"><?php echo htmlspecialchars($funding_str, ENT_QUOTES, 'UTF-8'); ?> &nbsp;·&nbsp; Deadline: <?php echo htmlspecialchars($pledge_deadline, ENT_QUOTES, 'UTF-8'); ?></span>
                             </div>
                             <div class="training-v2-pills">
+                                <?php if ($t_status_raw !== 'open_request'): ?>
                                 <button class="training-v2-pledge-btn"
                                         onclick="openPledgersModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
                                         title="View pledgers">
                                     <?php echo $pledge_count; ?> 🤝
                                 </button>
+                                <?php endif; ?>
                                 <?php if ($t_status_raw === 'open_request'): ?>
                                     <button class="training-v2-status-pill status-open_request"
                                             onclick="openCommunityRequestModal(<?php echo $t_id; ?>)"
