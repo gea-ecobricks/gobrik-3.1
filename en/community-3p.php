@@ -1,37 +1,59 @@
 <?php
+require_once '../earthenAuth_helper.php'; // Include the authentication helper functions
 require_once '../auth/session_start.php';
-require_once '../earthenAuth_helper.php';
 
+// PART 1: Set up page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.1';
-$page = 'community-3p';
+$version = '0.546';
+$page = 'log';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 
-$buwana_id = $_SESSION['buwana_id'];
 
-$source_training_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-if ($source_training_id <= 0) {
-    header('Location: courses.php');
+// PART 2: Check if user is logged in and session active
+if ($is_logged_in) {
+    $buwana_id = $_SESSION['buwana_id'];
+
+    // Include database connections
+    require_once '../gobrikconn_env.php';
+    require_once '../buwanaconn_env.php';
+
+    // Fetch user meta and location data
+    $user_continent_icon = getUserContinent($buwana_conn, $buwana_id);
+    $earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
+    $user_location_watershed = getWatershedName($buwana_conn, $buwana_id);
+    $user_location_full = getUserFullLocation($buwana_conn, $buwana_id);
+    $gea_status = getGEA_status($buwana_id);
+    $user_ecobricker_id = getEcobrickerID($buwana_id);
+    $user_community_name = getCommunityName($buwana_conn, $buwana_id);
+    $user_community_id = null;
+    $ecobrick_unique_id = 0;
+    $first_name = getFirstName($buwana_conn, $buwana_id);
+
+
+
+    // Fetch community_id from community name
+    if (!empty($user_community_name)) {
+        $stmt_com = $buwana_conn->prepare("SELECT community_id FROM communities_tb WHERE com_name = ?");
+        if ($stmt_com) {
+            $stmt_com->bind_param("s", $user_community_name);
+            $stmt_com->execute();
+            $stmt_com->bind_result($user_community_id);
+            $stmt_com->fetch();
+            $stmt_com->close();
+        }
+    }
+
+    // Check if retry parameter is passed in the URL
+    if (isset($_GET['retry']) && is_numeric($_GET['retry'])) {
+        $ecobrick_unique_id = (int)$_GET['retry'];
+        retryEcobrick($gobrik_conn, $ecobrick_unique_id);
+    }
+
+} else {
+    header('Location: login.php?redirect=' . urlencode($page)).php;
     exit();
 }
 
-require_once '../gobrikconn_env.php';
-require_once '../buwanaconn_env.php';
-
-// Fetch user info
-$first_name = getFirstName($buwana_conn, $buwana_id);
-$earthling_emoji = getUserEarthlingEmoji($buwana_conn, $buwana_id);
-$user_community_name = getCommunityName($buwana_conn, $buwana_id);
-
-$ecobricker_id = null;
-$users_email_address = '';
-$full_name = '';
-$stmt = $gobrik_conn->prepare("SELECT ecobricker_id, email_addr, full_name FROM tb_ecobrickers WHERE buwana_id = ?");
-$stmt->bind_param("i", $buwana_id);
-$stmt->execute();
-$stmt->bind_result($ecobricker_id, $users_email_address, $full_name);
-$stmt->fetch();
-$stmt->close();
 
 // Initialize training variables
 $training_title = $training_subtitle = $training_date = $lead_trainer = '';
