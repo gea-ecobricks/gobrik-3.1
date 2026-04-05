@@ -57,7 +57,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php require_once ("../includes/index-inc.php");?>
 
 
-<div class="clouds-new2" style="margin-bottom:25px;">
+<div class="clouds-new2" style="margin-bottom:25px; margin-top:36px">
     <div class="biosphere">
             <img src="../webps/biosphere-blanked.webp" width="400" height="400" alt="biosphere">
     </div>
