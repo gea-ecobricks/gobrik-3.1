@@ -539,19 +539,21 @@ display: none;
 
 </div>
 
+<!-- Newest Projects — not yet deployed, commented out
 <div class="menu-page-item">
   <a href="newest-projects.php" data-lang-id="1000-featured-projects">
     Featured Projects</a>
     <span class="status-circle" style="background-color: orange;" title="Not yet deployed"></span>
-
 </div>
+-->
 
+<!-- Newest Pages / Latest Trainings — not yet deployed, commented out
 <div class="menu-page-item">
   <a href="newest-trainings.php" data-lang-id="1000-latest-trainings">
     Latest Trainings</a>
     <span class="status-circle" style="background-color: red;" title="Not yet deployed"></span>
-
 </div>
+-->
 
 
   <div class="menu-page-item">
@@ -656,98 +658,111 @@ display: none;
   <!-- Right Settings Buttons -->
   <div id="function-icons">
     <div id="settings-buttons" aria-label="App Settings Panel">
-      <button type="button"
-              id="top-settings-button"
-              aria-label="Toggle settings menu"
-              aria-expanded="false"
-              aria-controls="language-menu-slider login-menu-slider"
-              onclick="toggleSettingsMenu()">
-      </button>
 
-      <!-- Language Switch -->
-      <div id="language-code"
-           onclick="showLangSelector()"
-           role="button"
-           tabindex="0"
-           aria-haspopup="true"
-           aria-expanded="false"
-           aria-controls="language-menu-slider"
-           aria-label="Switch language">
-        🌐 <span data-lang-id="000-language-code">EN</span>
-      </div>
+      <!-- Top row of controls (always visible when settings panel is slid in) -->
+      <div id="settings-btn-row">
+        <button type="button"
+                id="top-settings-button"
+                aria-label="Toggle settings menu"
+                aria-expanded="false"
+                onclick="toggleSettingsMenu()">
+        </button>
 
-      <!-- Login Services -->
-      <button type="button"
-              class="top-login-button"
-              onclick="showLoginSelector()"
-              aria-haspopup="true"
-              aria-expanded="false"
-              aria-controls="login-menu-slider"
-              aria-label="Login Services">
-      </button>
+        <!-- Language Switch -->
+        <div id="language-code"
+             onclick="showLangSelector()"
+             role="button"
+             tabindex="0"
+             aria-haspopup="true"
+             aria-expanded="false"
+             aria-label="Switch language">
+          🌐 <span data-lang-id="000-language-code">EN</span>
+        </div>
 
-      <!-- Dark Mode Toggle -->
-      <dark-mode-toggle
-        id="dark-mode-toggle-5"
-        class="slider"
-        style="min-width:82px;margin-top:-5px;margin-bottom:-15px;"
-        appearance="toggle">
-      </dark-mode-toggle>
-    </div>
-  </div>
-</div>
+        <!-- Login Services -->
+        <button type="button"
+                class="top-login-button"
+                onclick="loginOrMenu('https://buwana.ecobricks.org/en/login.php?app=gbrk_f2c61a85a4cd4b8b89a7', <?php echo $is_logged_in ? 'true' : 'false'; ?>)"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-label="Login Services">
+        </button>
 
+        <!-- Dark Mode Toggle -->
+        <dark-mode-toggle
+          id="dark-mode-toggle-5"
+          class="slider"
+          style="min-width:82px;margin-top:-5px;margin-bottom:-15px;"
+          appearance="toggle">
+        </dark-mode-toggle>
+      </div><!-- /settings-btn-row -->
 
-<!-- LANGUAGE SELECTOR -->
-<div id="language-menu-slider" class="top-slider-menu" tabindex="-1" role="menu">
-  <div class="lang-selector-box">
-    <button onclick="navigateTo('../id/<?php echo $active_url; ?>')">🇮🇩 IN</button>
-    <button onclick="navigateTo('../es/<?php echo $active_url; ?>')">🇪🇸 ES</button>
-    <button onclick="navigateTo('../fr/<?php echo $active_url; ?>')">🇫🇷 FR</button>
-    <button onclick="navigateTo('../en/<?php echo $active_url; ?>')">🇬🇧 EN</button>
-  </div>
-</div>
+      <!-- Expandable grid panel — grows downward when lang or app button is clicked -->
+      <div id="settings-expand-panel">
 
+        <!-- Language Grid -->
+        <div id="language-menu-slider" class="expand-grid-section" tabindex="-1" role="menu">
+          <div class="bap-header">
+            <span class="bap-title">Switch Language</span>
+          </div>
+          <div class="bap-grid">
+            <a class="bap-lang-tile" href="../id/<?php echo htmlspecialchars($active_url); ?>" onclick="navigateTo('../id/<?php echo htmlspecialchars($active_url); ?>'); return false;">
+              <div class="bap-lang-flag">🇮🇩</div>
+              <span class="bap-app-name">Bahasa</span>
+            </a>
+            <a class="bap-lang-tile" href="../es/<?php echo htmlspecialchars($active_url); ?>" onclick="navigateTo('../es/<?php echo htmlspecialchars($active_url); ?>'); return false;">
+              <div class="bap-lang-flag">🇪🇸</div>
+              <span class="bap-app-name">Español</span>
+            </a>
+            <a class="bap-lang-tile" href="../fr/<?php echo htmlspecialchars($active_url); ?>" onclick="navigateTo('../fr/<?php echo htmlspecialchars($active_url); ?>'); return false;">
+              <div class="bap-lang-flag">🇫🇷</div>
+              <span class="bap-app-name">Français</span>
+            </a>
+            <a class="bap-lang-tile" href="../en/<?php echo htmlspecialchars($active_url); ?>" onclick="navigateTo('../en/<?php echo htmlspecialchars($active_url); ?>'); return false;">
+              <div class="bap-lang-flag">🇬🇧</div>
+              <span class="bap-app-name">English</span>
+            </a>
+          </div>
+        </div><!-- /language-menu-slider -->
 
+        <!-- My Buwana Apps Grid -->
+        <div id="login-menu-slider" class="expand-grid-section" tabindex="-1" role="dialog" aria-label="My Buwana Apps">
+          <div class="bap-header">
+            <span class="bap-title">My Buwana Apps</span>
+            <a href="https://buwana.ecobricks.org/en/index.php" class="bap-add-app" title="Add a new app" aria-label="Add a new app">+</a>
+          </div>
+          <div class="bap-grid" id="login-selector-box">
+            <a class="bap-app-tile" target="_blank" href="https://gobrik.com/en/dashboard.php"
+               title="GoBrik | Ecobrick action platform">
+              <div class="bap-app-icon"
+                   data-light-logo="../icons/gobrik-icon.svg"
+                   data-dark-logo="../icons/gobrik-icon-white.svg">
+              </div>
+              <span class="bap-app-name">GoBrik</span>
+            </a>
+            <a class="bap-app-tile" target="_blank" href="https://earthcal.earthen.io"
+               title="EarthCal | Cyclic calendar">
+              <div class="bap-app-icon"
+                   data-light-logo="../icons/earthcal-icon.svg"
+                   data-dark-logo="../icons/earthcal-icon.svg">
+              </div>
+              <span class="bap-app-name">EarthCal</span>
+            </a>
+          </div>
+        </div><!-- /login-menu-slider -->
 
-<!-- LOGIN SELECTOR -->
-<div id="login-menu-slider" class="top-slider-menu" tabindex="-1" role="menu">
-  <div class="login-selector-box">
-    <a class="login-selector" target="_blank" href="https://buwana.ecobricks.org/en/login.php">🌍 GoBrik</a>
-    <a class="login-selector" target="_blank" href="https://buwana.ecobricks.org/en/login.php">🌒 EarthCal</a>
-  </div>
-</div>
+      </div><!-- /settings-expand-panel -->
+    </div><!-- /settings-buttons -->
+  </div><!-- /function-icons -->
+</div><!-- /header -->
 
 
 <script>
 function navigateTo(url) {
   window.location.href = url;
 }
-
 </script>
 <script src="../scripts/header-2026.js?v=1"></script>
-
-
-<!--
-<div id="language-menu-slider">
-    <div class="lang-selector-box">
-      <button type="button" class="lang-selector" onclick="switchLanguage('id')">🇮🇩 IN</button>
-      <button type="button" class="lang-selector" onclick="switchLanguage('es')">🇪🇸 ES</button>
-      <button type="button" class="lang-selector" onclick="switchLanguage('fr')">🇫🇷 FR</button>
-      <button type="button" class="lang-selector" onclick="switchLanguage('en')">🇬🇧 EN</button>
-    </div>
-  </div> -->
-
-
-<div id="login-menu-slider">
-  <div class="login-selector-box">
-    <a class="login-selector" target="_blank" href='https://gobrik.com/en/go.php#home'>
-      <i style="background: url(../icons/gobrik-icon-white.svg) no-repeat; width:15px; height:15px;display: inline-block;background-size:contain;margin-right:4px;"></i>GoBrik</a>
-    <a class="login-selector" target="_blank" href='https://gobrik.com/email'>✉️ Trainer Email</a>
-    <a class="login-selector" target="_blank" href='https://nextcloud.gobrik.com'><i style="background: url(../icons/next-cloud-white.svg) no-repeat; width:22px; height:11px;display: inline-block;background-size:contain;margin-right:4px;"></i>Trainer NextCloud</a>
-    <button type="button" class="login-selector" onclick="clearSiteCache()" data-lang-id="1003-reset-preferences">❌ Reset Preferences</button>
-  </div>
-</div>
 
 
 <div id="main">
