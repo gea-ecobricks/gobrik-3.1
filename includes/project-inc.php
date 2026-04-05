@@ -310,6 +310,9 @@ overflow: hidden;
 
 .project-image {
 	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
 }
 
 @media screen and (max-width: 768px) {
@@ -448,6 +451,6 @@ margin-bottom: 31px;}
 
 </style>	
 
-<?php require_once ("../header-2026.php");?>
+<?php require_once ("../header-2026b.php");?>
 			  
 						  
