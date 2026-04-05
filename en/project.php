@@ -285,14 +285,20 @@ if ($project && !empty($project['connected_ecobricks'])) {
 
 
 <script>
-const PROJECT_PREVIEW_DATA = <?php echo $project ? json_encode([
-    'photo1_main' => '../' . ($project['photo1_main'] ?? ''),
-    'photo1_tmb'  => '../' . ($project['photo1_tmb']  ?? ''),
-    'project_name'      => $project['project_name']      ?? '',
-    'description_short' => $project['description_short'] ?? '',
-    'project_id'        => $project['project_id']        ?? 0,
-    'briks_used'        => $project['briks_used']        ?? 0,
-], JSON_HEX_TAG) ?: 'null'; ?>;
+const PROJECT_PREVIEW_DATA = <?php
+if ($project) {
+    echo json_encode([
+        'photo1_main'       => '../' . ($project['photo1_main']       ?? ''),
+        'photo1_tmb'        => '../' . ($project['photo1_tmb']        ?? ''),
+        'project_name'      => $project['project_name']               ?? '',
+        'description_short' => $project['description_short']          ?? '',
+        'project_id'        => $project['project_id']                 ?? 0,
+        'briks_used'        => $project['briks_used']                 ?? 0,
+    ], JSON_HEX_TAG) ?: 'null';
+} else {
+    echo 'null';
+}
+?>;
 
 function ecobrickPreview(brik_serial, weight, owner, location) {
     var imageUrl = 'https://ecobricks.org/briks/ecobrick-' + brik_serial + '-file.jpeg';
