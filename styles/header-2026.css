@@ -10,9 +10,13 @@
    (main.css sets position:fixed; this file cancels that for header-2026b pages).
 -------------------------------------------------------------------------- */
 
-/* ── GoBrik: header scrolls with page (not fixed) ──────────────────────── */
+/* ── GoBrik: header scrolls with page (not fixed) ──────────────────────── *
+ *  main.css sets position:fixed on #header.  We override to relative so     *
+ *  the header flows naturally with the page while still acting as the        *
+ *  positioning context for #settings-buttons (position:absolute).            *
+ * -------------------------------------------------------------------------- */
 #header {
-    position: static !important;
+    position: relative !important;
     top: auto !important;
 }
 
