@@ -802,17 +802,22 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         padding: 0 10px;
     }
 
+    /* ===== Modal scrolling: content scrolls, viewport locked ===== */
+    .modal-content-box {
+        overflow-y: auto;
+    }
+
     /* ===== Mobile modal fix — box-sizing prevents padding from blowing past 100vw ===== */
     @media (max-width: 700px) {
         /* The header sets width:100% + padding:10px without box-sizing, causing 20px overflow.
            Override here so padding is included in the 100% width. */
         .modal-content-box {
             box-sizing: border-box;
-            overflow: hidden;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: stretch;
-            justify-content: center;
+            justify-content: flex-start;
         }
         .modal-message {
             box-sizing: border-box;
@@ -1062,9 +1067,9 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                             $t_status_raw = strtolower($t3p['threshold_status'] ?? 'open');
                             $t_status_labels = [
                                 'open'         => 'Open',
-                                'reached'      => 'Threshold Reached',
+                                'reached'      => 'Its a go!',
                                 'cancelled'    => 'Cancelled',
-                                'open_request' => '🏘 Community Request',
+                                'open_request' => 'Community Request',
                             ];
                             $t_status_label  = $t_status_labels[$t_status_raw] ?? ucfirst($t_status_raw);
                             $pledge_count    = (int)($t3p['pledge_count'] ?? 0);
@@ -1904,61 +1909,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         document.body.classList.add('modal-open');
     }
 
-    function projectPreview(projectData) {
-        if (!projectData) return;
-
-        const modal = document.getElementById('form-modal-message-v2');
-        const photoContainer = modal?.querySelector('.modal-photo-v2');
-        const messageContainer = modal?.querySelector('.modal-message-v2');
-        const modalStatusPill = modal?.querySelector('.modal-status-pill');
-        const modalViewButton = modal?.querySelector('.modal-view-button');
-
-        if (!modal || !photoContainer || !messageContainer) return;
-
-        photoContainer.replaceChildren();
-        messageContainer.replaceChildren();
-
-        const photoWrapper = document.createElement('div');
-        photoWrapper.className = 'ecobrick-photo-wrapper';
-
-        const img = document.createElement('img');
-        const primaryPhotoUrl = projectData.photo1_main || projectData.photo1_tmb || '';
-        img.src = primaryPhotoUrl;
-        img.alt = projectData.project_name || 'Project photo';
-
-        photoWrapper.appendChild(img);
-        photoContainer.appendChild(photoWrapper);
-
-        const title = document.createElement('h4');
-        title.textContent = projectData.project_name || 'Project';
-        messageContainer.appendChild(title);
-
-        if (projectData.description_short) {
-            const desc = document.createElement('p');
-            desc.textContent = projectData.description_short;
-            messageContainer.appendChild(desc);
-        }
-
-        if (modalViewButton) {
-            modalViewButton.href = `project.php?id=${encodeURIComponent(projectData.project_id || '')}`;
-            modalViewButton.textContent = 'View project';
-            modalViewButton.setAttribute('aria-label', `Open project ${projectData.project_name || ''}`);
-            modalViewButton.style.display = 'inline-flex';
-        }
-
-        if (modalStatusPill) {
-            modalStatusPill.className = 'modal-status-pill status-pill status-default';
-            modalStatusPill.textContent = `${projectData.briks_used ?? 0} ecobricks`;
-            modalStatusPill.style.display = 'inline-flex';
-        }
-
-        modal.classList.remove('modal-hidden');
-        modal.classList.add('modal-shown');
-        document.getElementById('page-content')?.classList.add('blurred');
-        document.getElementById('footer-full')?.classList.add('blurred');
-        document.body.classList.add('modal-open');
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
         updateFeaturedBricks(currentFeaturedBricks);
 
@@ -2592,7 +2542,7 @@ function openCommunityRequestModal(trainingId) {
             const defaultMsg = `Dear ${escapeHTML(data.requester_name)},\n\nThank you so much for your community training request for "${escapeHTML(data.training_title)}". We are delighted to hear that your community wants to participate!\n\nWe can confirm that we will be going ahead with your community training as requested, on ${escapeHTML(data.training_date)} at ${escapeHTML(data.location)}.\n\nPlease use the payment link that accompanies this email to complete the full course payment for your community. Once payment is confirmed, we will send you all the joining instructions and materials.\n\nWith warm regards,\nThe Training Team`;
 
             messageContainer.innerHTML = `
-                <h2 style="margin:0 0 16px 0;">🏘 Community Training Request</h2>
+                <h2 style="margin:0 0 16px 0;">Community Training Request</h2>
                 <div class="community-request-modal-body">
                     <div class="community-request-detail-row"><span class="community-request-detail-label">Training</span><span class="community-request-detail-value">${escapeHTML(data.training_title)}</span></div>
                     <div class="community-request-detail-row"><span class="community-request-detail-label">Requested by</span><span class="community-request-detail-value">${escapeHTML(data.requester_name)} &lt;${escapeHTML(data.requester_email)}&gt;</span></div>
@@ -2616,7 +2566,7 @@ function openCommunityRequestModal(trainingId) {
                     </label>
                     <div>
                         <strong>Confirm course is going ahead</strong>
-                        <div style="font-size:0.85em;opacity:0.72;margin-top:2px;">Enables payment link in email. Course status will update to Threshold Reached.</div>
+                        <div style="font-size:0.85em;opacity:0.72;margin-top:2px;">Enables payment link in email. <span id="community-confirm-status-hint">Toggle to confirm.</span></div>
                     </div>
                 </div>
 
@@ -2629,6 +2579,18 @@ function openCommunityRequestModal(trainingId) {
                     <button class="page-button" onclick="closeInfoModal()" style="flex:0 0 auto;">Cancel</button>
                 </div>
             `;
+
+            const toggleInput = document.getElementById('community-confirm-toggle-input');
+            const statusHint  = document.getElementById('community-confirm-status-hint');
+            if (toggleInput && statusHint) {
+                toggleInput.addEventListener('change', function() {
+                    statusHint.textContent = this.checked
+                        ? 'Training status will be set to: Its a go!'
+                        : 'Toggle to confirm.';
+                    statusHint.style.fontWeight = this.checked ? '600' : '';
+                    statusHint.style.opacity    = this.checked ? '1' : '';
+                });
+            }
         })
         .catch(err => {
             messageContainer.innerHTML = `<p style="color:red;">Error: ${escapeHTML(err.message)}</p>`;

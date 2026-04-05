@@ -279,7 +279,61 @@ function viewGalleryImage(imageSrc, altText) {
     document.body.classList.add('modal-open');
 }
 
+function projectPreview(projectData) {
+    if (!projectData) return;
 
+    const modal = document.getElementById('form-modal-message-v2');
+    const photoContainer = modal?.querySelector('.modal-photo-v2');
+    const messageContainer = modal?.querySelector('.modal-message-v2');
+    const modalStatusPill = modal?.querySelector('.modal-status-pill');
+    const modalViewButton = modal?.querySelector('.modal-view-button');
+
+    if (!modal || !photoContainer || !messageContainer) return;
+
+    photoContainer.replaceChildren();
+    messageContainer.replaceChildren();
+
+    const photoWrapper = document.createElement('div');
+    photoWrapper.className = 'ecobrick-photo-wrapper';
+
+    const img = document.createElement('img');
+    const primaryPhotoUrl = projectData.photo1_main || projectData.photo1_tmb || '';
+    img.src = primaryPhotoUrl;
+    img.alt = projectData.project_name || 'Project photo';
+
+    photoWrapper.appendChild(img);
+    photoContainer.appendChild(photoWrapper);
+
+    const title = document.createElement('h4');
+    title.textContent = projectData.project_name || 'Project';
+    messageContainer.appendChild(title);
+
+    if (projectData.description_short) {
+        const desc = document.createElement('p');
+        desc.textContent = projectData.description_short;
+        messageContainer.appendChild(desc);
+    }
+
+    if (modalViewButton) {
+        modalViewButton.href = `project.php?id=${encodeURIComponent(projectData.project_id || '')}`;
+        modalViewButton.textContent = 'View project';
+        modalViewButton.setAttribute('aria-label', `Open project ${projectData.project_name || ''}`);
+        modalViewButton.style.display = 'inline-flex';
+    }
+
+    if (modalStatusPill) {
+        modalStatusPill.className = 'modal-status-pill status-pill status-default';
+        modalStatusPill.textContent = `${projectData.briks_used ?? 0} ecobricks`;
+        modalStatusPill.style.display = 'inline-flex';
+    }
+
+    modal.classList.remove('modal-hidden');
+    modal.classList.add('modal-shown');
+    document.getElementById('page-content')?.classList.add('blurred');
+    document.getElementById('footer-full')?.classList.add('blurred');
+    document.body.classList.add('modal-open');
+}
+window.projectPreview = projectPreview;
 
 
 function createInfoModal(infoText) {

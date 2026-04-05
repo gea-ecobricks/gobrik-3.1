@@ -309,7 +309,7 @@ overflow: hidden;
 }
 
 .project-image {
-	padding: 20px;
+	padding: 0;
 }
 
 @media screen and (max-width: 768px) {
@@ -322,11 +322,11 @@ overflow: hidden;
 	.project-image img {
 		border-width: 10px;
 		border-color: #97C4E3;
-		width: 85%;
+		width: 100%;
 		box-shadow: 0 0px 10px rgba(85, 84, 84, 0.8);
 		border-style: solid;
 		border-radius: 10px;
-		margin: 20px auto 0;
+		margin: 0;
 		display: block;
 	}
 
@@ -383,8 +383,9 @@ overflow: hidden;
 
 .project-title {
 	font-family: 'Arvo', serif;
-	font-size: 3em;
-	padding: 20px 10px 0px 10px;
+	font-size: 2em;
+	padding: 10px 10px 0px 10px;
+	margin: 0;
 	color: var(--text-color);
 }
 
