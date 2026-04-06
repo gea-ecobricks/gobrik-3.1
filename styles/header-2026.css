@@ -18,6 +18,7 @@
 #header {
     position: relative !important;
     top: auto !important;
+    z-index: 45 !important; /* match Buwana — must exceed .form-container (20) so settings panel always paints on top */
 }
 
 @media screen and (min-width: 1201px) {

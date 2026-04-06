@@ -84,7 +84,7 @@
 
 
 <link rel="stylesheet" type="text/css" href="../styles/footer.css?v=<?php echo ($version); ;?>">
-<link rel="stylesheet" href="../styles/header-2026.css?v=1">
+<link rel="stylesheet" href="../styles/header-2026.css?v=2<?php echo ($version); ?>">
 
 <?php if ($page === "messenger"): ?>
     <style>
