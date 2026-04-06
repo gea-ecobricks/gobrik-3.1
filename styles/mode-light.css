@@ -28,6 +28,9 @@
 
     --settings-background: rgb(213, 213, 213);
     --settings-border: rgb(220, 220, 222);
+    --app-tile-bg: rgba(0, 0, 0, 0.05);
+    --app-tile-bg-hover: rgba(0, 0, 0, 0.12);
+    --expand-glow: rgba(56, 186, 255, 0.50);
     --emblem-pink: #fc02fc;
     --emblem-pink-over: #bb02bb;
     --emblem-blue: #329bb8;

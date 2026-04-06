@@ -246,6 +246,62 @@
     background: rgba(128, 128, 128, 0.15);
 }
 
+/* ── Drawer section title ────────────────────────────────────────────────── */
+
+.bap-title {
+    font-family: 'Mulish', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--subdued-text);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ── App / language tile grid ────────────────────────────────────────────── */
+
+.bap-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.bap-app-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 6px 8px;
+    border-radius: 12px;
+    background-color: var(--app-tile-bg);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.18s ease;
+    gap: 6px;
+}
+
+.bap-app-tile:hover {
+    background-color: var(--app-tile-bg-hover);
+}
+
+.bap-app-icon {
+    width: 52px;
+    height: 52px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.bap-app-name {
+    font-family: 'Mulish', sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-color);
+    text-align: center;
+    line-height: 1.25;
+    word-break: break-word;
+    max-width: 72px;
+}
+
 /* Language tile — mirrors .bap-app-tile from main.css */
 .bap-lang-tile {
     display: flex;
