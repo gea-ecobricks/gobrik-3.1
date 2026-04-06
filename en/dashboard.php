@@ -548,11 +548,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 <?php require_once("../includes/dashboard-inc.php"); ?>
 
 <style>
-    /* Give the content room below the fixed header */
-    .dashboard-wrapper {
-        padding-top: 70px;
-    }
-
     .dashboard-v2-panel {
         position: relative;
     }

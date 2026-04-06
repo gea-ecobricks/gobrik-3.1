@@ -19,6 +19,7 @@
     position: relative !important;
     top: auto !important;
     z-index: 45 !important; /* match Buwana — must exceed .form-container (20) so settings panel always paints on top */
+    overflow: visible !important; /* prevent backdrop-filter compositing layer from clipping the settings expand panel */
 }
 
 @media screen and (min-width: 1201px) {

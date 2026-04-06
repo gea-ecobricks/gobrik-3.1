@@ -44,7 +44,7 @@ require_once ("../includes/project-inc.php");
 
 echo '
 
-    <div id="form-submission-box" style="margin-top:80px;">
+    <div id="form-submission-box">
         <div class="form-container-v2" style="padding-top:0px !important">';
 
 $conn = $gobrik_conn;
