@@ -762,7 +762,57 @@ function navigateTo(url) {
   window.location.href = url;
 }
 </script>
-<script src="../scripts/header-2026.js?v=1"></script>
+<script src="../scripts/header-2026.js?v=2<?php echo ($version); ?>"></script>
+<?php if ($is_logged_in): ?>
+<script>
+(function () {
+    var BUWANA_ID = <?php echo (int)($buwana_id_for_feedback); ?>;
+    if (!BUWANA_ID) return;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var box = document.getElementById('login-selector-box');
+        if (!box) return;
+
+        fetch('https://buwana.ecobricks.org/api/users_apps.php?buwana_id=' + BUWANA_ID, {
+            credentials: 'include'
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (!data.ok || !data.apps || !data.apps.length) return;
+            box.innerHTML = '';
+            data.apps.forEach(function (app) {
+                var name   = app.app_display_name    || '';
+                var url    = app.app_login_url        || '#';
+                var icon   = app.app_square_icon_url  || '';
+                var slogan = app.app_slogan            || name;
+
+                var tile = document.createElement('a');
+                tile.className = 'bap-app-tile';
+                tile.href      = url;
+                tile.target    = '_blank';
+                tile.rel       = 'noopener';
+                tile.title     = slogan;
+
+                var iconDiv = document.createElement('div');
+                iconDiv.className = 'bap-app-icon';
+                if (icon) {
+                    iconDiv.style.backgroundImage = "url('" + icon.replace(/'/g, "%27") + "')";
+                }
+
+                var nameSpan = document.createElement('span');
+                nameSpan.className   = 'bap-app-name';
+                nameSpan.textContent = name;
+
+                tile.appendChild(iconDiv);
+                tile.appendChild(nameSpan);
+                box.appendChild(tile);
+            });
+        })
+        .catch(function () { /* leave static fallback tiles on network error */ });
+    });
+}());
+</script>
+<?php endif; ?>
 
 
 <div id="main">
