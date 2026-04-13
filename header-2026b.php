@@ -513,7 +513,16 @@ display: none;
 
     <?php endif; ?>
 
-
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var mode = localStorage.getItem('dark-mode-toggle') || 'light';
+    document.querySelectorAll('a[href*="buwana.ecobricks.org/en/login.php"], a[href*="buwana.ecobricks.org/en/signup-1.php"]').forEach(function(link) {
+        var u = new URL(link.href);
+        u.searchParams.set('mode', mode);
+        link.href = u.toString();
+    });
+});
+</script>
 
 <!-- Other menu items -->
 <div class="menu-page-item">

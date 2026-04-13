@@ -14,6 +14,9 @@ $extras = [];
 if (isset($_GET['firstname'])) $extras['firstname'] = $_GET['firstname'];
 if (isset($_GET['status'])) $extras['status'] = $_GET['status'];
 if (isset($_GET['id'])) $extras['id'] = $_GET['id']; // buwana_id
+if (isset($_GET['mode']) && in_array($_GET['mode'], ['light', 'dark'], true)) {
+    $extras['mode'] = $_GET['mode'];
+}
 $redirectTarget = $_GET['redirect'] ?? ($_SESSION['post_login_redirect'] ?? null);
 
 if ($redirectTarget && strpos($redirectTarget, '/') === 0) {
