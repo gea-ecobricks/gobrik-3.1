@@ -349,6 +349,7 @@ margin-top:-100px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text-color);
 }
 
 .pledge-reg-meta {
@@ -358,6 +359,7 @@ margin-top:-100px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text-color);
 }
 
 /* ------------------------------------------------------------------ */
@@ -595,6 +597,7 @@ margin-top:-100px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text-color);
 }
 
 .my-project-meta {
@@ -604,6 +607,7 @@ margin-top:-100px !important;
     overflow-wrap: break-word;
     word-break: break-word;
     min-width: 0;
+    color: var(--text-color);
 }
 
 .project-phase-pill {

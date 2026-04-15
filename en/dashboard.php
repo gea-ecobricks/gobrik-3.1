@@ -1051,7 +1051,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         <?php if (strpos(strtolower($gea_status), 'trainer') !== false && !empty($trainings_3p)): ?>
             <div id="my-trainings-v2-panel" class="dashboard-v2-panel">
                 <span class="panel-pill trainer-pill">Trainer · 3P</span>
-                <h3>My Trainings | v2</h3>
+                <h3>My Trainings</h3>
                 <div class="my-project-list">
                     <?php foreach ($trainings_3p as $t3p): ?>
                         <?php
@@ -1357,7 +1357,8 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         <?php endif; ?>
 
-        <!-- My Trainings (trainer only) -->
+        <!-- My Trainings (trainer only) — hidden for now, superseded by my-trainings-v2-panel -->
+        <?php /*
         <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
             <div id="my-trainings-panel" class="dashboard-v2-panel">
                 <span class="panel-pill trainer-pill">Trainer</span>
@@ -1419,6 +1420,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                 </table>
             </div>
         <?php endif; ?>
+        */ ?>
 
     </div><!-- end column-wide -->
 
