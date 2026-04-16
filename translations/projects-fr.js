@@ -15,8 +15,6 @@ const fr_Page_Translations = {
 
     "000-page-title": "Projets Communautaires d'Écobriques",
     "001-page-description": "Les communautés du monde entier utilisent des écobriques pour construire des espaces verts, du mobilier et des structures. Parcourez les derniers projets publiés sur GoBrik et découvrez ce qui est possible lorsque nous mettons le plastique à bon usage.",
-    "002-back-button": "&#8962; Accueil GoBrik",
-    "003-live-feed-label": "<span class=\"blink\">⬤  </span>Derniers projets communautaires d'écobriques.  Cliquez pour prévisualiser.",
-    "004-gallery-empty": "Aucun projet à afficher pour le moment."
+    "002-gallery-empty": "Aucun projet à afficher pour le moment."
 
 };

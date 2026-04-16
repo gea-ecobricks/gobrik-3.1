@@ -15,8 +15,6 @@ const es_Page_Translations = {
 
     "000-page-title": "Proyectos Comunitarios de Ecoladrillos",
     "001-page-description": "Las comunidades de todo el mundo utilizan ecoladrillos para construir espacios verdes, mobiliario y estructuras. Explora los últimos proyectos publicados en GoBrik y descubre lo que es posible cuando ponemos el plástico a buen uso.",
-    "002-back-button": "&#8962; Inicio GoBrik",
-    "003-live-feed-label": "<span class=\"blink\">⬤  </span>Últimos proyectos comunitarios de ecoladrillos.  Haz clic para previsualizar.",
-    "004-gallery-empty": "No hay proyectos para mostrar en este momento."
+    "002-gallery-empty": "No hay proyectos para mostrar en este momento."
 
 };

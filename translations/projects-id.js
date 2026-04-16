@@ -15,8 +15,6 @@ const id_Page_Translations = {
 
     "000-page-title": "Proyek Ecobrick Komunitas",
     "001-page-description": "Komunitas di seluruh dunia menggunakan ecobrick untuk membangun ruang hijau, furnitur, dan struktur. Jelajahi proyek terbaru yang diposting di GoBrik dan temukan apa yang mungkin dilakukan ketika kita memanfaatkan plastik dengan baik.",
-    "002-back-button": "&#8962; Beranda GoBrik",
-    "003-live-feed-label": "<span class=\"blink\">⬤  </span>Proyek ecobrick komunitas terbaru.  Klik untuk pratinjau.",
-    "004-gallery-empty": "Tidak ada proyek yang ditampilkan saat ini."
+    "002-gallery-empty": "Tidak ada proyek yang ditampilkan saat ini."
 
 };

@@ -60,44 +60,39 @@ echo '<!DOCTYPE html>
 
 <?php require_once ("../includes/projects-inc.php"); ?>
 
-<!-- PAGE HEADER -->
-<div class="projects-page-header">
-    <div class="projects-hero">
-        <h1 class="projects-title" data-lang-id="000-page-title">Community Ecobrick Projects</h1>
-        <p class="projects-description" data-lang-id="001-page-description">
-            Communities around the world are using ecobricks to build green spaces, furniture, and structures.
-            Browse the latest projects posted on GoBrik and discover what is possible when we put plastic to good use.
-        </p>
-        <div class="projects-back-link">
-            <a href="index.php" class="feature-button" data-lang-id="002-back-button">&#8962; GoBrik Home</a>
+<!-- PAGE CONTENT -->
+<div id="top-page-image" class="projects-banner top-page-image"></div>
+<div id="form-submission-box" class="landing-page-form">
+    <div class="form-container" style="padding-top: 108px;">
+
+        <!-- PAGE HEADER -->
+        <div class="projects-header">
+            <h2 class="projects-title" data-lang-id="000-page-title">Community Ecobrick Projects</h2>
+            <p class="projects-description" data-lang-id="001-page-description">
+                Communities around the world are using ecobricks to build green spaces, furniture, and structures.
+                Browse the latest projects posted on GoBrik and discover what is possible when we put plastic to good use.
+            </p>
         </div>
+
+        <!-- PROJECTS GALLERY -->
+        <div id="project-gallery-grid" class="landing-photo-grid">
+            <?php if (!empty($gallery_projects)): ?>
+                <?php foreach ($gallery_projects as $pidx => $proj): ?>
+                    <button class="landing-grid-item landing-project-item" type="button"
+                            title="<?php echo htmlspecialchars($proj['project_name'], ENT_QUOTES, 'UTF-8'); ?>"
+                            data-pidx="<?php echo (int)$pidx; ?>">
+                        <img src="<?php echo htmlspecialchars($proj['photo1_tmb'] ?: $proj['photo1_main'], ENT_QUOTES, 'UTF-8'); ?>"
+                             alt="<?php echo htmlspecialchars($proj['project_name'], ENT_QUOTES, 'UTF-8'); ?>"
+                             loading="lazy">
+                        <span class="landing-project-title"><?php echo htmlspecialchars($proj['project_name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    </button>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="gallery-empty" data-lang-id="002-gallery-empty">No projects to display at this time.</p>
+            <?php endif; ?>
+        </div>
+
     </div>
-</div>
-
-<!-- PROJECTS GALLERY -->
-<div class="featured-content-gallery gallery-section-projects projects-full-gallery">
-
-    <div class="feed-live">
-        <p data-lang-id="003-live-feed-label"><span class="blink">⬤  </span>Latest community ecobrick projects.  Click to preview.</p>
-    </div>
-
-    <div id="project-gallery-grid" class="landing-photo-grid">
-        <?php if (!empty($gallery_projects)): ?>
-            <?php foreach ($gallery_projects as $pidx => $proj): ?>
-                <button class="landing-grid-item landing-project-item" type="button"
-                        title="<?php echo htmlspecialchars($proj['project_name'], ENT_QUOTES, 'UTF-8'); ?>"
-                        data-pidx="<?php echo (int)$pidx; ?>">
-                    <img src="<?php echo htmlspecialchars($proj['photo1_tmb'] ?: $proj['photo1_main'], ENT_QUOTES, 'UTF-8'); ?>"
-                         alt="<?php echo htmlspecialchars($proj['project_name'], ENT_QUOTES, 'UTF-8'); ?>"
-                         loading="lazy">
-                    <span class="landing-project-title"><?php echo htmlspecialchars($proj['project_name'], ENT_QUOTES, 'UTF-8'); ?></span>
-                </button>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p class="gallery-empty" data-lang-id="004-gallery-empty">No projects to display at this time.</p>
-        <?php endif; ?>
-    </div>
-
 </div>
 
 <script>

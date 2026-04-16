@@ -532,6 +532,13 @@ document.addEventListener('DOMContentLoaded', function() {
   <span class="status-circle" style="background-color:light-green;" title="Working.  Being tested."></span>
 </div>
 
+<div class="menu-page-item">
+  <a href="projects.php" data-lang-id="1000-latest-projects">
+    Latest Projects
+  </a>
+  <span class="status-circle" style="background-color:green;" title="Working well."></span>
+</div>
+
 
 <div class="menu-page-item">
   <a href="newest-briks.php" data-lang-id="1000-latest-ecobricks">

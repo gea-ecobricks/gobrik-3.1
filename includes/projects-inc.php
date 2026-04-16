@@ -25,44 +25,26 @@ body {
 }
 
 /* -------------------------------------------------------
-   2. PAGE HEADER — title + description hero block
+   2. PAGE HEADER — title + description
    ------------------------------------------------------- */
 
-.projects-page-header {
-    width: 100%;
-    padding: 60px 0 20px 0;
+.projects-header {
     text-align: center;
-    background: var(--dashboard-page-background, #f5f5f5);
-}
-
-.projects-hero {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 24px;
+    margin-bottom: 28px;
 }
 
 .projects-title {
     font-family: 'Arvo', serif;
     color: var(--h1);
     line-height: 1.2;
-    margin-bottom: 16px;
-}
-
-@media screen and (max-width: 700px) {
-    .projects-title { font-size: 2.0em; }
-}
-@media screen and (min-width: 701px) and (max-width: 1300px) {
-    .projects-title { font-size: 2.4em; }
-}
-@media screen and (min-width: 1301px) {
-    .projects-title { font-size: 2.8em; }
+    margin-bottom: 14px;
 }
 
 .projects-description {
     font-family: 'Mulish', sans-serif;
     color: var(--text-color);
     line-height: 1.55;
-    margin: 0 auto 24px auto;
+    margin: 0 auto 10px auto;
     max-width: 640px;
 }
 
@@ -70,90 +52,11 @@ body {
     .projects-description { font-size: 1.05em; }
 }
 @media screen and (min-width: 701px) {
-    .projects-description { font-size: 1.2em; }
-}
-
-.projects-back-link {
-    margin: 4px auto 10px auto;
-    display: flex;
-    justify-content: center;
+    .projects-description { font-size: 1.15em; }
 }
 
 /* -------------------------------------------------------
-   3. FEATURE BUTTON
-   ------------------------------------------------------- */
-
-.feature-button {
-    font-family: 'Mulish', sans-serif;
-    display: inline-block;
-    background: #00a1f2;
-    background-image: linear-gradient(to bottom, #00a1f2, #008ad4);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 1.2em;
-    padding: 8px 18px;
-    text-decoration: none !important;
-    margin: 10px auto;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    text-align: center;
-}
-.feature-button:hover {
-    background: #3cb0fd;
-    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
-    text-decoration: underline !important;
-}
-
-/* -------------------------------------------------------
-   4. GALLERY SECTION
-   ------------------------------------------------------- */
-
-.featured-content-gallery {
-    padding: 30px 0 50px 0;
-    border-radius: 18px;
-    margin: 18px auto 40px auto;
-    max-width: 1500px;
-}
-
-.gallery-section-projects {
-    background: rgba(0, 140, 220, 0.07);
-}
-
-.projects-full-gallery {
-    /* Give the full-page gallery a little extra breathing room */
-    margin-top: 0;
-    border-radius: 0;
-}
-
-/* -------------------------------------------------------
-   5. LIVE FEED BAR
-   ------------------------------------------------------- */
-
-.feed-live {
-    text-align: center;
-    background: var(--darker);
-    border-radius: 15px 15px 0 0;
-    font-size: 0.9em;
-    margin: 15px auto -10px auto;
-    width: 80%;
-    padding: 10px;
-}
-.feed-live p {
-    font-family: 'Courier New', monospace !important;
-    color: var(--subdued-text);
-    line-height: 1.1;
-    font-weight: 300;
-}
-@media screen and (max-width: 700px) {
-    .feed-live p { font-size: 0.8em; }
-}
-@media screen and (min-width: 700px) {
-    .feed-live p { font-size: 0.9em; }
-}
-
-/* -------------------------------------------------------
-   6. PHOTO GRID
+   3. PHOTO GRID
    ------------------------------------------------------- */
 
 .landing-photo-grid {
@@ -234,7 +137,7 @@ body {
 }
 
 /* -------------------------------------------------------
-   7. SIDE-MENU OVERLAY
+   4. SIDE-MENU OVERLAY
    ------------------------------------------------------- */
 
 #main-menu-overlay {

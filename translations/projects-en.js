@@ -15,8 +15,6 @@ const en_Page_Translations = {
 
     "000-page-title": "Community Ecobrick Projects",
     "001-page-description": "Communities around the world are using ecobricks to build green spaces, furniture, and structures. Browse the latest projects posted on GoBrik and discover what is possible when we put plastic to good use.",
-    "002-back-button": "&#8962; GoBrik Home",
-    "003-live-feed-label": "<span class=\"blink\">⬤  </span>Latest community ecobrick projects.  Click to preview.",
-    "004-gallery-empty": "No projects to display at this time."
+    "002-gallery-empty": "No projects to display at this time."
 
 };
