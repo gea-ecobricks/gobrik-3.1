@@ -107,7 +107,7 @@ $sql_ecobricks = "SELECT ecobrick_full_photo_url, ecobrick_thumb_photo_url, seri
                   WHERE ecobrick_thumb_photo_url IS NOT NULL
                     AND ecobrick_thumb_photo_url != ''
                     AND status NOT IN ('not ready', 'deleted')
-                  ORDER BY ecobrick_id DESC
+                  ORDER BY date_logged_ts DESC
                   LIMIT 10";
 $result_ecobricks = $gobrik_conn->query($sql_ecobricks);
 $gallery_ecobricks = [];
