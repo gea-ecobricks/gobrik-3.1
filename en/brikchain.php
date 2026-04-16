@@ -64,10 +64,10 @@ echo '<!DOCTYPE html>
     <div id="splash-bar" style="margin-bottom:-80vh"></div>
 
   <!-- PAGE CONTENT -->
-    <div id="top-page-image" class="brikchain top-page-image"></div>
 
     <div id="form-submission-box" class="landing-page-form">
         <div class="form-container">
+            <div id="top-page-image" class="brikchain top-page-image"></div>
             <div style="text-align:center;width:100%;margin:auto;margin-top:25px;">
                 <h1 data-lang-id="001-brikchain-title">The Brikchain</h1>
             </div>
@@ -84,7 +84,6 @@ require_once '../gobrikconn_env.php';
 try {
     // Query the view to fetch all rows for aggregation
     $sql = "SELECT year,
-                   brick_count,
                    total_brk,
                    weight,
                    tot_usd_exp_amt,
@@ -99,7 +98,6 @@ try {
     }
 
     // Initialize sum variables
-    $sum_ecobricks = 0;
     $sum_brikcoins = 0;
     $sum_weight = 0;
     $sum_expenses = 0;
@@ -110,7 +108,6 @@ try {
     // Aggregate data
     while ($row = $result->fetch_assoc()) {
         // Normalize values by removing commas and converting to float
-        $sum_ecobricks += (float)str_replace(',', '', $row['brick_count']);
         $sum_brikcoins += (float)str_replace(',', '', $row['total_brk']);
         $sum_weight += (float)str_replace(',', '', $row['weight']);
         $sum_expenses += (float)str_replace(',', '', $row['tot_usd_exp_amt']);
@@ -134,7 +131,7 @@ try {
         <div id="brikchain-totals">
             <p><span class="blink">◉  </span> ' . number_format($aes_rolling, 2) . ' &#8202;$ USD per 1 Kg of AES Plastic</p>
             <ul>
-                <li>Total Ecobricks Authenticated: ' . number_format($sum_ecobricks) . '</li>
+                <li>Total Ecobricks Authenticated: ' . $ecobrick_count . '</li>
                 <li>Total Brikcoins Generated: ' . number_format($sum_brikcoins) . '&#8202;ß</li>
                 <li>Total Authenticatd Sequestered Plastic: ' . number_format($sum_weight, 2) . '&#8202;kg</li>
                 <li>Total System Expenses: $' . number_format($sum_expenses, 2) . '&#8202;USD</li>
