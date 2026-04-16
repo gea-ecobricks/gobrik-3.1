@@ -3,7 +3,7 @@ require_once '../earthenAuth_helper.php'; // Include the authentication helper f
 
 // Set page variables
 $lang = basename(dirname($_SERVER['SCRIPT_NAME']));
-$version = '0.46';
+$version = '0.47';
 $page = 'brikchain';
 $lastModified = date("Y-m-d\TH:i:s\Z", filemtime(__FILE__));
 $is_logged_in = isLoggedIn(); // Check if the user is logged in using the helper function
@@ -58,7 +58,7 @@ echo '<!DOCTYPE html>
 
 <!--TOP PAGE BANNER-->
 
-<div class="splash-content-block">
+<div class="splash-content-block" style="margin-top:-70px">
 </div>
 
     <div id="splash-bar" style="margin-bottom:-80vh"></div>
