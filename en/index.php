@@ -131,7 +131,7 @@ if ($result_ecobricks && $result_ecobricks->num_rows > 0) {
 ?>
 
 <!-- LATEST ECOBRICKS GALLERY -->
-<div class="featured-content-gallery" style="overflow-x:clip;">
+<div class="featured-content-gallery">
     <div class="feed-live">
         <p data-lang-id="005-featured-live-brikchain"><span class="blink">⬤  </span>Live brikchain feed of authenticated ecobricks.  Click to preview.</p>
     </div>
@@ -168,7 +168,7 @@ if ($result_ecobricks && $result_ecobricks->num_rows > 0) {
 
 
 
-    <div class="bottom-scope" style="width:100%;height:100%;">
+    <div class="bottom-scope">
          <div class="landing-content">
             <div class="tree-coins" data-lang-id="010-second-feature-img" ><img src="../webps/2023-tree-blank.webp" style="width:100%;" alt="Build your greenest visions with ecobricks">
 
@@ -218,7 +218,7 @@ if ($result_projects && $result_projects->num_rows > 0) {
 $gobrik_conn->close();
 ?>
 
-<div class="featured-content-gallery" style="overflow-x:clip;">
+<div class="featured-content-gallery">
     <div class="feed-live">
         <p><span class="blink">⬤  </span>Latest community ecobrick projects.  Click to preview.</p>
     </div>
