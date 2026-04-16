@@ -61,7 +61,7 @@ echo '<!DOCTYPE html>
 <?php require_once ("../includes/projects-inc.php"); ?>
 
 <!-- PAGE CONTENT -->
-<div id="top-page-image" class="projects-banner top-page-image"></div>
+<div id="top-page-image" class="credentials-banner top-page-image"></div>
 <div id="form-submission-box" class="landing-page-form">
     <div class="form-container" style="padding-top: 108px;">
 
