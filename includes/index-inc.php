@@ -753,168 +753,90 @@ p a:hover {
 
 
 
-/* FEATURED ECOBRICKS GALLERY FORMATING */
-/*
-.brik-co2 {
-  font-size: 0.7em;
-  color: white;
-  font-family: 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
-  margin-top: -60px;
-  text-align: left;
-  padding: 0px 0px 10px 20px;
-  background-color: black !important;
-} */
+/* -------------------------------------------------------
+   LANDING PAGE — PHOTO GRID GALLERIES
+   Shared by the ecobrick gallery and the projects gallery.
+   Each tile is 250 px wide; height is standardised via
+   object-fit: cover so rows stay geometrically uniform.
+   ------------------------------------------------------- */
 
-.gallery-flex-container {
-display: flex;
-flex-wrap: wrap;
-justify-content: center;
-margin: 0px -15px 30px -15px}
-
-
-@media screen and (min-width: 700px) {
-
-.gallery-flex-container > .gal-photo {
-
-  padding: 5px;
-  max-height: 100px;
-  max-width:100px;
-  /* width:100px; */
-  overflow: hidden;
+.landing-photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 10px 30px 10px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.gallery-flex-container > .gal-project-photo {
-
-padding: 5px;
-max-height: 160px;
-max-width:160px;
-/* width:160px; */
-overflow: hidden;
-}
-/*
-.gallery-flex-container::before {
-  content: '';
-  flex: auto;
-}
-
-.gal-photo:nth-child(2n + 1):last-child {
-  margin-left: auto;
-} */
-
-
-
-.gal-photo img {
-  /* width:100px; */
-  height: 100px;
-  background: grey;
-  font-family: 'Mulish';
-  font-size: 0.8em;
-  cursor: pointer;
-  color: var(--text-color);
+.landing-grid-item {
+    width: 250px;
+    flex: 0 0 250px;
+    height: 300px;
+    overflow: hidden;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: var(--darker, #d8d8d8);
+    cursor: pointer;
+    position: relative;
+    border-radius: 6px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-
-.gal-project-photo img {
-  /* width:160px; */
-  height: 160px;
-  background: grey;
-  font-family: 'Mulish';
-  font-size: 0.8em;
-  cursor: pointer;
-  color: var(--text-color);
+.landing-grid-item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+    z-index: 2;
 }
 
-
-
-.photo-box-end {
-
-  height: 100px;
-  width: 100px;
-  margin: 5px;
-  overflow: hidden;
-  animation: blinker 1.5s cubic-bezier(0,.43,1,.64) infinite;
-  background: url(../icons/gobrik-icon-darker.svg) no-repeat center;
-  background-size: contain;
-  background-color: var(--emblem-green);
+.landing-grid-item img {
+    width: 250px;
+    height: 300px;
+    object-fit: cover;
+    display: block;
 }
 
-
-
-.project-photo-box-end {
-
-height: 160px;
-width: 160px;
-margin: 5px;
-overflow: hidden;
-animation: blinker 1.5s cubic-bezier(0,.43,1,.64) infinite;
-background: url(../icons/gobrik-icon-darker.svg) no-repeat center;
-background-size: contain;
-background-color: var(--emblem-green);
-}
-}
-
-@media screen and (max-width: 700px) {
-
-.gallery-flex-container > .gal-photo {
-  max-height: 60px;
-  max-width:60px;
-  width:60px;
-  overflow: hidden;
+/* Project name overlay at the bottom of each project tile */
+.landing-project-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 6px 8px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.50);
+    color: #fff;
+    font-family: 'Mulish', sans-serif;
+    font-size: 0.78em;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    display: block;
 }
 
-.gallery-flex-container > .gal-project-photo {
-  max-height: 100px;
-  max-width:100px;
-  /* width:100px; */
-  overflow: hidden;
+.gallery-empty {
+    font-family: 'Mulish', sans-serif;
+    color: var(--subdued-text, #999);
+    padding: 20px;
+    text-align: center;
+    width: 100%;
 }
 
-
-.gal-photo img {
-  margin: 4px;
-  width:60px;
-  height: 60px;
-  background: grey;
-  font-family: 'Mulish';
-  font-size: 0.6em;
-  cursor: pointer;
-  color: var(--text-color);
-}
-
-.gal-project-photo img {
-  margin: 4px;
-  /* width:100px; */
-  height: 100px;
-  background: grey;
-  font-family: 'Mulish';
-  font-size: 0.6em;
-  cursor: pointer;
-  color: var(--text-color);
-}
-
-.photo-box-end {
-
-  height: 60px;
-  width: 60px;
-  margin: 3px;
-
-  animation: blinker 1.5s cubic-bezier(0,.43,1,.64) infinite;
-  background: url(../icons/gobrik-icon-darker.svg) no-repeat center;
-  background-size: contain;
-  background-color: var(--emblem-green);
-}
-
-.photo-project-box-end {
-
-height: 100px;
-width: 100px;
-margin: 3px;
-
-animation: blinker 1.5s cubic-bezier(0,.43,1,.64) infinite;
-background: url(../icons/gobrik-icon-darker.svg) no-repeat center;
-background-size: contain;
-background-color: var(--emblem-green);
-}
+/* Smaller tiles on narrow phones — two columns still fit */
+@media screen and (max-width: 560px) {
+    .landing-grid-item {
+        width: 160px;
+        flex: 0 0 160px;
+        height: 190px;
+    }
+    .landing-grid-item img {
+        width: 160px;
+        height: 190px;
+    }
 }
 
 
