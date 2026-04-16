@@ -481,10 +481,31 @@ p a:hover { color: var(--h1) !important; }
 }
 
 /* -------------------------------------------------------
-   11. LANDING PAGE — PHOTO GRID GALLERIES
+   11. GALLERY SECTIONS — BACKGROUND BANDS
+   Each gallery section (grid + feature-content-box) gets
+   a distinct subtle tint to visually group them together.
+   ------------------------------------------------------- */
+
+.featured-content-gallery {
+    padding: 30px 0 40px 0;
+    border-radius: 18px;
+    margin: 18px auto;
+    max-width: 1500px;
+}
+
+.gallery-section-ecobricks {
+    background: rgba(34, 180, 100, 0.07);
+}
+
+.gallery-section-projects {
+    background: rgba(0, 140, 220, 0.07);
+}
+
+/* -------------------------------------------------------
+   12. LANDING PAGE — PHOTO GRID GALLERIES
    Shared by the ecobrick gallery and the projects gallery.
-   Tiles are 250 px wide; height is standardised via
-   object-fit: cover so rows stay geometrically uniform.
+   Tiles are ~213 px wide (15 % smaller than the 250 px
+   original); hover scale(1.18) restores them to ~250 px.
    ------------------------------------------------------- */
 
 .landing-photo-grid {
@@ -498,9 +519,9 @@ p a:hover { color: var(--h1) !important; }
 }
 
 .landing-grid-item {
-    width: 250px;
-    flex: 0 0 250px;
-    height: 300px;
+    width: 213px;
+    flex: 0 0 213px;
+    height: 255px;
     overflow: hidden;
     border: none;
     padding: 0;
@@ -509,16 +530,16 @@ p a:hover { color: var(--h1) !important; }
     cursor: pointer;
     position: relative;
     border-radius: 6px;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 .landing-grid-item:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+    transform: scale(1.18);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.30);
     z-index: 2;
 }
 .landing-grid-item img {
-    width: 250px;
-    height: 300px;
+    width: 213px;
+    height: 255px;
     object-fit: cover;
     display: block;
 }
@@ -554,13 +575,13 @@ p a:hover { color: var(--h1) !important; }
 /* Smaller tiles on narrow phones — two columns still fit */
 @media screen and (max-width: 560px) {
     .landing-grid-item {
-        width: 160px;
-        flex: 0 0 160px;
-        height: 190px;
+        width: 136px;
+        flex: 0 0 136px;
+        height: 162px;
     }
     .landing-grid-item img {
-        width: 160px;
-        height: 190px;
+        width: 136px;
+        height: 162px;
     }
 }
 

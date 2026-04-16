@@ -106,7 +106,7 @@ $sql_ecobricks = "SELECT ecobrick_full_photo_url, ecobrick_thumb_photo_url, seri
                   FROM tb_ecobricks
                   WHERE ecobrick_thumb_photo_url IS NOT NULL
                     AND ecobrick_thumb_photo_url != ''
-                    AND status NOT IN ('not ready', 'deleted')
+                    AND status = 'authenticated'
                   ORDER BY date_logged_ts DESC
                   LIMIT 10";
 $result_ecobricks = $gobrik_conn->query($sql_ecobricks);
@@ -131,7 +131,7 @@ if ($result_ecobricks && $result_ecobricks->num_rows > 0) {
 ?>
 
 <!-- LATEST ECOBRICKS GALLERY -->
-<div class="featured-content-gallery">
+<div class="featured-content-gallery gallery-section-ecobricks">
     <div class="feed-live">
         <p data-lang-id="005-featured-live-brikchain"><span class="blink">⬤  </span>Live brikchain feed of authenticated ecobricks.  Click to preview.</p>
     </div>
@@ -162,36 +162,6 @@ if ($result_ecobricks && $result_ecobricks->num_rows > 0) {
     </div>
 </div>
 
-
-
-
-
-
-
-    <div class="bottom-scope">
-         <div class="landing-content">
-            <div class="tree-coins" data-lang-id="010-second-feature-img" ><img src="../webps/2023-tree-blank.webp" style="width:100%;" alt="Build your greenest visions with ecobricks">
-
-
-            </div>
-
-            <div class="welcome-text" data-lang-id="011-second-text">
-                Together we're securing plastic out of the biosphere to make building blocks, generate brikcoins and co-create green spaces.
-               <br><br>
-               <img src="../svgs/aes-brk.svg" style="width:200px;" width="200" height="77" alt="Introducing Brikcoins and AES Plastic Offsetting">
-            </div>
-
-            <div class="tree-text" data-lang-id="012-gobrik-sub-text">
-                GoBrik provides ecobrickers and their communities with the tools to manage their ecobricking and to quantify its ecological value.
-            </div>
-
-        <br><br>
-
-
-        </div><!--closes Landing content-->
-    </div><!-- closes bottom-scope -->
-
-
 <!-- LATEST PROJECTS GALLERY -->
 <?php
 $sql_projects = "SELECT project_id, project_name, description_short, briks_used, photo1_main, photo1_tmb
@@ -218,7 +188,7 @@ if ($result_projects && $result_projects->num_rows > 0) {
 $gobrik_conn->close();
 ?>
 
-<div class="featured-content-gallery">
+<div class="featured-content-gallery gallery-section-projects">
     <div class="feed-live">
         <p><span class="blink">⬤  </span>Latest community ecobrick projects.  Click to preview.</p>
     </div>
@@ -249,6 +219,29 @@ $gobrik_conn->close();
         <div class="tree-text">A community of builders putting plastic to use</div>
     </div>
 </div>
+
+    <div class="bottom-scope">
+         <div class="landing-content">
+            <div class="tree-coins" data-lang-id="010-second-feature-img" ><img src="../webps/2023-tree-blank.webp" style="width:100%;" alt="Build your greenest visions with ecobricks">
+
+
+            </div>
+
+            <div class="welcome-text" data-lang-id="011-second-text">
+                Together we're securing plastic out of the biosphere to make building blocks, generate brikcoins and co-create green spaces.
+               <br><br>
+               <img src="../svgs/aes-brk.svg" style="width:200px;" width="200" height="77" alt="Introducing Brikcoins and AES Plastic Offsetting">
+            </div>
+
+            <div class="tree-text" data-lang-id="012-gobrik-sub-text">
+                GoBrik provides ecobrickers and their communities with the tools to manage their ecobricking and to quantify its ecological value.
+            </div>
+
+        <br><br>
+
+
+        </div><!--closes Landing content-->
+    </div><!-- closes bottom-scope -->
 
 <script>
 const GALLERY_ECOBRICKS = <?php echo json_encode($gallery_ecobricks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) ?: '[]'; ?>;
