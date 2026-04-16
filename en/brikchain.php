@@ -107,12 +107,12 @@ try {
 
     // Aggregate data
     while ($row = $result->fetch_assoc()) {
-        // Normalize values by removing commas and converting to float
-        $sum_brikcoins += (float)str_replace(',', '', $row['total_brk']);
-        $sum_weight += (float)str_replace(',', '', $row['weight']);
-        $sum_expenses += (float)str_replace(',', '', $row['tot_idr_exp_amt']);
-        $sum_revenue += (float)str_replace(',', '', $row['tot_idr_rev_amt']);
-        $sum_costs += (float)str_replace(',', '', $row['final_aes_plastic_cost_idr']);
+        // Normalize values by removing commas and converting to float (guard against NULL from LEFT JOINs)
+        $sum_brikcoins += (float)str_replace(',', '', $row['total_brk'] ?? '0');
+        $sum_weight += (float)str_replace(',', '', $row['weight'] ?? '0');
+        $sum_expenses += (float)str_replace(',', '', $row['tot_idr_exp_amt'] ?? '0');
+        $sum_revenue += (float)str_replace(',', '', $row['tot_idr_rev_amt'] ?? '0');
+        $sum_costs += (float)str_replace(',', '', $row['final_aes_plastic_cost_idr'] ?? '0');
         $row_count++;
     }
 
