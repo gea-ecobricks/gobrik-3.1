@@ -86,10 +86,10 @@ try {
     $sql = "SELECT year,
                    total_brk,
                    weight,
-                   tot_usd_exp_amt,
-                   tot_usd_rev_amt,
-                   final_aes_plastic_cost
-            FROM vw_detail_sums_by_year";
+                   tot_idr_exp_amt,
+                   tot_idr_rev_amt,
+                   final_aes_plastic_cost_idr
+            FROM vw_detail_sums_by_year_idr";
 
     $result = $gobrik_conn->query($sql);
 
@@ -110,9 +110,9 @@ try {
         // Normalize values by removing commas and converting to float
         $sum_brikcoins += (float)str_replace(',', '', $row['total_brk']);
         $sum_weight += (float)str_replace(',', '', $row['weight']);
-        $sum_expenses += (float)str_replace(',', '', $row['tot_usd_exp_amt']);
-        $sum_revenue += (float)str_replace(',', '', $row['tot_usd_rev_amt']);
-        $sum_costs += (float)str_replace(',', '', $row['final_aes_plastic_cost']);
+        $sum_expenses += (float)str_replace(',', '', $row['tot_idr_exp_amt']);
+        $sum_revenue += (float)str_replace(',', '', $row['tot_idr_rev_amt']);
+        $sum_costs += (float)str_replace(',', '', $row['final_aes_plastic_cost_idr']);
         $row_count++;
     }
 
@@ -214,7 +214,7 @@ try {
 
 			<?php
 
-			$sql = "SELECT * FROM vw_detail_sums_by_year Order by `year` DESC;";
+			$sql = "SELECT * FROM vw_detail_sums_by_year_idr Order by `year` DESC;";
 
 			$result = $gobrik_conn->query($sql);
 
@@ -241,8 +241,8 @@ try {
 				<!--<td>".$row["brick_count"]." ecobricks</td>-->
 				<td>".$row["calculated_weight"]."&#8202;Kg</td>
 				<!--<td>".$row["weight"]."&#8202;Kg</td>-->
-				<td>".$row["tot_usd_exp_amt"]."&#8202;$ USD</td>
-				<td>".$row["final_aes_plastic_cost"]."&#8202;$ USD</td>
+				<td>".$row["tot_idr_exp_amt"]."&#8202; IDR</td>
+				<td>".$row["final_aes_plastic_cost_idr"]."&#8202; IDR</td>
 				</tr>";
 				}
 				echo "</table>";
