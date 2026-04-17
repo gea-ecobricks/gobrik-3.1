@@ -121,6 +121,10 @@ margin: 0px -15px 30px -15px}
 
 @media screen and (min-width: 700px) { 
 
+.form-container {
+padding-top: 158px;
+}
+
 .gallery-flex-container > .gal-photo {
 
   padding: 5px;
