@@ -1371,8 +1371,8 @@ border-color: #00a112 !important;
 
 @media (max-width: 820px) {
   .modal-v2 {
-    padding: 12px;
-    align-items: flex-start;
+    padding: 60px 12px 12px;
+    align-items: center;
   }
 
   .modal-photo-box-v2 {
