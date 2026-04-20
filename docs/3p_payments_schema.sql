@@ -586,3 +586,187 @@ CREATE TABLE `tb_trainings` (
                                 CONSTRAINT `fk_training_community` FOREIGN KEY (`community_id`) REFERENCES `communities_tbX` (`community_id`) ON DELETE SET NULL,
                                 CONSTRAINT `fk_training_country` FOREIGN KEY (`country_id`) REFERENCES `countries_tb` (`country_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=963 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+
+-- ------------------------------------------------------------
+-- 11. product_campaign_tiers_tb
+-- Optional reward / pricing tiers for a product campaign
+-- Useful for: ebook, paperback, signed copy, patron tier, bundle, etc.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS product_campaign_tiers_tb (
+                                                         tier_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                                         campaign_id BIGINT UNSIGNED NOT NULL,
+                                                         product_id BIGINT UNSIGNED NOT NULL,
+
+                                                         tier_code VARCHAR(64) DEFAULT NULL,
+    tier_name VARCHAR(255) NOT NULL,
+    tier_subtitle VARCHAR(255) DEFAULT NULL,
+    tier_description LONGTEXT DEFAULT NULL,
+
+    tier_currency CHAR(3) NOT NULL DEFAULT 'IDR',
+    tier_price_idr INT UNSIGNED NOT NULL,
+
+    qty_per_pledge INT UNSIGNED NOT NULL DEFAULT 1,
+    max_backers INT UNSIGNED DEFAULT NULL,
+
+    sort_order INT UNSIGNED NOT NULL DEFAULT 1,
+
+    includes_shipping TINYINT(1) NOT NULL DEFAULT 0,
+    shipping_scope VARCHAR(24) NOT NULL DEFAULT 'separate',
+    -- Suggested:
+    -- 'separate', 'indonesia_included', 'worldwide_included', 'pickup_only', 'digital'
+
+    tier_status VARCHAR(24) NOT NULL DEFAULT 'active',
+    -- Suggested:
+    -- 'draft', 'active', 'sold_out', 'inactive', 'archived'
+
+    available_from DATETIME DEFAULT NULL,
+    available_until DATETIME DEFAULT NULL,
+
+    notes TEXT DEFAULT NULL,
+    meta_json JSON DEFAULT NULL,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (tier_id),
+    UNIQUE KEY uq_campaign_tier_code (campaign_id, tier_code),
+    KEY idx_tier_campaign (campaign_id),
+    KEY idx_tier_product (product_id),
+    KEY idx_tier_status (tier_status),
+    KEY idx_tier_sort (campaign_id, sort_order),
+
+    CONSTRAINT fk_tier_campaign
+    FOREIGN KEY (campaign_id) REFERENCES product_campaigns_tb(campaign_id)
+                                                           ON DELETE CASCADE,
+
+    CONSTRAINT fk_tier_product
+    FOREIGN KEY (product_id) REFERENCES products_tb(product_id)
+                                                           ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- ------------------------------------------------------------
+-- 12. product_campaign_updates_tb
+-- Public-facing updates for the campaign page
+-- Useful for: launch notes, threshold reached, print progress, shipping updates
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS product_campaign_updates_tb (
+                                                           update_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                                           campaign_id BIGINT UNSIGNED NOT NULL,
+
+                                                           update_title VARCHAR(255) NOT NULL,
+    update_slug VARCHAR(255) DEFAULT NULL,
+    update_summary TEXT DEFAULT NULL,
+    update_body LONGTEXT NOT NULL,
+
+    update_type VARCHAR(24) NOT NULL DEFAULT 'general',
+    -- Suggested:
+    -- 'general', 'milestone', 'threshold', 'production', 'shipping', 'announcement'
+
+    visibility VARCHAR(24) NOT NULL DEFAULT 'public',
+    -- Suggested:
+    -- 'public', 'supporters_only', 'private'
+
+    is_pinned TINYINT(1) NOT NULL DEFAULT 0,
+    ready_to_show TINYINT(1) NOT NULL DEFAULT 1,
+
+    published_at DATETIME DEFAULT NULL,
+    created_by_buwana_id BIGINT UNSIGNED DEFAULT NULL,
+
+    notes TEXT DEFAULT NULL,
+    meta_json JSON DEFAULT NULL,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (update_id),
+    UNIQUE KEY uq_campaign_update_slug (campaign_id, update_slug),
+    KEY idx_update_campaign (campaign_id),
+    KEY idx_update_type (update_type),
+    KEY idx_update_visibility (visibility),
+    KEY idx_update_published (published_at),
+    KEY idx_update_pinned (campaign_id, is_pinned, published_at),
+
+    CONSTRAINT fk_update_campaign
+    FOREIGN KEY (campaign_id) REFERENCES product_campaigns_tb(campaign_id)
+                                                           ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- ------------------------------------------------------------
+-- 13. product_shipping_rates_tb
+-- Shipping rules for product campaigns / products
+-- Supports Indonesia and international pricing
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS product_shipping_rates_tb (
+                                                         shipping_rate_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+                                                         campaign_id BIGINT UNSIGNED DEFAULT NULL,
+                                                         product_id BIGINT UNSIGNED DEFAULT NULL,
+                                                         tier_id BIGINT UNSIGNED DEFAULT NULL,
+
+                                                         rate_name VARCHAR(255) NOT NULL,
+    rate_description VARCHAR(255) DEFAULT NULL,
+
+    destination_scope VARCHAR(24) NOT NULL DEFAULT 'country',
+    -- Suggested:
+    -- 'pickup', 'country', 'region', 'zone', 'worldwide'
+
+    country_code CHAR(2) DEFAULT NULL,
+    region_code VARCHAR(64) DEFAULT NULL,
+    zone_code VARCHAR(64) DEFAULT NULL,
+
+    currency CHAR(3) NOT NULL DEFAULT 'IDR',
+    shipping_amount INT UNSIGNED NOT NULL,
+
+    per_unit_mode VARCHAR(24) NOT NULL DEFAULT 'per_order',
+    -- Suggested:
+    -- 'per_order', 'per_item'
+
+    min_qty INT UNSIGNED NOT NULL DEFAULT 1,
+    max_qty INT UNSIGNED DEFAULT NULL,
+
+    min_weight_grams INT UNSIGNED DEFAULT NULL,
+    max_weight_grams INT UNSIGNED DEFAULT NULL,
+
+    shipping_method VARCHAR(32) DEFAULT NULL,
+    -- Suggested:
+    -- 'standard', 'express', 'pickup', 'economy'
+
+    estimated_days_min INT UNSIGNED DEFAULT NULL,
+    estimated_days_max INT UNSIGNED DEFAULT NULL,
+
+    rate_status VARCHAR(24) NOT NULL DEFAULT 'active',
+    -- Suggested:
+    -- 'active', 'inactive', 'archived'
+
+    sort_order INT UNSIGNED NOT NULL DEFAULT 1,
+
+    notes TEXT DEFAULT NULL,
+    meta_json JSON DEFAULT NULL,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (shipping_rate_id),
+    KEY idx_ship_campaign (campaign_id),
+    KEY idx_ship_product (product_id),
+    KEY idx_ship_tier (tier_id),
+    KEY idx_ship_country (country_code),
+    KEY idx_ship_scope (destination_scope),
+    KEY idx_ship_status (rate_status),
+    KEY idx_ship_sort (sort_order),
+
+    CONSTRAINT fk_ship_campaign
+    FOREIGN KEY (campaign_id) REFERENCES product_campaigns_tb(campaign_id)
+                                                           ON DELETE CASCADE,
+
+    CONSTRAINT fk_ship_product
+    FOREIGN KEY (product_id) REFERENCES products_tb(product_id)
+                                                           ON DELETE CASCADE,
+
+    CONSTRAINT fk_ship_tier
+    FOREIGN KEY (tier_id) REFERENCES product_campaign_tiers_tb(tier_id)
+                                                           ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

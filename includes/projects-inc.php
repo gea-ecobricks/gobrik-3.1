@@ -137,7 +137,32 @@ body {
 }
 
 /* -------------------------------------------------------
-   4. SIDE-MENU OVERLAY
+   4. TOP-PAGE-IMAGE HANGING EFFECT — projects-page overrides
+   ------------------------------------------------------- */
+
+/* Desktop: the global form-container padding: 30px collapses the inline
+   padding-top: 108px on this page, leaving the h2 inside the 170px banner.
+   Override here to push the heading clearly below the image bottom (~240px). */
+@media screen and (min-width: 701px) {
+    #form-submission-box .form-container {
+        padding-top: 165px !important;
+    }
+}
+
+/* Mobile: the global landing-page-form padding-top: 75px creates too much
+   blank space above the form box on this page. Reduce it and rebalance the
+   container padding-top so the banner-to-title gap stays the same (~8px). */
+@media screen and (max-width: 700px) {
+    #form-submission-box.landing-page-form {
+        padding-top: 30px;
+    }
+    #form-submission-box .form-container {
+        padding-top: 153px !important;
+    }
+}
+
+/* -------------------------------------------------------
+   5. SIDE-MENU OVERLAY
    ------------------------------------------------------- */
 
 #main-menu-overlay {
