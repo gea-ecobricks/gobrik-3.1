@@ -154,7 +154,7 @@ $locationFullTxt = $location_third_last . ', ' . $location_last;
 
 // 🎓 Fetch trainings where user is trainer, ordered by most recent first
 $trainings = [];
-$sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type, t.ready_to_show, t.show_report,
+$sql_trainings = "SELECT t.training_id, t.training_title, t.training_date, t.training_location, t.training_type, t.ready_to_show, t.show_report, t.payment_mode, t.feature_photo1_tmb, t.feature_photo1_main,
                          (SELECT COUNT(*) FROM tb_training_trainees WHERE training_id = t.training_id) AS trainee_count
                   FROM tb_trainings t
                   INNER JOIN tb_training_trainers tt ON t.training_id = tt.training_id
@@ -220,6 +220,12 @@ if ($stmt_trainings_3p) {
         $trainings_3p[] = $row;
     }
     $stmt_trainings_3p->close();
+}
+
+// Build a lookup map for fast 3P data access inside the v2 panel loop
+$trainings_3p_map = [];
+foreach ($trainings_3p as $t3p_item) {
+    $trainings_3p_map[(int)$t3p_item['training_id']] = $t3p_item;
 }
 
 // 📋 Fetch trainings where user is a registered trainee (legacy confirmed, non-3P)
@@ -712,6 +718,15 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         filter: brightness(0.90);
         transform: translateY(-1px);
     }
+    .training-v2-status-pill.status-upcoming {
+        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+    }
+    .training-v2-status-pill.status-reported {
+        background: linear-gradient(135deg, #0277bd 0%, #0288d1 100%);
+    }
+    .training-v2-status-pill.status-report-due {
+        background: linear-gradient(135deg, #e65100 0%, #f57c00 100%);
+    }
 
     /* Community Request Modal */
     .community-request-modal-body {
@@ -1047,78 +1062,135 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         </div>
 
-        <!-- My Trainings v2 (3P pledge-threshold trainings, trainer only) -->
-        <?php if (strpos(strtolower($gea_status), 'trainer') !== false && !empty($trainings_3p)): ?>
+        <!-- My Trainings v2 (all trainings where user is trainer) -->
+        <?php if (strpos(strtolower($gea_status), 'trainer') !== false && !empty($trainings)): ?>
             <div id="my-trainings-v2-panel" class="dashboard-v2-panel">
-                <span class="panel-pill trainer-pill">Trainer · 3P</span>
+                <span class="panel-pill trainer-pill">Trainer</span>
                 <h3>My Trainings</h3>
                 <div class="my-project-list">
-                    <?php foreach ($trainings_3p as $t3p): ?>
+                    <?php foreach ($trainings as $tr): ?>
                         <?php
-                            $t_id         = (int)$t3p['training_id'];
-                            $t_title      = htmlspecialchars($t3p['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $t_date       = !empty($t3p['training_date']) ? date("Y-m-d", strtotime($t3p['training_date'])) : '—';
-                            $t_type       = htmlspecialchars($t3p['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
-                            $t_status_raw = strtolower($t3p['threshold_status'] ?? 'open');
-                            $t_status_labels = [
-                                'open'         => 'Open',
-                                'reached'      => 'Its a go!',
-                                'cancelled'    => 'Cancelled',
-                                'open_request' => 'Community Request',
-                            ];
-                            $t_status_label  = $t_status_labels[$t_status_raw] ?? ucfirst($t_status_raw);
-                            $pledge_count    = (int)($t3p['pledge_count'] ?? 0);
-                            $funding_goal    = (int)($t3p['funding_goal_idr'] ?? 0);
-                            $total_pledged   = (int)($t3p['total_pledged_idr'] ?? 0);
-                            $funding_pct     = (int)($t3p['funding_pct'] ?? 0);
-                            $funding_str     = 'IDR ' . number_format($total_pledged) . ' / ' . number_format($funding_goal);
-                            $pledge_deadline = !empty($t3p['pledge_deadline']) ? date("M j, Y", strtotime($t3p['pledge_deadline'])) : '—';
-                            $tmb_raw  = !empty($t3p['feature_photo1_tmb']) ? $t3p['feature_photo1_tmb'] : ($t3p['feature_photo1_main'] ?? '');
-                            $tmb_src  = htmlspecialchars($tmb_raw, ENT_QUOTES, 'UTF-8');
+                            $t_id    = (int)$tr['training_id'];
+                            $t_title = htmlspecialchars($tr['training_title'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $t_date  = !empty($tr['training_date']) ? date("Y-m-d", strtotime($tr['training_date'])) : '—';
+                            $t_type  = htmlspecialchars($tr['training_type'] ?? '', ENT_QUOTES, 'UTF-8');
+                            $tmb_raw = !empty($tr['feature_photo1_tmb']) ? $tr['feature_photo1_tmb'] : ($tr['feature_photo1_main'] ?? '');
+                            $tmb_src = htmlspecialchars($tmb_raw, ENT_QUOTES, 'UTF-8');
+                            $is_3p   = isset($trainings_3p_map[$t_id]);
                         ?>
-                        <div class="my-project-row">
-                            <button class="project-gear-btn"
-                                    data-show-report="<?php echo (int)($t3p['show_report'] ?? 0); ?>"
-                                    data-ready-to-show="<?php echo (int)($t3p['ready_to_show'] ?? 0); ?>"
-                                    onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
-                                    title="Training actions">⚙️</button>
-                            <?php if ($tmb_src): ?>
-                                <img class="my-project-tmb"
-                                     src="<?php echo $tmb_src; ?>"
-                                     alt="<?php echo $t_title; ?>"
-                                     style="cursor:default;">
-                            <?php else: ?>
-                                <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;cursor:default;">🎓</div>
-                            <?php endif; ?>
-                            <div class="my-project-info">
-                                <span class="my-project-title"><?php echo $t_title; ?></span>
-                                <span class="my-project-meta"><?php echo $t_date . ' · ' . $t_type; ?></span>
-                                <div class="training-v2-progress-wrap">
-                                    <div class="training-v2-progress-bar" style="width:<?php echo $funding_pct; ?>%"></div>
-                                </div>
-                                <span class="my-project-meta"><?php echo htmlspecialchars($funding_str, ENT_QUOTES, 'UTF-8'); ?> &nbsp;·&nbsp; Deadline: <?php echo htmlspecialchars($pledge_deadline, ENT_QUOTES, 'UTF-8'); ?></span>
-                            </div>
-                            <div class="training-v2-pills">
-                                <?php if ($t_status_raw !== 'open_request'): ?>
-                                <button class="training-v2-pledge-btn"
-                                        onclick="openPledgersModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
-                                        title="View pledgers">
-                                    <?php echo $pledge_count; ?> 🤝
-                                </button>
-                                <?php endif; ?>
-                                <?php if ($t_status_raw === 'open_request'): ?>
-                                    <button class="training-v2-status-pill status-open_request"
-                                            onclick="openCommunityRequestModal(<?php echo $t_id; ?>)"
-                                            title="Review community training request">
-                                        <?php echo $t_status_label; ?>
-                                    </button>
+                        <?php if ($is_3p): ?>
+                            <?php
+                                $t3p          = $trainings_3p_map[$t_id];
+                                $t_status_raw = strtolower($t3p['threshold_status'] ?? 'open');
+                                $t_status_labels = [
+                                    'open'         => 'Open',
+                                    'reached'      => 'Its a go!',
+                                    'cancelled'    => 'Cancelled',
+                                    'open_request' => 'Community Request',
+                                ];
+                                $t_status_label  = $t_status_labels[$t_status_raw] ?? ucfirst($t_status_raw);
+                                $pledge_count    = (int)($t3p['pledge_count'] ?? 0);
+                                $funding_goal    = (int)($t3p['funding_goal_idr'] ?? 0);
+                                $total_pledged   = (int)($t3p['total_pledged_idr'] ?? 0);
+                                $funding_pct     = (int)($t3p['funding_pct'] ?? 0);
+                                $funding_str     = 'IDR ' . number_format($total_pledged) . ' / ' . number_format($funding_goal);
+                                $pledge_deadline = !empty($t3p['pledge_deadline']) ? date("M j, Y", strtotime($t3p['pledge_deadline'])) : '—';
+                            ?>
+                            <div class="my-project-row">
+                                <button class="project-gear-btn"
+                                        data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
+                                        data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>"
+                                        onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
+                                        title="Training actions">⚙️</button>
+                                <?php if ($tmb_src): ?>
+                                    <img class="my-project-tmb"
+                                         src="<?php echo $tmb_src; ?>"
+                                         alt="<?php echo $t_title; ?>"
+                                         style="cursor:default;">
                                 <?php else: ?>
-                                    <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
-                                        <?php echo $t_status_label; ?>
-                                    </span>
+                                    <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;cursor:default;">🎓</div>
                                 <?php endif; ?>
+                                <div class="my-project-info">
+                                    <span class="my-project-title"><?php echo $t_title; ?></span>
+                                    <span class="my-project-meta"><?php echo $t_date . ' · ' . $t_type; ?></span>
+                                    <div class="training-v2-progress-wrap">
+                                        <div class="training-v2-progress-bar" style="width:<?php echo $funding_pct; ?>%"></div>
+                                    </div>
+                                    <span class="my-project-meta"><?php echo htmlspecialchars($funding_str, ENT_QUOTES, 'UTF-8'); ?> &nbsp;·&nbsp; Deadline: <?php echo htmlspecialchars($pledge_deadline, ENT_QUOTES, 'UTF-8'); ?></span>
+                                </div>
+                                <div class="training-v2-pills">
+                                    <?php if ($t_status_raw !== 'open_request'): ?>
+                                    <button class="training-v2-pledge-btn"
+                                            onclick="openPledgersModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
+                                            title="View pledgers">
+                                        <?php echo $pledge_count; ?> 🤝
+                                    </button>
+                                    <?php endif; ?>
+                                    <?php if ($t_status_raw === 'open_request'): ?>
+                                        <button class="training-v2-status-pill status-open_request"
+                                                onclick="openCommunityRequestModal(<?php echo $t_id; ?>)"
+                                                title="Review community training request">
+                                            <?php echo $t_status_label; ?>
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?php echo $t_status_label; ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
-                        </div>
+                        <?php else: ?>
+                            <?php
+                                $training_date_ts = !empty($tr['training_date']) ? strtotime($tr['training_date']) : 0;
+                                $is_listed   = (int)($tr['ready_to_show'] ?? 0) === 1;
+                                $show_report = (int)($tr['show_report'] ?? 0) === 1;
+                                $is_past     = $training_date_ts && $training_date_ts < time();
+                                $trainee_count = (int)($tr['trainee_count'] ?? 0);
+
+                                if (!$is_listed) {
+                                    $status_key   = 'draft';
+                                    $status_label = 'Draft';
+                                } elseif (!$is_past) {
+                                    $status_key   = 'upcoming';
+                                    $status_label = 'Upcoming';
+                                } elseif ($show_report) {
+                                    $status_key   = 'reported';
+                                    $status_label = 'Reported';
+                                } else {
+                                    $status_key   = 'report-due';
+                                    $status_label = 'Report Due';
+                                }
+                            ?>
+                            <div class="my-project-row">
+                                <button class="project-gear-btn"
+                                        data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
+                                        data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>"
+                                        onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
+                                        title="Training actions">⚙️</button>
+                                <?php if ($tmb_src): ?>
+                                    <img class="my-project-tmb"
+                                         src="<?php echo $tmb_src; ?>"
+                                         alt="<?php echo $t_title; ?>"
+                                         style="cursor:default;">
+                                <?php else: ?>
+                                    <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;cursor:default;">🎓</div>
+                                <?php endif; ?>
+                                <div class="my-project-info">
+                                    <span class="my-project-title"><?php echo $t_title; ?></span>
+                                    <span class="my-project-meta"><?php echo $t_date . ' · ' . $t_type; ?></span>
+                                </div>
+                                <div class="training-v2-pills">
+                                    <button class="training-v2-pledge-btn"
+                                            onclick="openTraineesModal(<?php echo $t_id; ?>, '<?php echo $t_title; ?>')"
+                                            title="View trainees">
+                                        <?php echo $trainee_count; ?> 👥
+                                    </button>
+                                    <span class="training-v2-status-pill status-<?php echo $status_key; ?>">
+                                        <?php echo $status_label; ?>
+                                    </span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
                 <div class="panel-list-footer">
