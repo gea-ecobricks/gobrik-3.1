@@ -1623,7 +1623,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     function toggleFeaturedEmptyState(hasData) {
         const emptyMessage = document.getElementById('featured-ecobricks-empty');
-        const grid = document.querySelector('.ecobrick-grid');
+        const grid = latestPanel?.querySelector('.ecobrick-grid');
         const slider = document.getElementById('ecobrick-slider');
 
         if (emptyMessage) {
@@ -1651,7 +1651,7 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
 
     function renderFeaturedEcobricks(bricks) {
         const slider = document.getElementById('ecobrick-slider');
-        const grid = document.querySelector('.ecobrick-grid');
+        const grid = latestPanel?.querySelector('.ecobrick-grid');
 
         if (!slider || !grid) return;
 
