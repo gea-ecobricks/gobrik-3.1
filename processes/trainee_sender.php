@@ -1,5 +1,10 @@
 <?php
-session_start();
+require_once '../auth/session_start.php';
+require_once '../vendor/autoload.php';
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+
 if (!isset($_SESSION['buwana_id'])) {
     echo json_encode(['success' => false, 'message' => 'Not logged in']);
     exit();
