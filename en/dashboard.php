@@ -699,6 +699,12 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
         color: #fff;
         background: #757575;
         border: none;
+        cursor: pointer;
+        transition: filter 0.15s ease, transform 0.15s ease;
+    }
+    .training-v2-status-pill:hover {
+        filter: brightness(0.90);
+        transform: translateY(-1px);
     }
     .training-v2-status-pill.status-open {
         background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
@@ -1133,9 +1139,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                             <?php echo $t_status_label; ?>
                                         </button>
                                     <?php else: ?>
-                                        <span class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <button class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>"
+                                                data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
+                                                data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>"
+                                                onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
+                                                title="Training actions">
                                             <?php echo $t_status_label; ?>
-                                        </span>
+                                        </button>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -1185,9 +1195,13 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                             title="View trainees">
                                         <?php echo $trainee_count; ?> 👥
                                     </button>
-                                    <span class="training-v2-status-pill status-<?php echo $status_key; ?>">
+                                    <button class="training-v2-status-pill status-<?php echo $status_key; ?>"
+                                            data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
+                                            data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>"
+                                            onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
+                                            title="Training actions">
                                         <?php echo $status_label; ?>
-                                    </span>
+                                    </button>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -2284,19 +2298,38 @@ function openTraineeSender(trainingId) {
                 return;
             }
 
-            const msg = `Hi there $first_name,\n\nThank you again for registering for our ${escapeHTML(data.training_title)} event!  \n\nThis is a reminder that today, at ${escapeHTML(data.training_time_txt)} the ${escapeHTML(data.training_type)} begins!\n\nThe training is on Zoom.  Here's the full zoom link and invite you will need to access:\n\n------------------------\n\n${escapeHTML(data.zoom_link_full)}\n\n------------------------\n\nWe'll be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.\n\nMeanwhile, we're also setting up a support chat for the week.  I don't know about you, but I've got a lot of plastic saved up and it needs packing.  So after the workshop we're going to use the group to let you (and us!) share our ecobricking progress and ask questions.\n\nWe do our best to avoid meta products in the same way we avoid single-use plastic products, so sorry no whatsapp.  We use Signal (a free, open-source, foundation-run equivalent).  Click the link to join the group now or after the workshop:\n\nhttps://signal.group/#CjQKICIVvzmbBXqB7_9-5XyXd53zbdw7RLqVWKbQ8UzX2EkREhC0_jo3SCAr40xIO_jePrmT\n\nUnlike some of our GEA workshops, no need to bring anything to this workshop except your curiousity.  It will be interactive, so be prepared to share and anwser questions via mic and via chat.\n\nAlright, see you soon!\n\n${escapeHTML(data.lead_trainer)}\n${escapeHTML(data.trainer_contact_email)}`;
+            const goAheadTitle = `Reminder: ${escapeHTML(data.training_title)} starts today`;
+            const noGoTitle = `NO-GO: "${escapeHTML(data.training_title)}" did not meet its registration goal to go ahead...`;
 
-            const defaultTitle = `Reminder: ${escapeHTML(data.training_title)} starts today`;
+            const goAheadMsg = `Hi there $first_name,\n\nThank you again for registering for our ${escapeHTML(data.training_title)} event!  \n\nThis is a reminder that today, at ${escapeHTML(data.training_time_txt)} the ${escapeHTML(data.training_type)} begins!\n\nThe training is on Zoom.  Here's the full zoom link and invite you will need to access:\n\n------------------------\n\n${escapeHTML(data.zoom_link_full)}\n\n------------------------\n\nWe'll be opening up the meeting 15 minutes earlier to test systems and audio.  Feel free to join early for a meet and greet.\n\nMeanwhile, we're also setting up a support chat for the week.  I don't know about you, but I've got a lot of plastic saved up and it needs packing.  So after the workshop we're going to use the group to let you (and us!) share our ecobricking progress and ask questions.\n\nWe do our best to avoid meta products in the same way we avoid single-use plastic products, so sorry no whatsapp.  We use Signal (a free, open-source, foundation-run equivalent).  Click the link to join the group now or after the workshop:\n\nhttps://signal.group/#CjQKICIVvzmbBXqB7_9-5XyXd53zbdw7RLqVWKbQ8UzX2EkREhC0_jo3SCAr40xIO_jePrmT\n\nUnlike some of our GEA workshops, no need to bring anything to this workshop except your curiousity.  It will be interactive, so be prepared to share and anwser questions via mic and via chat.\n\nAlright, see you soon!\n\n${escapeHTML(data.lead_trainer)}\n${escapeHTML(data.trainer_contact_email)}`;
+
+            const noGoMsg = `Hi there $first_name,\n\nThank you for registering for our ${escapeHTML(data.training_title)} event!  \n\nUnfortunately, today's course did not attain the requisite amount of minimum participants and will not be going ahead.\n\nConsequently, you will not be charged for the course.  That's how our Pledge, Pay and Proceed system works.\n\nThis is the very first time we've launched a course of GoBrik using our 3P system-- so thanks for your patience as we get going.  \n\nAgain, thanks for registering and your interest. 🙏\n\nTowards a transition from plastic in our homes, communities and enterprises into greater harmony with Earth's cycles.\n\n${escapeHTML(data.lead_trainer)}`;
 
             modalBox.innerHTML = `
                 <h4 style="text-align:center;">Send a message to Participants</h4>
                 <p style="text-align:center;">Use this quick tool and default message to send a message to everyone who has signed up for the training</p>
-                <input id="trainee-title" type="text" style="width:100%;margin-bottom:10px;" value="${defaultTitle}" />
-                <textarea id="trainee-message" style="white-space:pre-wrap;text-align:left;width:100%;height:260px;">${msg}</textarea>
+                <select id="trainee-template-select" style="width:100%;margin-bottom:12px;padding:8px 10px;border-radius:8px;border:1px solid #ccc;font-size:0.95em;">
+                    <option value="go-ahead">✅ Go-Ahead Notification</option>
+                    <option value="no-go">❌ No-Go Course Deferral</option>
+                </select>
+                <input id="trainee-title" type="text" style="width:100%;margin-bottom:10px;" value="${goAheadTitle}" />
+                <textarea id="trainee-message" style="white-space:pre-wrap;text-align:left;width:100%;height:260px;">${goAheadMsg}</textarea>
                 <button id="trainee-test-send" class="confirm-button enabled" style="min-width:360px;margin-top:10px;">Test to: ${escapeHTML(data.trainer_contact_email)}</button>
                 <button id="trainee-all-send" class="confirm-button enabled" style="min-width:360px;margin-top:10px;">Send Email to All</button>
                 <div id="trainee-send-status" style="margin-top:10px;text-align:center;"></div>
             `;
+
+            document.getElementById('trainee-template-select').addEventListener('change', function() {
+                const titleEl   = document.getElementById('trainee-title');
+                const messageEl = document.getElementById('trainee-message');
+                if (this.value === 'no-go') {
+                    titleEl.value   = noGoTitle;
+                    messageEl.value = noGoMsg;
+                } else {
+                    titleEl.value   = goAheadTitle;
+                    messageEl.value = goAheadMsg;
+                }
+            });
 
             document.getElementById('trainee-test-send').addEventListener('click', () => sendTraineeEmails(trainingId, true));
             document.getElementById('trainee-all-send').addEventListener('click', () => sendTraineeEmails(trainingId, false));
