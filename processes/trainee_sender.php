@@ -130,9 +130,21 @@ if ($test) {
     $success = $ok;
     $messages[] = $ok ? "Test sent to $trainer_contact_email" : "Failed to send test";
 } else {
-    $sql = "SELECT e.first_name, e.email_addr FROM tb_training_trainees t INNER JOIN tb_ecobrickers e ON t.ecobricker_id = e.ecobricker_id WHERE t.training_id = ?";
+    // UNION: legacy free-course registrants (tb_training_trainees) + 3P pledge registrants (training_registrations_tb)
+    $sql = "SELECT e.first_name, e.email_addr
+            FROM tb_training_trainees t
+            INNER JOIN tb_ecobrickers e ON t.ecobricker_id = e.ecobricker_id
+            WHERE t.training_id = ?
+            UNION
+            SELECT
+                COALESCE(e2.first_name, SUBSTRING_INDEX(r.attendee_name, ' ', 1)) AS first_name,
+                COALESCE(e2.email_addr, r.attendee_email)                          AS email_addr
+            FROM training_registrations_tb r
+            LEFT JOIN tb_ecobrickers e2 ON e2.buwana_id = r.buwana_id
+            WHERE r.training_id = ?
+              AND r.status NOT IN ('cancelled', 'expired')";
     $stmt = $gobrik_conn->prepare($sql);
-    $stmt->bind_param('i', $training_id);
+    $stmt->bind_param('ii', $training_id, $training_id);
     $stmt->execute();
     $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) {
