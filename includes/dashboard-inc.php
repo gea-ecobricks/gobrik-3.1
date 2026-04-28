@@ -541,6 +541,18 @@ margin-top:-100px !important;
     border-bottom: 1px solid rgba(0,0,0,0.07);
 }
 
+.training-action-row {
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+    padding: 11px 6px;
+    margin: 0 -6px;
+}
+
+.training-action-row:hover {
+    background: rgba(0,0,0,0.04);
+}
+
 .my-project-row:last-child {
     border-bottom: none;
 }

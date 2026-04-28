@@ -1102,19 +1102,16 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                 $funding_str     = 'IDR ' . number_format($total_pledged) . ' / ' . number_format($funding_goal);
                                 $pledge_deadline = !empty($t3p['pledge_deadline']) ? date("M j, Y", strtotime($t3p['pledge_deadline'])) : '—';
                             ?>
-                            <div class="my-project-row">
-                                <button class="project-gear-btn"
-                                        data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
-                                        data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>"
-                                        onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
-                                        title="Training actions">⚙️</button>
+                            <div class="my-project-row training-action-row"
+                                 data-training-id="<?php echo $t_id; ?>"
+                                 data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
+                                 data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>">
                                 <?php if ($tmb_src): ?>
                                     <img class="my-project-tmb"
                                          src="<?php echo $tmb_src; ?>"
-                                         alt="<?php echo $t_title; ?>"
-                                         style="cursor:default;">
+                                         alt="<?php echo $t_title; ?>">
                                 <?php else: ?>
-                                    <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;cursor:default;">🎓</div>
+                                    <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;">🎓</div>
                                 <?php endif; ?>
                                 <div class="my-project-info">
                                     <span class="my-project-title"><?php echo $t_title; ?></span>
@@ -1140,9 +1137,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                         </button>
                                     <?php else: ?>
                                         <button class="training-v2-status-pill status-<?php echo htmlspecialchars($t_status_raw, ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
-                                                data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>"
-                                                onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
                                                 title="Training actions">
                                             <?php echo $t_status_label; ?>
                                         </button>
@@ -1171,19 +1165,16 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                     $status_label = 'Report Due';
                                 }
                             ?>
-                            <div class="my-project-row">
-                                <button class="project-gear-btn"
-                                        data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
-                                        data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>"
-                                        onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
-                                        title="Training actions">⚙️</button>
+                            <div class="my-project-row training-action-row"
+                                 data-training-id="<?php echo $t_id; ?>"
+                                 data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
+                                 data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>">
                                 <?php if ($tmb_src): ?>
                                     <img class="my-project-tmb"
                                          src="<?php echo $tmb_src; ?>"
-                                         alt="<?php echo $t_title; ?>"
-                                         style="cursor:default;">
+                                         alt="<?php echo $t_title; ?>">
                                 <?php else: ?>
-                                    <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;cursor:default;">🎓</div>
+                                    <div class="my-project-tmb" style="background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;font-size:1.5em;">🎓</div>
                                 <?php endif; ?>
                                 <div class="my-project-info">
                                     <span class="my-project-title"><?php echo $t_title; ?></span>
@@ -1196,9 +1187,6 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
                                         <?php echo $trainee_count; ?> 👥
                                     </button>
                                     <button class="training-v2-status-pill status-<?php echo $status_key; ?>"
-                                            data-show-report="<?php echo (int)($tr['show_report'] ?? 0); ?>"
-                                            data-ready-to-show="<?php echo (int)($tr['ready_to_show'] ?? 0); ?>"
-                                            onclick="actionsTrainingModal(this, <?php echo $t_id; ?>)"
                                             title="Training actions">
                                         <?php echo $status_label; ?>
                                     </button>
@@ -2362,15 +2350,16 @@ function sendTraineeEmails(trainingId, isTest) {
                 btn.textContent = '✅ Message sent!';
                 btn.style.background = 'green';
             } else {
-                btn.textContent = '🙄Message failed to send';
+                btn.textContent = '🙄 Message failed to send';
                 btn.style.background = 'red';
             }
-            if (data.message) {
-                statusDiv.innerHTML += `<p>${escapeHTML(data.message)}</p>`;
+            if (Array.isArray(data.messages) && data.messages.length) {
+                const listItems = data.messages.map(m => `<li style="text-align:left;">${escapeHTML(m)}</li>`).join('');
+                statusDiv.innerHTML += `<ul style="margin-top:8px;padding-left:18px;font-size:0.9em;">${listItems}</ul>`;
             }
         })
         .catch(err => {
-            btn.textContent = '🙄Message failed to send';
+            btn.textContent = '🙄 Message failed to send';
             btn.style.background = 'red';
             statusDiv.innerHTML += `<p>${escapeHTML(err.message)}</p>`;
         });
@@ -2800,6 +2789,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 parseInt(this.dataset.projectId) || 0,
                 this.dataset.projectName || ''
             );
+        });
+    });
+
+    // My Trainings V2 — clicking anywhere on the row (except pledge btn and community-request pill) opens actions menu
+    document.querySelectorAll('.training-action-row').forEach(function(row) {
+        row.addEventListener('click', function(e) {
+            if (e.target.closest('.training-v2-pledge-btn')) return;
+            if (e.target.closest('.status-open_request')) return;
+            actionsTrainingModal(this, parseInt(this.dataset.trainingId));
         });
     });
 });

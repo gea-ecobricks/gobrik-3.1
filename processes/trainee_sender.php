@@ -147,4 +147,4 @@ $gobrik_conn->close();
 
 error_log('[TraineeSender] '.implode(' | ', $messages));
 
-echo json_encode(['success' => $success, 'message' => implode('\n', $messages)]);
+echo json_encode(['success' => $success, 'messages' => $messages]);
