@@ -1,4 +1,5 @@
-
+<?php
+session_start();
 if (!isset($_SESSION['buwana_id'])) {
     echo json_encode(['success' => false, 'message' => 'Not logged in']);
     exit();
