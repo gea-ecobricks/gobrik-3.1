@@ -596,7 +596,7 @@ function openInfoModal() {
         <div class="register-modal-stack register-modal-centered">
             <h1>🔑</h1>
             <h2>Login to Register</h2>
-            <p>To register for this course you must use your GoBrik account.</p>
+            <p>To register for this course you really must use your GoBrik account.</p>
             <div class="register-modal-actions register-modal-actions-column">
                 <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>?status=relanding" class="confirm-button enabled register-modal-action-wide">Login</a>
                 <a href="signup.php" class="confirm-button enabled register-modal-action-wide">Sign Up</a>
