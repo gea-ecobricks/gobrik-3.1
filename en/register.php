@@ -598,8 +598,8 @@ function openInfoModal() {
             <h2>Login to Register</h2>
             <p>To register for this course you really must use your GoBrik account.</p>
             <div class="register-modal-actions register-modal-actions-column">
-                <a href="login.php?redirect=register.php?id=<?php echo $training_id; ?>?status=relanding" class="confirm-button enabled register-modal-action-wide">Login</a>
-                <a href="signup.php" class="confirm-button enabled register-modal-action-wide">Sign Up</a>
+                <a href="/auth/redirect.php?redirect=<?php echo urlencode('/en/register.php?id=' . $training_id . '&status=relanding'); ?>" class="confirm-button enabled register-modal-action-wide">Login</a>
+                <a href="https://buwana.ecobricks.org/en/signup-1.php?app=gbrk_f2c61a85a4cd4b8b89a7&redirect=courses.php" class="confirm-button enabled register-modal-action-wide">Sign Up</a>
             </div>
             <p class="register-modal-footnote">GoBrik authentication is powered by Buwana SSO for regenerative apps</p>
         </div>
