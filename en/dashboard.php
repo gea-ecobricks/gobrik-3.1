@@ -508,31 +508,31 @@ $ghost_member_stats = [
     'sent_002' => 0,
     'remaining' => 0,
 ];
-
-if ($is_admin) {
-    require_once '../emailing/earthen_helpers.php';
-
-    $ghoststats_conn = loadGhostStatsConnection();
-
-    if ($ghoststats_conn) {
-        $sent001_stats = getGhostMemberStats($ghoststats_conn, 'sent-001');
-        $sent002_stats = getGhostMemberStats($ghoststats_conn, 'sent-002');
-
-        $ghost_total = max($sent001_stats['total'] ?? 0, $sent002_stats['total'] ?? 0);
-        $ghost_remaining = max(0, $ghost_total - ($sent001_stats['sent'] ?? 0) - ($sent002_stats['sent'] ?? 0));
-
-        $ghost_member_stats = [
-            'total' => $ghost_total,
-            'sent_001' => $sent001_stats['sent'] ?? 0,
-            'sent_002' => $sent002_stats['sent'] ?? 0,
-            'remaining' => $ghost_remaining,
-        ];
-    }
-
-    if ($ghoststats_conn instanceof mysqli) {
-        $ghoststats_conn->close();
-    }
-}
+//
+// if ($is_admin) {
+//     require_once '../emailing/earthen_helpers.php';
+//
+//     $ghoststats_conn = loadGhostStatsConnection();
+//
+//     if ($ghoststats_conn) {
+//         $sent001_stats = getGhostMemberStats($ghoststats_conn, 'sent-001');
+//         $sent002_stats = getGhostMemberStats($ghoststats_conn, 'sent-002');
+//
+//         $ghost_total = max($sent001_stats['total'] ?? 0, $sent002_stats['total'] ?? 0);
+//         $ghost_remaining = max(0, $ghost_total - ($sent001_stats['sent'] ?? 0) - ($sent002_stats['sent'] ?? 0));
+//
+//         $ghost_member_stats = [
+//             'total' => $ghost_total,
+//             'sent_001' => $sent001_stats['sent'] ?? 0,
+//             'sent_002' => $sent002_stats['sent'] ?? 0,
+//             'remaining' => $ghost_remaining,
+//         ];
+//     }
+//
+//     if ($ghoststats_conn instanceof mysqli) {
+//         $ghoststats_conn->close();
+//     }
+// }
 
 // 🔒 Clean exit: close DB connections
 $buwana_conn->close();
@@ -1405,32 +1405,32 @@ https://github.com/gea-ecobricks/gobrik-3.0/tree/main/en-->
             </div>
         <?php endif; ?>
 
-        <!-- Earthen Mailer (admin only) -->
-        <?php if ($is_admin): ?>
-            <div id="admin-menu" class="dashboard-v2-panel">
-                <span class="panel-pill admin-pill">Admin</span>
-                <h4 class="panel-title">Earthen Manual Mailer</h4>
-                <div class="earthen-mailer-layout">
-                    <div class="earthen-mailer-actions">
-                        <a href="earthen-sender.php" class="page-button">Earthen Mailer</a>
-                        <a href="https://earthen.io/ghost" class="page-button">Ghost Login</a>
-                        <a href="admin-panel.php" class="page-button">Member Management</a>
-                        <a href="../emailing/mailgun-logs.php" class="page-button">Mailgun logs</a>
-                    </div>
-                    <div class="earthen-mailer-chart">
-                        <div class="earthen-mailer-chart-inner">
-                            <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
-                        </div>
-                        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
-                            <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
-                            <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
-                            <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
-
+        <!-- Earthen Mailer (admin only)
+//         <?php if ($is_admin): ?>
+//             <div id="admin-menu" class="dashboard-v2-panel">
+//                 <span class="panel-pill admin-pill">Admin</span>
+//                 <h4 class="panel-title">Earthen Manual Mailer</h4>
+//                 <div class="earthen-mailer-layout">
+//                     <div class="earthen-mailer-actions">
+//                         <a href="earthen-sender.php" class="page-button">Earthen Mailer</a>
+//                         <a href="https://earthen.io/ghost" class="page-button">Ghost Login</a>
+//                         <a href="admin-panel.php" class="page-button">Member Management</a>
+//                         <a href="../emailing/mailgun-logs.php" class="page-button">Mailgun logs</a>
+//                     </div>
+//                     <div class="earthen-mailer-chart">
+//                         <div class="earthen-mailer-chart-inner">
+//                             <canvas id="earthen-mailer-donut" aria-label="Earthen member send status" role="img"></canvas>
+//                         </div>
+//                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-top:12px;font-size:0.95em;">
+//                             <div><strong>Total members:</strong> <?php echo number_format((int) $ghost_member_stats['total']); ?></div>
+//                             <div><strong>sent-001:</strong> <?php echo number_format((int) $ghost_member_stats['sent_001']); ?></div>
+//                             <div><strong>sent-002:</strong> <?php echo number_format((int) $ghost_member_stats['sent_002']); ?></div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+//         <?php endif; ?>
+ -->
         <!-- My Trainings (trainer only) — hidden for now, superseded by my-trainings-v2-panel -->
         <?php /*
         <?php if (strpos(strtolower($gea_status), 'trainer') !== false): ?>
